@@ -29,7 +29,7 @@ export function CountryCodeSelect({ value, onChange }: CountryCodeSelectProps) {
         type="button"
         variant="outline"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full justify-between bg-white border-gray-300 hover:bg-gray-50"
+        className="w-full justify-between border-1 bg-white border-gray-300 hover:bg-gray-50 rounded-xl"
       >
         <span className="flex items-center space-x-2">
           <span>{selectedCountry.flag}</span>

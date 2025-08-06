@@ -1,30 +1,30 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
-import { FileUpload } from "@/components/file-upload"
-import { CountryCodeSelect } from "@/components/country-code-select"
-import { useToast } from "@/components/ui/use-toast"
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { FileUpload } from "@/components/file-upload";
+import { CountryCodeSelect } from "@/components/country-code-select";
+import { useToast } from "@/components/ui/use-toast";
 
 interface UserProfile {
-  fullName: string
-  email: string
-  mobile: string
-  countryCode: string
-  nationalId: string
-  nationalIdFile: File | null
-  bio: string
-  skills: string
-  portfolioLink: string
+  fullName: string;
+  email: string;
+  mobile: string;
+  countryCode: string;
+  nationalId: string;
+  nationalIdFile: File | null;
+  bio: string;
+  skills: string;
+  portfolioLink: string;
 }
 
 export default function ProfilePage() {
-  const { toast } = useToast()
+  const { toast } = useToast();
   const [profile, setProfile] = useState<UserProfile>({
     fullName: "",
     email: "",
@@ -35,18 +35,18 @@ export default function ProfilePage() {
     bio: "",
     skills: "",
     portfolioLink: "",
-  })
-  const [isEditing, setIsEditing] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
+  });
+  const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Simulate fetching user data
     const fetchUserData = async () => {
-      setIsLoading(true)
-      await new Promise((resolve) => setTimeout(resolve, 500)) // Simulate network delay
-      const userDataString = localStorage.getItem("userData")
+      setIsLoading(true);
+      await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate network delay
+      const userDataString = localStorage.getItem("userData");
       if (userDataString) {
-        const userData = JSON.parse(userDataString)
+        const userData = JSON.parse(userDataString);
         setProfile({
           fullName: userData.fullName || "John Doe",
           email: userData.email || "john.doe@example.com",
@@ -57,56 +57,56 @@ export default function ProfilePage() {
           bio: "Experienced professional seeking new opportunities in various projects.",
           skills: "Project Management, Data Analysis, Communication",
           portfolioLink: "https://johndoe.com",
-        })
+        });
       }
-      setIsLoading(false)
-    }
-    fetchUserData()
-  }, [])
+      setIsLoading(false);
+    };
+    fetchUserData();
+  }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { id, value } = e.target
-    setProfile((prev) => ({ ...prev, [id]: value }))
-  }
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { id, value } = e.target;
+    setProfile((prev) => ({ ...prev, [id]: value }));
+  };
 
   const handleFileChange = (file: File | null, field: keyof UserProfile) => {
-    setProfile((prev) => ({ ...prev, [field]: file }))
-  }
+    setProfile((prev) => ({ ...prev, [field]: file }));
+  };
 
   const handleCountryCodeChange = (value: string) => {
-    setProfile((prev) => ({ ...prev, countryCode: value }))
-  }
+    setProfile((prev) => ({ ...prev, countryCode: value }));
+  };
 
   const handleSave = async () => {
-    setIsEditing(false)
+    setIsEditing(false);
     // Simulate API call to save data
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    console.log("Profile saved:", profile)
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    console.log("Profile saved:", profile);
     toast({
       title: "Profile Updated",
       description: "Your profile information has been successfully saved.",
-    })
-  }
+    });
+  };
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
         <p className="text-gray-500">Loading profile...</p>
       </div>
-    )
+    );
   }
 
   return (
-    <div className="space-y-8">
-      <h1 className="text-3xl font-bold text-gray-900">My Profile</h1>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-xl">Personal Information</CardTitle>
-        </CardHeader>
+    <div className="space-y-8 pe-20 py-10">
+      <Card className="border-0">
         <CardContent className="space-y-4">
           <div>
-            <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="fullName"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Full Name
             </label>
             <Input
@@ -118,7 +118,10 @@ export default function ProfilePage() {
             />
           </div>
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Email Address
             </label>
             <Input
@@ -131,15 +134,17 @@ export default function ProfilePage() {
             />
           </div>
           <div>
-            <label htmlFor="mobile" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="mobile"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Mobile Number
             </label>
             <div className="flex space-x-3">
-              <div className="w-32">
+              <div className="w-32 ">
                 <CountryCodeSelect
                   value={profile.countryCode}
                   onChange={handleCountryCodeChange}
-                  disabled={!isEditing}
                 />
               </div>
               <div className="flex-1">
@@ -155,7 +160,10 @@ export default function ProfilePage() {
             </div>
           </div>
           <div>
-            <label htmlFor="nationalId" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="nationalId"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               National ID Number
             </label>
             <Input
@@ -182,7 +190,10 @@ export default function ProfilePage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <label htmlFor="bio" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="bio"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Bio
             </label>
             <Textarea
@@ -196,7 +207,10 @@ export default function ProfilePage() {
             />
           </div>
           <div>
-            <label htmlFor="skills" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="skills"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Skills (comma-separated)
             </label>
             <Input
@@ -209,7 +223,10 @@ export default function ProfilePage() {
             />
           </div>
           <div>
-            <label htmlFor="portfolioLink" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="portfolioLink"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Portfolio Link
             </label>
             <Input
@@ -231,16 +248,22 @@ export default function ProfilePage() {
             <Button variant="outline" onClick={() => setIsEditing(false)}>
               Cancel
             </Button>
-            <Button onClick={handleSave} className="bg-emerald-600 hover:bg-emerald-700">
+            <Button
+              onClick={handleSave}
+              className="bg-emerald-600 hover:bg-emerald-700"
+            >
               Save Changes
             </Button>
           </>
         ) : (
-          <Button onClick={() => setIsEditing(true)} className="bg-emerald-600 hover:bg-emerald-700">
+          <Button
+            onClick={() => setIsEditing(true)}
+            className="bg-emerald-600 hover:bg-emerald-700"
+          >
             Edit Profile
           </Button>
         )}
       </div>
     </div>
-  )
+  );
 }
