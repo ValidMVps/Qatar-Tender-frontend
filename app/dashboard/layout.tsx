@@ -26,7 +26,6 @@ import {
 import { AuthGuard } from "@/components/auth-guard";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
-import { NavUser } from "@/components/nav-user";
 import { SidebarProvider } from "@/components/ui/sidebar";
 
 export default function DashboardLayout({
@@ -164,14 +163,14 @@ export default function DashboardLayout({
           </nav>{" "}
         </aside>
 
-        <div className="flex-1 flex flex-col min-w-0">
+        <div className="flex-1 flex flex-col min-w-0 bg-white">
           <Navbar
             sidebarOpen={sidebarOpen}
             setSidebarOpen={setSidebarOpen}
             sidebarLinks={sidebarLinks}
           />
 
-          <main className="flex-1 w-full px-4 sm:px-6 py-6 overflow-x-auto">
+          <main className="flex-1 w-full px-4 sm:px-6 py-6 overflow-x-auto bg-neutral-50/30">
             {children}
           </main>
         </div>

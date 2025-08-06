@@ -124,7 +124,6 @@ export default function NotificationsPage() {
 
   return (
     <div className="space-y-6">
-
       <div className="flex items-center gap-4">
         <div className="relative w-full">
           <Input
@@ -153,10 +152,10 @@ export default function NotificationsPage() {
           return (
             <Card
               key={notification.id}
-              className={`transition-all hover:bg-blue-50 bg-white ${
+              className={`transition-all  rounded-none bg-transparent ${
                 !notification.read
-                  ? "border-1 border-blue-200 bg-blue-50/30"
-                  : ""
+                  ? "border-0 border-b-2 border-blue-200 "
+                  : "border-0 border-b border-neutral-200"
               }`}
             >
               <CardContent className="p-6">

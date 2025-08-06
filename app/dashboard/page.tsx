@@ -334,12 +334,12 @@ export default function DashboardPage() {
         </motion.div>{" "}
         <div className="grid grid-cols-1 gap-4  md:grid-cols-2 xl:grid-cols-4">
           {/* Total Tenders Posted */}
-          <Card className="bg-blue-500">
+          <Card className="bg-blue-500 text-neutral-50">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
                 Total Tenders Posted
               </CardTitle>
-              <FileText className="h-5 w-5 text-muted-foreground" />
+              <FileText className="h-5 w-5 text-white" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">12</div>
@@ -347,12 +347,12 @@ export default function DashboardPage() {
           </Card>
 
           {/* Active Tenders */}
-          <Card className="bg-blue-500">
+          <Card className="bg-blue-500  text-white">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
                 Active Tenders
               </CardTitle>
-              <BadgeCheck className="h-5 w-5 text-muted-foreground" />
+              <BadgeCheck className="h-5 w-5 text-white" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">3</div>
@@ -360,12 +360,12 @@ export default function DashboardPage() {
           </Card>
 
           {/* Proposals Received */}
-          <Card className="bg-blue-500">
+          <Card className="bg-blue-500  text-white">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
                 Bids Received
               </CardTitle>
-              <UserRoundCheck className="h-5 w-5 text-muted-foreground" />
+              <UserRoundCheck className="h-5 w-5" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">47</div>
@@ -373,10 +373,10 @@ export default function DashboardPage() {
           </Card>
 
           {/* Total Spent */}
-          <Card className="bg-blue-500">
+          <Card className="bg-blue-500  text-white">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Spent</CardTitle>
-              <Wallet className="h-5 w-5 text-muted-foreground" />
+              <Wallet className="h-5 w-5 " />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">$2,500</div>
