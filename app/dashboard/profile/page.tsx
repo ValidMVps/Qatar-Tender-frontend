@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { FileUpload } from "@/components/file-upload";
-import { CountryCodeSelect } from "@/components/country-code-select";
 import { useToast } from "@/components/ui/use-toast";
 import { AvatarFallback } from "@radix-ui/react-avatar";
 import {
@@ -19,6 +18,7 @@ import {
   Clock,
 } from "lucide-react";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { CountryCodeSelect } from "@/components/country-code-select";
 
 interface UserProfile {
   fullName: string;
@@ -328,7 +328,6 @@ export default function ProfilePage() {
               <CountryCodeSelect
                 value={displayProfile.countryCode}
                 onChange={handleCountryCodeChange}
-                disabled={!isEditing || verificationStatus === "verified"}
               />
               <Input
                 id="mobile"
@@ -378,7 +377,6 @@ export default function ProfilePage() {
             accept=".pdf,.jpg,.jpeg,.png"
             value={displayProfile.nationalIdFile}
             onChange={(file) => handleFileChange(file, "nationalIdFile")}
-            disabled={!isEditing || verificationStatus === "verified"}
           />
         </CardContent>
       </Card>
