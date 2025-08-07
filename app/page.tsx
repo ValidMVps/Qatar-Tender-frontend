@@ -76,7 +76,7 @@ export default function LandingPage() {
           </nav>
         </div>
       </header>
-
+      <h1>dsdsd</h1>
       {/* Hero */}
       <motion.section
         initial="hidden"
@@ -121,7 +121,6 @@ export default function LandingPage() {
             </div>
 
             {/* Stats */}
-     
           </div>
         </div>
       </motion.section>
