@@ -15,68 +15,71 @@ import { Mail, Phone, MapPin } from "lucide-react";
 
 export default function HelpPage() {
   return (
-    <div className=" mx-auto px-4 md:px-6 lg:px-8 py-8">
+    <div className="mx-auto px-4 md:px-6 lg:px-8 py-8">
       <section className="mb-16">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
           {/* FAQ Section */}
           <div className="space-y-10">
             <div>
-              <h3 className="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-4">
+              <h3 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-6">
                 Frequently Asked Questions
               </h3>
-              <Accordion type="single" collapsible className="w-full border-t">
-                <AccordionItem value="item-1" className="border-b">
-                  <AccordionTrigger className="px-4 py-3 text-base font-medium text-left">
-                    How do I post a new tender?
-                  </AccordionTrigger>
-                  <AccordionContent className="px-4 pb-4 text-gray-700 dark:text-gray-300">
-                    To post a new tender, navigate to the "Dashboard" and click
-                    on the "Post Tender" button. Fill in all the required
-                    details about your project, including description, budget,
-                    and deadline. Once submitted, it will be visible to service
-                    providers.
-                  </AccordionContent>
-                </AccordionItem>
-
-                <AccordionItem value="item-2" className="border-b">
-                  <AccordionTrigger className="px-4 py-3 text-base font-medium text-left">
-                    How can I track my tender's progress?
-                  </AccordionTrigger>
-                  <AccordionContent className="px-4 pb-4 text-gray-700 dark:text-gray-300">
-                    You can track the progress of your tenders by going to "My
-                    Tenders" from the sidebar. Here, you'll see the status of
-                    each tender, including submitted bids and project
-                    milestones.
-                  </AccordionContent>
-                </AccordionItem>
-
-                <AccordionItem value="item-3" className="border-b">
-                  <AccordionTrigger className="px-4 py-3 text-base font-medium text-left">
-                    What if I need to modify a tender after posting?
-                  </AccordionTrigger>
-                  <AccordionContent className="px-4 pb-4 text-gray-700 dark:text-gray-300">
-                    If you need to modify a tender, go to "My Tenders," select
-                    the tender you wish to edit, and look for the "Edit" option.
-                    Please note that significant changes might require
-                    re-approval or notification to bidders.
-                  </AccordionContent>
-                </AccordionItem>
-
-                <AccordionItem value="item-4">
-                  <AccordionTrigger className="px-4 py-3 text-base font-medium text-left">
-                    How do I contact a service provider?
-                  </AccordionTrigger>
-                  <AccordionContent className="px-4 pb-4 text-gray-700 dark:text-gray-300">
-                    Once a bid is submitted or a project is awarded, you can
-                    communicate with service providers directly through the
-                    built-in chat system. Access "Chats" from your sidebar to
-                    view all your conversations.
-                  </AccordionContent>
-                </AccordionItem>
+              <Accordion type="single" collapsible className="w-full">
+                {[
+                  {
+                    title: "How do I post a new tender?",
+                    content:
+                      'To post a new tender, go to "Dashboard" and click "Post Tender". Fill in all required details like description, budget, and deadline.',
+                  },
+                  {
+                    title: "How can I track my tender's progress?",
+                    content:
+                      'Go to "My Tenders" from the sidebar. You can view status, submitted bids, and project milestones.',
+                  },
+                  {
+                    title: "What if I need to modify a tender after posting?",
+                    content:
+                      'In "My Tenders", select the tender and click "Edit". Major changes may need re-approval or notify bidders.',
+                  },
+                  {
+                    title: "How do I contact a service provider?",
+                    content:
+                      'After submitting or awarding a bid, use the "Chats" section from the sidebar to message providers directly.',
+                  },
+                  {
+                    title: "Can I cancel a tender?",
+                    content:
+                      "Yes, go to 'My Tenders', select the tender, and click 'Cancel'. All active bidders will be notified.",
+                  },
+                  {
+                    title: "Is there a fee to post tenders?",
+                    content:
+                      "No, posting tenders is currently free. Fees may apply later for featured listings or premium tools.",
+                  },
+                  {
+                    title: "How do I report an issue with a provider?",
+                    content:
+                      "Go to the provider’s profile and click 'Report'. You can also reach out to support directly.",
+                  },
+                ].map((item, index) => (
+                  <AccordionItem
+                    key={index}
+                    value={`item-${index + 1}`}
+                    className="border-b py-2"
+                  >
+                    <AccordionTrigger className="bg- dark:bg-neutral-900 px-4 py-3 text-base font-medium text-left  dark:hover:bg-neutral-800 transition-colors duration-200">
+                      {item.title}
+                    </AccordionTrigger>
+                    <AccordionContent className="px-4 pb-4 text-gray-700 dark:text-gray-300">
+                      {item.content}
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
               </Accordion>
             </div>
           </div>
-          {/* Contact Form */}
+
+          {/* Contact Form + Info */}
           <div className="flex flex-col gap-6">
             <Card className="rounded-md border-neutral-200/70 h-min">
               <CardHeader>
@@ -111,12 +114,13 @@ export default function HelpPage() {
                     placeholder="Type your message here..."
                   />
                 </div>
-                <Button className="w-full bg-neutral-900 text-white rounded-sm">
+                <Button className="w-full bg-blue-600 text-white rounded-sm">
                   Send Message
                 </Button>
               </CardContent>
-            </Card>{" "}
-            <Card className="rounded-md border-neutral-200/70 ">
+            </Card>
+
+            <Card className="rounded-md border-neutral-200/70">
               <CardHeader>
                 <CardTitle className="text-lg font-semibold">
                   Reach us directly
