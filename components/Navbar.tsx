@@ -29,7 +29,6 @@ import {
 } from "./ui/breadcrumb";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "./ui/sidebar";
 import { Separator } from "@radix-ui/react-select";
-import { AppSidebar } from "./app-sidebar";
 import {
   DropdownMenu,
   DropdownMenuContent,
