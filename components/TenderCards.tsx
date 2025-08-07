@@ -9,10 +9,15 @@ import {
   Users,
   CheckCircle,
   Clock,
-type StatusType = "open" | "closed" | "pending";
-import { XCircle } from "lucide-react";
+  XCircle,
+} from "lucide-react";
 
-const statusConfig: Record<StatusType, { icon: React.ElementType; label: string; color: string }> = {
+type StatusType = "open" | "closed" | "pending";
+
+const statusConfig: Record<
+  StatusType,
+  { icon: React.ElementType; label: string; color: string }
+> = {
   open: {
     icon: CheckCircle,
     label: "Open",
@@ -33,9 +38,6 @@ const statusConfig: Record<StatusType, { icon: React.ElementType; label: string;
 const TenderCards = ({ tender }: { tender: Tender }) => {
   const status = statusConfig[tender.status as StatusType];
   const StatusIcon = status.icon;
-const TenderCards = ({ tender }: { tender: Tender }) => {
-  const status = statusConfig[tender.status];
-  const StatusIcon = status.icon;
 
   return (
     <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md hover:border-blue-200 transition-all duration-200 group">
@@ -44,7 +46,7 @@ const TenderCards = ({ tender }: { tender: Tender }) => {
           <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors duration-200">
             {tender.title}
           </h3>
-          <p className="text-sm text-gray-600 mt-1">{tender.department}</p>
+          <p className="text-sm text-gray-600 mt-1">Business</p>
         </div>
         <div className="flex items-center space-x-2">
           <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors duration-200">
@@ -56,15 +58,11 @@ const TenderCards = ({ tender }: { tender: Tender }) => {
       <div className="grid grid-cols-2 gap-4 mb-4">
         <div className="flex items-center space-x-2">
           <DollarSign className="h-4 w-4 text-gray-400" />
-          <span className="text-sm font-medium text-gray-900">
-            {tender.value}
-          </span>
+          <span className="text-sm font-medium text-gray-900">1200$</span>
         </div>
         <div className="flex items-center space-x-2">
           <Users className="h-4 w-4 text-gray-400" />
-          <span className="text-sm text-gray-600">
-            {tender.applicants} applicants
-          </span>
+          <span className="text-sm text-gray-600">34 applicants</span>
         </div>
         <div className="flex items-center space-x-2">
           <Calendar className="h-4 w-4 text-gray-400" />
