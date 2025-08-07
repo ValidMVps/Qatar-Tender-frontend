@@ -170,7 +170,7 @@ export default function DashboardLayout({
             sidebarLinks={sidebarLinks}
           />
 
-          <main className="flex-1 w-full px-4 sm:px-6 py-6 overflow-x-auto bg-neutral-50/30">
+          <main className="flex-1 w-full px-4 sm:px-0 py-0 overflow-x-auto bg-neutral-50/30">
             {children}
           </main>
         </div>

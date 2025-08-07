@@ -498,6 +498,64 @@ export default function MyTendersPage() {
     <>
       {/* Search and Filter Section */}
       <div className="mb-6 space-y-4">
+        {" "}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+          <Card className="bg-blue-500 border border-neutral-300 py-2">
+            <CardContent className="p-4 flex items-center justify-between">
+              <div>
+                <p className="text-sm text-white pb-1">Total Tenders</p>
+                <p className="text-xl font-semibold text-white">
+                  {tenders.length}
+                </p>
+              </div>
+              <FileText className="h-6 w-6 text-white" />
+            </CardContent>
+          </Card>
+          <Card className="bg-blue-500 border border-neutral-300 py-2">
+            <CardContent className="p-4 flex items-center justify-between">
+              <div>
+                <p className="text-sm text-white  pb-1">Active Tenders</p>
+                <p className="text-xl font-semibold text-white">
+                  {tenders.filter((t) => t.status === "active").length}
+                </p>
+              </div>
+              <CheckCircle className="h-6 w-6 text-white" />
+            </CardContent>
+          </Card>
+          <Card className="bg-blue-500 border border-neutral-300 py-2">
+            <CardContent className="p-4 flex items-center justify-between">
+              <div>
+                <p className="text-sm text-white  pb-1">Awarded Tenders</p>
+                <p className="text-xl font-semibold text-white">
+                  {tenders.filter((t) => t.awardedBid).length}
+                </p>
+              </div>
+              <Award className="h-6 w-6 text-white" />
+            </CardContent>
+          </Card>
+          <Card className="bg-blue-500 text-white border border-neutral-300 py-2">
+            <CardContent className="p-4 flex items-center justify-between">
+              <div>
+                <p className="text-sm text-white  pb-1">Completed Tenders</p>
+                <p className="text-xl font-semibold text-white">
+                  {tenders.filter((t) => t.isCompleted).length}
+                </p>
+              </div>
+              <CheckCircle className="h-6 w-6 text-white" />
+            </CardContent>
+          </Card>
+          <Card className="bg-blue-500 text-white border border-neutral-300 py-2">
+            <CardContent className="p-4 flex items-center justify-between">
+              <div>
+                <p className="text-sm text-white  pb-1">Rejected Tenders</p>
+                <p className="text-xl font-semibold text-white">
+                  {tenders.filter((t) => t.isCompleted).length}
+                </p>
+              </div>
+              <CheckCircle className="h-6 w-6 text-white" />
+            </CardContent>
+          </Card>
+        </div>
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -528,7 +586,6 @@ export default function MyTendersPage() {
             </Select>
           </div>
         </div>
-
         {/* Results counter 
         <div className="text-sm text-gray-600">
           Showing {filteredTenders.length} of {tenders.length} tenders
