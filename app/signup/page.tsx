@@ -97,7 +97,6 @@ export default function SignupPage() {
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
       const userData = {
-        accountType: formData.accountType,
         isKycVerified: false,
         submittedAt: new Date().toISOString(),
         ...formData,
