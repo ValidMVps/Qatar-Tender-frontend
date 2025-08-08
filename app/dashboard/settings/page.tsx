@@ -51,9 +51,9 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className=" mx-auto px-3 py-2">
-      <Card className="border-0 bg-transparent">
-        <CardContent>
+    <div className=" container mx-auto px-0 py-8">
+      <Card className="border-0 bg-transparent  px-0">
+        <CardContent className="px-0">
           <form onSubmit={handleSaveAll} className="space-y-0">
             {/* Notification Settings */}
             <div className="space-y-4 pt-6 pb-6 ">

@@ -165,16 +165,12 @@ const AnalyticsCard: React.FC<{
 }> = ({ title, value, icon, description }) => (
   <Card className="border-gray-200 bg-blue-500 text-white ">
     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-      <CardTitle className="text-sm font-medium text-white">
-        {title}
-      </CardTitle>
+      <CardTitle className="text-sm font-medium text-white">{title}</CardTitle>
       <div className="text-white">{icon}</div>
     </CardHeader>
     <CardContent>
       <div className="text-2xl font-bold text-white">{value}</div>
-      {description && (
-        <p className="text-xs text-white mt-1">{description}</p>
-      )}
+      {description && <p className="text-xs text-white mt-1">{description}</p>}
     </CardContent>
   </Card>
 );
@@ -226,20 +222,6 @@ const ReviewCard: React.FC<{ review: Review }> = ({ review }) => (
             {review.projectName}
           </p>
         </div>
-
-        {review.tags.length > 0 && (
-          <div className="flex flex-wrap gap-2">
-            {review.tags.map((tag, index) => (
-              <Badge
-                key={index}
-                variant="secondary"
-                className="text-xs bg-gray-100 text-gray-700 hover:bg-gray-200"
-              >
-                {tag}
-              </Badge>
-            ))}
-          </div>
-        )}
       </div>
     </CardContent>
   </Card>
@@ -283,7 +265,7 @@ const ReviewsRatingsPage: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-6 lg:p-8 ">
+    <div className="min-h-screen bg-gray-50 container mx-auto px-0 py-8 ">
       <div className="mx-auto space-y-8">
         {/* Analytics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

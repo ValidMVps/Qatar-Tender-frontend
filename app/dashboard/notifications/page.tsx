@@ -123,7 +123,7 @@ export default function NotificationsPage() {
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 container mx-auto px-0 py-8">
       <div className="flex items-center gap-4">
         <div className="relative w-full">
           <Input

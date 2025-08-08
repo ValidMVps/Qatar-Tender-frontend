@@ -46,6 +46,7 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import EditTenderModal from "@/components/EdittenderModal";
 
 // Sample data with more diverse scenarios
 const sampleTenders = [
@@ -65,22 +66,7 @@ const sampleTenders = [
     createdAt: "2024-01-10",
     postedDate: "Jan 10, 2024",
   },
-  {
-    id: 2,
-    title: "Website Development and Design",
-    description:
-      "Modern responsive website needed for our consulting firm with Arabic and English support. Must include CMS, SEO optimization, and mobile-first design approach.",
-    budget: "25,000",
-    deadline: "2024-02-20",
-    status: "draft", // Changed from pending
-    bidsCount: 5,
-    awardedBid: false,
-    isCompleted: false,
-    category: "IT Services",
-    location: "Doha, Qatar",
-    createdAt: "2024-01-12",
-    postedDate: "Not posted yet", // Changed from Pending Admin Approval
-  },
+
   {
     id: 3,
     title: "HVAC System Installation",
@@ -113,22 +99,7 @@ const sampleTenders = [
     createdAt: "2024-01-15",
     postedDate: "Jan 15, 2024",
   },
-  {
-    id: 5,
-    title: "Transportation Fleet Management",
-    description:
-      "Looking for a service provider to manage our company's transportation fleet of 25 vehicles. Includes maintenance, driver management, and route optimization.",
-    budget: "120,000",
-    deadline: "2024-03-10",
-    status: "draft",
-    bidsCount: 0,
-    awardedBid: false,
-    isCompleted: false,
-    category: "Transportation",
-    location: "Lusail, Qatar",
-    createdAt: "2024-01-18",
-    postedDate: "Not posted yet",
-  },
+
   {
     id: 6,
     title: "Digital Marketing Campaign",
@@ -145,22 +116,7 @@ const sampleTenders = [
     createdAt: "2024-01-08",
     postedDate: "Jan 8, 2024",
   },
-  {
-    id: 7,
-    title: "Security System Upgrade",
-    description:
-      "Upgrade existing security system with modern CCTV cameras, access control, and monitoring software for our corporate headquarters.",
-    budget: "65,000",
-    deadline: "2024-02-25",
-    status: "draft", // Changed from pending
-    bidsCount: 3,
-    awardedBid: false,
-    isCompleted: false,
-    category: "Security",
-    location: "West Bay, Doha",
-    createdAt: "2024-01-16",
-    postedDate: "Not posted yet", // Changed from Pending Admin Approval
-  },
+
   {
     id: 8,
     title: "Catering Services Contract",
@@ -193,22 +149,7 @@ const sampleTenders = [
     createdAt: "2024-01-03",
     postedDate: "Jan 3, 2024",
   },
-  {
-    id: 10,
-    title: "Accounting and Bookkeeping Services",
-    description:
-      "Monthly accounting and bookkeeping services for small business. Includes tax preparation, financial reporting, and compliance management.",
-    budget: "18,000",
-    deadline: "2024-02-15",
-    status: "draft",
-    bidsCount: 0,
-    awardedBid: false,
-    isCompleted: false,
-    category: "Finance",
-    location: "Doha, Qatar",
-    createdAt: "2024-01-22",
-    postedDate: "Not posted yet",
-  },
+
   {
     id: 11,
     title: "Event Management - Annual Conference",
@@ -225,22 +166,7 @@ const sampleTenders = [
     createdAt: "2024-01-14",
     postedDate: "Jan 14, 2024",
   },
-  {
-    id: 12,
-    title: "Solar Panel Installation",
-    description:
-      "Installation of solar panel system for commercial building. Includes design, installation, grid connection, and 5-year maintenance contract.",
-    budget: "220,000",
-    deadline: "2024-03-15",
-    status: "draft", // Changed from pending
-    bidsCount: 2,
-    awardedBid: false,
-    isCompleted: false,
-    category: "Energy",
-    location: "Industrial Area, Doha",
-    createdAt: "2024-01-19",
-    postedDate: "Not posted yet", // Changed from Pending Admin Approval
-  },
+
   {
     id: 13,
     title: "Office Furniture Supply",
@@ -313,6 +239,7 @@ export default function MyTendersPage() {
   const [tenders, setTenders] = useState(sampleTenders);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [openTenderModal, setOpenTenderModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState<{
     show: boolean;
     action: string;
@@ -495,9 +422,9 @@ export default function MyTendersPage() {
   };
 
   return (
-    <>
+    <div className="container mx-auto px-0 py-8">
       {/* Search and Filter Section */}
-      <div className="mb-6 space-y-4">
+      <div className="mb-6 space-y-4 ">
         {" "}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 mb-6">
           <Card className="bg-blue-500 border border-neutral-300 py-2">
@@ -657,7 +584,7 @@ export default function MyTendersPage() {
                       </div>
                       <div className="flex items-center space-x-2 ml-4">
                         {tender.status !== "rejected" && (
-                          <Link href={`/tender/${tender.id}`}>
+                          <Link href={`/dashboard/tender/${tender.id}`}>
                             <Button
                               variant="ghost"
                               size="sm"
@@ -708,29 +635,10 @@ export default function MyTendersPage() {
 
                               {/* Reapply button moved to rejection reason modal */}
 
-                              <button
-                                onClick={() => handleDuplicateTender(tender.id)}
-                                className=" w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
-                              >
-                                <Copy className="h-4 w-4 mr-2" />
-                                Duplicate Tender
-                              </button>
-
-                              <button className=" w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
-                                <Share2 className="h-4 w-4 mr-2" />
-                                Share Tender
-                              </button>
-
-                              <button className=" w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
-                                <Download className="h-4 w-4 mr-2" />
-                                Export as PDF
-                              </button>
-
-                              <button className=" w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
-                                <Printer className="h-4 w-4 mr-2" />
-                                Print Tender
-                              </button>
-
+                              <EditTenderModal
+                                open={openTenderModal}
+                                onOpenChange={setOpenTenderModal}
+                              />
                               <button
                                 onClick={() =>
                                   setShowConfirmModal({
@@ -742,7 +650,7 @@ export default function MyTendersPage() {
                                 className=" w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center"
                               >
                                 <Trash2 className="h-4 w-4 mr-2" />
-                                Delete Tender
+                                Close Tender
                               </button>
                             </div>
                           </div>
@@ -809,7 +717,7 @@ export default function MyTendersPage() {
 
       {/* Confirmation Modal */}
       {showConfirmModal.show && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-xs bg-opacity-50 flex items-center justify-center z-50">
           <Card className="w-full max-w-md mx-4 border border-neutral-300">
             <CardContent className="p-6">
               <div className="mb-5">
@@ -952,6 +860,6 @@ export default function MyTendersPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </>
+    </div>
   );
 }

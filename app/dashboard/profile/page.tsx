@@ -167,7 +167,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="space-y-6 pe-20 py-0">
+    <div className="space-y-6 container mx-auto px-0 py-8">
       <Card className="border-0 bg-transparent">
         <CardContent className="p-6">
           <div className="flex flex-col md:flex-row gap-6 items-start md:items-center">

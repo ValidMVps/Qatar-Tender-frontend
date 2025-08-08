@@ -37,6 +37,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useState } from "react";
+import CreateTenderModal from "@/components/CreateTenderModal";
 const fadeInUp = {
   hidden: { opacity: 0, y: 30 },
   show: { opacity: 1, y: 0, transition: { duration: 0.5 } },
@@ -46,7 +48,7 @@ interface Tender {
   title: string;
   department: string;
   value: string;
-  deadline: string;
+  postedDate: string;
   status: "active" | "draft" | "closed" | "awarded";
   applicants: number;
   publishedDate: string;
@@ -85,7 +87,7 @@ const mockTenders: Tender[] = [
     title: "Construction of New Municipal Building",
     department: "Public Works",
     value: "$2,500,000",
-    deadline: "2024-02-15",
+    postedDate: "2024-02-15",
     status: "active",
     applicants: 12,
     publishedDate: "2024-01-10",
@@ -96,7 +98,7 @@ const mockTenders: Tender[] = [
     title: "IT Infrastructure Upgrade Project",
     department: "Technology Services",
     value: "$750,000",
-    deadline: "2024-02-20",
+    postedDate: "2024-02-20",
     status: "active",
     applicants: 8,
     publishedDate: "2024-01-12",
@@ -107,7 +109,7 @@ const mockTenders: Tender[] = [
     title: "Road Maintenance and Repair Services",
     department: "Transportation",
     value: "$1,200,000",
-    deadline: "2024-01-30",
+    postedDate: "2024-01-30",
     status: "closed",
     applicants: 15,
     publishedDate: "2023-12-15",
@@ -118,7 +120,7 @@ const mockTenders: Tender[] = [
     title: "Green Energy Solar Panel Installation",
     department: "Environmental Services",
     value: "$3,100,000",
-    deadline: "2024-03-05",
+    postedDate: "2024-03-05",
     status: "draft",
     applicants: 0,
     publishedDate: "2024-01-15",
@@ -129,7 +131,7 @@ const mockTenders: Tender[] = [
     title: "Healthcare Equipment Procurement",
     department: "Health Services",
     value: "$850,000",
-    deadline: "2024-02-25",
+    postedDate: "2024-02-25",
     status: "active",
     applicants: 6,
     publishedDate: "2024-01-08",
@@ -140,19 +142,21 @@ const mockTenders: Tender[] = [
     title: "Educational Software License Agreement",
     department: "Education",
     value: "$425,000",
-    deadline: "2024-01-25",
+    postedDate: "2024-01-25",
     status: "awarded",
     applicants: 4,
     publishedDate: "2023-12-20",
     category: "Software",
   },
 ];
+
 const TenderCard = ({ tender }: { tender: Tender }) => {
   const status = statusConfig[tender.status];
+
   const StatusIcon = status.icon;
 
   return (
-    <div className="bg-white rounded-xl p-6 shadow-xs border border-gray-100 hover:border-blue-200 transition-all duration-200 group">
+    <div className="bg-white rounded-xl p-6 px-3 shadow-xs border border-gray-100 hover:border-blue-200 transition-all duration-200 group">
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
           <h3 className="text-lg font-semibold text-gray-900  transition-colors duration-200">
@@ -183,7 +187,7 @@ const TenderCard = ({ tender }: { tender: Tender }) => {
         <div className="flex items-center space-x-2">
           <Calendar className="h-4 w-4 text-gray-400" />
           <span className="text-sm text-gray-600">
-            Due: {new Date(tender.deadline).toLocaleDateString()}
+            Posted: {new Date(tender.postedDate).toLocaleDateString()}
           </span>
         </div>
         <div className="flex items-center space-x-2">
@@ -280,6 +284,7 @@ const recentActivity = [
 ];
 
 export default function DashboardPage() {
+  const [openTenderModal, setOpenTenderModal] = useState(false);
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "active":
@@ -305,12 +310,12 @@ export default function DashboardPage() {
         initial="hidden"
         animate="show"
         variants={{ show: { transition: { staggerChildren: 0.1 } } }}
-        className="container mx-auto space-y-6"
+        className="container mx-auto space-y-6 py-8 px-0 "
       >
         {/* Welcome Box */}
         <motion.div
           variants={fadeInUp}
-          className="bg-blue- rounded-xl text-neutral-950 px-2 py-3  flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+          className="bg-blue- rounded-xl text-neutral-950  flex flex-col md:flex-row md:items-center md:justify-between gap-4"
         >
           <div className="flex">
             <div className="div space-y-2">
@@ -324,12 +329,13 @@ export default function DashboardPage() {
             </div>
           </div>
           <div className="flex  items-start md:items-end gap-1">
-            <Link href="/create-tender">
-              <Button className="bg-blue-600 hover:bg-blue-700 flex items-center space-x-2">
-                <Plus className="h-4 w-4" />
-                <span>Post Tender</span>
-              </Button>
-            </Link>
+            <Button
+              className="bg-blue-600 hover:bg-blue-700 flex items-center space-x-2"
+              onClick={() => setOpenTenderModal(true)}
+            >
+              <Plus className="h-4 w-4" />
+              <span>Post Tender</span>
+            </Button>
           </div>
         </motion.div>{" "}
         <div className="grid grid-cols-1 gap-4  md:grid-cols-2 xl:grid-cols-4">
@@ -402,7 +408,10 @@ export default function DashboardPage() {
               </div>
             </div>
           </motion.div>
-
+          <CreateTenderModal
+            open={openTenderModal}
+            onOpenChange={setOpenTenderModal}
+          />
           {/* Sidebar Widgets */}
         </div>
       </motion.div>
