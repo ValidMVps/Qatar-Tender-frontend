@@ -22,6 +22,8 @@ import {
   GalleryVerticalEnd,
   AudioWaveform,
   Command,
+  PanelLeft,
+  PanelRight,
 } from "lucide-react";
 import { AuthGuard } from "@/components/auth-guard";
 import { Button } from "@/components/ui/button";
@@ -34,7 +36,6 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
@@ -108,7 +109,7 @@ export default function DashboardLayout({
         )}
         <aside
           className={`bg-white border-r border-gray-200 transition-all duration-300 ease-in-out ${
-            sidebarCollapsed ? "w-16" : "w-64"
+            sidebarOpen ? "w-16" : "w-64"
           } hidden sm:flex flex-col flex-shrink-0 relative z-30`}
         >
           <div className="relative px-4 py-6 pb-10 flex items-center justify-between">
@@ -118,7 +119,7 @@ export default function DashboardLayout({
               </div>
               <span
                 className={`text-2xl font-semibold text-gray-900 transition-opacity duration-200 ${
-                  sidebarCollapsed
+                  sidebarOpen
                     ? "opacity-0 w-0 overflow-hidden"
                     : "opacity-100"
                 }`}
@@ -126,16 +127,6 @@ export default function DashboardLayout({
                 TenderHub
               </span>
             </div>
-            <button
-              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-              className="absolute -right-3 top-6 bg-white border border-gray-200 rounded-full p-1 shadow-sm"
-            >
-              {sidebarCollapsed ? (
-                <ChevronRight className="h-4 w-4" />
-              ) : (
-                <ChevronLeft className="h-4 w-4" />
-              )}
-            </button>
           </div>
           <nav className="px-2 pb-4 flex-1 space-y-2">
             {sidebarLinks.map((item) => (
@@ -151,7 +142,7 @@ export default function DashboardLayout({
                 <item.icon className="h-5 w-5 flex-shrink-0" />
                 <span
                   className={`ml-3 text-md transition-all duration-300 origin-left ${
-                    sidebarCollapsed
+                    sidebarOpen
                       ? "opacity-0 scale-95 w-0 overflow-hidden"
                       : "opacity-100 scale-100"
                   }`}

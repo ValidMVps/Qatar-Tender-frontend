@@ -1,0 +1,629 @@
+"use client";
+import * as React from "react";
+import {
+  AlertTriangle,
+  BarChart3,
+  Bell,
+  BookOpen,
+  LineChartIcon as ChartLine,
+  ChevronRight,
+  CircleHelp,
+  Clock,
+  FilePlus,
+  Gauge,
+  Inbox,
+  Layers,
+  LineChartIcon,
+  ListOrdered,
+  Settings,
+  Star,
+  User,
+  ArrowUp,
+  ArrowDown,
+} from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarInset,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+  SidebarRail,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
+import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Line,
+  LineChart,
+  XAxis,
+  YAxis,
+} from "recharts";
+
+type TenderStatus = "Pending" | "Active" | "Closed";
+
+type Tender = {
+  id: string;
+  title: string;
+  category: string;
+  status: TenderStatus;
+  bidsReceived: number;
+  views: number;
+  postedAt: string; // ISO date
+  deadline: string; // ISO date
+  bidDiffPct?: number; // For visualization; e.g., spread between min and max bids (%)
+  value: number;
+};
+
+const dummyTenders: Tender[] = [
+  {
+    id: "TND-001",
+    title: "Apartment Renovation - Kitchen & Bath",
+    category: "Construction",
+    status: "Active",
+    bidsReceived: 12,
+    views: 420,
+    postedAt: "2025-07-20",
+    deadline: "2025-08-15",
+    bidDiffPct: 24,
+    value: 150000, // Added value
+  },
+  {
+    id: "TND-002",
+    title: "Home Solar Panel Installation",
+    category: "Energy",
+    status: "Active",
+    bidsReceived: 0,
+    views: 185,
+    postedAt: "2025-07-29",
+    deadline: "2025-08-10",
+    bidDiffPct: 0,
+    value: 25000, // Added value
+  },
+  {
+    id: "TND-003",
+    title: "Custom Wardrobes & Cabinetry",
+    category: "Carpentry",
+    status: "Active",
+    bidsReceived: 7,
+    views: 260,
+    postedAt: "2025-07-18",
+    deadline: "2025-08-05",
+    bidDiffPct: 31,
+    value: 18000, // Added value
+  },
+  {
+    id: "TND-004",
+    title: "Landscape Design & Irrigation",
+    category: "Landscaping",
+    status: "Active",
+    bidsReceived: 9,
+    views: 510,
+    postedAt: "2025-06-30",
+    deadline: "2025-07-30",
+    bidDiffPct: 18,
+    value: 35000, // Added value
+  },
+  {
+    id: "TND-005",
+    title: "AC Servicing & Duct Cleaning",
+    category: "HVAC",
+    status: "Active",
+    bidsReceived: 2,
+    views: 143,
+    postedAt: "2025-07-25",
+    deadline: "2025-08-06",
+    bidDiffPct: 12,
+    value: 5000, // Added value
+  },
+  {
+    id: "TND-006",
+    title: "Painting: 3BHK Apartment",
+    category: "Painting",
+    status: "Active",
+    bidsReceived: 5,
+    views: 201,
+    postedAt: "2025-07-15",
+    deadline: "2025-08-03",
+    bidDiffPct: 22,
+    value: 8000, // Added value
+  },
+];
+
+function formatDate(d: string) {
+  return new Date(d).toLocaleDateString("en-QA", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
+
+function StatusBadge({ status }: { status: TenderStatus }) {
+  if (status === "Active")
+    return (
+      <Badge className="bg-blue-600 hover:bg-blue-600 text-white">Active</Badge>
+    );
+  if (status === "Pending") return <Badge variant="secondary">Pending</Badge>;
+  return <Badge variant="outline">Closed</Badge>;
+}
+
+function StatCard({
+  title,
+  value,
+  icon,
+  subtle,
+}: {
+  title: string;
+  value: string;
+  icon: React.ReactNode;
+  subtle?: string;
+}) {
+  return (
+    <Card className="h-full border-1 shadow-none bg-blue-500 text-white border-neutral-200 rounded-md">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+        <CardTitle className="text-sm font-medium">{title}</CardTitle>
+        <div className="text-white ">{icon}</div>
+      </CardHeader>
+      <CardContent>
+        <div className="text-2xl font-semibold">{value}</div>
+        {subtle ? <p className="text-xs text-white mt-1">{subtle}</p> : null}
+      </CardContent>
+    </Card>
+  );
+}
+
+type SortColumn = "postedAt" | "deadline" | "bidsReceived" | null;
+type SortDirection = "asc" | "desc";
+
+export default function Component() {
+  const [query, setQuery] = React.useState("");
+  const [sortColumn, setSortColumn] = React.useState<SortColumn>(null);
+  const [sortDirection, setSortDirection] =
+    React.useState<SortDirection>("asc");
+  const [filterStatus, setFilterStatus] = React.useState<TenderStatus | "All">(
+    "All"
+  );
+
+  const handleSort = (column: SortColumn) => {
+    if (sortColumn === column) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortColumn(column);
+      setSortDirection("asc"); // Default to ascending when changing column
+    }
+  };
+
+  // Derived metrics
+  const {
+    totalTenders,
+    totalBids,
+    pendingApprovals,
+    avgBidsPerTender,
+    categoryCounts,
+    bidDiffSeries,
+    recentTenders,
+    reminders,
+    rating,
+    totalTenderValue,
+    avgTenderValue,
+  } = React.useMemo(() => {
+    const totalTenders = dummyTenders.length;
+    const totalBids = dummyTenders.reduce((sum, t) => sum + t.bidsReceived, 0);
+    const pendingApprovals = dummyTenders.filter(
+      (t) => t.status === "Pending"
+    ).length;
+    const avgBidsPerTender = totalTenders ? totalBids / totalTenders : 0;
+
+    const categoryCountsMap = new Map<string, number>();
+    for (const t of dummyTenders) {
+      categoryCountsMap.set(
+        t.category,
+        (categoryCountsMap.get(t.category) ?? 0) + 1
+      );
+    }
+    const categoryCounts = Array.from(categoryCountsMap.entries()).map(
+      ([category, count]) => ({
+        category,
+        tenders: count,
+      })
+    );
+
+    const bidDiffSeries = dummyTenders.map((t) => ({
+      name: t.title.length > 24 ? t.title.slice(0, 22) + "…" : t.title,
+      diff: t.bidDiffPct ?? 0,
+    }));
+
+    const byPostedDesc = [...dummyTenders].sort(
+      (a, b) => new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime()
+    );
+    const recentTenders = byPostedDesc.slice(0, 5);
+
+    const now = new Date();
+    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const threeDaysAhead = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
+
+    const noBidsIn7Days = dummyTenders.filter(
+      (t) =>
+        new Date(t.postedAt) <= sevenDaysAgo &&
+        t.bidsReceived === 0 &&
+        t.status !== "Closed"
+    );
+    const expiringSoon = dummyTenders.filter(
+      (t) => new Date(t.deadline) <= threeDaysAhead && t.status !== "Closed"
+    );
+
+    // Dummy rating data (optional feature)
+    const rating = {
+      average: 4.6,
+      totalReviews: 128,
+      summary: "Great communication and clear requirements from vendors.",
+    };
+
+    const totalTenderValue = dummyTenders.reduce((sum, t) => sum + t.value, 0);
+    const avgTenderValue = totalTenders ? totalTenderValue / totalTenders : 0;
+
+    return {
+      totalTenders,
+      totalBids,
+      pendingApprovals,
+      avgBidsPerTender,
+      categoryCounts,
+      bidDiffSeries,
+      recentTenders,
+      reminders: {
+        noBidsIn7Days,
+        expiringSoon,
+      },
+      rating,
+      totalTenderValue, // Added
+      avgTenderValue, // Added
+    };
+  }, []);
+
+  const nav = [
+    { title: "Dashboard", icon: BarChart3, url: "#", active: true },
+    { title: "My Tenders", icon: ListOrdered, url: "#" },
+    { title: "Approvals", icon: Layers, url: "#" },
+    { title: "Support", icon: CircleHelp, url: "#" },
+    { title: "Settings", icon: Settings, url: "#" },
+  ];
+
+  const filteredTenders = React.useMemo(() => {
+    const q = query.trim().toLowerCase();
+    let currentTenders = recentTenders;
+
+    // Apply filtering by search query
+    if (q) {
+      currentTenders = currentTenders.filter(
+        (t) =>
+          t.title.toLowerCase().includes(q) ||
+          t.category.toLowerCase().includes(q) ||
+          t.status.toLowerCase().includes(q)
+      );
+    }
+
+    // Apply filtering by status
+    if (filterStatus !== "All") {
+      currentTenders = currentTenders.filter((t) => t.status === filterStatus);
+    }
+
+    // Apply sorting
+    if (sortColumn) {
+      currentTenders = [...currentTenders].sort((a, b) => {
+        let valA: any;
+        let valB: any;
+
+        if (sortColumn === "postedAt" || sortColumn === "deadline") {
+          valA = new Date(a[sortColumn]).getTime();
+          valB = new Date(b[sortColumn]).getTime();
+        } else if (sortColumn === "bidsReceived") {
+          valA = a[sortColumn];
+          valB = b[sortColumn];
+        }
+
+        if (valA < valB) {
+          return sortDirection === "asc" ? -1 : 1;
+        }
+        if (valA > valB) {
+          return sortDirection === "asc" ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+
+    return currentTenders;
+  }, [query, recentTenders, sortColumn, sortDirection, filterStatus]);
+
+  return (
+    <SidebarProvider>
+      {/* Main content */}
+      <SidebarInset className="bg-transparent">
+        {/* Page body */}
+        <div className="flex flex-1 flex-col gap-6 p-4 md:p-6">
+          {/* Snapshot cards */}
+          <section>
+            <div className="grid gap-4 md:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
+              <StatCard
+                title="Total Tenders Posted"
+                value={String(totalTenders)}
+                icon={<ListOrdered className="h-5 w-5" />}
+                subtle="All time"
+              />
+              <StatCard
+                title="Bids Received"
+                value={String(totalBids)}
+                icon={<Inbox className="h-5 w-5" />}
+                subtle="Across all tenders"
+              />
+              <StatCard
+                title="Pending Tender Approvals"
+                value={String(pendingApprovals)}
+                icon={<Clock className="h-5 w-5" />}
+                subtle="Awaiting review"
+              />
+              <StatCard
+                title="Average Bid per Tender"
+                value={avgBidsPerTender.toFixed(1)}
+                icon={<Gauge className="h-5 w-5" />}
+                subtle="Avg number of bids"
+              />
+              <StatCard
+                title="Total Tender Value"
+                value={`$${totalTenderValue.toLocaleString()}`}
+                icon={<BookOpen className="h-5 w-5" />}
+                subtle="Across all tenders"
+              />
+          
+            </div>
+          </section>
+          {/* Charts and lists */}
+          <section className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
+            {/* Left (main) column */}
+            <div className="lg:col-span-8 flex flex-col gap-4 md:gap-6">
+              {/* Recent Tenders */}
+              <Card className="border-1 shadow-none border-neutral-200 rounded-md">
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <div>
+                      <CardTitle className="text-base">
+                        Recent Tenders
+                      </CardTitle>
+                      <CardDescription>
+                        Latest tenders you’ve posted
+                      </CardDescription>
+                    </div>
+                    <Button variant="outline" size="sm" className="gap-1">
+                      <BarChart3 className="h-4 w-4" />
+                      <span>View all</span>
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex gap-2">
+                    <div className="relative flex-1">
+                      <Input
+                        placeholder="Search by title, category or status..."
+                        value={query}
+                        onChange={(e) => setQuery(e.target.value)}
+                        className="pl-9"
+                        aria-label="Search tenders"
+                      />
+                      <LineChartIcon className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    </div>
+                    <Select
+                      value={filterStatus}
+                      onValueChange={(value: TenderStatus | "All") =>
+                        setFilterStatus(value)
+                      }
+                    >
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Filter by Status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="All">All Statuses</SelectItem>
+                        <SelectItem value="Active">Active</SelectItem>
+                        <SelectItem value="Pending">Pending</SelectItem>
+                        <SelectItem value="Closed">Closed</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="rounded-lg">
+                    <Table className="px-0 ">
+                      <TableHeader className="px-0">
+                        <TableRow>
+                          <TableHead>Title</TableHead>
+                          <TableHead>Category</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead
+                            className="cursor-pointer"
+                            onClick={() => handleSort("postedAt")}
+                          >
+                            <div className="flex items-center gap-1">
+                              Posted At
+                              {sortColumn === "postedAt" &&
+                                (sortDirection === "asc" ? (
+                                  <ArrowUp className="h-3 w-3" />
+                                ) : (
+                                  <ArrowDown className="h-3 w-3" />
+                                ))}
+                            </div>
+                          </TableHead>
+                          <TableHead
+                            className="cursor-pointer"
+                            onClick={() => handleSort("deadline")}
+                          >
+                            <div className="flex items-center gap-1">
+                              Deadline
+                              {sortColumn === "deadline" &&
+                                (sortDirection === "asc" ? (
+                                  <ArrowUp className="h-3 w-3" />
+                                ) : (
+                                  <ArrowDown className="h-3 w-3" />
+                                ))}
+                            </div>
+                          </TableHead>
+                          <TableHead
+                            className="text-right cursor-pointer"
+                            onClick={() => handleSort("bidsReceived")}
+                          >
+                            <div className="flex items-center justify-center gap-1">
+                              Bids Received
+                              {sortColumn === "bidsReceived" &&
+                                (sortDirection === "asc" ? (
+                                  <ArrowUp className="h-3 w-3" />
+                                ) : (
+                                  <ArrowDown className="h-3 w-3" />
+                                ))}
+                            </div>
+                          </TableHead>
+                       
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody className="px-0 ">
+                        {filteredTenders.map((t) => (
+                          <TableRow key={t.id} className=" px-0">
+                            <TableCell className="font-medium px-0">
+                              <div className="flex items-center gap-2">
+                                <span>{t.title}</span>
+                                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                              </div>
+                            </TableCell>
+                            <TableCell>{t.category}</TableCell>
+                            <TableCell>
+                              <StatusBadge status={t.status} />
+                            </TableCell>
+                            <TableCell>{formatDate(t.postedAt)}</TableCell>
+                            <TableCell>{formatDate(t.deadline)}</TableCell>
+                            <TableCell className="text-center">
+                              {t.bidsReceived}
+                            </TableCell>
+                       
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </CardContent>
+              </Card>
+              {/* Reminders / Alerts */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+            </div>
+            {/* Right (aside) column */}
+            <div className="lg:col-span-4 flex flex-col gap-4 md:gap-6">
+              {/* User Rating */}
+              <Card className="border-1 shadow-none border-neutral-200 rounded-md">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <AlertTriangle className="h-4 w-4 text-amber-600" />
+                    Tenders with no bids in 7 days
+                  </CardTitle>
+                  <CardDescription>
+                    Consider extending visibility or updating details
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {reminders.noBidsIn7Days.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">
+                      No items to show.
+                    </p>
+                  ) : (
+                    <ul className="space-y-3">
+                      {reminders.noBidsIn7Days.map((t) => (
+                        <li
+                          key={t.id}
+                          className="flex items-center justify-between"
+                        >
+                          <div className="min-w-0">
+                            <p className="truncate font-medium">{t.title}</p>
+                            <p className="text-xs text-muted-foreground">
+                              Posted {formatDate(t.postedAt)} • {t.category}
+                            </p>
+                          </div>
+                          <Badge variant="outline" className="shrink-0">
+                            {t.bidsReceived} bids
+                          </Badge>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </CardContent>
+              </Card>
+              <Card className="border-1 shadow-none border-neutral-200 rounded-md">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base">User Rating</CardTitle>
+                  <CardDescription>Based on vendor reviews</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="text-3xl font-semibold">
+                      {rating.average.toFixed(1)}
+                    </div>
+                    <div className="flex items-center gap-1 text-amber-500">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <Star
+                          key={i}
+                          className={`h-4 w-4 ${
+                            i < Math.round(rating.average)
+                              ? "fill-amber-500"
+                              : "fill-transparent"
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    {rating.totalReviews} reviews • {rating.summary}
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <Button size="sm" variant="outline" className="gap-1">
+                      <ChartLine className="h-4 w-4" />
+                      <span>View reviews</span>
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </section>
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
+  );
+}

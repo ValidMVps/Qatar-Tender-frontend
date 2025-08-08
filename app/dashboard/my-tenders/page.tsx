@@ -607,13 +607,13 @@ export default function MyTendersPage() {
                             <div className="py-1">
                               {tender.status !== "closed" &&
                                 tender.status !== "rejected" && (
-                                  <Link
-                                    href={`/edit-tender/${tender.id}`}
+                                  <div
                                     className=" px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                                    onClick={() => setOpenTenderModal(true)}
                                   >
                                     <Edit className="h-4 w-4 mr-2" />
                                     Edit Tender
-                                  </Link>
+                                  </div>
                                 )}
 
                               {tender.status === "active" &&

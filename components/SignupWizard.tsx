@@ -29,16 +29,13 @@ type AccountType = "individual" | "business";
 
 type FormState = {
   accountType: AccountType | null;
-  // Individual
   fullName: string;
   email: string;
-  // Business
   companyName: string;
   companyEmail: string;
-  // Phone (shared)
   countryCode: string;
   phone: string;
-  password: string; // Added password field
+  password: string;
 };
 
 const initialState: FormState = {
@@ -49,7 +46,7 @@ const initialState: FormState = {
   companyEmail: "",
   countryCode: "+974",
   phone: "",
-  password: "", // Added password field
+  password: "",
 };
 
 const countries = [
@@ -71,12 +68,10 @@ export default function SignupWizard() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [resendCooldown, setResendCooldown] = useState(0);
 
-  // Derived values
   const currentEmail = useMemo(() => {
     return form.accountType === "business" ? form.companyEmail : form.email;
-  }, [form.accountType, form.companyEmail, form.email]);
+  }, [form]);
 
-  // Resend cooldown timer
   useEffect(() => {
     if (resendCooldown <= 0) return;
     const t = setInterval(() => setResendCooldown((s) => s - 1), 1000);
@@ -103,6 +98,7 @@ export default function SignupWizard() {
         form.accountType === "business" ? form.companyEmail : form.email;
       const nameToCheck =
         form.accountType === "business" ? form.companyName : form.fullName;
+
       if (!nameToCheck.trim()) {
         nextErrors.name =
           form.accountType === "business"
@@ -114,22 +110,23 @@ export default function SignupWizard() {
       } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailToCheck)) {
         nextErrors.email = "Please enter a valid email address.";
       }
+
       if (!form.phone.trim()) {
         nextErrors.phone = "Phone number is required.";
       } else if (!/^\d{6,15}$/.test(form.phone.replace(/\D/g, ""))) {
         nextErrors.phone = "Enter a valid phone number (6-15 digits).";
       }
+
       if (!form.password.trim()) {
         nextErrors.password = "Password is required.";
       } else if (form.password.length < 8) {
-        nextErrors.password = "Password must be at least 8 characters long.";
+        nextErrors.password = "Password must be at least 8 characters.";
       } else if (!/[a-zA-Z]/.test(form.password)) {
-        nextErrors.password = "Password must contain at least one letter.";
+        nextErrors.password = "Include at least one letter.";
       } else if (!/[0-9]/.test(form.password)) {
-        nextErrors.password = "Password must contain at least one number.";
+        nextErrors.password = "Include at least one number.";
       } else if (!/[^a-zA-Z0-9]/.test(form.password)) {
-        nextErrors.password =
-          "Password must contain at least one special character.";
+        nextErrors.password = "Include at least one special character.";
       }
     }
     setErrors(nextErrors);
@@ -202,7 +199,7 @@ export default function SignupWizard() {
       companyEmail: `${companyLocal}${serial}@${domain}`,
       countryCode: cc,
       phone,
-      password: `P@ssw0rd${serial}`, // Added random password
+      password: `P@ssw0rd${serial}`,
     };
     setForm(next);
     setErrors({});
@@ -223,150 +220,72 @@ export default function SignupWizard() {
   };
 
   return (
-    <div className="space-y-10 w-3xl rounded-3xl p-14 bg-[#fff] border-2 border-gray-100 ">
+    <div className="space-y-8 w-xl rounded-2xl p-8 bg-white border border-gray-100">
       <StepHeader current={step} />
-      <div className="space-y-10">
-        {/* Step bodies with smooth transitions */}
-        <div
-          className={cn(
-            "transition-opacity duration-300",
-            step === 1 ? "opacity-100" : "hidden opacity-0"
-          )}
-        >
+
+      <div className="space-y-8">
+        {step === 1 && (
           <StepOne
             selected={form.accountType}
             onSelect={handleSelectType}
             error={errors.accountType}
           />
-        </div>
-
-        <div
-          className={cn(
-            "transition-opacity duration-300",
-            step === 2 ? "opacity-100" : "hidden opacity-0"
-          )}
-        >
+        )}
+        {step === 2 && (
           <StepTwo
             form={form}
             errors={errors}
             onChange={(patch) => setForm((f) => ({ ...f, ...patch }))}
           />
-        </div>
-
-        <div
-          className={cn(
-            "transition-opacity duration-300",
-            step === 3 ? "opacity-100" : "hidden opacity-0"
-          )}
-        >
+        )}
+        {step === 3 && (
           <StepThree
             email={currentEmail}
             cooldown={resendCooldown}
             onResend={resend}
           />
-        </div>
+        )}
+      </div>
 
-        {/* Footer actions */}
-        <div className="flex flex-wrap items-center justify-between gap-6 pt-8">
-          <Button variant="outline" onClick={fillRandom} className="px-6 py-3">
-            Fill with random data
-          </Button>
+      <div className="flex flex-wrap items-center justify-between gap-4 pt-1">
+        <Button variant="outline" onClick={fillRandom} className="px-5 py-2">
+          Fill with random data
+        </Button>
 
-          <div className="flex items-center gap-4">
-            {step > 1 && (
-              <Button variant="ghost" onClick={onBack} className="px-6 py-3">
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back
-              </Button>
-            )}
-            {step === 1 && (
-              <Button
-                onClick={onContinue}
-                className="bg-blue-600 text-white hover:bg-blue-700 px-8 py-3"
-              >
-                Continue
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            )}
-            {step === 2 && (
-              <Button
-                onClick={onSubmit}
-                className="bg-blue-600 text-white hover:bg-blue-700 px-8 py-3"
-              >
-                Submit
-                <MailCheck className="ml-2 h-4 w-4" />
-              </Button>
-            )}
-            {step === 3 && (
-              <Button
-                variant="secondary"
-                onClick={() => setStep(2)}
-                className="px-6 py-3"
-              >
-                Edit details
-              </Button>
-            )}
-          </div>
+        <div className="flex items-center gap-3">
+          {step > 1 && (
+            <Button variant="ghost" onClick={onBack} className="px-5 py-2">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back
+            </Button>
+          )}
+          {step === 1 && (
+            <Button
+              onClick={onContinue}
+              className="bg-blue-600 text-white px-6 py-2 hover:bg-blue-700"
+            >
+              Continue <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          )}
+          {step === 2 && (
+            <Button
+              onClick={onSubmit}
+              className="bg-blue-600 text-white px-6 py-2 hover:bg-blue-700"
+            >
+              Submit <MailCheck className="ml-2 h-4 w-4" />
+            </Button>
+          )}
+          {step === 3 && (
+            <Button
+              variant="secondary"
+              onClick={() => setStep(2)}
+              className="px-5 py-2"
+            >
+              Edit details
+            </Button>
+          )}
         </div>
       </div>
-    </div>
-  );
-}
-
-function StepHeader({ current }: { current: Step }) {
-  const steps = [
-    { id: 1, label: "Account Type" },
-    { id: 2, label: "Details" },
-    { id: 3, label: "Verify Email" },
-  ] as const;
-
-  return (
-    <div className="w-full">
-      <ol className="flex items-center justify-between w-full relative">
-        {steps.map((s, i) => {
-          const isActive = current === s.id;
-          const isComplete = current > s.id;
-
-          return (
-            <li
-              key={s.id}
-              className="flex flex-col items-center relative flex-1"
-            >
-              {/* Connector line - only show for first two steps */}
-              {i < steps.length - 1 && (
-                <div className="absolute top-5 left-1/2 w-full h-px bg-neutral-200 z-0" />
-              )}
-
-              {/* Step circle */}
-              <div
-                className={cn(
-                  "flex h-10 w-10 items-center justify-center rounded-full text-sm font-medium transition-colors relative z-10 bg-white",
-                  isComplete
-                    ? "bg-blue-600 text-white"
-                    : isActive
-                    ? "bg-blue-100 text-blue-700 ring-2 ring-blue-200"
-                    : "bg-muted text-muted-foreground"
-                )}
-                aria-current={isActive ? "step" : undefined}
-              >
-                {isComplete ? <CheckCircle2 className="h-5 w-5" /> : s.id}
-              </div>
-
-              {/* Step label */}
-              <span
-                className={cn(
-                  "text-sm font-medium mt-2 text-center",
-                  isActive
-                    ? "font-semibold text-foreground"
-                    : "text-muted-foreground"
-                )}
-              >
-                {s.label}
-              </span>
-            </li>
-          );
-        })}
-      </ol>
     </div>
   );
 }
@@ -385,7 +304,7 @@ function StepOne({
       <div className="mb-8 text-base text-muted-foreground">
         Choose the type of account
       </div>
-      <div className="grid gap-6 sm:grid-cols-1">
+      <div className="grid gap-3 sm:grid-cols-1">
         <SelectableCard
           title="Individual"
           description="For contractors, consultants, and freelancers."
@@ -426,7 +345,7 @@ function SelectableCard({
       aria-pressed={selected}
       className={cn(
         "group flex gap-6 relative text-left",
-        "rounded-xl border bg-white p-6 transition-all",
+        "rounded-xl border bg-white p-5 transition-all",
         "hover:shadow-xs focus-visible:outline-none  ",
         selected ? "border-blue-400" : "border-neutral-200"
       )}
@@ -461,7 +380,7 @@ function StepTwo({
 }) {
   const isBiz = form.accountType === "business";
   return (
-    <div className="space-y-8">
+    <div className="space-y-5">
       {isBiz ? (
         <>
           <div className="space-y-3">
@@ -473,7 +392,7 @@ function StepTwo({
               placeholder="e.g., Doha Build Co."
               value={form.companyName}
               onChange={(e) => onChange({ companyName: e.target.value })}
-              className="py-3 text-base"
+              className="py-3 mt-2 text-base"
             />
             {errors.name && (
               <p className="text-sm text-red-600 mt-2">{errors.name}</p>
@@ -489,7 +408,7 @@ function StepTwo({
               placeholder="name@company.qa"
               value={form.companyEmail}
               onChange={(e) => onChange({ companyEmail: e.target.value })}
-              className="py-3 text-base"
+              className="py-3  mt-2  text-base"
             />
             {errors.email && (
               <p className="text-sm text-red-600 mt-2">{errors.email}</p>
@@ -507,7 +426,7 @@ function StepTwo({
               placeholder="e.g., Layla Al-Thani"
               value={form.fullName}
               onChange={(e) => onChange({ fullName: e.target.value })}
-              className="py-3 text-base"
+              className="py-3  mt-2  text-base"
             />
             {errors.name && (
               <p className="text-sm text-red-600 mt-2">{errors.name}</p>
@@ -523,7 +442,7 @@ function StepTwo({
               placeholder="you@example.qa"
               value={form.email}
               onChange={(e) => onChange({ email: e.target.value })}
-              className="py-3 text-base"
+              className="py-3  mt-2  text-base"
             />
             {errors.email && (
               <p className="text-sm text-red-600 mt-2">{errors.email}</p>
@@ -536,7 +455,7 @@ function StepTwo({
         <Label htmlFor="phone" className="text-base font-medium">
           Phone
         </Label>
-        <div className="flex gap-3">
+        <div className="flex gap-3  mt-2 ">
           <Select
             value={form.countryCode}
             onValueChange={(v) => onChange({ countryCode: v })}
@@ -583,7 +502,7 @@ function StepTwo({
           placeholder="Enter your password"
           value={form.password}
           onChange={(e) => onChange({ password: e.target.value })}
-          className="py-3 text-base"
+          className="py-3 text-base  mt-2 "
         />
         {errors.password && (
           <div className="text-sm text-red-600 mt-2">
@@ -642,4 +561,61 @@ function StepThree({
 
 function sample<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
+}
+function StepHeader({ current }: { current: Step }) {
+  const steps = [
+    { id: 1, label: "Account Type" },
+    { id: 2, label: "Details" },
+    { id: 3, label: "Verify Email" },
+  ] as const;
+
+  return (
+    <div className="w-full">
+      <ol className="flex items-center justify-between w-full relative">
+        {steps.map((s, i) => {
+          const isActive = current === s.id;
+          const isComplete = current > s.id;
+
+          return (
+            <li
+              key={s.id}
+              className="flex flex-col items-center relative flex-1"
+            >
+              {/* Connector line - only show for first two steps */}
+              {i < steps.length - 1 && (
+                <div className="absolute top-5 left-1/2 w-full h-px bg-neutral-200 z-0" />
+              )}
+
+              {/* Step circle */}
+              <div
+                className={cn(
+                  "flex h-10 w-10 items-center justify-center rounded-full text-sm font-medium transition-colors relative z-10 bg-white",
+                  isComplete
+                    ? "bg-blue-600 text-white"
+                    : isActive
+                    ? "bg-blue-100 text-blue-700 ring-2 ring-blue-200"
+                    : "bg-muted text-muted-foreground"
+                )}
+                aria-current={isActive ? "step" : undefined}
+              >
+                {isComplete ? <CheckCircle2 className="h-5 w-5" /> : s.id}
+              </div>
+
+              {/* Step label */}
+              <span
+                className={cn(
+                  "text-sm font-medium mt-2 text-center",
+                  isActive
+                    ? "font-semibold text-foreground"
+                    : "text-muted-foreground"
+                )}
+              >
+                {s.label}
+              </span>
+            </li>
+          );
+        })}
+      </ol>
+    </div>
+  );
 }
