@@ -474,72 +474,88 @@ export default function Component() {
             {/* Right (aside) column */}
             <div className="lg:col-span-5 flex flex-col gap-4 md:gap-4">
               {/* User Rating */}{" "}
-        <Card className="w-full p-6">
-  <CardContent className="p-0 space-y-6">
-    {/* Total Projects Section */}
-    <div>
-      <p className="text-sm text-muted-foreground">Total Projects Posted</p>
-      <h2 className="text-4xl font-bold mt-1">128</h2>
-    </div>
+              <Card className="w-full p-6">
+                <CardContent className="p-0 space-y-6">
+                  {/* Total Projects Section */}
+                  <div>
+                    <p className="text-sm text-muted-foreground">
+                      Total Projects Posted
+                    </p>
+                    <h2 className="text-4xl font-bold mt-1">128</h2>
+                  </div>
 
-    {/* Recently Active Posters Section */}
-    <div>
-      <div className="flex -space-x-2 overflow-hidden">
-        <Avatar className="w-10 h-10 border-2 border-background">
-          <AvatarImage src="https://bundui-images.netlify.app/avatars/08.png" alt="User 1" />
-          <AvatarFallback>U1</AvatarFallback>
-        </Avatar>
-        <Avatar className="w-10 h-10 border-2 border-background">
-          <AvatarImage src="https://bundui-images.netlify.app/avatars/04.png" alt="User 2" />
-          <AvatarFallback>U2</AvatarFallback>
-        </Avatar>
-        <Avatar className="w-10 h-10 border-2 border-background">
-          <AvatarImage src="https://bundui-images.netlify.app/avatars/05.png" alt="User 3" />
-          <AvatarFallback>U3</AvatarFallback>
-        </Avatar>
-        <Avatar className="w-10 h-10 border-2 border-background">
-          <AvatarImage src="https://bundui-images.netlify.app/avatars/06.png" alt="User 4" />
-          <AvatarFallback>U4</AvatarFallback>
-        </Avatar>
-        <Avatar className="w-10 h-10 border-2 border-background">
-          <AvatarImage src="https://bundui-images.netlify.app/avatars/07.png" alt="User 5" />
-          <AvatarFallback>U5</AvatarFallback>
-        </Avatar>
-      </div>
-    </div>
+                  {/* Recently Active Posters Section */}
+                  <div>
+                    <div className="flex -space-x-2 overflow-hidden">
+                      <Avatar className="w-10 h-10 border-2 border-background">
+                        <AvatarImage
+                          src="https://bundui-images.netlify.app/avatars/08.png"
+                          alt="User 1"
+                        />
+                        <AvatarFallback>U1</AvatarFallback>
+                      </Avatar>
+                      <Avatar className="w-10 h-10 border-2 border-background">
+                        <AvatarImage
+                          src="https://bundui-images.netlify.app/avatars/04.png"
+                          alt="User 2"
+                        />
+                        <AvatarFallback>U2</AvatarFallback>
+                      </Avatar>
+                      <Avatar className="w-10 h-10 border-2 border-background">
+                        <AvatarImage
+                          src="https://bundui-images.netlify.app/avatars/05.png"
+                          alt="User 3"
+                        />
+                        <AvatarFallback>U3</AvatarFallback>
+                      </Avatar>
+                      <Avatar className="w-10 h-10 border-2 border-background">
+                        <AvatarImage
+                          src="https://bundui-images.netlify.app/avatars/06.png"
+                          alt="User 4"
+                        />
+                        <AvatarFallback>U4</AvatarFallback>
+                      </Avatar>
+                      <Avatar className="w-10 h-10 border-2 border-background">
+                        <AvatarImage
+                          src="https://bundui-images.netlify.app/avatars/07.png"
+                          alt="User 5"
+                        />
+                        <AvatarFallback>U5</AvatarFallback>
+                      </Avatar>
+                    </div>
+                  </div>
 
-    {/* Highlights Section */}
-    <div className="space-y-4">
-      <h3 className="text-base font-semibold">Highlights</h3>
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <span className="text-sm">Avg. Bids per Project</span>
-          <div className="flex items-center gap-1 text-green-500">
-            <ArrowUpRight className="w-4 h-4" />
-            <span className="font-medium">6.1</span>
-          </div>
-        </div>
-        <Separator />
-        <div className="flex items-center justify-between">
-          <span className="text-sm">Projects With No Bids</span>
-          <div className="flex items-center gap-1 text-red-500">
-            <ArrowDownLeft className="w-4 h-4" />
-            <span className="font-medium">12</span>
-          </div>
-        </div>
-        <Separator />
-        <div className="flex items-center justify-between">
-          <span className="text-sm">Total Bids Received</span>
-          <div className="flex items-center gap-1 text-green-500">
-            <ArrowUpRight className="w-4 h-4" />
-            <span className="font-medium">342</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </CardContent>
-</Card>
-
+                  {/* Highlights Section */}
+                  <div className="space-y-4">
+                    <h3 className="text-base font-semibold">Highlights</h3>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm">Avg. Bids per Project</span>
+                        <div className="flex items-center gap-1 text-green-500">
+                          <ArrowUpRight className="w-4 h-4" />
+                          <span className="font-medium">6.1</span>
+                        </div>
+                      </div>
+                      <Separator />
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm">Projects With No Bids</span>
+                        <div className="flex items-center gap-1 text-red-500">
+                          <ArrowDownLeft className="w-4 h-4" />
+                          <span className="font-medium">12</span>
+                        </div>
+                      </div>
+                      <Separator />
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm">Total Bids Received</span>
+                        <div className="flex items-center gap-1 text-green-500">
+                          <ArrowUpRight className="w-4 h-4" />
+                          <span className="font-medium">342</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
               <Card className="border-1 col-span-3 h-fit shadow-none border-neutral-200 rounded-md">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-base flex items-center gap-2">

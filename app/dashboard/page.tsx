@@ -17,6 +17,8 @@ import {
   DollarSign,
   Calendar,
   Edit,
+  CheckCircle,
+  Icon,
 } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -39,6 +41,8 @@ import {
 } from "@/components/ui/tooltip";
 import { useState } from "react";
 import CreateTenderModal from "@/components/CreateTenderModal";
+import { TenderCarder } from "@/components/TenderCarder";
+import { OverviewChart } from "@/components/OverviewChart";
 const fadeInUp = {
   hidden: { opacity: 0, y: 30 },
   show: { opacity: 1, y: 0, transition: { duration: 0.5 } },
@@ -149,6 +153,84 @@ const mockTenders: Tender[] = [
     category: "Software",
   },
 ];
+const statsData = [
+  {
+    title: "Total Tenders Posted",
+    value: "12",
+    icon: FileText,
+    description: "Last 30 days",
+  },
+  {
+    title: "Active Tenders",
+    value: "3",
+    icon: CheckCircle,
+    description: "Currently open",
+  },
+  {
+    title: "Bids Received",
+    value: "47",
+    icon: Users,
+    description: "Across all tenders",
+  },
+  {
+    title: "Total Spent",
+    value: "$2,500",
+    icon: DollarSign,
+    description: "This month",
+  },
+];
+
+const tendersData: {
+  id: string;
+  title: string;
+  category: string;
+  price: string;
+  postedDate: string;
+  status: "Active" | "Closed" | "Draft";
+  applicants: number;
+  type: string;
+}[] = [
+  {
+    id: "1",
+    title: "Construction of New Municipal Building",
+    category: "Public Works",
+    price: "$2,500,000",
+    postedDate: "2/15/2024",
+    status: "Active",
+    applicants: 12,
+    type: "Construction",
+  },
+  {
+    id: "2",
+    title: "IT Infrastructure Upgrade Project",
+    category: "Technology Services",
+    price: "$750,000",
+    postedDate: "2/20/2024",
+    status: "Active",
+    applicants: 8,
+    type: "Technology",
+  },
+  {
+    id: "3",
+    title: "Road Maintenance and Repair Services",
+    category: "Transportation",
+    price: "$1,200,000",
+    postedDate: "1/30/2024",
+    status: "Closed",
+    applicants: 15,
+    type: "Maintenance",
+  },
+  {
+    id: "4",
+    title: "Green Energy Solar Panel Installation",
+    category: "Environmental Services",
+    price: "$3,100,000",
+    postedDate: "3/5/2024",
+    status: "Draft",
+    applicants: 0,
+    type: "Energy",
+  },
+];
 
 const TenderCard = ({ tender }: { tender: Tender }) => {
   const status = statusConfig[tender.status];
@@ -208,7 +290,6 @@ const TenderCard = ({ tender }: { tender: Tender }) => {
             <Eye className="h-3 w-3 mr-1" />
             View
           </button>
-        
         </div>
       </div>
     </div>
@@ -302,116 +383,88 @@ export default function DashboardPage() {
   };
 
   return (
-    <TooltipProvider>
-      <motion.div
-        initial="hidden"
-        animate="show"
-        variants={{ show: { transition: { staggerChildren: 0.1 } } }}
-        className="container mx-auto space-y-6 py-8 px-0 "
-      >
-        {/* Welcome Box */}
-        <motion.div
-          variants={fadeInUp}
-          className="bg-blue- rounded-xl text-neutral-950  flex flex-col md:flex-row md:items-center md:justify-between gap-4"
-        >
-          <div className="flex">
-            <div className="div space-y-2">
-              {" "}
-              <h2 className="text-2xl font-bold">
-                Welcome back Ahmed Al-Mahmoud
-              </h2>
-              <p className="text-neutral-800 text-sm opacity-80">
-                Here's what’s happening in your account today.
-              </p>
-            </div>
+    <motion.div
+      initial="hidden"
+      animate="show"
+      variants={{ show: { transition: { staggerChildren: 0.1 } } }}
+      className="container mx-auto  px-0 "
+    >
+      {/* Welcome Box */}
+      <main className="flex-1 p-6 px-2 md:py-8  space-y-7 ">
+        <div className="flex items-center justify-between py-3 px-1 ">
+          <div>
+            <h1 className="text-3xl font-bold pb-2 text-gray-900">
+              Welcome back Ahmed Al-Mahmoud
+            </h1>
+            <p className="text-md text-gray-500">
+              Here&apos;s what&apos;s happening in your account today.
+            </p>
           </div>
-          <div className="flex  items-start md:items-end gap-1">
-            <Button
-              className="bg-blue-600 hover:bg-blue-700 flex items-center space-x-2"
-              onClick={() => setOpenTenderModal(true)}
-            >
-              <Plus className="h-4 w-4" />
-              <span>Post Tender</span>
-            </Button>
-          </div>
-        </motion.div>{" "}
-        <div className="grid grid-cols-1 gap-4  md:grid-cols-2 xl:grid-cols-4">
-          {/* Total Tenders Posted */}
-          <Card className="bg-blue-500 text-neutral-50">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Total Tenders Posted
-              </CardTitle>
-              <FileText className="h-5 w-5 text-white" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">12</div>
-            </CardContent>
-          </Card>
-
-          {/* Active Tenders */}
-          <Card className="bg-blue-500  text-white">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Active Tenders
-              </CardTitle>
-              <BadgeCheck className="h-5 w-5 text-white" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">3</div>
-            </CardContent>
-          </Card>
-
-          {/* Proposals Received */}
-          <Card className="bg-blue-500  text-white">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Bids Received
-              </CardTitle>
-              <UserRoundCheck className="h-5 w-5" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">47</div>
-            </CardContent>
-          </Card>
-
-          {/* Total Spent */}
-          <Card className="bg-blue-500  text-white">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Spent</CardTitle>
-              <Wallet className="h-5 w-5 " />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">$2,500</div>
-            </CardContent>
-          </Card>
+          <Button className="bg-blue-600 hover:bg-blue-700 text-white shadow-md">
+            <Plus className="mr-2 h-4 w-4" /> Post New Tender
+          </Button>
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Recent Tenders */}
-          <motion.div variants={fadeInUp} className="lg:col-span-2">
-            <div className="bg-white/10 rounded-xl pt-5 ">
-              {/*<div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  Recent Tenders
-                </h3>
-                <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
-                  View All
-                </button>
-              </div>*/}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                {mockTenders.slice(0, 4).map((tender) => (
-                  <TenderCard key={tender.id} tender={tender} />
-                ))}
-              </div>
-            </div>
-          </motion.div>
-          <CreateTenderModal
-            open={openTenderModal}
-            onOpenChange={setOpenTenderModal}
-          />
-          {/* Sidebar Widgets */}
+
+        {/* Stats Cards */}
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
+          {statsData.map((stat, index) => {
+            const Icon = stat.icon; // Capitalized so JSX knows it's a component
+            return (
+              <Card
+                key={index}
+                className="border-neutral-200 rounded-md transition-shadow duration-200"
+              >
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-gray-500">
+                    {stat.title}
+                  </CardTitle>
+                  <Icon className="h-5 w-5 text-gray-400" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-gray-900">
+                    {stat.value}
+                  </div>
+                  {stat.description && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      {stat.description}
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
-      </motion.div>
-    </TooltipProvider>
+
+        {/* Overview Chart */}
+        <Card className="mb-8 shadow-xs rounded-md border-neutral-200">
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold">
+              Tenders Overview
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <OverviewChart />
+          </CardContent>
+        </Card>
+
+        {/* Recent Tenders 
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-semibold text-gray-900">
+            Recent Tenders
+          </h2>
+          <Button
+            variant="outline"
+            className="text-sm text-gray-600 bg-transparent"
+          >
+            View All
+          </Button>
+        </div>
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2">
+          {tendersData.map((tender) => (
+            <TenderCarder key={tender.id} tender={tender} />
+          ))}
+        </div>*/}
+      </main>
+    </motion.div>
   );
 }

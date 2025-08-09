@@ -55,8 +55,22 @@ export default function Component() {
       style={{ height: "calc(100vh - 100px)" }}
     >
       <div className="grid flex-1 h-full overflow-hidden md:grid-cols-12">
-        <div className="hidden flex-col col-span-3  h-full border-r bg-background md:flex">
-          <div className="flex items-center gap-2 p-4">
+        <div className="hidden flex-col col-span-3 h-full border-r bg-background md:flex">
+          {/* Header Box */}
+          <div className="flex items-center h-16 justify-between px-4 py-3 border-b">
+            <div className="flex items-center gap-2">
+              <Inbox className="h-5 w-5 text-muted-foreground" />
+              <span className="font-semibold">Inbox</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">All</span>
+              <Switch />
+              <span className="text-sm text-muted-foreground">Unread</span>
+            </div>
+          </div>
+
+          {/* Search */}
+          <div className="flex items-center mt-2 gap-2 p-4">
             <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
@@ -66,6 +80,8 @@ export default function Component() {
               />
             </div>
           </div>
+
+          {/* Project List */}
           <div className="flex-1 overflow-auto">
             <nav className="grid gap-1 px-4 text-sm font-medium">
               {/* Project 1 - Office Renovation (selected) */}
@@ -88,6 +104,7 @@ export default function Component() {
                   <Badge variant="secondary">Active</Badge>
                 </div>
               </Link>
+
               {/* Project 2 */}
               <Link
                 href="#"
@@ -110,6 +127,7 @@ export default function Component() {
                   <Badge variant="secondary">Active</Badge>
                 </div>
               </Link>
+
               {/* Project 3 */}
               <Link
                 href="#"
@@ -132,6 +150,7 @@ export default function Component() {
                   <Badge variant="secondary">Active</Badge>
                 </div>
               </Link>
+
               {/* Project 4 */}
               <Link
                 href="#"
@@ -157,6 +176,7 @@ export default function Component() {
             </nav>
           </div>
         </div>
+
         <ChatSection />
         <ProjectDetailsSidebar
           selectedProject={{
