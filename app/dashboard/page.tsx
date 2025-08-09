@@ -208,10 +208,7 @@ const TenderCard = ({ tender }: { tender: Tender }) => {
             <Eye className="h-3 w-3 mr-1" />
             View
           </button>
-          <button className="inline-flex cursor-pointer  items-center px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 text-sm font-medium rounded-lg transition-colors duration-200">
-            <Edit className="h-3 w-3 mr-1" />
-            Edit
-          </button>
+        
         </div>
       </div>
     </div>

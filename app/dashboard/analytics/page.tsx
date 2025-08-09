@@ -20,6 +20,8 @@ import {
   User,
   ArrowUp,
   ArrowDown,
+  ArrowUpRight,
+  ArrowDownLeft,
 } from "lucide-react";
 import {
   Select,
@@ -74,9 +76,12 @@ import {
   CartesianGrid,
   Line,
   LineChart,
+  ResponsiveContainer,
   XAxis,
   YAxis,
 } from "recharts";
+import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
+import ProjectsOverviewChart from "@/components/ProjectOverviewChart";
 
 type TenderStatus = "Pending" | "Active" | "Closed";
 
@@ -326,6 +331,55 @@ export default function Component() {
     { title: "Settings", icon: Settings, url: "#" },
   ];
 
+  // Amount spent chart state and data
+  const [selectedAmountTimeRange, setSelectedAmountTimeRange] = React.useState<
+    "1day" | "1week" | "1month" | "1year"
+  >("1month");
+
+  // Dummy data for amount spent chart
+  const amountSpentData = React.useMemo(() => {
+    // Generate dummy data based on selectedAmountTimeRange
+    if (selectedAmountTimeRange === "1day") {
+      // 24 hours
+      return Array.from({ length: 24 }, (_, i) => ({
+        date: `${i}:00`,
+        amountSpent: Math.floor(Math.random() * 2000) + 1000,
+      }));
+    }
+    if (selectedAmountTimeRange === "1week") {
+      // 7 days
+      return Array.from({ length: 7 }, (_, i) => ({
+        date: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][i],
+        amountSpent: Math.floor(Math.random() * 10000) + 5000,
+      }));
+    }
+    if (selectedAmountTimeRange === "1month") {
+      // 30 days
+      return Array.from({ length: 30 }, (_, i) => ({
+        date: `Day ${i + 1}`,
+        amountSpent: Math.floor(Math.random() * 12000) + 4000,
+      }));
+    }
+    // 12 months
+    return Array.from({ length: 12 }, (_, i) => ({
+      date: [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+      ][i],
+      amountSpent: Math.floor(Math.random() * 100000) + 50000,
+    }));
+  }, [selectedAmountTimeRange]);
+
   const filteredTenders = React.useMemo(() => {
     const q = query.trim().toLowerCase();
     let currentTenders = recentTenders;
@@ -411,153 +465,88 @@ export default function Component() {
                 icon={<BookOpen className="h-5 w-5" />}
                 subtle="Across all tenders"
               />
-          
             </div>
           </section>
           {/* Charts and lists */}
           <section className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
             {/* Left (main) column */}
-            <div className="lg:col-span-8 flex flex-col gap-4 md:gap-6">
-              {/* Recent Tenders */}
-              <Card className="border-1 shadow-none border-neutral-200 rounded-md">
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between gap-2">
-                    <div>
-                      <CardTitle className="text-base">
-                        Recent Tenders
-                      </CardTitle>
-                      <CardDescription>
-                        Latest tenders you’ve posted
-                      </CardDescription>
-                    </div>
-                    <Button variant="outline" size="sm" className="gap-1">
-                      <BarChart3 className="h-4 w-4" />
-                      <span>View all</span>
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex gap-2">
-                    <div className="relative flex-1">
-                      <Input
-                        placeholder="Search by title, category or status..."
-                        value={query}
-                        onChange={(e) => setQuery(e.target.value)}
-                        className="pl-9"
-                        aria-label="Search tenders"
-                      />
-                      <LineChartIcon className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    </div>
-                    <Select
-                      value={filterStatus}
-                      onValueChange={(value: TenderStatus | "All") =>
-                        setFilterStatus(value)
-                      }
-                    >
-                      <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Filter by Status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="All">All Statuses</SelectItem>
-                        <SelectItem value="Active">Active</SelectItem>
-                        <SelectItem value="Pending">Pending</SelectItem>
-                        <SelectItem value="Closed">Closed</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="rounded-lg">
-                    <Table className="px-0 ">
-                      <TableHeader className="px-0">
-                        <TableRow>
-                          <TableHead>Title</TableHead>
-                          <TableHead>Category</TableHead>
-                          <TableHead>Status</TableHead>
-                          <TableHead
-                            className="cursor-pointer"
-                            onClick={() => handleSort("postedAt")}
-                          >
-                            <div className="flex items-center gap-1">
-                              Posted At
-                              {sortColumn === "postedAt" &&
-                                (sortDirection === "asc" ? (
-                                  <ArrowUp className="h-3 w-3" />
-                                ) : (
-                                  <ArrowDown className="h-3 w-3" />
-                                ))}
-                            </div>
-                          </TableHead>
-                          <TableHead
-                            className="cursor-pointer"
-                            onClick={() => handleSort("deadline")}
-                          >
-                            <div className="flex items-center gap-1">
-                              Deadline
-                              {sortColumn === "deadline" &&
-                                (sortDirection === "asc" ? (
-                                  <ArrowUp className="h-3 w-3" />
-                                ) : (
-                                  <ArrowDown className="h-3 w-3" />
-                                ))}
-                            </div>
-                          </TableHead>
-                          <TableHead
-                            className="text-right cursor-pointer"
-                            onClick={() => handleSort("bidsReceived")}
-                          >
-                            <div className="flex items-center justify-center gap-1">
-                              Bids Received
-                              {sortColumn === "bidsReceived" &&
-                                (sortDirection === "asc" ? (
-                                  <ArrowUp className="h-3 w-3" />
-                                ) : (
-                                  <ArrowDown className="h-3 w-3" />
-                                ))}
-                            </div>
-                          </TableHead>
-                       
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody className="px-0 ">
-                        {filteredTenders.map((t) => (
-                          <TableRow key={t.id} className=" px-0">
-                            <TableCell className="font-medium px-0">
-                              <div className="flex items-center gap-2">
-                                <span>{t.title}</span>
-                                <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                              </div>
-                            </TableCell>
-                            <TableCell>{t.category}</TableCell>
-                            <TableCell>
-                              <StatusBadge status={t.status} />
-                            </TableCell>
-                            <TableCell>{formatDate(t.postedAt)}</TableCell>
-                            <TableCell>{formatDate(t.deadline)}</TableCell>
-                            <TableCell className="text-center">
-                              {t.bidsReceived}
-                            </TableCell>
-                       
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-                </CardContent>
-              </Card>
-              {/* Reminders / Alerts */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-            </div>
+            <ProjectsOverviewChart />
             {/* Right (aside) column */}
-            <div className="lg:col-span-4 flex flex-col gap-4 md:gap-6">
-              {/* User Rating */}
-              <Card className="border-1 shadow-none border-neutral-200 rounded-md">
+            <div className="lg:col-span-5 flex flex-col gap-4 md:gap-4">
+              {/* User Rating */}{" "}
+        <Card className="w-full p-6">
+  <CardContent className="p-0 space-y-6">
+    {/* Total Projects Section */}
+    <div>
+      <p className="text-sm text-muted-foreground">Total Projects Posted</p>
+      <h2 className="text-4xl font-bold mt-1">128</h2>
+    </div>
+
+    {/* Recently Active Posters Section */}
+    <div>
+      <div className="flex -space-x-2 overflow-hidden">
+        <Avatar className="w-10 h-10 border-2 border-background">
+          <AvatarImage src="https://bundui-images.netlify.app/avatars/08.png" alt="User 1" />
+          <AvatarFallback>U1</AvatarFallback>
+        </Avatar>
+        <Avatar className="w-10 h-10 border-2 border-background">
+          <AvatarImage src="https://bundui-images.netlify.app/avatars/04.png" alt="User 2" />
+          <AvatarFallback>U2</AvatarFallback>
+        </Avatar>
+        <Avatar className="w-10 h-10 border-2 border-background">
+          <AvatarImage src="https://bundui-images.netlify.app/avatars/05.png" alt="User 3" />
+          <AvatarFallback>U3</AvatarFallback>
+        </Avatar>
+        <Avatar className="w-10 h-10 border-2 border-background">
+          <AvatarImage src="https://bundui-images.netlify.app/avatars/06.png" alt="User 4" />
+          <AvatarFallback>U4</AvatarFallback>
+        </Avatar>
+        <Avatar className="w-10 h-10 border-2 border-background">
+          <AvatarImage src="https://bundui-images.netlify.app/avatars/07.png" alt="User 5" />
+          <AvatarFallback>U5</AvatarFallback>
+        </Avatar>
+      </div>
+    </div>
+
+    {/* Highlights Section */}
+    <div className="space-y-4">
+      <h3 className="text-base font-semibold">Highlights</h3>
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <span className="text-sm">Avg. Bids per Project</span>
+          <div className="flex items-center gap-1 text-green-500">
+            <ArrowUpRight className="w-4 h-4" />
+            <span className="font-medium">6.1</span>
+          </div>
+        </div>
+        <Separator />
+        <div className="flex items-center justify-between">
+          <span className="text-sm">Projects With No Bids</span>
+          <div className="flex items-center gap-1 text-red-500">
+            <ArrowDownLeft className="w-4 h-4" />
+            <span className="font-medium">12</span>
+          </div>
+        </div>
+        <Separator />
+        <div className="flex items-center justify-between">
+          <span className="text-sm">Total Bids Received</span>
+          <div className="flex items-center gap-1 text-green-500">
+            <ArrowUpRight className="w-4 h-4" />
+            <span className="font-medium">342</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </CardContent>
+</Card>
+
+              <Card className="border-1 col-span-3 h-fit shadow-none border-neutral-200 rounded-md">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-base flex items-center gap-2">
                     <AlertTriangle className="h-4 w-4 text-amber-600" />
                     Tenders with no bids in 7 days
                   </CardTitle>
-                  <CardDescription>
-                    Consider extending visibility or updating details
-                  </CardDescription>
+                  <CardDescription>Consider updating details</CardDescription>
                 </CardHeader>
                 <CardContent>
                   {reminders.noBidsIn7Days.length === 0 ? (
@@ -586,42 +575,131 @@ export default function Component() {
                   )}
                 </CardContent>
               </Card>
-              <Card className="border-1 shadow-none border-neutral-200 rounded-md">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-base">User Rating</CardTitle>
-                  <CardDescription>Based on vendor reviews</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <div className="text-3xl font-semibold">
-                      {rating.average.toFixed(1)}
-                    </div>
-                    <div className="flex items-center gap-1 text-amber-500">
-                      {Array.from({ length: 5 }).map((_, i) => (
-                        <Star
-                          key={i}
-                          className={`h-4 w-4 ${
-                            i < Math.round(rating.average)
-                              ? "fill-amber-500"
-                              : "fill-transparent"
-                          }`}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    {rating.totalReviews} reviews • {rating.summary}
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <Button size="sm" variant="outline" className="gap-1">
-                      <ChartLine className="h-4 w-4" />
-                      <span>View reviews</span>
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
             </div>
           </section>
+
+          <div className="grid grid-cols-9 w-full justify-start gap-5">
+            <Card className="border-1 shadow-none col-span-12 border-neutral-200 rounded-md">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between gap-2">
+                  <div>
+                    <CardTitle className="text-base">Recent Tenders</CardTitle>
+                    <CardDescription>
+                      Latest tenders you’ve posted
+                    </CardDescription>
+                  </div>
+                  <Button variant="outline" size="sm" className="gap-1">
+                    <BarChart3 className="h-4 w-4" />
+                    <span>View all</span>
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <Input
+                      placeholder="Search by title, category or status..."
+                      value={query}
+                      onChange={(e) => setQuery(e.target.value)}
+                      className="pl-9"
+                      aria-label="Search tenders"
+                    />
+                    <LineChartIcon className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  </div>
+                  <Select
+                    value={filterStatus}
+                    onValueChange={(value: TenderStatus | "All") =>
+                      setFilterStatus(value)
+                    }
+                  >
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Filter by Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="All">All Statuses</SelectItem>
+                      <SelectItem value="Active">Active</SelectItem>
+                      <SelectItem value="Pending">Pending</SelectItem>
+                      <SelectItem value="Closed">Closed</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="rounded-lg">
+                  <Table className="px-0 ">
+                    <TableHeader className="px-0">
+                      <TableRow>
+                        <TableHead>Title</TableHead>
+                        <TableHead>Category</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead
+                          className="cursor-pointer"
+                          onClick={() => handleSort("postedAt")}
+                        >
+                          <div className="flex items-center gap-1">
+                            Posted At
+                            {sortColumn === "postedAt" &&
+                              (sortDirection === "asc" ? (
+                                <ArrowUp className="h-3 w-3" />
+                              ) : (
+                                <ArrowDown className="h-3 w-3" />
+                              ))}
+                          </div>
+                        </TableHead>
+                        <TableHead
+                          className="cursor-pointer"
+                          onClick={() => handleSort("deadline")}
+                        >
+                          <div className="flex items-center gap-1">
+                            Deadline
+                            {sortColumn === "deadline" &&
+                              (sortDirection === "asc" ? (
+                                <ArrowUp className="h-3 w-3" />
+                              ) : (
+                                <ArrowDown className="h-3 w-3" />
+                              ))}
+                          </div>
+                        </TableHead>
+                        <TableHead
+                          className="text-right cursor-pointer"
+                          onClick={() => handleSort("bidsReceived")}
+                        >
+                          <div className="flex items-center justify-center gap-1">
+                            Bids Received
+                            {sortColumn === "bidsReceived" &&
+                              (sortDirection === "asc" ? (
+                                <ArrowUp className="h-3 w-3" />
+                              ) : (
+                                <ArrowDown className="h-3 w-3" />
+                              ))}
+                          </div>
+                        </TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody className="px-0 ">
+                      {filteredTenders.map((t) => (
+                        <TableRow key={t.id} className=" px-0">
+                          <TableCell className="font-medium px-0">
+                            <div className="flex items-center gap-2">
+                              <span>{t.title}</span>
+                              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                            </div>
+                          </TableCell>
+                          <TableCell>{t.category}</TableCell>
+                          <TableCell>
+                            <StatusBadge status={t.status} />
+                          </TableCell>
+                          <TableCell>{formatDate(t.postedAt)}</TableCell>
+                          <TableCell>{formatDate(t.deadline)}</TableCell>
+                          <TableCell className="text-center">
+                            {t.bidsReceived}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </CardContent>
+            </Card>{" "}
+          </div>
         </div>
       </SidebarInset>
     </SidebarProvider>

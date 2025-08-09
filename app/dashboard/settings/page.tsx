@@ -2,7 +2,7 @@
 
 import type React from "react";
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -14,6 +14,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import Image from "next/image";
+import { Moon, Sun, Thermometer } from "lucide-react";
 
 export default function SettingsPage() {
   const [fullName, setFullName] = useState("John Doe");
@@ -30,6 +32,10 @@ export default function SettingsPage() {
 
   const [appLanguage, setAppLanguage] = useState("en");
 
+  // New states for Font & Theme
+  const [font, setFont] = useState("Inter");
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+
   const handleSaveAll = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -43,6 +49,8 @@ export default function SettingsPage() {
       newPassword,
       confirmPassword,
       appLanguage,
+      font,
+      theme,
     });
 
     setCurrentPassword("");
@@ -51,15 +59,13 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className=" container mx-auto px-0 py-8">
-      <Card className="border-0 bg-transparent  px-0">
+    <div className="container mx-auto px-0 py-8">
+      <Card className="border-0 bg-transparent px-0">
         <CardContent className="px-0">
           <form onSubmit={handleSaveAll} className="space-y-0">
             {/* Notification Settings */}
-            <div className="space-y-4 pt-6 pb-6 ">
-              <h2 className="text-lg font-semibold">
-                Notification Settings
-              </h2>
+            <div className="space-y-4 pt-6 pb-6">
+              <h2 className="text-lg font-semibold">Notification Settings</h2>
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <Label>New Bid Received</Label>
@@ -101,6 +107,46 @@ export default function SettingsPage() {
                     <SelectItem value="ar">العربية (Arabic)</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+            </div>
+
+            {/* Font & Theme Settings */}
+            <div className="space-y-6 pt-6 border-t">
+              {/* Font Selection */}
+              <div className="space-y-2">
+                <Label className="text-base font-medium">Font</Label>
+                <Select value={font} onValueChange={(value) => setFont(value)}>
+                  <SelectTrigger className="w-[200px]">
+                    <SelectValue placeholder="Select font" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Inter">Inter</SelectItem>
+                    <SelectItem value="Roboto">Roboto</SelectItem>
+                    <SelectItem value="Poppins">Poppins</SelectItem>
+                    <SelectItem value="Open Sans">Open Sans</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-sm text-muted-foreground">
+                  Set the font you want to use in the dashboard.
+                </p>
+              </div>
+
+              {/* Theme Selection */}
+              <div className="space-y-3">
+                <Label className="text-base font-medium">Theme</Label>
+                <p className="text-sm text-muted-foreground">
+                  Select the theme for the dashboard.
+                </p>
+                <div className="flex items-center gap-3">
+                  <Sun className="w-5 h-5" />
+                  <Switch
+                    checked={theme === "dark"}
+                    onCheckedChange={(checked) =>
+                      setTheme(checked ? "dark" : "light")
+                    }
+                  />
+                  <Moon className="w-5 h-5" />
+                </div>
               </div>
             </div>
 

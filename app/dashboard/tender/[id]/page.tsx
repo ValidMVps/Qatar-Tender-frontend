@@ -46,7 +46,7 @@ const getTenderData = (id: string) => {
         "We are looking for a qualified contractor to handle this important construction project in West Bay. The project involves complete construction of a 5-story office building with modern amenities.",
       budget: "150,000",
       deadline: "2024-02-15",
-      status: "approved",
+      status: "active",
       category: "Construction",
       location: "West Bay, Doha",
       postedDate: "Jan 10, 2024",
@@ -124,7 +124,7 @@ const getTenderData = (id: string) => {
         "Comprehensive corporate training program for 200+ employees covering leadership, digital skills, and compliance. Includes curriculum development, training materials, and delivery across multiple locations.",
       budget: "95,000",
       deadline: "2024-03-05",
-      status: "approved",
+      status: "active",
       category: "Training & Development",
       location: "Multiple Locations, Qatar",
       postedDate: "Jan 8, 2024",
@@ -508,7 +508,7 @@ export default function TenderDetailPage() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "approved":
+      case "active":
         return "bg-black text-white border-black";
       case "pending_approval":
         return "bg-gray-600 text-white border-gray-600";
@@ -523,8 +523,8 @@ export default function TenderDetailPage() {
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case "approved":
-        return "Approved";
+      case "active":
+        return "active";
       case "pending_approval":
         return "Pending Approval";
       case "closed":
@@ -586,7 +586,7 @@ export default function TenderDetailPage() {
                 </h3>
                 <p className="text-sm text-gray-700 mt-1">
                   This tender is currently under admin review. Bids and Q&A will
-                  be available once the tender is approved.
+                  be available once the tender is active.
                 </p>
               </div>
             </div>
@@ -875,7 +875,7 @@ export default function TenderDetailPage() {
                   </h3>
                   <p className="text-gray-700 max-w-md mx-auto mb-4">
                     Bids and Q&A sections are hidden until your tender is
-                    approved by an administrator. This helps ensure quality and
+                    active by an administrator. This helps ensure quality and
                     compliance with platform guidelines.
                   </p>
                   <Badge className="bg-gray-100 text-gray-800 border-gray-200">

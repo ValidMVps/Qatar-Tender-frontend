@@ -1,385 +1,386 @@
 "use client";
 
 import type React from "react";
-import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { FileUpload } from "@/components/file-upload";
-import { useToast } from "@/components/ui/use-toast";
-import { AvatarFallback } from "@radix-ui/react-avatar";
-import {
-  Calendar,
-  Camera,
-  Mail,
-  CheckCircle,
-  XCircle,
-  Clock,
-} from "lucide-react";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
-import { CountryCodeSelect } from "@/components/country-code-select";
 
-interface UserProfile {
-  fullName: string;
-  email: string;
-  mobile: string;
-  address: string;
-  countryCode: string;
-  nationalId: string;
-  nationalIdFile: File | null;
-  bio: string;
-  skills: string;
-  portfolioLink: string;
-}
+import { useState, useEffect } from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Progress } from "@/components/ui/progress";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"; // Re-import Tabs components
+import {
+  HomeIcon,
+  FileTextIcon,
+  FolderOpenIcon,
+  StarIcon,
+  SettingsIcon,
+  HelpCircleIcon,
+  BarChartIcon,
+  PlusIcon,
+  BellIcon,
+  CameraIcon,
+  MailIcon,
+  CalendarIcon,
+  UploadIcon,
+  SaveIcon,
+  XIcon,
+  CheckCircleIcon,
+} from "lucide-react";
+import Link from "next/link";
+import Image from "next/image";
 
 export default function ProfilePage() {
-  const { toast } = useToast();
-
-  const [profile, setProfile] = useState<UserProfile>({
-    fullName: "",
-    email: "",
-    mobile: "",
-    address: "",
-    countryCode: "+974",
-    nationalId: "",
-    nationalIdFile: null,
-    bio: "",
-    skills: "",
-    portfolioLink: "",
-  });
-
-  const [tempProfile, setTempProfile] = useState<UserProfile>({ ...profile });
   const [isEditing, setIsEditing] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [completion, setCompletion] = useState(0);
-  const [verificationStatus, setVerificationStatus] = useState<
-    "unverified" | "reviewing" | "verified" | "rejected"
-  >("unverified");
+  const [profileData, setProfileData] = useState({
+    fullName: "John Doe",
+    email: "john.doe@example.com",
+    mobileCountryCode: "QA",
+    mobileNumber: "12345678",
+    address: "",
+    nationalId: "",
+  });
+  const [profileCompletion, setProfileCompletion] = useState(0);
+  const [isProfileCompleted, setIsProfileCompleted] = useState(false);
+  const [showCompletionModal, setShowCompletionModal] = useState(false);
 
+  // Initial calculation of profile completion on component mount
   useEffect(() => {
-    const fetchUserData = async () => {
-      setIsLoading(true);
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      const userData = {
-        fullName: "John Doe",
-        email: "john.doe@example.com",
-        mobile: "12345678",
-        address: "",
-        countryCode: "+974",
-        nationalId: "",
-        nationalIdFile: null,
-        bio: "Experienced professional seeking new opportunities.",
-        skills: "Project Management, Data Analysis",
-        portfolioLink: "https://johndoe.com",
-      };
-      setProfile(userData);
-      setTempProfile(userData);
-      setIsLoading(false);
+    const calculateInitialCompletion = () => {
+      let completedFields = 0;
+      if (profileData.fullName) completedFields++;
+      if (profileData.email) completedFields++;
+      if (profileData.mobileNumber) completedFields++;
+      if (profileData.address) completedFields++;
+      if (profileData.nationalId) completedFields++;
+      setProfileCompletion(Math.round((completedFields / 5) * 100));
     };
-    fetchUserData();
+    calculateInitialCompletion();
   }, []);
 
-  useEffect(() => {
-    const fields = [
-      profile.fullName,
-      profile.email,
-      profile.mobile,
-      profile.address,
-      profile.countryCode,
-      profile.nationalId,
-      profile.nationalIdFile,
-      profile.bio,
-      profile.skills,
-      profile.portfolioLink,
-    ];
-    const filled = fields.filter(Boolean).length;
-    setCompletion(Math.round((filled / fields.length) * 100));
-  }, [profile]);
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
-    setTempProfile((prev) => ({ ...prev, [id]: value }));
+    setProfileData((prev) => ({ ...prev, [id]: value }));
   };
 
-  const handleFileChange = (file: File | null, field: keyof UserProfile) => {
-    setTempProfile((prev) => ({ ...prev, [field]: file }));
+  const handleSelectChange = (value: string) => {
+    setProfileData((prev) => ({ ...prev, mobileCountryCode: value }));
   };
 
-  const handleCountryCodeChange = (value: string) => {
-    setTempProfile((prev) => ({ ...prev, countryCode: value }));
-  };
-
-  const handleEdit = () => {
+  const handleEditClick = () => {
     setIsEditing(true);
-    setTempProfile({ ...profile });
   };
 
-  const handleCancel = () => {
+  const handleSaveClick = () => {
+    console.log("Saving profile data:", profileData);
     setIsEditing(false);
-    setTempProfile({ ...profile });
+
+    // Recalculate profile completion only on save
+    let completedFields = 0;
+    if (profileData.fullName) completedFields++;
+    if (profileData.email) completedFields++;
+    if (profileData.mobileNumber) completedFields++;
+    if (profileData.address) completedFields++;
+    if (profileData.nationalId) completedFields++;
+    setProfileCompletion(Math.round((completedFields / 5) * 100));
   };
 
-  const handleSave = async () => {
-    setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setProfile({ ...tempProfile });
+  const handleCancelClick = () => {
     setIsEditing(false);
-    setIsLoading(false);
-    toast({
-      title: "Profile Updated",
-      description: "Your profile has been saved.",
-    });
   };
 
-  const handleVerify = () => {
-    setVerificationStatus("reviewing");
-    toast({
-      title: "Verification Submitted",
-      description: "Your documents are under review.",
-    });
-
-    setTimeout(() => {
-      const outcome = Math.random() < 0.5 ? "verified" : "rejected";
-      setVerificationStatus(outcome as "verified" | "rejected");
-
-      toast({
-        title:
-          outcome === "verified" ? "Verified ✅" : "Verification Rejected ❌",
-        description:
-          outcome === "verified"
-            ? "You're verified now!"
-            : "Your submission was rejected. Please try again.",
-      });
-    }, 3000);
+  const handleCompleteProfileClick = () => {
+    setShowCompletionModal(true);
   };
 
-  const displayProfile = isEditing ? tempProfile : profile;
+  const handleConfirmCompletion = () => {
+    setIsProfileCompleted(true);
+    setIsEditing(false); // Lock editing
+    setShowCompletionModal(false);
+  };
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <p className="text-gray-500">Loading profile...</p>
-      </div>
-    );
-  }
+  const handleCloseModal = () => {
+    setShowCompletionModal(false);
+  };
+
+  // Determine if inputs should be disabled
+  const areInputsDisabled = !isEditing || isProfileCompleted;
 
   return (
-    <div className="space-y-6 container mx-auto px-0 py-8">
-      <Card className="border-0 bg-transparent">
-        <CardContent className="p-6">
-          <div className="flex flex-col md:flex-row gap-6 items-start md:items-center">
-            <div className="relative">
-              <Avatar className="h-24 w-24">
-                <AvatarImage
-                  src="https://bundui-images.netlify.app/avatars/08.png"
-                  alt="Profile"
-                />
-                <AvatarFallback className="text-2xl">JD</AvatarFallback>
-              </Avatar>
-              {verificationStatus !== "verified" && (
-                <Button
-                  size="icon"
-                  variant="outline"
-                  className="absolute -right-2 -bottom-2 h-8 w-8 rounded-full"
-                >
-                  <Camera />
-                </Button>
-              )}
-            </div>
-
-            <div className="flex-1 space-y-3">
-              <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-bold">{profile.fullName}</h1>
-                {verificationStatus === "verified" && (
-                  <CheckCircle className="text-green-600" size={20} />
-                )}
-                {verificationStatus === "reviewing" && (
-                  <Clock className="text-yellow-500" size={20} />
-                )}
-                {verificationStatus === "rejected" && (
-                  <XCircle className="text-red-500" size={20} />
-                )}
-              </div>
-              <p className="text-muted-foreground">Senior Product Designer</p>
-              <div className="text-muted-foreground flex gap-4 text-sm">
-                <div className="flex items-center gap-1">
-                  <Mail className="size-4" />
-                  {profile.email}
-                </div>
-                <div className="flex items-center gap-1">
-                  <Calendar className="size-4" />
-                  Joined March 2023
-                </div>
-              </div>
-            </div>
-
-            <div className="flex flex-col items-center gap-3">
-              {completion < 100 && (
-                <div className="relative w-20 h-20">
-                  <svg className="w-20 h-20 -rotate-90" viewBox="0 0 36 36">
-                    <path
-                      className="text-gray-200"
-                      stroke="currentColor"
-                      strokeWidth="3"
-                      fill="none"
-                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+    <div className="flex min-h-screen bg-white container mx-auto px-0 py-8">
+      <div className="flex-1 flex flex-col">
+        {/* Profile Content */}
+        <main className="flex-1 p-6 overflow-auto">
+          {/* Profile Summary Section (Full Width) */}
+          <div className="pb-6 mb-6 border-b border-gray-200">
+            <div className="flex items-center justify-between flex-wrap gap-4">
+              <div className="flex items-center gap-6">
+                <div className="relative">
+                  <Avatar className="w-28 h-28">
+                    <AvatarImage
+                      src="https://bundui-images.netlify.app/avatars/08.png"
+                      alt="John Doe"
                     />
-                    <path
-                      className="text-blue-500"
-                      stroke="currentColor"
-                      strokeWidth="3"
-                      fill="none"
-                      strokeLinecap="round"
-                      strokeDasharray={`${completion}, 100`}
-                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                    />
-                  </svg>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-sm font-semibold text-gray-700">
-                      {completion}%
-                    </span>
+                    <AvatarFallback>JD</AvatarFallback>
+                  </Avatar>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="absolute bottom-0 right-0 rounded-full bg-white border border-gray-200 shadow-sm w-9 h-9"
+                  >
+                    <CameraIcon className="w-5 h-5 text-gray-600" />
+                  </Button>
+                </div>
+                <div>
+                  <h2 className="text-3xl font-bold text-gray-900">John Doe</h2>
+                  <p className="text-gray-600 text-lg">
+                    Senior Product Designer
+                  </p>
+                  <div className="flex items-center gap-6 text-base text-gray-500 mt-3">
+                    <div className="flex items-center gap-2">
+                      <MailIcon className="w-5 h-5" />
+                      <span>john.doe@example.com</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CalendarIcon className="w-5 h-5" />
+                      <span>Joined March 2023</span>
+                    </div>
                   </div>
                 </div>
-              )}
-              {verificationStatus === "unverified" && completion === 100 && (
+              </div>
+              <div className="flex items-center gap-4">
+                {isProfileCompleted ? (
+                  <div className="flex items-center gap-2 text-blue-600 font-medium">
+                    <CheckCircleIcon className="w-5 h-5" />
+                    <span>Verification Pending</span>
+                  </div>
+                ) : !isEditing ? (
+                  <Button
+                    onClick={handleEditClick}
+                    className="bg-[#5A4DFF] hover:bg-[#4a3dff] text-white rounded-md px-6 py-2"
+                  >
+                    Edit Profile
+                  </Button>
+                ) : (
+                  <>
+                    <Button
+                      onClick={handleSaveClick}
+                      className="bg-green-500 hover:bg-green-600 text-white rounded-md px-6 py-2 flex items-center gap-2"
+                    >
+                      <SaveIcon className="w-4 h-4" />
+                      Save Changes
+                    </Button>
+                    <Button
+                      onClick={handleCancelClick}
+                      variant="outline"
+                      className="rounded-md px-6 py-2 flex items-center gap-2 bg-transparent"
+                    >
+                      <XIcon className="w-4 h-4" />
+                      Cancel
+                    </Button>
+                  </>
+                )}
+              </div>
+            </div>
+            {/* Profile Completion Bar */}
+            <div className="mt-8 pt-6 border-t border-gray-100">
+              <div className="flex items-center justify-between mb-2">
+                <Label className="text-gray-700 font-semibold">
+                  Profile Completion
+                </Label>
+                <span className="text-sm font-medium text-gray-700">
+                  {profileCompletion}%
+                </span>
+              </div>
+              <Progress
+                value={profileCompletion}
+                className="h-3 bg-gray-200 [&>*]:bg-[#5A4DFF]"
+              />
+              <p className="text-sm text-gray-500 mt-2">
+                Complete your profile to unlock all features.
+              </p>
+              {profileCompletion === 100 && !isProfileCompleted && (
                 <Button
-                  className="bg-green-500"
-                  onClick={handleVerify}
+                  onClick={handleCompleteProfileClick}
+                  className="mt-4 bg-blue-600 hover:bg-blue-700 text-white rounded-md px-6 py-2"
                 >
-                  <CheckCircle /> Verify Account
+                  Complete Profile
                 </Button>
               )}
-              {verificationStatus === "reviewing" && (
-                <p className="text-yellow-600 text-sm md:text-base font-semibold">
-                  Under Review...
-                </p>
-              )}
-              {verificationStatus === "verified" && (
-                <p className="text-green-600 text-sm md:text-base font-semibold">
-                  Verified
-                </p>
-              )}
-              {verificationStatus === "rejected" && (
-                <div className="flex flex-col items-center gap-2 text-center">
-                  <p className="text-red-600 text-sm md:text-base font-semibold">
-                    Your verification was rejected. Please check your info and
-                    try again.
+            </div>
+          </div>
+
+          {/* Tabbed Profile Form */}
+          <Tabs defaultValue="profile-details" className="w-full mt-6">
+            <TabsList className="grid w-full grid-cols-2 bg-gray-100 rounded-lg p-1">
+              <TabsTrigger
+                value="profile-details"
+                className="data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-md"
+              >
+                Profile Details
+              </TabsTrigger>
+              <TabsTrigger
+                value="account-verification"
+                className="data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-md"
+              >
+                Account Verification
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="profile-details" className="pt-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <Label htmlFor="fullName" className="text-gray-700">
+                    Full Name
+                  </Label>
+                  <Input
+                    id="fullName"
+                    value={profileData.fullName}
+                    onChange={handleInputChange}
+                    disabled={areInputsDisabled}
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="email" className="text-gray-700">
+                    Email
+                  </Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={profileData.email}
+                    onChange={handleInputChange}
+                    disabled={areInputsDisabled}
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="mobile" className="text-gray-700">
+                    Mobile
+                  </Label>
+                  <div className="flex gap-2 mt-1">
+                    <Select
+                      value={profileData.mobileCountryCode}
+                      onValueChange={handleSelectChange}
+                      disabled={areInputsDisabled}
+                    >
+                      <SelectTrigger className="w-[120px]">
+                        <SelectValue placeholder="Country" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="QA">QA +974</SelectItem>
+                        <SelectItem value="US">US +1</SelectItem>
+                        <SelectItem value="UK">UK +44</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Input
+                      id="mobileNumber"
+                      value={profileData.mobileNumber}
+                      onChange={handleInputChange}
+                      disabled={areInputsDisabled}
+                      className="flex-1"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <Label htmlFor="address" className="text-gray-700">
+                    Address
+                  </Label>
+                  <Input
+                    id="address"
+                    value={profileData.address}
+                    onChange={handleInputChange}
+                    disabled={areInputsDisabled}
+                    className="mt-1"
+                  />
+                </div>
+              </div>
+            </TabsContent>
+            <TabsContent value="account-verification" className="pt-6">
+              <div className="grid grid-cols-1 gap-6">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Account Verification
+                  </h3>
+                  <p className="text-sm text-gray-500 mb-4">
+                    This info is used to verify your identity.
                   </p>
-                  <Button
-                    size="sm"
-                    onClick={handleVerify}
-                    variant="destructive"
-                  >
-                    Reapply Verification
-                  </Button>
+                  <Label htmlFor="nationalId" className="text-gray-700">
+                    National ID
+                  </Label>
+                  <Input
+                    id="nationalId"
+                    value={profileData.nationalId}
+                    onChange={handleInputChange}
+                    disabled={areInputsDisabled}
+                    className="mt-1"
+                  />
                 </div>
-              )}
-            </div>
-
-            {(verificationStatus === "unverified" ||
-              verificationStatus === "rejected") &&
-              (isEditing ? (
-                <div className="flex flex-col gap-2">
-                  <Button variant="outline" onClick={handleCancel}>
-                    Cancel
-                  </Button>
-                  <Button onClick={handleSave}>Save</Button>
+                <div>
+                  <Label className="text-gray-700">
+                    Upload National ID (PDF, JPG, PNG)
+                  </Label>
+                  <div className="mt-1 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center flex flex-col items-center justify-center space-y-3">
+                    <UploadIcon className="w-8 h-8 text-gray-400" />
+                    <p className="text-gray-600 text-sm">
+                      Drag and drop your file here, or click to browse
+                    </p>
+                    <Button
+                      variant="outline"
+                      className="px-6 py-2 bg-transparent"
+                      disabled={areInputsDisabled}
+                    >
+                      Choose File
+                    </Button>
+                    <p className="text-xs text-gray-500">
+                      PDF, JPG, PNG up to 10MB
+                    </p>
+                  </div>
                 </div>
-              ) : (
-                <Button onClick={handleEdit}>Edit Profile</Button>
-              ))}
-          </div>
-        </CardContent>
-      </Card>
+              </div>
+            </TabsContent>
+          </Tabs>
+        </main>
+      </div>
 
-      {/* Personal Info Section */}
-      <Card className="border-0 bg-transparent">
-        <CardContent className="space-y-4">
-          <div>
-            <label htmlFor="fullName" className="text-sm font-medium">
-              Full Name
-            </label>
-            <Input
-              id="fullName"
-              value={displayProfile.fullName}
-              onChange={handleChange}
-              disabled={!isEditing || verificationStatus === "verified"}
-            />
-          </div>
-          <div>
-            <label htmlFor="email" className="text-sm font-medium">
-              Email
-            </label>
-            <Input
-              id="email"
-              type="email"
-              value={displayProfile.email}
-              disabled
-            />
-          </div>
-          <div>
-            <label htmlFor="mobile" className="text-sm font-medium">
-              Mobile
-            </label>
-            <div className="flex space-x-2">
-              <CountryCodeSelect
-                value={displayProfile.countryCode}
-                onChange={handleCountryCodeChange}
-              />
-              <Input
-                id="mobile"
-                type="tel"
-                value={displayProfile.mobile}
-                onChange={handleChange}
-                disabled={!isEditing || verificationStatus === "verified"}
-              />
-            </div>
-          </div>
-          <div>
-            <label htmlFor="address" className="text-sm font-medium">
-              Address
-            </label>
-            <Input
-              id="address"
-              value={displayProfile.address}
-              onChange={handleChange}
-              disabled={!isEditing || verificationStatus === "verified"}
-            />
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Verification Section */}
-      <Card className="border-0 bg-transparent">
-        <CardHeader>
-          <CardTitle className="text-base">Account Verification</CardTitle>
-          <p className="text-sm text-muted-foreground">
-            This info is used to verify your identity.
-          </p>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <label htmlFor="nationalId" className="text-sm font-medium">
-              National ID
-            </label>
-            <Input
-              id="nationalId"
-              value={displayProfile.nationalId}
-              onChange={handleChange}
-              disabled={!isEditing || verificationStatus === "verified"}
-            />
-          </div>
-          <FileUpload
-            label="Upload National ID (PDF, JPG, PNG)"
-            accept=".pdf,.jpg,.jpeg,.png"
-            value={displayProfile.nationalIdFile}
-            onChange={(file) => handleFileChange(file, "nationalIdFile")}
-          />
-        </CardContent>
-      </Card>
+      {/* Confirmation Dialog */}
+      <Dialog open={showCompletionModal} onOpenChange={setShowCompletionModal}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Confirm Profile Completion</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to complete your profile? Once confirmed,
+              your profile will be submitted for verification and you will no
+              longer be able to edit it.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={handleCloseModal}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleConfirmCompletion}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              Confirm
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
