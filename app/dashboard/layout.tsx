@@ -5,30 +5,17 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   Building2,
-  Plus,
   FileText,
   Home,
   Settings,
   HelpCircle,
-  Bell,
-  ChevronDown,
-  ChevronLeft,
-  ChevronRight,
-  Menu,
   X,
   Briefcase,
   Star,
-  GalleryVerticalEnd,
-  AudioWaveform,
-  Command,
-  PanelLeft,
-  PanelRight,
   BarChart,
 } from "lucide-react";
-import { AuthGuard } from "@/components/auth-guard";
-import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { motion } from "framer-motion";
 
 export default function DashboardLayout({
   children,
@@ -42,13 +29,6 @@ export default function DashboardLayout({
     document.body.style.overflow = sidebarOpen ? "hidden" : "";
   }, [sidebarOpen]);
 
-  const currentUser = {
-    name: "Ahmed Al-Mahmoud",
-    email: "ahmed@example.com",
-    avatar: "AM",
-    company: "Al-Mahmoud Enterprises",
-  };
-
   const sidebarLinks = [
     { name: "Dashboard", href: "/dashboard", icon: Home },
     { name: "My Tenders", href: "/dashboard/my-tenders", icon: FileText },
@@ -60,15 +40,28 @@ export default function DashboardLayout({
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-gray-50 flex flex-col lg:flex-row">
+      {/* Mobile overlay menu */}
       {sidebarOpen && (
-        <div className="fixed inset-0 z-40 flex lg:hidden">
+        <motion.div
+          className="fixed inset-0 z-40 flex lg:hidden"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ type: "keyframes", stiffness: 300, damping: 30 }}
+        >
           <div
-            className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm"
+            className="fixed inset-0 bg-black/20 shadow-lg bg-opacity-30 backdrop-blur-"
             onClick={() => setSidebarOpen(false)}
           />
-          <div className="relative flex w-64 flex-col bg-white h-full z-50 shadow-lg">
-            <div className="flex items-center justify-between px-4 py-4">
+          <motion.div
+            className="relative flex w-64 flex-col bg-white h-full z-50 shadow-lg"
+            initial={{ x: -200, opacity: 1 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ type: "keyframes", stiffness: 300, damping: 30 }}
+          >
+            <div className="flex items-center justify-between px-3 py-4">
               <div className="flex items-center">
                 <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center shadow-sm">
                   <Building2 className="h-5 w-5 text-white" />
@@ -81,7 +74,7 @@ export default function DashboardLayout({
                 <X className="h-6 w-6 text-gray-600" />
               </button>
             </div>
-            <nav className="mt-4 space-y-1 px-4">
+            <nav className="mt-4 space-y-1 px-2">
               {sidebarLinks.map((item) => (
                 <Link
                   key={item.name}
@@ -104,13 +97,15 @@ export default function DashboardLayout({
                 </Link>
               ))}
             </nav>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       )}
+
+      {/* Desktop sidebar */}
       <aside
-        className={`bg-white border-r border-gray-200 transition-all duration-300 ease-in-out ${
+        className={`bg-white border-r border-gray-200 transition-all duration-300 ease-in-out hidden lg:flex flex-col flex-shrink-0 relative z-30 ${
           sidebarOpen ? "w-16" : "w-64"
-        } hidden sm:flex flex-col flex-shrink-0 relative z-30`}
+        }`}
       >
         <div className="relative px-4 py-6 pb-10 flex items-center justify-between">
           <div className="flex items-center space-x-3">
@@ -149,15 +144,17 @@ export default function DashboardLayout({
               </span>
             </Link>
           ))}
-        </nav>{" "}
+        </nav>
       </aside>
+
+      {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0 bg-white">
         <Navbar
           sidebarOpen={sidebarOpen}
           setSidebarOpen={setSidebarOpen}
           sidebarLinks={sidebarLinks}
         />
-        <main className="flex-1 w-full px-4 sm:px-0 py-0 overflow-x-auto bg-neutral-50/30">
+        <main className="flex-1 w-full px-2 sm:px-4 py-4  md:mt-0 mt-[70px] bg-neutral-50/30">
           {children}
         </main>
       </div>

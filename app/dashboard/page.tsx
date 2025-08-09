@@ -136,13 +136,13 @@ export default function DashboardPage() {
       initial="hidden"
       animate="show"
       variants={{ show: { transition: { staggerChildren: 0.1 } } }}
-      className="container mx-auto  px-0 "
+      className="container mx-auto px-0"
     >
       {/* Welcome Box */}
-      <main className="flex-1 p-6 px-2 md:py-8  space-y-7 ">
-        <div className="flex items-center justify-between py-3 px-1 ">
-          <div>
-            <h1 className="text-3xl font-bold pb-2 text-gray-900">
+      <main className="flex-1  py-1 px-1 md:py-3 md:px-3  space-y-7">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between py-3 px-1">
+          <div className="mb-4 md:mb-0">
+            <h1 className="md:text-3xl text-xl font-bold pb-2 text-gray-900">
               Welcome back Ahmed Al-Mahmoud
             </h1>
             <p className="text-md text-gray-500">
@@ -150,14 +150,14 @@ export default function DashboardPage() {
             </p>
           </div>
           <Button
-            className="bg-blue-600 hover:bg-blue-700 text-white shadow-md"
+            className="bg-blue-600 hover:bg-blue-700 text-white shadow-md flex items-center "
             onClick={() => setOpenTenderModal(true)}
           >
-            <Plus className="mr-2 h-4 w-4" /> Post New Tender
+            <Plus className="md:mr-2 mr-0 h-4 w-4" /> Post New Tender
           </Button>
         </div>
         {/* Stats Cards */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
+        <div className="md:grid hidden gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 xl:grid-cols-4 mb-8">
           {statsData.map((stat, index) => {
             const Icon = stat.icon; // Capitalized so JSX knows it's a component
             return (
@@ -186,7 +186,7 @@ export default function DashboardPage() {
           })}
         </div>
         {/* Overview Chart */}
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <RecentTenders />
           <Card className="mb-8 shadow-xs rounded-md border-neutral-200">
             <CardHeader>
@@ -199,23 +199,7 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
         </div>
-        {/* Recent Tenders 
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold text-gray-900">
-            Recent Tenders
-          </h2>
-          <Button
-            variant="outline"
-            className="text-sm text-gray-600 bg-transparent"
-          >
-            View All
-          </Button>
-        </div>
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2">
-          {tendersData.map((tender) => (
-            <TenderCarder key={tender.id} tender={tender} />
-          ))}
-        </div>*/}{" "}
+
         <CreateTenderModal
           open={openTenderModal}
           onOpenChange={setOpenTenderModal}

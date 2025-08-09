@@ -121,111 +121,109 @@ export default function BidderProfilePage() {
   }
 
   return (
-    <div className="space-y-6 container mx-auto px-0 py-8">
-      <div className="mx-auto space-y-8">
-        <Card className="border-0 bg-transparent">
-          <CardHeader className="p-6 border-b flex flex-col sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="w-14 h-14 bg-gray-100 rounded-md flex items-center justify-center">
-                <Building2 className="h-7 w-7 text-emerald-600" />
-              </div>
+    <div className="container  py-1 px-2 md:py-3 md:px-3 space-y-4 md:space-y-6">
+      <Card className="border-0 bg-transparent px-0">
+      <CardHeader className="p-2 md:p-6 border-b flex flex-col md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-col md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-4 pb-3">
+        <div>
+          <CardTitle className="text-xl md:text-2xl font-semibold pb-1">
+          {bidder.name}
+          </CardTitle>
+          <CardDescription className="text-sm text-gray-600 flex items-center">
+          <Star className="h-4 w-4 text-yellow-400 mr-1" />
+          {bidder.overallRating} ({bidder.totalReviews} reviews)
+          </CardDescription>
+        </div>
+        </div>
+      </CardHeader>
+
+      <CardContent className="p-0 md:p-6 space-y-6 pt-3">
+        {/* About */}
+        <section className="break-words">
+        <h3 className="text-lg font-semibold mb-2">About</h3>
+        <p className="text-gray-700">{bidder.bio}</p>
+        </section>
+
+        <Separator />
+
+        {/* Contact */}
+        <section>
+        <h3 className="text-lg font-semibold mb-2">
+          Contact Information
+        </h3>
+        <div className="space-y-2 text-gray-700">
+          <p className="flex items-start md:items-center break-all">
+          <Mail className="w-4 h-4 mr-2 flex-shrink-0 mt-1 md:mt-0" />
+          {bidder.email}
+          </p>
+          <p className="flex items-center">
+          <Phone className="w-4 h-4 mr-2 flex-shrink-0" />
+          {bidder.phone}
+          </p>
+          <p className="flex items-start md:items-center">
+          <MapPin className="w-4 h-4 mr-2 flex-shrink-0 mt-1 md:mt-0" />
+          {bidder.address}
+          </p>
+        </div>
+        </section>
+
+        <Separator />
+
+        {/* Projects & Reviews */}
+        <section>
+        <h3 className="text-lg font-semibold mb-4">Projects & Reviews</h3>
+
+        <div className="space-y-6">
+          {bidder.projectHistory.map((project) => (
+          <Card
+            key={project.id}
+            className="p-3 md:p-5 border-0 border-b-1 rounded-none"
+          >
+            {/* Project Header */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+            <div className="flex items-start gap-3">
+              <Briefcase className="h-5 w-5 text-blue-600 mt-1" />
               <div>
-                <CardTitle className="text-2xl font-semibold pb-1">
-                  {bidder.name}
-                </CardTitle>
-                <CardDescription className="text-sm text-gray-600 flex items-center">
-                  <Star className="h-4 w-4 text-yellow-400 mr-1" />
-                  {bidder.overallRating} ({bidder.totalReviews} reviews)
-                </CardDescription>
+              <p className="font-medium text-base">
+                {project.name}
+              </p>
+              <p className="text-sm text-gray-500 flex items-center mt-1">
+                <Calendar className="h-3 w-3 mr-1" />
+                {project.date}
+              </p>
               </div>
             </div>
-          </CardHeader>
 
-          <CardContent className="p-6 space-y-6">
-            {/* About */}
-            <section>
-              <h3 className="text-lg font-semibold mb-2">About</h3>
-              <p className="text-gray-700">{bidder.bio}</p>
-            </section>
+            <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-start">
+              <Badge>{project.status}</Badge>
+              <span className="flex items-center text-yellow-500 text-sm">
+              {project.rating}
+              <Star className="h-4 w-4 fill-current ml-1" />
+              </span>
+            </div>
+            </div>
 
-            <Separator />
-
-            {/* Contact */}
-            <section>
-              <h3 className="text-lg font-semibold mb-2">
-                Contact Information
-              </h3>
-              <div className="space-y-2 text-gray-700 px-0">
-                <p className="flex items-center">
-                  <Mail className="w-4 h-4 mr-2" /> {bidder.email}
-                </p>
-                <p className="flex items-center">
-                  <Phone className="w-4 h-4 mr-2" /> {bidder.phone}
-                </p>
-                <p className="flex items-center">
-                  <MapPin className="w-4 h-4 mr-2" /> {bidder.address}
+            {/* Reviews */}
+            {project.reviews && project.reviews.length > 0 && (
+            <div className="mt-4 space-y-3">
+              {project.reviews.map((review) => (
+              <div
+                key={review.id}
+                className="bg-gray-50 p-3 rounded-md border border-gray-200"
+              >
+                <p className="text-sm text-gray-700">
+                {review.comment}
                 </p>
               </div>
-            </section>
-
-            <Separator />
-
-            {/* Projects & Reviews */}
-            <section>
-              <h3 className="text-lg font-semibold mb-4">Projects & Reviews</h3>
-
-              <div className="space-y-6">
-                {bidder.projectHistory.map((project) => (
-                  <Card
-                    key={project.id}
-                    className="p-5 border-0 border-b-1 rounded-none s px-0"
-                  >
-                    {/* Project Header */}
-                    <div className="flex justify-between items-start flex-wrap gap-4">
-                      <div className="flex items-start gap-3">
-                        <Briefcase className="h-5 w-5 text-blue-600 mt-1" />
-                        <div>
-                          <p className="font-medium text-base">
-                            {project.name}
-                          </p>
-                          <p className="text-sm text-gray-500 flex items-center mt-1">
-                            <Calendar className="h-3 w-3 mr-1" />
-                            {project.date}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-3">
-                        <Badge>{project.status}</Badge>
-                        <span className="flex items-center text-yellow-500 text-sm">
-                          {project.rating}
-                          <Star className="h-4 w-4 fill-current ml-1" />
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Reviews */}
-                    {project.reviews && project.reviews.length > 0 && (
-                      <div className="mt-4 space-y-3">
-                        {project.reviews.map((review) => (
-                          <div
-                            key={review.id}
-                            className="bg-gray-50 p-3 rounded-md border border-gray-200"
-                          >
-                            <p className="text-sm text-gray-700">
-                              {review.comment}
-                            </p>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </Card>
-                ))}
-              </div>
-            </section>
-          </CardContent>
-        </Card>
-      </div>
+              ))}
+            </div>
+            )}
+          </Card>
+          ))}
+        </div>
+        </section>
+      </CardContent>
+      </Card>
     </div>
   );
 }

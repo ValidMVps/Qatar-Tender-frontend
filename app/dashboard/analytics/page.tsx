@@ -202,16 +202,27 @@ function StatCard({
   subtle?: string;
 }) {
   return (
-    <Card className="h-full border-1 shadow-none bg-blue-500 text-white border-neutral-200 rounded-md">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-        <CardTitle className="text-sm font-medium">{title}</CardTitle>
-        <div className="text-white ">{icon}</div>
-      </CardHeader>
-      <CardContent>
-        <div className="text-2xl font-semibold">{value}</div>
-        {subtle ? <p className="text-xs text-white mt-1">{subtle}</p> : null}
-      </CardContent>
-    </Card>
+    <>
+      <Card className="h-full border-1 md:block hidden shadow-none bg-blue-500 text-white border-neutral-200 rounded-md">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+          <CardTitle className="text-sm font-medium">{title}</CardTitle>
+          <div className="text-white ">{icon}</div>
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-semibold">{value}</div>
+          {subtle ? <p className="text-xs text-white mt-1">{subtle}</p> : null}
+        </CardContent>
+      </Card>
+      <Card className="w-full border-0 border-b-1  md:hidden flex justify-between items-center shadow-none bg-white text-black border-neutral-200 rounded-none ">
+        <CardTitle className="text-sm font-medium">
+          {title}
+          {subtle ? <p className="text-xs text-black/70 font-normal mt-0">{subtle}</p> : null}
+        </CardTitle>
+        <CardContent className="flex items-center justify-center x py-3">
+          <div className="text-lg font-semibold">{value}</div>
+        </CardContent>
+      </Card>
+    </>
   );
 }
 
@@ -429,12 +440,12 @@ export default function Component() {
   return (
     <SidebarProvider>
       {/* Main content */}
-      <SidebarInset className="bg-transparent">
+      <SidebarInset className="bg-transparent container py-1 px-2 md:py-3 md:px-3 ">
         {/* Page body */}
-        <div className="flex flex-1 flex-col gap-6 p-4 md:p-6">
+        <div className="flex flex-1 flex-col gap-6">
           {/* Snapshot cards */}
           <section>
-            <div className="grid gap-4 md:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
+            <div className="grid gap-2 md:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
               <StatCard
                 title="Total Tenders Posted"
                 value={String(totalTenders)}
@@ -468,12 +479,12 @@ export default function Component() {
             </div>
           </section>
           {/* Charts and lists */}
-          <section className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
+          <section className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6">
             {/* Left (main) column */}
             <ProjectsOverviewChart />
             {/* Right (aside) column */}
-            <div className="lg:col-span-5 flex flex-col gap-4 md:gap-4">
-              {/* User Rating */}{" "}
+            <div className="md:col-span-5 col-span-1 flex flex-col gap-4 md:gap-4">
+              {/* User Rating */}
               <Card className="w-full p-6">
                 <CardContent className="p-0 space-y-6">
                   {/* Total Projects Section */}
@@ -483,7 +494,6 @@ export default function Component() {
                     </p>
                     <h2 className="text-4xl font-bold mt-1">128</h2>
                   </div>
-
                   {/* Recently Active Posters Section */}
                   <div>
                     <div className="flex -space-x-2 overflow-hidden">
@@ -524,7 +534,6 @@ export default function Component() {
                       </Avatar>
                     </div>
                   </div>
-
                   {/* Highlights Section */}
                   <div className="space-y-4">
                     <h3 className="text-base font-semibold">Highlights</h3>
@@ -556,7 +565,7 @@ export default function Component() {
                   </div>
                 </CardContent>
               </Card>
-              <Card className="border-1 col-span-3 h-fit shadow-none border-neutral-200 rounded-md">
+              <Card className="border-1 col-span-full lg:col-span-3 h-fit shadow-none border-neutral-200 rounded-md">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-base flex items-center gap-2">
                     <AlertTriangle className="h-4 w-4 text-amber-600" />
@@ -593,25 +602,28 @@ export default function Component() {
               </Card>
             </div>
           </section>
-
-          <div className="grid grid-cols-9 w-full justify-start gap-5">
-            <Card className="border-1 shadow-none col-span-12 border-neutral-200 rounded-md">
+          <div className="grid grid-cols-12 w-full justify-start gap-2 md:gap-5">
+            <Card className="border-1 shadow-none col-span-full border-neutral-200 rounded-md">
               <CardHeader className="pb-3">
-                <div className="flex items-center justify-between gap-2">
+                <div className="flex flex-row sm:flex-row items-start sm:items-center justify-between gap-2">
                   <div>
                     <CardTitle className="text-base">Recent Tenders</CardTitle>
                     <CardDescription>
                       Latest tenders you’ve posted
                     </CardDescription>
                   </div>
-                  <Button variant="outline" size="sm" className="gap-1">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-1 bg-transparent"
+                  >
                     <BarChart3 className="h-4 w-4" />
                     <span>View all</span>
                   </Button>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <div className="relative flex-1">
                     <Input
                       placeholder="Search by title, category or status..."
@@ -628,7 +640,7 @@ export default function Component() {
                       setFilterStatus(value)
                     }
                   >
-                    <SelectTrigger className="w-[180px]">
+                    <SelectTrigger className="w-full sm:w-[180px]">
                       <SelectValue placeholder="Filter by Status" />
                     </SelectTrigger>
                     <SelectContent>
@@ -639,7 +651,8 @@ export default function Component() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="rounded-lg">
+                {/* Responsive Table */}
+                <div className="rounded-lg overflow-x-auto hidden md:block">
                   <Table className="px-0 ">
                     <TableHeader className="px-0">
                       <TableRow>
@@ -647,7 +660,7 @@ export default function Component() {
                         <TableHead>Category</TableHead>
                         <TableHead>Status</TableHead>
                         <TableHead
-                          className="cursor-pointer"
+                          className="cursor-pointer whitespace-nowrap"
                           onClick={() => handleSort("postedAt")}
                         >
                           <div className="flex items-center gap-1">
@@ -661,7 +674,7 @@ export default function Component() {
                           </div>
                         </TableHead>
                         <TableHead
-                          className="cursor-pointer"
+                          className="cursor-pointer whitespace-nowrap"
                           onClick={() => handleSort("deadline")}
                         >
                           <div className="flex items-center gap-1">
@@ -675,7 +688,7 @@ export default function Component() {
                           </div>
                         </TableHead>
                         <TableHead
-                          className="text-right cursor-pointer"
+                          className="text-right cursor-pointer whitespace-nowrap"
                           onClick={() => handleSort("bidsReceived")}
                         >
                           <div className="flex items-center justify-center gap-1">
@@ -693,19 +706,25 @@ export default function Component() {
                     <TableBody className="px-0 ">
                       {filteredTenders.map((t) => (
                         <TableRow key={t.id} className=" px-0">
-                          <TableCell className="font-medium px-0">
+                          <TableCell className="font-medium px-0 whitespace-nowrap">
                             <div className="flex items-center gap-2">
                               <span>{t.title}</span>
                               <ChevronRight className="h-4 w-4 text-muted-foreground" />
                             </div>
                           </TableCell>
-                          <TableCell>{t.category}</TableCell>
+                          <TableCell className="whitespace-nowrap">
+                            {t.category}
+                          </TableCell>
                           <TableCell>
                             <StatusBadge status={t.status} />
                           </TableCell>
-                          <TableCell>{formatDate(t.postedAt)}</TableCell>
-                          <TableCell>{formatDate(t.deadline)}</TableCell>
-                          <TableCell className="text-center">
+                          <TableCell className="whitespace-nowrap">
+                            {formatDate(t.postedAt)}
+                          </TableCell>
+                          <TableCell className="whitespace-nowrap">
+                            {formatDate(t.deadline)}
+                          </TableCell>
+                          <TableCell className="text-center whitespace-nowrap">
                             {t.bidsReceived}
                           </TableCell>
                         </TableRow>
@@ -713,8 +732,35 @@ export default function Component() {
                     </TableBody>
                   </Table>
                 </div>
+                {/* Mobile Card List */}
+                <div className="block md:hidden space-y-3">
+                  {filteredTenders.length === 0 ? (
+                    <p className="text-sm text-muted-foreground px-2">No tenders found.</p>
+                  ) : (
+                    filteredTenders.map((t) => (
+                      <div
+                        key={t.id}
+                        className=" rounded-lg py-3 flex flex-col gap-2 bg-white "
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="font-semibold">{t.title}</span>
+                          <StatusBadge status={t.status} />
+                        </div>
+                        <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+                          <span>{t.category}</span>
+                          <span>• Posted: {formatDate(t.postedAt)}</span>
+                          <span>• Deadline: {formatDate(t.deadline)}</span>
+                        </div>
+                        <div className="flex items-center justify-between mt-1">
+                          <span className="text-xs">Bids: {t.bidsReceived}</span>
+                          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
               </CardContent>
-            </Card>{" "}
+            </Card>
           </div>
         </div>
       </SidebarInset>

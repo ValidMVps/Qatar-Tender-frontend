@@ -15,13 +15,13 @@ import { Mail, Phone, MapPin } from "lucide-react";
 
 export default function HelpPage() {
   return (
-    <div className="container mx-auto px-0 py-8">
+    <div className="container py-1 px-2 md:py-3 md:px-3">
       <section className="mb-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-10">
           {/* FAQ Section */}
-          <div className="space-y-10">
+          <div className="space-y-4 order-2 md:order-1">
             <div>
-              <h3 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-6">
+              <h3 className="text-xl md:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-3 md:mb-6">
                 Frequently Asked Questions
               </h3>
               <Accordion type="single" collapsible className="w-full">
@@ -65,9 +65,9 @@ export default function HelpPage() {
                   <AccordionItem
                     key={index}
                     value={`item-${index + 1}`}
-                    className="border-b py-2"
+                    className="border-b py-1 md:py-2 px-0"
                   >
-                    <AccordionTrigger className="bg- dark:bg-neutral-900 px-4 py-3 text-base font-medium text-left  dark:hover:bg-neutral-800 transition-colors duration-200">
+                    <AccordionTrigger className="bg- dark:bg-neutral-900 px-1 md:px-4 py-3 text-xs md:text-base font-medium text-left  dark:hover:bg-neutral-800 transition-colors duration-200">
                       {item.title}
                     </AccordionTrigger>
                     <AccordionContent className="px-4 pb-4 text-gray-700 dark:text-gray-300">
@@ -80,14 +80,14 @@ export default function HelpPage() {
           </div>
 
           {/* Contact Form + Info */}
-          <div className="flex flex-col gap-6">
-            <Card className="rounded-md border-neutral-200/70 h-min">
-              <CardHeader>
+          <div className="flex flex-col md:gap-6 gap-4 order-2">
+            <Card className="rounded-md border-0 md:border-1 md:border-neutral-200/70 h-min">
+              <CardHeader className="px-0 md:px-6">
                 <CardTitle className="text-lg font-semibold">
                   Send us a message
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-5">
+              <CardContent className="space-y-5  px-0 md:px-7">
                 <div>
                   <Label htmlFor="name" className="mb-1">
                     Your Name

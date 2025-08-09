@@ -422,11 +422,10 @@ export default function MyTendersPage() {
   };
 
   return (
-    <div className="container mx-auto px-0 py-8">
+    <div className="container mx-auto  py-1 px-1 md:py-3 md:px-3 ">
       {/* Search and Filter Section */}
-      <div className="mb-6 space-y-4 ">
-        {" "}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+      <div className="mb-6 space-y-2 md:space-y-4 w-full">
+        <div className="md:grid hidden grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 mb-6">
           <Card className="bg-blue-500 border border-neutral-300 py-2">
             <CardContent className="p-4 flex items-center justify-between">
               <div>
@@ -441,7 +440,7 @@ export default function MyTendersPage() {
           <Card className="bg-blue-500 border border-neutral-300 py-2">
             <CardContent className="p-4 flex items-center justify-between">
               <div>
-                <p className="text-sm text-white  pb-1">Active Tenders</p>
+                <p className="text-sm text-white pb-1">Active Tenders</p>
                 <p className="text-xl font-semibold text-white">
                   {tenders.filter((t) => t.status === "active").length}
                 </p>
@@ -452,7 +451,7 @@ export default function MyTendersPage() {
           <Card className="bg-blue-500 border border-neutral-300 py-2">
             <CardContent className="p-4 flex items-center justify-between">
               <div>
-                <p className="text-sm text-white  pb-1">Awarded Tenders</p>
+                <p className="text-sm text-white pb-1">Awarded Tenders</p>
                 <p className="text-xl font-semibold text-white">
                   {tenders.filter((t) => t.awardedBid).length}
                 </p>
@@ -463,7 +462,7 @@ export default function MyTendersPage() {
           <Card className="bg-blue-500 text-white border border-neutral-300 py-2">
             <CardContent className="p-4 flex items-center justify-between">
               <div>
-                <p className="text-sm text-white  pb-1">Completed Tenders</p>
+                <p className="text-sm text-white pb-1">Completed Tenders</p>
                 <p className="text-xl font-semibold text-white">
                   {tenders.filter((t) => t.isCompleted).length}
                 </p>
@@ -474,7 +473,7 @@ export default function MyTendersPage() {
           <Card className="bg-blue-500 text-white border border-neutral-300 py-2">
             <CardContent className="p-4 flex items-center justify-between">
               <div>
-                <p className="text-sm text-white  pb-1">Rejected Tenders</p>
+                <p className="text-sm text-white pb-1">Rejected Tenders</p>
                 <p className="text-xl font-semibold text-white">
                   {tenders.filter((t) => t.isCompleted).length}
                 </p>
@@ -483,23 +482,23 @@ export default function MyTendersPage() {
             </CardContent>
           </Card>
         </div>
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="relative flex-1">
+        <div className="flex flex-row gap-1 md:gap-4 w-full">
+          <div className="relative flex-1 md:w-full">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
               placeholder="Search tenders by title, description, or category..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 h-11 border-neutral-300 focus:border-blue-500 focus:ring-blue-500"
+              className="pl-10 h-11 border-neutral-300 w-full focus:border-blue-500 focus:ring-blue-500"
             />
           </div>
-          <div className="flex gap-3">
+          <div className="md:flex hidden w-[30%] md:w-auto overflow-hidden gap-1 md:gap-3">
             <Select
               value={selectedCategory}
               onValueChange={setSelectedCategory}
             >
               <SelectTrigger className="w-[200px] h-11 border-neutral-300 focus:border-blue-500 focus:ring-blue-500">
-                <Filter className="h-4 w-4 mr-2" />
+                <Filter className="h-4 w-4 mr-2 " />
                 <SelectValue placeholder="All Categories" />
               </SelectTrigger>
               <SelectContent>
@@ -513,12 +512,6 @@ export default function MyTendersPage() {
             </Select>
           </div>
         </div>
-        {/* Results counter 
-        <div className="text-sm text-gray-600">
-          Showing {filteredTenders.length} of {tenders.length} tenders
-          {searchQuery && ` for "${searchQuery}"`}
-          {selectedCategory && selectedCategory !== "all" && ` in ${selectedCategory}`}
-        </div>*/}
       </div>
 
       <Tabs
@@ -526,164 +519,179 @@ export default function MyTendersPage() {
         onValueChange={setActiveTab}
         className="w-full mb-6"
       >
-        <TabsList className="grid w-full grid-cols-6">
-          {" "}
-          {/* Changed grid-cols-7 to grid-cols-6 */}
+        <TabsList className=" w-full grid-cols-3 sm:grid-cols-6 gap-2 md:grid hidden">
+          {/* Changed grid-cols-6 on small screens and below to grid-cols-3 for better wrapping */}
           <TabsTrigger value="all">All</TabsTrigger>
           <TabsTrigger value="active">Active</TabsTrigger>
           <TabsTrigger value="awarded">Awarded</TabsTrigger>
-          {/* Removed Pending tab */}
           <TabsTrigger value="closed">Closed</TabsTrigger>
           <TabsTrigger value="rejected">Rejected</TabsTrigger>
           <TabsTrigger value="completed">Completed</TabsTrigger>
         </TabsList>
         <TabsContent value={activeTab} className="mt-4">
-          <div className="space-y-4">
+          <div className="space-y-2 md:space-y-4">
             {filteredTenders.length > 0 ? (
               filteredTenders.map((tender) => (
-                <Card
-                  key={tender.id}
-                  className="border border-neutral-200/50 rounded-lg"
-                >
-                  <CardContent className="p-6">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-3 mb-2">
-                          <h3 className="font-semibold text-gray-900 text-lg">
-                            {tender.title}
-                          </h3>
+                <Link href={`/dashboard/tender/${tender.id}`}>
+                  {" "}
+                  <Card
+                    key={tender.id}
+                    className="border border-neutral-200/50 rounded-lg"
+                  >
+                    <CardContent className="md:p-6 p-4">
+                      <div className="flex flex-col md:flex-row items-start md:items-start justify-between mb-3 gap-2 md:gap-4 ">
+                        <div className="flex-1">
+                          <div className="flex  md:flex-row flex-row sm:flex-row items-start sm:items-center space-x-0 sm:space-x-4 mb-2">
+                            <h3 className="font-semibold text-gray-900 text-sm md:text-lg">
+                              {tender.title}
+                            </h3>
+                            <Badge
+                              className={`md:text-xs text-base border hidden md:flex items-center space-x-1 ${getStatusColor(
+                                tender
+                              )}`}
+                            >
+                              {getStatusIcon(tender)}
+                              <span>{getStatusText(tender)}</span>
+                            </Badge>
+                          </div>
+                          <p className="text-xs  text-gray-600 line-clamp-2 mb-0 md:mb-3">
+                            {tender.description}
+                          </p>
+                          <div className="md:flex hidden flex-wrap items-center gap-4 text-sm text-gray-500">
+                            <span className="flex items-center">
+                              <Calendar className="h-4 w-4 mr-1" />
+                              Posted: {tender.postedDate}
+                            </span>
+                            <span className="flex items-center">
+                              <Users className="h-4 w-4 mr-1" />
+                              {tender.bidsCount} bids
+                            </span>
+                            <span className="flex items-center">
+                              <DollarSign className="h-4 w-4 mr-1" />
+                              {tender.budget} QAR
+                            </span>
+                            <Badge variant="outline" className="text-xs">
+                              {tender.category}
+                            </Badge>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-2 ml-0 md:ml-4">
                           <Badge
-                            className={`text-xs border flex items-center space-x-1 ${getStatusColor(
+                            className={`text-xs border md:hidden items-center space-x-1 ${getStatusColor(
                               tender
                             )}`}
                           >
-                            {getStatusIcon(tender)}
-                            <span>{getStatusText(tender)}</span>
+                            <div className="hidden">
+                              {" "}
+                              {getStatusIcon(tender)}
+                            </div>
+                            <span className="text-xs">
+                              {getStatusText(tender)}
+                            </span>
                           </Badge>
-                        </div>
-                        <p className="text-sm text-gray-600 line-clamp-2 mb-3">
-                          {tender.description}
-                        </p>
-                        <div className="flex items-center space-x-6 text-sm text-gray-500">
-                          <span className="flex items-center">
-                            <Calendar className="h-4 w-4 mr-1" />
-                            Posted: {tender.postedDate}
-                          </span>
-                          <span className="flex items-center">
-                            <Users className="h-4 w-4 mr-1" />
-                            {tender.bidsCount} bids
-                          </span>
-                          <span className="flex items-center">
-                            <DollarSign className="h-4 w-4 mr-1" />
-                            {tender.budget} QAR
-                          </span>
-                          <Badge variant="outline" className="text-xs">
-                            {tender.category}
-                          </Badge>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-2 ml-4">
-                        {tender.status !== "rejected" && (
-                          <Link href={`/dashboard/tender/${tender.id}`}>
+                          {tender.status !== "rejected" && (
+                            <Link href={`/dashboard/tender/${tender.id}`}>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-blue-600 hover:text-blue-700 md:flex hidden hover:bg-blue-50"
+                              >
+                                <Eye className="h-4 w-4 mr-1" />
+                                View
+                              </Button>
+                            </Link>
+                          )}
+                          <div className="relative group">
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                              className="hover:bg-gray-100"
                             >
-                              <Eye className="h-4 w-4 mr-1" />
-                              View
+                              <MoreHorizontal className="h-4 w-4" />
                             </Button>
-                          </Link>
-                        )}
-                        <div className="relative group">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="hover:bg-gray-100"
-                          >
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                          <div className="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">
-                            <div className="py-1">
-                              {tender.status !== "closed" &&
-                                tender.status !== "rejected" && (
-                                  <div
-                                    className=" px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
-                                    onClick={() => setOpenTenderModal(true)}
-                                  >
-                                    <Edit className="h-4 w-4 mr-2" />
-                                    Edit Tender
-                                  </div>
-                                )}
+                            <div className="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">
+                              <div className="py-1">
+                                {tender.status !== "closed" &&
+                                  tender.status !== "rejected" && (
+                                    <div
+                                      className=" px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center cursor-pointer"
+                                      onClick={() => setOpenTenderModal(true)}
+                                    >
+                                      <Edit className="h-4 w-4 mr-2" />
+                                      Edit Tender
+                                    </div>
+                                  )}
 
-                              {tender.status === "active" &&
-                                !tender.awardedBid && (
-                                  <button
-                                    onClick={() =>
-                                      setShowConfirmModal({
-                                        show: true,
-                                        action: "close",
-                                        tenderId: tender.id,
-                                      })
-                                    }
-                                    className=" w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
-                                  >
-                                    <XCircle className="h-4 w-4 mr-2" />
-                                    Close Tender
-                                  </button>
-                                )}
+                                {tender.status === "active" &&
+                                  !tender.awardedBid && (
+                                    <button
+                                      onClick={() =>
+                                        setShowConfirmModal({
+                                          show: true,
+                                          action: "close",
+                                          tenderId: tender.id,
+                                        })
+                                      }
+                                      className=" w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                                    >
+                                      <XCircle className="h-4 w-4 mr-2" />
+                                      Close Tender
+                                    </button>
+                                  )}
 
-                              {/* Reapply button moved to rejection reason modal */}
+                                {/* Reapply button moved to rejection reason modal */}
 
-                              <EditTenderModal
-                                open={openTenderModal}
-                                onOpenChange={setOpenTenderModal}
-                              />
-                              <button
-                                onClick={() =>
-                                  setShowConfirmModal({
-                                    show: true,
-                                    action: "delete",
-                                    tenderId: tender.id,
-                                  })
-                                }
-                                className=" w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center"
-                              >
-                                <Trash2 className="h-4 w-4 mr-2" />
-                                Close Tender
-                              </button>
+                                <EditTenderModal
+                                  open={openTenderModal}
+                                  onOpenChange={setOpenTenderModal}
+                                />
+                                <button
+                                  onClick={() =>
+                                    setShowConfirmModal({
+                                      show: true,
+                                      action: "delete",
+                                      tenderId: tender.id,
+                                    })
+                                  }
+                                  className=" w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center"
+                                >
+                                  <Trash2 className="h-4 w-4 mr-2" />
+                                  Close Tender
+                                </button>
+                              </div>
                             </div>
                           </div>
                         </div>
                       </div>
-                    </div>
 
-                    {/* Rejection reason if applicable */}
-                    {tender.status === "rejected" && tender.rejectionReason && (
-                      <div className="mt-3 p-2 bg-red-50 border border-red-200 rounded-md flex items-start justify-between">
-                        <div className="flex items-start">
-                          <AlertTriangle className="h-5 w-5 text-red-500 mr-2 mt-0.5" />
-                          <div>
-                            <p className="text-sm font-medium text-red-800">
-                              Rejection Reason:
-                            </p>
-                            <p className="text-sm text-red-700">
-                              {tender.rejectionReason}
-                            </p>
+                      {/* Rejection reason if applicable */}
+                      {tender.status === "rejected" &&
+                        tender.rejectionReason && (
+                          <div className="mt-3 p-2 bg-red-50 border border-red-200 rounded-md flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                            <div className="flex items-start">
+                              <AlertTriangle className="h-5 w-5 text-red-500 mr-2 mt-0.5" />
+                              <div>
+                                <p className="text-sm font-medium text-red-800">
+                                  Rejection Reason:
+                                </p>
+                                <p className="text-sm text-red-700">
+                                  {tender.rejectionReason}
+                                </p>
+                              </div>
+                            </div>
+                            <Button
+                              onClick={() => handleReapplyTender(tender.id)}
+                              size="sm"
+                              className="bg-red-600 hover:bg-red-700 ml-0 md:ml-4"
+                            >
+                              <RefreshCcw className="h-4 w-4 mr-1" />
+                              Reapply
+                            </Button>
                           </div>
-                        </div>
-                        <Button
-                          onClick={() => handleReapplyTender(tender.id)}
-                          size="sm"
-                          className="bg-red-600 hover:bg-red-700 ml-4"
-                        >
-                          <RefreshCcw className="h-4 w-4 mr-1" />
-                          Reapply
-                        </Button>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
+                        )}
+                    </CardContent>
+                  </Card>
+                </Link>
               ))
             ) : (
               <div className="text-center py-12 bg-white rounded-lg border border-neutral-300">
@@ -717,8 +725,8 @@ export default function MyTendersPage() {
 
       {/* Confirmation Modal */}
       {showConfirmModal.show && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-xs bg-opacity-50 flex items-center justify-center z-50">
-          <Card className="w-full max-w-md mx-4 border border-neutral-300">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-xs bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-md mx-auto border border-neutral-300">
             <CardContent className="p-6">
               <div className="mb-5">
                 <h3 className="text-lg font-medium text-gray-900 mb-2">
@@ -736,7 +744,7 @@ export default function MyTendersPage() {
                     : "Are you sure you want to proceed with this action?"}
                 </p>
               </div>
-              <div className="flex justify-end space-x-3">
+              <div className="flex justify-end space-x-3 flex-wrap gap-2">
                 <Button
                   variant="outline"
                   size="sm"
@@ -788,7 +796,7 @@ export default function MyTendersPage() {
         open={showReapplyModal.show}
         onOpenChange={() => setShowReapplyModal({ show: false, tender: null })}
       >
-        <DialogContent className="sm:max-w-[600px]">
+        <DialogContent className="sm:max-w-[600px] w-full">
           <DialogHeader>
             <DialogTitle>
               Reapply for Tender: {showReapplyModal.tender?.title}
