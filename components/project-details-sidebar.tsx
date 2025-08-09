@@ -1,5 +1,7 @@
 "use client";
 
+import type React from "react";
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,10 +18,10 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { FileText, DollarSign, Calendar, User, Star } from "lucide-react";
-import { CheckCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-interface ProjectDetailsSidebarProps {
+interface ProjectDetailsSidebarProps
+  extends React.ComponentPropsWithoutRef<"div"> {
   selectedProject: {
     title: string;
     description: string;
@@ -37,28 +39,27 @@ export function ProjectDetailsSidebar({
   selectedProject,
   getStatusColor,
   onMarkComplete,
+  className,
+  ...props
 }: ProjectDetailsSidebarProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [rating, setRating] = useState(0);
   const [reviewText, setReviewText] = useState("");
-
   const openReviewDialog = () => setIsDialogOpen(true);
   const handleSubmitReview = () => {
     onMarkComplete();
     setIsDialogOpen(false);
   };
-
   return (
     <div
-      className="hidden lg:flex flex-col  h-full col-span-2 border-l bg-background overflow-hidden"
-      style={{ height: "calc(100vh - 70px)" }}
+      className={`flex flex-col h-full border-l bg-background overflow-hidden ${className}`}
+      {...props}
     >
       <ScrollArea className="h-full">
         <div className="p-6">
           <h3 className="text-lg font-semibold mb-6 text-black">
             Project Details
           </h3>
-
           <Card className="mb-6 bg-transparent px-0 border-0 rounded-lg shadow-none">
             <CardHeader className="px-0">
               <CardTitle className="flex items-center gap-2 text-black">
@@ -75,8 +76,7 @@ export function ProjectDetailsSidebar({
                   {selectedProject.description}
                 </p>
               </div>
-
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm font-medium text-gray-600 flex items-center gap-1">
                     <DollarSign className="w-4 h-4" />
@@ -100,7 +100,6 @@ export function ProjectDetailsSidebar({
                   </div>
                 </div>
               </div>
-
               <div>
                 <label className="text-sm font-medium text-gray-600 flex items-center gap-1">
                   <Calendar className="w-4 h-4" />
@@ -110,7 +109,6 @@ export function ProjectDetailsSidebar({
                   {selectedProject.startDate}
                 </p>
               </div>
-
               <div>
                 <label className="text-sm font-medium text-gray-600 flex items-center gap-1">
                   <User className="w-4 h-4" />
@@ -122,7 +120,6 @@ export function ProjectDetailsSidebar({
               </div>
             </CardContent>
           </Card>
-
           {/* ✅ Review / Complete Button */}
           <div className="space-y-3">
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -135,12 +132,10 @@ export function ProjectDetailsSidebar({
                   {selectedProject.review ? "Edit Review" : "Mark as Completed"}
                 </Button>
               </DialogTrigger>
-
               <DialogContent className="sm:max-w-md">
                 <DialogHeader>
                   <DialogTitle>Submit Review</DialogTitle>
                 </DialogHeader>
-
                 <div className="grid gap-4 py-4">
                   <div className="flex flex-col gap-2">
                     <Label htmlFor="rating">Rating</Label>
@@ -174,7 +169,6 @@ export function ProjectDetailsSidebar({
                     />
                   </div>
                 </div>
-
                 <DialogFooter>
                   <Button
                     onClick={handleSubmitReview}
