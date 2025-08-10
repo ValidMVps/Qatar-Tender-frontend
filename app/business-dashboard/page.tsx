@@ -1,25 +1,22 @@
 "use client";
-
 import {
   Eye,
-  BarChart3,
   Banknote,
   Users,
   FileText,
-  LayoutDashboard,
   Wallet,
   UserRoundCheck,
   BadgeCheck,
   Plus,
-  Building2,
   CalendarDays,
   MoreHorizontal,
   DollarSign,
-  Calendar,
   Edit,
   CheckCircle,
-  Icon,
+  Bell,
 } from "lucide-react";
+import type React from "react";
+
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -33,17 +30,29 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { useState } from "react";
 import CreateTenderModal from "@/components/CreateTenderModal";
-import { TenderCarder } from "@/components/TenderCarder";
-import { OverviewChart } from "@/components/OverviewChart";
 import RecentTenders from "@/components/RecentTenders";
+
+import {
+  Line,
+  LineChart,
+  Bar,
+  BarChart,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  ResponsiveContainer,
+} from "recharts";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  ChartLegend,
+  ChartLegendContent,
+} from "@/components/ui/chart";
+import { OverviewChart } from "@/components/OverviewChart";
 
 interface Tender {
   id: string;
@@ -57,154 +66,253 @@ interface Tender {
   category: string;
 }
 
-const statusConfig: Record<
-  string,
-  { label: string; color: string; icon: React.ElementType }
-> = {
-  active: {
-    label: "Active",
-    color: "bg-blue-100 text-blue-700 border-blue-200",
-    icon: BadgeCheck,
-  },
-  closed: {
-    label: "Closed",
-    color: "bg-gray-100 text-gray-700 border-gray-200",
-    icon: FileText,
-  },
-  draft: {
-    label: "Draft",
-    color: "bg-yellow-100 text-yellow-700 border-yellow-200",
-    icon: Edit,
-  },
-  awarded: {
-    label: "Awarded",
-    color: "bg-green-100 text-green-700 border-green-200",
-    icon: UserRoundCheck,
-  },
-};
+interface Bid {
+  id: string;
+  tenderTitle: string;
+  bidAmount: string;
+  status: "active" | "closed" | "awarded" | "rejected" | "pending";
+  submissionDate: string;
+}
 
-const statsData = [
+// Updated dummy bids data
+const bidsData: Bid[] = [
   {
-    title: "Total Tenders Posted",
-    value: "12",
-    icon: FileText,
-    description: "Last 30 days",
+    id: "BID001",
+    tenderTitle: "Office Renovation Project",
+    bidAmount: "$50,000",
+    status: "active",
+    submissionDate: "2024-07-28",
   },
   {
-    title: "Active Tenders",
-    value: "3",
-    icon: CheckCircle,
-    description: "Currently open",
+    id: "BID002",
+    tenderTitle: "Software Development Contract",
+    bidAmount: "$120,000",
+    status: "closed",
+    submissionDate: "2024-07-25",
   },
   {
-    title: "Bids Received",
-    value: "47",
-    icon: Users,
-    description: "Across all tenders",
+    id: "BID003",
+    tenderTitle: "Marketing Campaign for New Product",
+    bidAmount: "$15,000",
+    status: "awarded",
+    submissionDate: "2024-07-20",
   },
   {
-    title: "Total Spent",
-    value: "$2,500",
-    icon: DollarSign,
-    description: "This month",
+    id: "BID004",
+    tenderTitle: "IT Support Services",
+    bidAmount: "$30,000",
+    status: "rejected",
+    submissionDate: "2024-07-18",
   },
+  {
+    id: "BID005",
+    tenderTitle: "Event Management for Annual Gala",
+    bidAmount: "$75,000",
+    status: "pending",
+    submissionDate: "2024-07-15",
+  },
+];
+
+// Updated getBidStatusBadge
+const getBidStatusBadge = (status: Bid["status"]) => {
+  switch (status) {
+    case "active":
+      return <Badge className="bg-blue-500 text-white">Active</Badge>;
+    case "closed":
+      return <Badge className="bg-gray-500 text-white">Closed</Badge>;
+    case "awarded":
+      return <Badge className="bg-green-500 text-white">Awarded</Badge>;
+    case "rejected":
+      return <Badge className="bg-red-500 text-white">Rejected</Badge>;
+    case "pending":
+      return <Badge variant="outline">Pending</Badge>;
+    default:
+      return <Badge variant="secondary">{status}</Badge>;
+  }
+};
+const biddingSuccessData = [
+  { month: "Jan", bidsPlaced: 20, bidsWon: 5 },
+  { month: "Feb", bidsPlaced: 22, bidsWon: 6 },
+  { month: "Mar", bidsPlaced: 18, bidsWon: 4 },
+  { month: "Apr", bidsPlaced: 25, bidsWon: 7 },
+  { month: "May", bidsPlaced: 20, bidsWon: 6 },
+  { month: "Jun", bidsPlaced: 23, bidsWon: 8 },
 ];
 
 export default function DashboardPage() {
   const [openTenderModal, setOpenTenderModal] = useState(false);
-  const getStatusBadge = (status: string) => {
+
+  const getBidStatusBadge = (status: Bid["status"]) => {
     switch (status) {
-      case "active":
-        return (
-          <Badge className="bg-blue-500 hover:bg-blue-600 text-white">
-            Active
-          </Badge>
-        );
       case "pending":
         return <Badge variant="outline">Pending</Badge>;
       case "closed":
-        return <Badge variant="secondary">Closed</Badge>;
+        return (
+          <Badge className="bg-purple-500 hover:bg-purple-600 text-white">
+            closed
+          </Badge>
+        );
       case "awarded":
         return <Badge className="bg-emerald-600 text-white">Awarded</Badge>;
+      case "closed":
+        return <Badge variant="destructive">closed</Badge>;
       default:
         return <Badge variant="secondary">{status}</Badge>;
     }
   };
 
-  return (
-    <motion.div
-      initial="hidden"
-      animate="show"
-      variants={{ show: { transition: { staggerChildren: 0.1 } } }}
-      className="container mx-auto px-0 md:pt-5"
-    >
-      {/* Welcome Box */}
-      <main className="flex-1  py-1 px-1 md:py-3 md:px-3  space-y-7">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between py-3 px-1">
-          <div className="mb-4 md:mb-0">
-            <h1 className="md:text-3xl text-xl font-bold pb-2 text-gray-900">
-              Welcome back Ahmed Al-Mahmoud
-            </h1>
-            <p className="text-md text-gray-500">
-              Here&apos;s what&apos;s happening in your account today.
-            </p>
-          </div>
-          <Button
-            className="bg-blue-600 hover:bg-blue-700 text-white shadow-md flex items-center "
-            onClick={() => setOpenTenderModal(true)}
-          >
-            <Plus className="md:mr-2 mr-0 h-4 w-4" /> Post New Tender
-          </Button>
-        </div>
-        {/* Stats Cards */}
-        <div className="md:grid hidden gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 xl:grid-cols-4 mb-8">
-          {statsData.map((stat, index) => {
-            const Icon = stat.icon; // Capitalized so JSX knows it's a component
-            return (
-              <Card
-                key={index}
-                className="border-neutral-200 rounded-md transition-shadow duration-200"
-              >
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-500">
-                    {stat.title}
-                  </CardTitle>
-                  <Icon className="h-5 w-5 text-gray-400" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-gray-900">
-                    {stat.value}
-                  </div>
-                  {stat.description && (
-                    <p className="text-xs text-gray-500 mt-1">
-                      {stat.description}
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-        {/* Overview Chart */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <RecentTenders />
-          <Card className="mb-8 shadow-xs rounded-md border-neutral-200">
-            <CardHeader>
-              <CardTitle className="text-lg font-semibold">
-                Tenders Overview
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <OverviewChart />
-            </CardContent>
-          </Card>
-        </div>
+  // Placeholder logic for dynamic CTA button
+  const hasPostedTenders = true; // Replace with actual logic based on user's company data
+  const hasPlacedBids = false; // Replace with actual logic based on user's company data
 
-        <CreateTenderModal
-          open={openTenderModal}
-          onOpenChange={setOpenTenderModal}
-        />
-      </main>
-    </motion.div>
+  const ctaButton = hasPostedTenders ? (
+    <Button
+      className=" text-blue-700 shadow-none flex items-center"
+      onClick={() => setOpenTenderModal(true)}
+      variant={"secondary"}
+    >
+      <Plus className="md:mr-2 mr-0 h-4 w-4" /> Post New Tender
+    </Button>
+  ) : (
+    <Button
+      className="bg-green-600 hover:bg-green-700 text-white shadow-md flex items-center"
+      // You might want to use Next.js router for navigation here:
+      // onClick={() => router.push("/browse-tenders")}
+    >
+      <Eye className="md:mr-2 mr-0 h-4 w-4" /> Browse Tenders
+    </Button>
+  );
+
+  return (
+    <TooltipProvider>
+      <motion.div
+        initial="hidden"
+        animate="show"
+        variants={{ show: { transition: { staggerChildren: 0.1 } } }}
+        className="container mx-auto px-0  py-5"
+      >
+        <main className="flex-1 py-1 px-1 md:py-5 md:px-3 space-y-7">
+          {/* Welcome Header */}
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between py-8 px-7 rounded-lg bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 shadow-sm">
+            <div className="mb-4 md:mb-0">
+              <h1 className="md:text-3xl text-xl font-medium pb-2 text-white">
+                Welcome back Acme Corp!
+              </h1>
+              <p className="text-md text-blue-100">
+                Here's an overview of your posting and bidding activity today.
+              </p>
+            </div>
+            <div className="flex-shrink-0">{ctaButton}</div>
+          </div>
+
+          {/* Stats Cards - Grouped into two main cards */}
+
+          {/* Dual Column Overview: Recent Tenders & Recent Bids */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            {/* Left Column: Recent Tenders Posted by Your Company */}
+            <RecentTenders />
+
+            {/* Right Column: Recent Bids You’ve Placed */}
+            <Card className="shadow-xs rounded-md border-neutral-200">
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle className="text-lg font-semibold">
+                  Recent Bids You&apos;ve Placed
+                </CardTitle>
+                <Button variant="outline" size="sm" asChild>
+                  <Link href="#">View All Bids</Link>
+                </Button>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Tender Title</TableHead>
+                      <TableHead>Amount</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="text-right">
+                        Submission Date
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {bidsData.map((bid) => (
+                      <TableRow key={bid.id}>
+                        <TableCell className="font-medium">
+                          {bid.tenderTitle}
+                        </TableCell>
+                        <TableCell>{bid.bidAmount}</TableCell>
+                        <TableCell>{getBidStatusBadge(bid.status)}</TableCell>
+                        <TableCell className="text-right">
+                          {bid.submissionDate}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Charts Section */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            {/* Posting Performance Chart */}
+            <Card className="shadow-xs rounded-md border-neutral-200">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold">
+                  Posting Performance
+                </CardTitle>
+                <p className="text-sm text-gray-500">
+                  Monthly trend of tenders posted vs bids received.
+                </p>
+              </CardHeader>
+              <CardContent>
+                <OverviewChart />
+              </CardContent>
+            </Card>
+
+            {/* Bidding Success Rate Chart */}
+            <Card className="shadow-xs rounded-md border-neutral-200">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold">
+                  Bidding Success Rate
+                </CardTitle>
+                <p className="text-sm text-gray-500">
+                  Bids placed vs bids won.
+                </p>
+              </CardHeader>
+              <CardContent>
+                <ChartContainer config={{}} className="aspect-video h-[300px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={biddingSuccessData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="month" />
+                      <YAxis />
+                      <ChartTooltip
+                        cursor={false}
+                        content={<ChartTooltipContent indicator="dot" />}
+                      />
+                      <ChartLegend content={<ChartLegendContent />} />
+                      <Bar
+                        dataKey="bidsPlaced"
+                        fill="#8884d8"
+                        name="Bids Placed"
+                      />
+                      <Bar dataKey="bidsWon" fill="#82ca9d" name="Bids Won" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </ChartContainer>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Reminders / Notifications */}
+
+          <CreateTenderModal
+            open={openTenderModal}
+            onOpenChange={setOpenTenderModal}
+          />
+        </main>
+      </motion.div>
+    </TooltipProvider>
   );
 }

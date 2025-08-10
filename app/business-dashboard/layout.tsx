@@ -55,12 +55,12 @@ export default function DashboardLayout({
         },
         {
           name: "My Posted Tenders",
-          href: "/business-dashboard/my-posted-tenders",
+          href: "/business-dashboard/my-tenders",
           icon: FileText,
         },
         {
           name: "Active Projects",
-          href: "/business-dashboard/active-projects",
+          href: "/business-dashboard/projects",
           icon: Briefcase,
         },
       ],

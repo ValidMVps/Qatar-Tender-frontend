@@ -139,22 +139,27 @@ export default function DashboardPage() {
       className="container mx-auto px-0"
     >
       {/* Welcome Box */}
-      <main className="flex-1  py-1 px-1 md:py-3 md:px-3  space-y-7">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between py-3 px-1">
+      <main className="flex-1  py-1 px-1 md:py-9 md:px-3  space-y-7">
+       
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between py-8 px-7 rounded-lg bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 shadow-sm">
           <div className="mb-4 md:mb-0">
-            <h1 className="md:text-3xl text-xl font-bold pb-2 text-gray-900">
-              Welcome back Ahmed Al-Mahmoud
+            <h1 className="md:text-3xl text-xl font-medium pb-2 text-white">
+              Welcome back AHmed
             </h1>
-            <p className="text-md text-gray-500">
-              Here&apos;s what&apos;s happening in your account today.
+            <p className="text-md text-blue-100">
+              Here's an overview of your posting and bidding activity today.
             </p>
           </div>
-          <Button
-            className="bg-blue-600 hover:bg-blue-700 text-white shadow-md flex items-center "
-            onClick={() => setOpenTenderModal(true)}
-          >
-            <Plus className="md:mr-2 mr-0 h-4 w-4" /> Post New Tender
-          </Button>
+          <div className="flex-shrink-0">
+            {" "}
+            <Button
+              className=" text-blue-700 flex items-center "
+              onClick={() => setOpenTenderModal(true)}
+              variant={'secondary'}
+            >
+              <Plus className="md:mr-2 mr-0 h-4 w-4" /> Post New Tender
+            </Button>
+          </div>
         </div>
         {/* Stats Cards */}
         <div className="md:grid hidden gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 xl:grid-cols-4 mb-8">
@@ -199,7 +204,6 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
         </div>
-
         <CreateTenderModal
           open={openTenderModal}
           onOpenChange={setOpenTenderModal}

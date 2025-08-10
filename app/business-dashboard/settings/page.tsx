@@ -2,7 +2,7 @@
 
 import type React from "react";
 import { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -15,33 +15,42 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import Image from "next/image";
-import { Moon, Sun, Thermometer } from "lucide-react";
+import { Moon, Sun, Upload } from "lucide-react";
 
 export default function SettingsPage() {
-  const [fullName, setFullName] = useState("John Doe");
-  const [email, setEmail] = useState("john.doe@example.com");
+  // Company Profile States
+  const [companyName, setCompanyName] = useState("Acme Solutions Inc.");
+  const [industry, setIndustry] = useState("Construction");
+  const [contactPerson, setContactPerson] = useState("Jane Doe");
+  const [companyEmail, setCompanyEmail] = useState("info@acmesolutions.com");
+  const [companyLogo, setCompanyLogo] = useState(
+    "/placeholder.svg?height=100&width=100&text=Company+Logo"
+  );
 
+  // Notification Settings
   const [newBidNotification, setNewBidNotification] = useState(true);
   const [tenderStatusNotification, setTenderStatusNotification] =
     useState(true);
   const [messageNotification, setMessageNotification] = useState(true);
 
+  // Security Settings
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  // Appearance & Language Settings
   const [appLanguage, setAppLanguage] = useState("en");
-
-  // New states for Font & Theme
   const [font, setFont] = useState("Inter");
   const [theme, setTheme] = useState<"light" | "dark">("light");
 
   const handleSaveAll = (e: React.FormEvent) => {
     e.preventDefault();
-
     console.log("Saving settings:", {
-      fullName,
-      email,
+      companyName,
+      industry,
+      contactPerson,
+      companyEmail,
+      companyLogo,
       newBidNotification,
       tenderStatusNotification,
       messageNotification,
@@ -52,112 +61,177 @@ export default function SettingsPage() {
       font,
       theme,
     });
-
+    // Clear password fields after saving (or show success/error)
     setCurrentPassword("");
     setNewPassword("");
     setConfirmPassword("");
+    // In a real app, you'd send this data to a backend API
+  };
+
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      // In a real app, you'd upload this file to a storage service (e.g., Vercel Blob)
+      // For now, we'll just create a URL for preview
+      setCompanyLogo(URL.createObjectURL(file));
+    }
   };
 
   return (
-    <div className="container mx-auto px-0 py-8">
-      <Card className="border-0 bg-transparent px-0">
-        <CardContent className="px-0">
-          <form onSubmit={handleSaveAll} className="space-y-0">
-            {/* Notification Settings */}
-            <div className="space-y-4 pt-6 pb-6">
-              <h2 className="text-lg font-semibold">Notification Settings</h2>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <Label>New Bid Received</Label>
-                  <Switch
-                    checked={newBidNotification}
-                    onCheckedChange={setNewBidNotification}
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <Label>Tender Status Updates</Label>
-                  <Switch
-                    checked={tenderStatusNotification}
-                    onCheckedChange={setTenderStatusNotification}
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <Label>New Messages</Label>
-                  <Switch
-                    checked={messageNotification}
-                    onCheckedChange={setMessageNotification}
-                  />
-                </div>
+    <div className="min-h-screen py-8">
+      <div className="container mx-auto px-4 space-y-8">
+        <form onSubmit={handleSaveAll}>
+          {" "}
+          {/* Company Profile */}
+          {/* Notification Settings */}
+          <Card className="border-0 px-0">
+            <CardHeader className="border-0 px-0">
+              <CardTitle className="text-2xl font-semibold text-gray-800">
+                Notification Settings
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4 px-0">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="newBidNotification"> Bid Status Updates</Label>
+                <Switch
+                  id="newBidNotification"
+                  checked={newBidNotification}
+                  onCheckedChange={setNewBidNotification}
+                />
               </div>
-            </div>
-
-            {/* Language Settings */}
-            <div className="space-y-4 pt-6 border-t">
-              <h2 className="text-lg font-semibold pb-2">Language & Region</h2>
-              <div className="max-w-sm flex flex-col gap-1">
-                <Label htmlFor="appLanguage" className="pb-3">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="newBidNotification">
+                  Tender Status Updates
+                </Label>
+                <Switch
+                  id="newBidNotification"
+                  checked={newBidNotification}
+                  onCheckedChange={setNewBidNotification}
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="tenderStatusNotification">
+                  New Bids on Your Tender
+                </Label>
+                <Switch
+                  id="tenderStatusNotification"
+                  checked={tenderStatusNotification}
+                  onCheckedChange={setTenderStatusNotification}
+                />
+              </div>{" "}
+              <div className="flex items-center justify-between">
+                <Label htmlFor="tenderStatusNotification">
+                  Profile Verification Updates
+                </Label>
+                <Switch
+                  id="tenderStatusNotification"
+                  checked={tenderStatusNotification}
+                  onCheckedChange={setTenderStatusNotification}
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="messageNotification">New Messages</Label>
+                <Switch
+                  id="messageNotification"
+                  checked={messageNotification}
+                  onCheckedChange={setMessageNotification}
+                />
+              </div>
+            </CardContent>
+          </Card>
+          {/* Security Settings */}
+          <Card className="px-0 border-0">
+            <CardHeader className="px-0 border-0">
+              <CardTitle className="text-2xl font-semibold text-gray-800">
+                Security
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6 px-0">
+              <div className="space-y-2">
+                <Label htmlFor="currentPassword">Current Password</Label>
+                <Input
+                  id="currentPassword"
+                  type="password"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  placeholder="Enter current password"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="newPassword">New Password</Label>
+                <Input
+                  id="newPassword"
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Enter new password"
+                />
+              </div>
+              <div className="space-y-2 md:col-span-2">
+                <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Confirm new password"
+                />
+              </div>
+            </CardContent>
+          </Card>
+          {/* Appearance & Language Settings */}
+          <Card className="border-0 px-0">
+            <CardHeader className="border-0 px-0">
+              <CardTitle className="text-2xl font-semibold text-gray-800">
+                Appearance & Language
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-6 px-0">
+              <div className="space-y-2">
+                <Label htmlFor="appLanguage" className="mb-3">
                   Application Language
                 </Label>
                 <Select value={appLanguage} onValueChange={setAppLanguage}>
-                  <SelectTrigger id="appLanguage">
+                  <SelectTrigger id="appLanguage" className="mt-2">
                     <SelectValue placeholder="Select language" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="mt-3">
                     <SelectItem value="en">English</SelectItem>
                     <SelectItem value="ar">العربية (Arabic)</SelectItem>
+                    <SelectItem value="es">Español (Spanish)</SelectItem>
+                    <SelectItem value="fr">Français (French)</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-            </div>
 
-            {/* Font & Theme Settings */}
-            <div className="space-y-6 pt-6 border-t">
-              {/* Font Selection */}
-              <div className="space-y-2">
-                <Label className="text-base font-medium">Font</Label>
-                <Select value={font} onValueChange={(value) => setFont(value)}>
-                  <SelectTrigger className="w-[200px]">
-                    <SelectValue placeholder="Select font" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Inter">Inter</SelectItem>
-                    <SelectItem value="Roboto">Roboto</SelectItem>
-                    <SelectItem value="Poppins">Poppins</SelectItem>
-                    <SelectItem value="Open Sans">Open Sans</SelectItem>
-                  </SelectContent>
-                </Select>
-                <p className="text-sm text-muted-foreground">
-                  Set the font you want to use in the dashboard.
-                </p>
-              </div>
-
-              {/* Theme Selection */}
-              <div className="space-y-3">
+              <div className="space-y-3 md:col-span-3">
                 <Label className="text-base font-medium">Theme</Label>
                 <p className="text-sm text-muted-foreground">
                   Select the theme for the dashboard.
                 </p>
                 <div className="flex items-center gap-3">
-                  <Sun className="w-5 h-5" />
+                  <Sun className="w-5 h-5 text-gray-500" />
                   <Switch
                     checked={theme === "dark"}
                     onCheckedChange={(checked) =>
                       setTheme(checked ? "dark" : "light")
                     }
                   />
-                  <Moon className="w-5 h-5" />
+                  <Moon className="w-5 h-5 text-gray-500" />
                 </div>
               </div>
-            </div>
-
-            <div className="pt-6">
-              <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
-                Save All Settings
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+          <div className="flex justify-end">
+            <Button
+              type="submit"
+              className="bg-gray-900 hover:bg-gray-800 text-white"
+            >
+              Save All Settings
+            </Button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

@@ -82,6 +82,8 @@ import {
 } from "recharts";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import ProjectsOverviewChart from "@/components/ProjectOverviewChart";
+import { Tabs } from "@radix-ui/react-tabs";
+import { TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 type TenderStatus = "Pending" | "Active" | "Closed";
 
@@ -216,7 +218,9 @@ function StatCard({
       <Card className="w-full border-0 border-b-1  md:hidden flex justify-between items-center shadow-none bg-white text-black border-neutral-200 rounded-none ">
         <CardTitle className="text-sm font-medium">
           {title}
-          {subtle ? <p className="text-xs text-black/70 font-normal mt-0">{subtle}</p> : null}
+          {subtle ? (
+            <p className="text-xs text-black/70 font-normal mt-0">{subtle}</p>
+          ) : null}
         </CardTitle>
         <CardContent className="flex items-center justify-center x py-3">
           <div className="text-lg font-semibold">{value}</div>
@@ -236,6 +240,9 @@ export default function Component() {
     React.useState<SortDirection>("asc");
   const [filterStatus, setFilterStatus] = React.useState<TenderStatus | "All">(
     "All"
+  );
+  const [activeTab, setActiveTab] = React.useState<"received" | "given">(
+    "received"
   );
 
   const handleSort = (column: SortColumn) => {
@@ -439,331 +446,701 @@ export default function Component() {
 
   return (
     <SidebarProvider>
-      {/* Main content */}
-      <SidebarInset className="bg-transparent container py-1 px-2 md:py-3 md:px-3 ">
-        {/* Page body */}
-        <div className="flex flex-1 flex-col gap-6">
-          {/* Snapshot cards */}
-          <section>
-            <div className="grid gap-2 md:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
-              <StatCard
-                title="Total Tenders Posted"
-                value={String(totalTenders)}
-                icon={<ListOrdered className="h-5 w-5" />}
-                subtle="All time"
-              />
-              <StatCard
-                title="Bids Received"
-                value={String(totalBids)}
-                icon={<Inbox className="h-5 w-5" />}
-                subtle="Across all tenders"
-              />
-              <StatCard
-                title="Pending Tender Approvals"
-                value={String(pendingApprovals)}
-                icon={<Clock className="h-5 w-5" />}
-                subtle="Awaiting review"
-              />
-              <StatCard
-                title="Average Bid per Tender"
-                value={avgBidsPerTender.toFixed(1)}
-                icon={<Gauge className="h-5 w-5" />}
-                subtle="Avg number of bids"
-              />
-              <StatCard
-                title="Total Tender Value"
-                value={`$${totalTenderValue.toLocaleString()}`}
-                icon={<BookOpen className="h-5 w-5" />}
-                subtle="Across all tenders"
-              />
-            </div>
-          </section>
-          {/* Charts and lists */}
-          <section className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6">
-            {/* Left (main) column */}
-            <ProjectsOverviewChart />
-            {/* Right (aside) column */}
-            <div className="md:col-span-5 col-span-1 flex flex-col gap-4 md:gap-4">
-              {/* User Rating */}
-              <Card className="w-full p-6">
-                <CardContent className="p-0 space-y-6">
-                  {/* Total Projects Section */}
-                  <div>
-                    <p className="text-sm text-muted-foreground">
-                      Total Projects Posted
-                    </p>
-                    <h2 className="text-4xl font-bold mt-1">128</h2>
-                  </div>
-                  {/* Recently Active Posters Section */}
-                  <div>
-                    <div className="flex -space-x-2 overflow-hidden">
-                      <Avatar className="w-10 h-10 border-2 border-background">
-                        <AvatarImage
-                          src="https://bundui-images.netlify.app/avatars/08.png"
-                          alt="User 1"
-                        />
-                        <AvatarFallback>U1</AvatarFallback>
-                      </Avatar>
-                      <Avatar className="w-10 h-10 border-2 border-background">
-                        <AvatarImage
-                          src="https://bundui-images.netlify.app/avatars/04.png"
-                          alt="User 2"
-                        />
-                        <AvatarFallback>U2</AvatarFallback>
-                      </Avatar>
-                      <Avatar className="w-10 h-10 border-2 border-background">
-                        <AvatarImage
-                          src="https://bundui-images.netlify.app/avatars/05.png"
-                          alt="User 3"
-                        />
-                        <AvatarFallback>U3</AvatarFallback>
-                      </Avatar>
-                      <Avatar className="w-10 h-10 border-2 border-background">
-                        <AvatarImage
-                          src="https://bundui-images.netlify.app/avatars/06.png"
-                          alt="User 4"
-                        />
-                        <AvatarFallback>U4</AvatarFallback>
-                      </Avatar>
-                      <Avatar className="w-10 h-10 border-2 border-background">
-                        <AvatarImage
-                          src="https://bundui-images.netlify.app/avatars/07.png"
-                          alt="User 5"
-                        />
-                        <AvatarFallback>U5</AvatarFallback>
-                      </Avatar>
-                    </div>
-                  </div>
-                  {/* Highlights Section */}
-                  <div className="space-y-4">
-                    <h3 className="text-base font-semibold">Highlights</h3>
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Avg. Bids per Project</span>
-                        <div className="flex items-center gap-1 text-green-500">
-                          <ArrowUpRight className="w-4 h-4" />
-                          <span className="font-medium">6.1</span>
-                        </div>
-                      </div>
-                      <Separator />
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Projects With No Bids</span>
-                        <div className="flex items-center gap-1 text-red-500">
-                          <ArrowDownLeft className="w-4 h-4" />
-                          <span className="font-medium">12</span>
-                        </div>
-                      </div>
-                      <Separator />
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Total Bids Received</span>
-                        <div className="flex items-center gap-1 text-green-500">
-                          <ArrowUpRight className="w-4 h-4" />
-                          <span className="font-medium">342</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-              <Card className="border-1 col-span-full lg:col-span-3 h-fit shadow-none border-neutral-200 rounded-md">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <AlertTriangle className="h-4 w-4 text-amber-600" />
-                    Tenders with no bids in 7 days
-                  </CardTitle>
-                  <CardDescription>Consider updating details</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {reminders.noBidsIn7Days.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">
-                      No items to show.
-                    </p>
-                  ) : (
-                    <ul className="space-y-3">
-                      {reminders.noBidsIn7Days.map((t) => (
-                        <li
-                          key={t.id}
-                          className="flex items-center justify-between"
-                        >
-                          <div className="min-w-0">
-                            <p className="truncate font-medium">{t.title}</p>
-                            <p className="text-xs text-muted-foreground">
-                              Posted {formatDate(t.postedAt)} • {t.category}
-                            </p>
-                          </div>
-                          <Badge variant="outline" className="shrink-0">
-                            {t.bidsReceived} bids
-                          </Badge>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
-          </section>
-          <div className="grid grid-cols-12 w-full justify-start gap-2 md:gap-5">
-            <Card className="border-1 shadow-none col-span-full border-neutral-200 rounded-md">
-              <CardHeader className="pb-3">
-                <div className="flex flex-row sm:flex-row items-start sm:items-center justify-between gap-2">
-                  <div>
-                    <CardTitle className="text-base">Recent Tenders</CardTitle>
-                    <CardDescription>
-                      Latest tenders you’ve posted
-                    </CardDescription>
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="gap-1 bg-transparent"
-                  >
-                    <BarChart3 className="h-4 w-4" />
-                    <span>View all</span>
-                  </Button>
+     
+      <Tabs
+        value={activeTab}
+        onValueChange={(value) => setActiveTab(value as "received" | "given")}
+      > <TabsList className="grid w-full grid-cols-2">
+        <TabsTrigger value="received" className=" text-xs">
+          Reviews About My Business
+        </TabsTrigger>
+        <TabsTrigger value="given" className=" text-xs">
+          Reviews I've Given
+        </TabsTrigger>
+      </TabsList>
+        <TabsContent value="received">
+          {" "}
+          <SidebarInset className="bg-transparent container py-1 px-2 md:py-3 md:px-3 ">
+            {/* Page body */}
+            <div className="flex flex-1 flex-col gap-6">
+              {/* Snapshot cards */}
+              <section>
+                <div className="grid gap-2 md:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
+                  <StatCard
+                    title="Total Tenders Posted"
+                    value={String(totalTenders)}
+                    icon={<ListOrdered className="h-5 w-5" />}
+                    subtle="All time"
+                  />
+                  <StatCard
+                    title="Bids Received"
+                    value={String(totalBids)}
+                    icon={<Inbox className="h-5 w-5" />}
+                    subtle="Across all tenders"
+                  />
+                  <StatCard
+                    title="Pending Tender Approvals"
+                    value={String(pendingApprovals)}
+                    icon={<Clock className="h-5 w-5" />}
+                    subtle="Awaiting review"
+                  />
+                  <StatCard
+                    title="Average Bid per Tender"
+                    value={avgBidsPerTender.toFixed(1)}
+                    icon={<Gauge className="h-5 w-5" />}
+                    subtle="Avg number of bids"
+                  />
+                  <StatCard
+                    title="Total Tender Value"
+                    value={`$${totalTenderValue.toLocaleString()}`}
+                    icon={<BookOpen className="h-5 w-5" />}
+                    subtle="Across all tenders"
+                  />
                 </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex flex-col sm:flex-row gap-2">
-                  <div className="relative flex-1">
-                    <Input
-                      placeholder="Search by title, category or status..."
-                      value={query}
-                      onChange={(e) => setQuery(e.target.value)}
-                      className="pl-9"
-                      aria-label="Search tenders"
-                    />
-                    <LineChartIcon className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  </div>
-                  <Select
-                    value={filterStatus}
-                    onValueChange={(value: TenderStatus | "All") =>
-                      setFilterStatus(value)
-                    }
-                  >
-                    <SelectTrigger className="w-full sm:w-[180px]">
-                      <SelectValue placeholder="Filter by Status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="All">All Statuses</SelectItem>
-                      <SelectItem value="Active">Active</SelectItem>
-                      <SelectItem value="Pending">Pending</SelectItem>
-                      <SelectItem value="Closed">Closed</SelectItem>
-                    </SelectContent>
-                  </Select>
+              </section>
+              {/* Charts and lists */}
+              <section className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6">
+                {/* Left (main) column */}
+                <ProjectsOverviewChart />
+                {/* Right (aside) column */}
+                <div className="md:col-span-5 col-span-1 flex flex-col gap-4 md:gap-4">
+                  {/* User Rating */}
+                  <Card className="w-full p-6">
+                    <CardContent className="p-0 space-y-6">
+                      {/* Total Projects Section */}
+                      <div>
+                        <p className="text-sm text-muted-foreground">
+                          Total Projects Posted
+                        </p>
+                        <h2 className="text-4xl font-bold mt-1">128</h2>
+                      </div>
+                      {/* Recently Active Posters Section */}
+                      <div>
+                        <div className="flex -space-x-2 overflow-hidden">
+                          <Avatar className="w-10 h-10 border-2 border-background">
+                            <AvatarImage
+                              src="https://bundui-images.netlify.app/avatars/08.png"
+                              alt="User 1"
+                            />
+                            <AvatarFallback>U1</AvatarFallback>
+                          </Avatar>
+                          <Avatar className="w-10 h-10 border-2 border-background">
+                            <AvatarImage
+                              src="https://bundui-images.netlify.app/avatars/04.png"
+                              alt="User 2"
+                            />
+                            <AvatarFallback>U2</AvatarFallback>
+                          </Avatar>
+                          <Avatar className="w-10 h-10 border-2 border-background">
+                            <AvatarImage
+                              src="https://bundui-images.netlify.app/avatars/05.png"
+                              alt="User 3"
+                            />
+                            <AvatarFallback>U3</AvatarFallback>
+                          </Avatar>
+                          <Avatar className="w-10 h-10 border-2 border-background">
+                            <AvatarImage
+                              src="https://bundui-images.netlify.app/avatars/06.png"
+                              alt="User 4"
+                            />
+                            <AvatarFallback>U4</AvatarFallback>
+                          </Avatar>
+                          <Avatar className="w-10 h-10 border-2 border-background">
+                            <AvatarImage
+                              src="https://bundui-images.netlify.app/avatars/07.png"
+                              alt="User 5"
+                            />
+                            <AvatarFallback>U5</AvatarFallback>
+                          </Avatar>
+                        </div>
+                      </div>
+                      {/* Highlights Section */}
+                      <div className="space-y-4">
+                        <h3 className="text-base font-semibold">Highlights</h3>
+                        <div className="space-y-4">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm">
+                              Avg. Bids per Project
+                            </span>
+                            <div className="flex items-center gap-1 text-green-500">
+                              <ArrowUpRight className="w-4 h-4" />
+                              <span className="font-medium">6.1</span>
+                            </div>
+                          </div>
+                          <Separator />
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm">
+                              Projects With No Bids
+                            </span>
+                            <div className="flex items-center gap-1 text-red-500">
+                              <ArrowDownLeft className="w-4 h-4" />
+                              <span className="font-medium">12</span>
+                            </div>
+                          </div>
+                          <Separator />
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm">Total Bids Received</span>
+                            <div className="flex items-center gap-1 text-green-500">
+                              <ArrowUpRight className="w-4 h-4" />
+                              <span className="font-medium">342</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  <Card className="border-1 col-span-full lg:col-span-3 h-fit shadow-none border-neutral-200 rounded-md">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <AlertTriangle className="h-4 w-4 text-amber-600" />
+                        Tenders with no bids in 7 days
+                      </CardTitle>
+                      <CardDescription>
+                        Consider updating details
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      {reminders.noBidsIn7Days.length === 0 ? (
+                        <p className="text-sm text-muted-foreground">
+                          No items to show.
+                        </p>
+                      ) : (
+                        <ul className="space-y-3">
+                          {reminders.noBidsIn7Days.map((t) => (
+                            <li
+                              key={t.id}
+                              className="flex items-center justify-between"
+                            >
+                              <div className="min-w-0">
+                                <p className="truncate font-medium">
+                                  {t.title}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                  Posted {formatDate(t.postedAt)} • {t.category}
+                                </p>
+                              </div>
+                              <Badge variant="outline" className="shrink-0">
+                                {t.bidsReceived} bids
+                              </Badge>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </CardContent>
+                  </Card>
                 </div>
-                {/* Responsive Table */}
-                <div className="rounded-lg overflow-x-auto hidden md:block">
-                  <Table className="px-0 ">
-                    <TableHeader className="px-0">
-                      <TableRow>
-                        <TableHead>Title</TableHead>
-                        <TableHead>Category</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead
-                          className="cursor-pointer whitespace-nowrap"
-                          onClick={() => handleSort("postedAt")}
-                        >
-                          <div className="flex items-center gap-1">
-                            Posted At
-                            {sortColumn === "postedAt" &&
-                              (sortDirection === "asc" ? (
-                                <ArrowUp className="h-3 w-3" />
-                              ) : (
-                                <ArrowDown className="h-3 w-3" />
-                              ))}
-                          </div>
-                        </TableHead>
-                        <TableHead
-                          className="cursor-pointer whitespace-nowrap"
-                          onClick={() => handleSort("deadline")}
-                        >
-                          <div className="flex items-center gap-1">
-                            Deadline
-                            {sortColumn === "deadline" &&
-                              (sortDirection === "asc" ? (
-                                <ArrowUp className="h-3 w-3" />
-                              ) : (
-                                <ArrowDown className="h-3 w-3" />
-                              ))}
-                          </div>
-                        </TableHead>
-                        <TableHead
-                          className="text-right cursor-pointer whitespace-nowrap"
-                          onClick={() => handleSort("bidsReceived")}
-                        >
-                          <div className="flex items-center justify-center gap-1">
-                            Bids Received
-                            {sortColumn === "bidsReceived" &&
-                              (sortDirection === "asc" ? (
-                                <ArrowUp className="h-3 w-3" />
-                              ) : (
-                                <ArrowDown className="h-3 w-3" />
-                              ))}
-                          </div>
-                        </TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody className="px-0 ">
-                      {filteredTenders.map((t) => (
-                        <TableRow key={t.id} className=" px-0">
-                          <TableCell className="font-medium px-0 whitespace-nowrap">
-                            <div className="flex items-center gap-2">
-                              <span>{t.title}</span>
+              </section>
+              <div className="grid grid-cols-12 w-full justify-start gap-2 md:gap-5">
+                <Card className="border-1 shadow-none col-span-full border-neutral-200 rounded-md">
+                  <CardHeader className="pb-3">
+                    <div className="flex flex-row sm:flex-row items-start sm:items-center justify-between gap-2">
+                      <div>
+                        <CardTitle className="text-base">
+                          Recent Tenders
+                        </CardTitle>
+                        <CardDescription>
+                          Latest tenders you’ve posted
+                        </CardDescription>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="gap-1 bg-transparent"
+                      >
+                        <BarChart3 className="h-4 w-4" />
+                        <span>View all</span>
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      <div className="relative flex-1">
+                        <Input
+                          placeholder="Search by title, category or status..."
+                          value={query}
+                          onChange={(e) => setQuery(e.target.value)}
+                          className="pl-9"
+                          aria-label="Search tenders"
+                        />
+                        <LineChartIcon className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                      </div>
+                      <Select
+                        value={filterStatus}
+                        onValueChange={(value: TenderStatus | "All") =>
+                          setFilterStatus(value)
+                        }
+                      >
+                        <SelectTrigger className="w-full sm:w-[180px]">
+                          <SelectValue placeholder="Filter by Status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="All">All Statuses</SelectItem>
+                          <SelectItem value="Active">Active</SelectItem>
+                          <SelectItem value="Pending">Pending</SelectItem>
+                          <SelectItem value="Closed">Closed</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    {/* Responsive Table */}
+                    <div className="rounded-lg overflow-x-auto hidden md:block">
+                      <Table className="px-0 ">
+                        <TableHeader className="px-0">
+                          <TableRow>
+                            <TableHead>Title</TableHead>
+                            <TableHead>Category</TableHead>
+                            <TableHead>Status</TableHead>
+                            <TableHead
+                              className="cursor-pointer whitespace-nowrap"
+                              onClick={() => handleSort("postedAt")}
+                            >
+                              <div className="flex items-center gap-1">
+                                Posted At
+                                {sortColumn === "postedAt" &&
+                                  (sortDirection === "asc" ? (
+                                    <ArrowUp className="h-3 w-3" />
+                                  ) : (
+                                    <ArrowDown className="h-3 w-3" />
+                                  ))}
+                              </div>
+                            </TableHead>
+                            <TableHead
+                              className="cursor-pointer whitespace-nowrap"
+                              onClick={() => handleSort("deadline")}
+                            >
+                              <div className="flex items-center gap-1">
+                                Deadline
+                                {sortColumn === "deadline" &&
+                                  (sortDirection === "asc" ? (
+                                    <ArrowUp className="h-3 w-3" />
+                                  ) : (
+                                    <ArrowDown className="h-3 w-3" />
+                                  ))}
+                              </div>
+                            </TableHead>
+                            <TableHead
+                              className="text-right cursor-pointer whitespace-nowrap"
+                              onClick={() => handleSort("bidsReceived")}
+                            >
+                              <div className="flex items-center justify-center gap-1">
+                                Bids Received
+                                {sortColumn === "bidsReceived" &&
+                                  (sortDirection === "asc" ? (
+                                    <ArrowUp className="h-3 w-3" />
+                                  ) : (
+                                    <ArrowDown className="h-3 w-3" />
+                                  ))}
+                              </div>
+                            </TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody className="px-0 ">
+                          {filteredTenders.map((t) => (
+                            <TableRow key={t.id} className=" px-0">
+                              <TableCell className="font-medium px-0 whitespace-nowrap">
+                                <div className="flex items-center gap-2">
+                                  <span>{t.title}</span>
+                                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                                </div>
+                              </TableCell>
+                              <TableCell className="whitespace-nowrap">
+                                {t.category}
+                              </TableCell>
+                              <TableCell>
+                                <StatusBadge status={t.status} />
+                              </TableCell>
+                              <TableCell className="whitespace-nowrap">
+                                {formatDate(t.postedAt)}
+                              </TableCell>
+                              <TableCell className="whitespace-nowrap">
+                                {formatDate(t.deadline)}
+                              </TableCell>
+                              <TableCell className="text-center whitespace-nowrap">
+                                {t.bidsReceived}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                    {/* Mobile Card List */}
+                    <div className="block md:hidden space-y-3">
+                      {filteredTenders.length === 0 ? (
+                        <p className="text-sm text-muted-foreground px-2">
+                          No tenders found.
+                        </p>
+                      ) : (
+                        filteredTenders.map((t) => (
+                          <div
+                            key={t.id}
+                            className=" rounded-lg py-3 flex flex-col gap-2 bg-white "
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="font-semibold">{t.title}</span>
+                              <StatusBadge status={t.status} />
+                            </div>
+                            <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+                              <span>{t.category}</span>
+                              <span>• Posted: {formatDate(t.postedAt)}</span>
+                              <span>• Deadline: {formatDate(t.deadline)}</span>
+                            </div>
+                            <div className="flex items-center justify-between mt-1">
+                              <span className="text-xs">
+                                Bids: {t.bidsReceived}
+                              </span>
                               <ChevronRight className="h-4 w-4 text-muted-foreground" />
                             </div>
-                          </TableCell>
-                          <TableCell className="whitespace-nowrap">
-                            {t.category}
-                          </TableCell>
-                          <TableCell>
-                            <StatusBadge status={t.status} />
-                          </TableCell>
-                          <TableCell className="whitespace-nowrap">
-                            {formatDate(t.postedAt)}
-                          </TableCell>
-                          <TableCell className="whitespace-nowrap">
-                            {formatDate(t.deadline)}
-                          </TableCell>
-                          <TableCell className="text-center whitespace-nowrap">
-                            {t.bidsReceived}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </SidebarInset>
+        </TabsContent>
+        <TabsContent value="given">
+          {" "}
+          <SidebarInset className="bg-transparent container py-1 px-2 md:py-3 md:px-3 ">
+            {/* Page body */}
+            <div className="flex flex-1 flex-col gap-6">
+              {/* Snapshot cards */}
+              <section>
+                <div className="grid gap-2 md:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
+                  <StatCard
+                    title="Total Tenders Posted"
+                    value={String(totalTenders)}
+                    icon={<ListOrdered className="h-5 w-5" />}
+                    subtle="All time"
+                  />
+                  <StatCard
+                    title="Bids Received"
+                    value={String(totalBids)}
+                    icon={<Inbox className="h-5 w-5" />}
+                    subtle="Across all tenders"
+                  />
+                  <StatCard
+                    title="Pending Tender Approvals"
+                    value={String(pendingApprovals)}
+                    icon={<Clock className="h-5 w-5" />}
+                    subtle="Awaiting review"
+                  />
+                  <StatCard
+                    title="Average Bid per Tender"
+                    value={avgBidsPerTender.toFixed(1)}
+                    icon={<Gauge className="h-5 w-5" />}
+                    subtle="Avg number of bids"
+                  />
+                  <StatCard
+                    title="Total Tender Value"
+                    value={`$${totalTenderValue.toLocaleString()}`}
+                    icon={<BookOpen className="h-5 w-5" />}
+                    subtle="Across all tenders"
+                  />
                 </div>
-                {/* Mobile Card List */}
-                <div className="block md:hidden space-y-3">
-                  {filteredTenders.length === 0 ? (
-                    <p className="text-sm text-muted-foreground px-2">No tenders found.</p>
-                  ) : (
-                    filteredTenders.map((t) => (
-                      <div
-                        key={t.id}
-                        className=" rounded-lg py-3 flex flex-col gap-2 bg-white "
-                      >
-                        <div className="flex items-center justify-between">
-                          <span className="font-semibold">{t.title}</span>
-                          <StatusBadge status={t.status} />
-                        </div>
-                        <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
-                          <span>{t.category}</span>
-                          <span>• Posted: {formatDate(t.postedAt)}</span>
-                          <span>• Deadline: {formatDate(t.deadline)}</span>
-                        </div>
-                        <div className="flex items-center justify-between mt-1">
-                          <span className="text-xs">Bids: {t.bidsReceived}</span>
-                          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              </section>
+              {/* Charts and lists */}
+              <section className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6">
+                {/* Left (main) column */}
+                <ProjectsOverviewChart />
+                {/* Right (aside) column */}
+                <div className="md:col-span-5 col-span-1 flex flex-col gap-4 md:gap-4">
+                  {/* User Rating */}
+                  <Card className="w-full p-6">
+                    <CardContent className="p-0 space-y-6">
+                      {/* Total Projects Section */}
+                      <div>
+                        <p className="text-sm text-muted-foreground">
+                          Total Projects Posted
+                        </p>
+                        <h2 className="text-4xl font-bold mt-1">128</h2>
+                      </div>
+                      {/* Recently Active Posters Section */}
+                      <div>
+                        <div className="flex -space-x-2 overflow-hidden">
+                          <Avatar className="w-10 h-10 border-2 border-background">
+                            <AvatarImage
+                              src="https://bundui-images.netlify.app/avatars/08.png"
+                              alt="User 1"
+                            />
+                            <AvatarFallback>U1</AvatarFallback>
+                          </Avatar>
+                          <Avatar className="w-10 h-10 border-2 border-background">
+                            <AvatarImage
+                              src="https://bundui-images.netlify.app/avatars/04.png"
+                              alt="User 2"
+                            />
+                            <AvatarFallback>U2</AvatarFallback>
+                          </Avatar>
+                          <Avatar className="w-10 h-10 border-2 border-background">
+                            <AvatarImage
+                              src="https://bundui-images.netlify.app/avatars/05.png"
+                              alt="User 3"
+                            />
+                            <AvatarFallback>U3</AvatarFallback>
+                          </Avatar>
+                          <Avatar className="w-10 h-10 border-2 border-background">
+                            <AvatarImage
+                              src="https://bundui-images.netlify.app/avatars/06.png"
+                              alt="User 4"
+                            />
+                            <AvatarFallback>U4</AvatarFallback>
+                          </Avatar>
+                          <Avatar className="w-10 h-10 border-2 border-background">
+                            <AvatarImage
+                              src="https://bundui-images.netlify.app/avatars/07.png"
+                              alt="User 5"
+                            />
+                            <AvatarFallback>U5</AvatarFallback>
+                          </Avatar>
                         </div>
                       </div>
-                    ))
-                  )}
+                      {/* Highlights Section */}
+                      <div className="space-y-4">
+                        <h3 className="text-base font-semibold">Highlights</h3>
+                        <div className="space-y-4">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm">
+                              Avg. Bids per Project
+                            </span>
+                            <div className="flex items-center gap-1 text-green-500">
+                              <ArrowUpRight className="w-4 h-4" />
+                              <span className="font-medium">6.1</span>
+                            </div>
+                          </div>
+                          <Separator />
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm">
+                              Projects With No Bids
+                            </span>
+                            <div className="flex items-center gap-1 text-red-500">
+                              <ArrowDownLeft className="w-4 h-4" />
+                              <span className="font-medium">12</span>
+                            </div>
+                          </div>
+                          <Separator />
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm">Total Bids Received</span>
+                            <div className="flex items-center gap-1 text-green-500">
+                              <ArrowUpRight className="w-4 h-4" />
+                              <span className="font-medium">342</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  <Card className="border-1 col-span-full lg:col-span-3 h-fit shadow-none border-neutral-200 rounded-md">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <AlertTriangle className="h-4 w-4 text-amber-600" />
+                        Tenders with no bids in 7 days
+                      </CardTitle>
+                      <CardDescription>
+                        Consider updating details
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      {reminders.noBidsIn7Days.length === 0 ? (
+                        <p className="text-sm text-muted-foreground">
+                          No items to show.
+                        </p>
+                      ) : (
+                        <ul className="space-y-3">
+                          {reminders.noBidsIn7Days.map((t) => (
+                            <li
+                              key={t.id}
+                              className="flex items-center justify-between"
+                            >
+                              <div className="min-w-0">
+                                <p className="truncate font-medium">
+                                  {t.title}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                  Posted {formatDate(t.postedAt)} • {t.category}
+                                </p>
+                              </div>
+                              <Badge variant="outline" className="shrink-0">
+                                {t.bidsReceived} bids
+                              </Badge>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </CardContent>
+                  </Card>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </SidebarInset>
+              </section>
+              <div className="grid grid-cols-12 w-full justify-start gap-2 md:gap-5">
+                <Card className="border-1 shadow-none col-span-full border-neutral-200 rounded-md">
+                  <CardHeader className="pb-3">
+                    <div className="flex flex-row sm:flex-row items-start sm:items-center justify-between gap-2">
+                      <div>
+                        <CardTitle className="text-base">
+                          Recent Tenders
+                        </CardTitle>
+                        <CardDescription>
+                          Latest tenders you’ve posted
+                        </CardDescription>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="gap-1 bg-transparent"
+                      >
+                        <BarChart3 className="h-4 w-4" />
+                        <span>View all</span>
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      <div className="relative flex-1">
+                        <Input
+                          placeholder="Search by title, category or status..."
+                          value={query}
+                          onChange={(e) => setQuery(e.target.value)}
+                          className="pl-9"
+                          aria-label="Search tenders"
+                        />
+                        <LineChartIcon className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                      </div>
+                      <Select
+                        value={filterStatus}
+                        onValueChange={(value: TenderStatus | "All") =>
+                          setFilterStatus(value)
+                        }
+                      >
+                        <SelectTrigger className="w-full sm:w-[180px]">
+                          <SelectValue placeholder="Filter by Status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="All">All Statuses</SelectItem>
+                          <SelectItem value="Active">Active</SelectItem>
+                          <SelectItem value="Pending">Pending</SelectItem>
+                          <SelectItem value="Closed">Closed</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    {/* Responsive Table */}
+                    <div className="rounded-lg overflow-x-auto hidden md:block">
+                      <Table className="px-0 ">
+                        <TableHeader className="px-0">
+                          <TableRow>
+                            <TableHead>Title</TableHead>
+                            <TableHead>Category</TableHead>
+                            <TableHead>Status</TableHead>
+                            <TableHead
+                              className="cursor-pointer whitespace-nowrap"
+                              onClick={() => handleSort("postedAt")}
+                            >
+                              <div className="flex items-center gap-1">
+                                Posted At
+                                {sortColumn === "postedAt" &&
+                                  (sortDirection === "asc" ? (
+                                    <ArrowUp className="h-3 w-3" />
+                                  ) : (
+                                    <ArrowDown className="h-3 w-3" />
+                                  ))}
+                              </div>
+                            </TableHead>
+                            <TableHead
+                              className="cursor-pointer whitespace-nowrap"
+                              onClick={() => handleSort("deadline")}
+                            >
+                              <div className="flex items-center gap-1">
+                                Deadline
+                                {sortColumn === "deadline" &&
+                                  (sortDirection === "asc" ? (
+                                    <ArrowUp className="h-3 w-3" />
+                                  ) : (
+                                    <ArrowDown className="h-3 w-3" />
+                                  ))}
+                              </div>
+                            </TableHead>
+                            <TableHead
+                              className="text-right cursor-pointer whitespace-nowrap"
+                              onClick={() => handleSort("bidsReceived")}
+                            >
+                              <div className="flex items-center justify-center gap-1">
+                                Bids Received
+                                {sortColumn === "bidsReceived" &&
+                                  (sortDirection === "asc" ? (
+                                    <ArrowUp className="h-3 w-3" />
+                                  ) : (
+                                    <ArrowDown className="h-3 w-3" />
+                                  ))}
+                              </div>
+                            </TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody className="px-0 ">
+                          {filteredTenders.map((t) => (
+                            <TableRow key={t.id} className=" px-0">
+                              <TableCell className="font-medium px-0 whitespace-nowrap">
+                                <div className="flex items-center gap-2">
+                                  <span>{t.title}</span>
+                                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                                </div>
+                              </TableCell>
+                              <TableCell className="whitespace-nowrap">
+                                {t.category}
+                              </TableCell>
+                              <TableCell>
+                                <StatusBadge status={t.status} />
+                              </TableCell>
+                              <TableCell className="whitespace-nowrap">
+                                {formatDate(t.postedAt)}
+                              </TableCell>
+                              <TableCell className="whitespace-nowrap">
+                                {formatDate(t.deadline)}
+                              </TableCell>
+                              <TableCell className="text-center whitespace-nowrap">
+                                {t.bidsReceived}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                    {/* Mobile Card List */}
+                    <div className="block md:hidden space-y-3">
+                      {filteredTenders.length === 0 ? (
+                        <p className="text-sm text-muted-foreground px-2">
+                          No tenders found.
+                        </p>
+                      ) : (
+                        filteredTenders.map((t) => (
+                          <div
+                            key={t.id}
+                            className=" rounded-lg py-3 flex flex-col gap-2 bg-white "
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="font-semibold">{t.title}</span>
+                              <StatusBadge status={t.status} />
+                            </div>
+                            <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+                              <span>{t.category}</span>
+                              <span>• Posted: {formatDate(t.postedAt)}</span>
+                              <span>• Deadline: {formatDate(t.deadline)}</span>
+                            </div>
+                            <div className="flex items-center justify-between mt-1">
+                              <span className="text-xs">
+                                Bids: {t.bidsReceived}
+                              </span>
+                              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </SidebarInset>
+        </TabsContent>
+      </Tabs>
     </SidebarProvider>
   );
 }
