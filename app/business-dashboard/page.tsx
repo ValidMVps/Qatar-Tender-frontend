@@ -136,7 +136,7 @@ export default function DashboardPage() {
       initial="hidden"
       animate="show"
       variants={{ show: { transition: { staggerChildren: 0.1 } } }}
-      className="container mx-auto px-0"
+      className="container mx-auto px-0 md:pt-5"
     >
       {/* Welcome Box */}
       <main className="flex-1  py-1 px-1 md:py-3 md:px-3  space-y-7">

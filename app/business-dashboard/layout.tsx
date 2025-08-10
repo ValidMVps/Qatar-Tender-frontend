@@ -85,7 +85,7 @@ export default function DashboardLayout({
       links: [
         {
           name: "Company Profile",
-          href: "/business-dashboard/company-profile",
+          href: "/business-dashboard/profile",
           icon: Building2,
         },
         {
@@ -144,9 +144,10 @@ export default function DashboardLayout({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
+          transition={{ type: "keyframes", stiffness: 300, damping: 30 }}
         >
           <div
-            className="fixed inset-0 bg-black/20 backdrop-blur-sm"
+            className="fixed inset-0 bg-black/20"
             onClick={() => setSidebarOpen(false)}
           />
           <motion.div
@@ -154,6 +155,7 @@ export default function DashboardLayout({
             initial={{ x: -200 }}
             animate={{ x: 0 }}
             exit={{ x: -200 }}
+            transition={{ type: "keyframes", stiffness: 300, damping: 30 }}
           >
             <div className="flex items-center justify-between px-3 py-4">
               <div className="flex items-center">
@@ -197,7 +199,7 @@ export default function DashboardLayout({
           setSidebarOpen={setSidebarOpen}
           sidebarLinks={[]} // Navbar no longer needs flat list
         />
-        <main className="flex-1 w-full px-2 sm:px-4 py-0 md:mt-0 mt-[70px] bg-neutral-50/30">
+        <main className="flex-1 w-full px-2 sm:px-4 py-0  md:mt-0 mt-[70px] bg-neutral-50/30">
           {children}
         </main>
       </div>

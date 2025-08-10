@@ -1,8 +1,6 @@
 "use client";
-
 import type React from "react";
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,26 +25,36 @@ import {
 import {
   CameraIcon,
   MailIcon,
-  CalendarIcon,
   CheckCircleIcon,
   SaveIcon,
   XIcon,
   UploadIcon,
+  GlobeIcon,
+  PhoneIcon,
 } from "lucide-react";
 
 export default function Component() {
   const [isEditing, setIsEditing] = useState(false);
-  const [profileCompletion, setProfileCompletion] = useState(75); // Example value
+  const [profileCompletion, setProfileCompletion] = useState(0); // Initial value 0
   const [isProfileCompleted, setIsProfileCompleted] = useState(false);
   const [showCompletionModal, setShowCompletionModal] = useState(false);
   const [profileData, setProfileData] = useState({
-    fullName: "John Doe",
-    email: "john.doe@example.com",
-    mobileCountryCode: "US",
-    mobileNumber: "123-456-7890",
-    address: "123 Main St, Anytown, USA",
-    nationalId: "123-456-789",
+    companyName: "Qatar Construction Co.",
+    contactPersonName: "Jane Doe",
+    personalEmail: "jane.doe@example.com",
+    companyEmail: "omar545@hotmail.com",
+    companyPhoneCountryCode: "QA",
+    companyPhoneNumber: "97418995505",
+    commercialRegistrationNumber: "123-456-789",
+    companyDescription:
+      "Leading provider of innovative solutions in the tech industry.",
+    companyWebsite: "", // Default empty
   });
+
+  // Initialize profile completion on component mount
+  useEffect(() => {
+    updateProfileCompletion();
+  }, [profileData]); // Recalculate when profileData changes
 
   const handleEditClick = () => {
     setIsEditing(true);
@@ -56,7 +64,6 @@ export default function Component() {
     // In a real application, you would send this data to a backend
     console.log("Saving profile data:", profileData);
     setIsEditing(false);
-    // Simulate profile completion update
     updateProfileCompletion();
   };
 
@@ -71,27 +78,28 @@ export default function Component() {
       ...prevData,
       [id]: value,
     }));
-    updateProfileCompletion();
   };
 
   const handleSelectChange = (value: string) => {
     setProfileData((prevData) => ({
       ...prevData,
-      mobileCountryCode: value,
+      companyPhoneCountryCode: value,
     }));
-    updateProfileCompletion();
   };
 
   const updateProfileCompletion = () => {
     let completedFields = 0;
-    if (profileData.fullName) completedFields++;
-    if (profileData.email) completedFields++;
-    if (profileData.mobileNumber) completedFields++;
-    if (profileData.address) completedFields++;
-    if (profileData.nationalId) completedFields++;
+    if (profileData.companyName) completedFields++;
+    if (profileData.contactPersonName) completedFields++;
+    if (profileData.personalEmail) completedFields++;
+    if (profileData.companyEmail) completedFields++;
+    if (profileData.companyPhoneNumber) completedFields++;
+    if (profileData.commercialRegistrationNumber) completedFields++;
+    if (profileData.companyDescription) completedFields++;
+    if (profileData.companyWebsite) completedFields++;
 
-    // Assuming 5 fields for 100% completion
-    setProfileCompletion(Math.min(100, (completedFields / 5) * 100));
+    // Assuming 8 fields for 100% completion
+    setProfileCompletion(Math.min(100, (completedFields / 8) * 100));
   };
 
   const handleCompleteProfileClick = () => {
@@ -122,10 +130,10 @@ export default function Component() {
                 <div className="relative">
                   <Avatar className="w-20 h-20 md:w-28 md:h-28">
                     <AvatarImage
-                      src="https://bundui-images.netlify.app/avatars/08.png"
-                      alt="John Doe"
+                      src="/placeholder.svg?height=112&width=112"
+                      alt="Company Logo"
                     />
-                    <AvatarFallback>JD</AvatarFallback>
+                    <AvatarFallback>QC</AvatarFallback>
                   </Avatar>
                   <Button
                     variant="outline"
@@ -137,20 +145,36 @@ export default function Component() {
                 </div>
                 <div>
                   <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
-                    John Doe
+                    {profileData.companyName}
                   </h2>
                   <p className="text-base sm:text-lg text-gray-600">
-                    Senior Product Designer
+                    {profileData.companyDescription}
                   </p>
                   <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-6 text-sm sm:text-base text-gray-500 mt-3">
                     <div className="flex items-center gap-2">
                       <MailIcon className="w-4 h-4 sm:w-5 sm:h-5" />
-                      <span>john.doe@example.com</span>
+                      <span>{profileData.companyEmail}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <CalendarIcon className="w-4 h-4 sm:w-5 sm:h-5" />
-                      <span>Joined March 2023</span>
+                      <PhoneIcon className="w-4 h-4 sm:w-5 sm:h-5" />
+                      <span>
+                        {profileData.companyPhoneCountryCode}{" "}
+                        {profileData.companyPhoneNumber}
+                      </span>
                     </div>
+                    {profileData.companyWebsite && (
+                      <div className="flex items-center gap-2">
+                        <GlobeIcon className="w-4 h-4 sm:w-5 sm:h-5" />
+                        <a
+                          href={profileData.companyWebsite}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="hover:underline"
+                        >
+                          {profileData.companyWebsite}
+                        </a>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -222,27 +246,27 @@ export default function Component() {
                 value="profile-details"
                 className="data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-md text-sm sm:text-base"
               >
-                Profile Details
+                Company Details
               </TabsTrigger>
               <TabsTrigger
                 value="account-verification"
                 className="data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-md text-sm sm:text-base"
               >
-                Account Verification
+                Commercial Registration
               </TabsTrigger>
             </TabsList>
             <TabsContent value="profile-details" className="pt-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <Label
-                    htmlFor="fullName"
+                    htmlFor="companyName"
                     className="text-gray-700 text-sm sm:text-base"
                   >
-                    Full Name
+                    Company Name
                   </Label>
                   <Input
-                    id="fullName"
-                    value={profileData.fullName}
+                    id="companyName"
+                    value={profileData.companyName}
                     onChange={handleInputChange}
                     disabled={areInputsDisabled}
                     className="mt-1"
@@ -250,15 +274,30 @@ export default function Component() {
                 </div>
                 <div>
                   <Label
-                    htmlFor="email"
+                    htmlFor="contactPersonName"
                     className="text-gray-700 text-sm sm:text-base"
                   >
-                    Email
+                    Contact Person Name
                   </Label>
                   <Input
-                    id="email"
+                    id="contactPersonName"
+                    value={profileData.contactPersonName}
+                    onChange={handleInputChange}
+                    disabled={areInputsDisabled}
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label
+                    htmlFor="personalEmail"
+                    className="text-gray-700 text-sm sm:text-base"
+                  >
+                    Personal Email
+                  </Label>
+                  <Input
+                    id="personalEmail"
                     type="email"
-                    value={profileData.email}
+                    value={profileData.personalEmail}
                     onChange={handleInputChange}
                     disabled={areInputsDisabled}
                     className="mt-1"
@@ -266,14 +305,30 @@ export default function Component() {
                 </div>
                 <div>
                   <Label
-                    htmlFor="mobile"
+                    htmlFor="companyEmail"
                     className="text-gray-700 text-sm sm:text-base"
                   >
-                    Mobile
+                    Company Email
+                  </Label>
+                  <Input
+                    id="companyEmail"
+                    type="email"
+                    value={profileData.companyEmail}
+                    onChange={handleInputChange}
+                    disabled={areInputsDisabled}
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label
+                    htmlFor="companyPhoneNumber"
+                    className="text-gray-700 text-sm sm:text-base"
+                  >
+                    Company Phone
                   </Label>
                   <div className="flex gap-2 mt-1">
                     <Select
-                      value={profileData.mobileCountryCode}
+                      value={profileData.companyPhoneCountryCode}
                       onValueChange={handleSelectChange}
                       disabled={areInputsDisabled}
                     >
@@ -287,8 +342,8 @@ export default function Component() {
                       </SelectContent>
                     </Select>
                     <Input
-                      id="mobileNumber"
-                      value={profileData.mobileNumber}
+                      id="companyPhoneNumber"
+                      value={profileData.companyPhoneNumber}
                       onChange={handleInputChange}
                       disabled={areInputsDisabled}
                       className="flex-1"
@@ -297,14 +352,14 @@ export default function Component() {
                 </div>
                 <div>
                   <Label
-                    htmlFor="address"
+                    htmlFor="companyDescription"
                     className="text-gray-700 text-sm sm:text-base"
                   >
-                    Address
+                    Company Description
                   </Label>
                   <Input
-                    id="address"
-                    value={profileData.address}
+                    id="companyDescription"
+                    value={profileData.companyDescription}
                     onChange={handleInputChange}
                     disabled={areInputsDisabled}
                     className="mt-1"
@@ -316,20 +371,21 @@ export default function Component() {
               <div className="grid grid-cols-1 gap-6">
                 <div>
                   <h3 className="text-base sm:text-lg font-semibold text-gray-900">
-                    Account Verification
+                    Commercial Registration Verification
                   </h3>
                   <p className="text-xs sm:text-sm text-gray-500 mb-4">
-                    This info is used to verify your identity.
+                    This info is used to verify your company&apos;s
+                    registration.
                   </p>
                   <Label
-                    htmlFor="nationalId"
+                    htmlFor="commercialRegistrationNumber"
                     className="text-gray-700 text-sm sm:text-base"
                   >
-                    National ID
+                    Commercial Registration Number
                   </Label>
                   <Input
-                    id="nationalId"
-                    value={profileData.nationalId}
+                    id="commercialRegistrationNumber"
+                    value={profileData.commercialRegistrationNumber}
                     onChange={handleInputChange}
                     disabled={areInputsDisabled}
                     className="mt-1"
@@ -337,7 +393,7 @@ export default function Component() {
                 </div>
                 <div>
                   <Label className="text-gray-700 text-sm sm:text-base">
-                    Upload National ID (PDF, JPG, PNG)
+                    Upload CR Document (PDF, JPG, PNG)
                   </Label>
                   <div className="mt-1 border-2 border-dashed border-gray-300 rounded-lg p-4 sm:p-6 text-center flex flex-col items-center justify-center space-y-3">
                     <UploadIcon className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" />
