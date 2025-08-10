@@ -1,9 +1,7 @@
-"use client"
-
-import * as React from "react"
-import { Star } from "lucide-react"
-
-import { Button } from "@/components/ui/button"
+"use client";
+import * as React from "react";
+import { Star } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -11,34 +9,39 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { cn } from "@/lib/utils"
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
 
 interface ReviewDialogProps {
-  isOpen: boolean
-  onOpenChange: (open: boolean) => void
-  onSubmit: (rating: number, review: string) => void
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSubmit: (rating: number, review: string) => void;
 }
 
-export function ReviewDialog({ isOpen, onOpenChange, onSubmit }: ReviewDialogProps) {
-  const [rating, setRating] = React.useState(0)
-  const [reviewText, setReviewText] = React.useState("")
-
+export function ReviewDialog({
+  isOpen,
+  onOpenChange,
+  onSubmit,
+}: ReviewDialogProps) {
+  const [rating, setRating] = React.useState(0);
+  const [reviewText, setReviewText] = React.useState("");
   const handleSubmit = () => {
-    onSubmit(rating, reviewText)
-    setRating(0)
-    setReviewText("")
-    onOpenChange(false)
-  }
-
+    onSubmit(rating, reviewText);
+    setRating(0);
+    setReviewText("");
+    onOpenChange(false);
+  };
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Rate Project Completion</DialogTitle>
-          <DialogDescription>Please rate the worker and provide a review for the completed project.</DialogDescription>
+          <DialogDescription>
+            Please rate the worker and provide a review for the completed
+            project.
+          </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="flex items-center gap-2">
@@ -51,7 +54,9 @@ export function ReviewDialog({ isOpen, onOpenChange, onSubmit }: ReviewDialogPro
                   key={star}
                   className={cn(
                     "h-6 w-6 cursor-pointer",
-                    rating >= star ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground",
+                    rating >= star
+                      ? "fill-yellow-400 text-yellow-400"
+                      : "text-muted-foreground"
                   )}
                   onClick={() => setRating(star)}
                 />
@@ -76,5 +81,5 @@ export function ReviewDialog({ isOpen, onOpenChange, onSubmit }: ReviewDialogPro
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

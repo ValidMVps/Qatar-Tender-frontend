@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import Link from "next/link";
 
 type Step = 1 | 2 | 3;
 type AccountType = "individual" | "business";
@@ -222,7 +223,6 @@ export default function SignupWizard() {
   return (
     <div className="space-y-8 w-xl rounded-2xl p-8 bg-white border border-gray-100">
       <StepHeader current={step} />
-
       <div className="space-y-8">
         {step === 1 && (
           <StepOne
@@ -246,7 +246,6 @@ export default function SignupWizard() {
           />
         )}
       </div>
-
       <div className="flex flex-wrap items-center justify-between gap-4 pt-1">
         <Button variant="outline" onClick={fillRandom} className="px-5 py-2">
           Fill with random data
@@ -283,9 +282,24 @@ export default function SignupWizard() {
             >
               Edit details
             </Button>
-          )}
+          )}{" "}
         </div>
+      </div>{" "}
+      <div className="mt-4 text-center text-sm text-muted-foreground">
+        Don&apos;t have an account?{" "}
+        <Link
+          href="/login"
+          className="font-medium text-blue-600 hover:underline"
+        >
+          Login
+        </Link>
       </div>
+      <Link
+        href="/business-dashboard"
+        className="font-medium text-blue-600 hover:underline"
+      >
+        BUsiness
+      </Link>
     </div>
   );
 }

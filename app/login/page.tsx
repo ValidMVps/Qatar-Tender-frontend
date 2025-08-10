@@ -63,7 +63,7 @@ export default function LoginPage() {
       <Headerauth />
       <div className="flex justify-center items-center h-full p-0">
         <div className="min-h-screen flex w-full items-center justify-center ">
-          <div className="flex w-full border items-center justify-center">
+          <div className="flex w-full  items-center justify-center">
             <Card className="w-md border border-neutral-200">
               <CardHeader className="space-y-1 text-center">
                 <CardTitle className="text-2xl font-semibold tracking-tight">
