@@ -22,6 +22,11 @@ import {
   ArrowDown,
   ArrowUpRight,
   ArrowDownLeft,
+  Hourglass,
+  CheckSquare,
+  XSquare,
+  FileText,
+  TrendingUp,
 } from "lucide-react";
 import {
   Select,
@@ -253,7 +258,152 @@ export default function Component() {
       setSortDirection("asc"); // Default to ascending when changing column
     }
   };
-
+  const analyticsData = {
+    totalTendersPosted: 25,
+    pendingApprovalTenders: 3,
+    activeLiveTenders: 8,
+    closedCompletedTenders: 14,
+    avgBidsPerTender: 4.8,
+    completedProjects: 15,
+    onTimeCompletionRate: 92,
+    totalAwardedValue: "950,000 QAR",
+    totalSpendOnPlatform: "800,000 QAR",
+    averageRatingGivenByFreelancers: 4.7,
+    idVerificationStatus: "Verified",
+    recentActivity: [
+      {
+        type: "tender",
+        message: "New tender 'Office Renovation' posted",
+        time: "2 hours ago",
+      },
+      {
+        type: "bid",
+        message: "New bid on 'Website Development'",
+        time: "5 hours ago",
+      },
+      {
+        type: "project",
+        message: "'HVAC Installation' project completed",
+        time: "1 day ago",
+      },
+      {
+        type: "tender",
+        message: "Tender 'Legal Advisory' closed",
+        time: "3 days ago",
+      },
+    ],
+    jobPostingHistory: [
+      { month: "Jan", tenders: 5 },
+      { month: "Feb", tenders: 7 },
+      { month: "Mar", tenders: 6 },
+      { month: "Apr", tenders: 9 },
+      { month: "May", tenders: 8 },
+      { month: "Jun", tenders: 10 },
+      { month: "Jul", tenders: 12 },
+    ],
+    reviewsFromBidders: [
+      {
+        id: 1,
+        bidderName: "Freelancer A",
+        bidderAvatar: "/placeholder-user.jpg",
+        rating: 5,
+        comment:
+          "Excellent communication and clear project requirements. A pleasure to work with!",
+        date: "2024-07-10",
+      },
+      {
+        id: 2,
+        bidderName: "Freelancer B",
+        bidderAvatar: "/placeholder-user.jpg",
+        rating: 4,
+        comment:
+          "Good project, but payment was slightly delayed. Overall positive experience.",
+        date: "2024-07-05",
+      },
+      {
+        id: 3,
+        bidderName: "Freelancer C",
+        bidderAvatar: "/placeholder-user.jpg",
+        rating: 5,
+        comment: "Very professional and responsive. Highly recommend!",
+        date: "2024-06-28",
+      },
+      {
+        id: 4,
+        bidderName: "Freelancer D",
+        bidderAvatar: "/placeholder-user.jpg",
+        rating: 3,
+        comment:
+          "Project scope changed mid-way, which caused some issues. Managed to complete it.",
+        date: "2024-06-20",
+      },
+    ],
+    spendHistory: [
+      { month: "Jan", spend: 10000 },
+      { month: "Feb", spend: 15000 },
+      { month: "Mar", spend: 12000 },
+      { month: "Apr", spend: 18000 },
+      { month: "May", spend: 20000 },
+      { month: "Jun", spend: 25000 },
+      { month: "Jul", spend: 30000 },
+    ],
+    projectExpenditure: [
+      {
+        id: 1,
+        name: "Office Renovation Phase 1",
+        amount: "150,000 QAR",
+        status: "Completed",
+      },
+      {
+        id: 2,
+        name: "Website Redesign Project",
+        amount: "50,000 QAR",
+        status: "Completed",
+      },
+      {
+        id: 3,
+        name: "Marketing Campaign Q3",
+        amount: "30,000 QAR",
+        status: "Active",
+      },
+      {
+        id: 4,
+        name: "HVAC System Upgrade",
+        amount: "200,000 QAR",
+        status: "Completed",
+      },
+      {
+        id: 5,
+        name: "Mobile App Development",
+        amount: "120,000 QAR",
+        status: "Active",
+      },
+      {
+        id: 6,
+        name: "Legal Advisory Services",
+        amount: "15,000 QAR",
+        status: "Completed",
+      },
+      {
+        id: 7,
+        name: "Data Migration Project",
+        amount: "45,000 QAR",
+        status: "Completed",
+      },
+    ],
+    userBadge: {
+      currentBadge: "Bronze",
+      currentRating: 4.7,
+      completedProjects: 15,
+      progressToNextBadge: 60, // Percentage to next badge
+      badgeRequirements: {
+        Bronze: { minRating: 0, minProjects: 0 },
+        Silver: { minRating: 3.5, minProjects: 5 },
+        Gold: { minRating: 4.0, minProjects: 10 },
+        Platinum: { minRating: 4.5, minProjects: 20 },
+      },
+    },
+  };
   // Derived metrics
   const {
     totalTenders,
@@ -446,18 +596,367 @@ export default function Component() {
 
   return (
     <SidebarProvider>
-     
       <Tabs
         value={activeTab}
+        className="w-full px-0 container mx-auto"
         onValueChange={(value) => setActiveTab(value as "received" | "given")}
-      > <TabsList className="grid w-full grid-cols-2">
-        <TabsTrigger value="received" className=" text-xs">
-          Reviews About My Business
-        </TabsTrigger>
-        <TabsTrigger value="given" className=" text-xs">
-          Reviews I've Given
-        </TabsTrigger>
-      </TabsList>
+      >
+        {" "}
+        <TabsContent value="given" className=" px-0">
+          {" "}
+          <SidebarInset className="bg-transparent  py-1 px-2 md:py-3 md:px-3 ">
+            {/* Page body */}
+            <div className="flex flex-1 flex-col gap-6 w-full">
+              {/* Snapshot cards */}
+              <section>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <Card className="border border-gray-200 shadow-sm">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm font-medium text-gray-600 flex items-center justify-between">
+                        <span className="flex items-center">
+                          <FileText className="h-4 w-4 mr-2" />
+                          Total Tenders Posted
+                        </span>
+                        <TrendingUp className="h-4 w-4 text-green-500" />
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <div className="text-2xl font-bold text-gray-900">
+                        {analyticsData.totalTendersPosted}
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">
+                        +5 this month
+                      </p>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border border-gray-200 shadow-sm">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm font-medium text-gray-600 flex items-center">
+                        <Hourglass className="h-4 w-4 mr-2" />
+                        Pending Approval
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <div className="text-2xl font-bold text-gray-900">
+                        {analyticsData.pendingApprovalTenders}
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">
+                        Tenders awaiting review
+                      </p>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border border-gray-200 shadow-sm">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm font-medium text-gray-600 flex items-center">
+                        <CheckSquare className="h-4 w-4 mr-2" />
+                        Active (Live) Tenders
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <div className="text-2xl font-bold text-gray-900">
+                        {analyticsData.activeLiveTenders}
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">
+                        Currently open for bids
+                      </p>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border border-gray-200 shadow-sm">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm font-medium text-gray-600 flex items-center">
+                        <XSquare className="h-4 w-4 mr-2" />
+                        Closed/Completed
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <div className="text-2xl font-bold text-gray-900">
+                        {analyticsData.closedCompletedTenders}
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">
+                        Tenders finished or closed
+                      </p>
+                    </CardContent>
+                  </Card>
+                </div>
+              </section>{" "}
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="received" className=" text-xs">
+                  Reviews About My Business
+                </TabsTrigger>
+                <TabsTrigger value="given" className=" text-xs">
+                  Reviews I've Given
+                </TabsTrigger>
+              </TabsList>
+              {/* Charts and lists */}
+              <section className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6">
+                {/* Left (main) column */}
+                <ProjectsOverviewChart />
+                {/* Right (aside) column */}
+                <div className="md:col-span-5 col-span-1 flex flex-col gap-4 md:gap-4">
+                  {/* User Rating */}
+                  <Card className="w-full p-6">
+                    <CardContent className="p-0 space-y-6">
+                      {/* Total Projects Section */}
+                      <div>
+                        <p className="text-sm text-muted-foreground">
+                          Total Projects Posted
+                        </p>
+                        <h2 className="text-4xl font-bold mt-1">128</h2>
+                      </div>
+                      {/* Recently Active Posters Section */}
+                      <div>
+                        <div className="flex -space-x-2 overflow-hidden">
+                          <Avatar className="w-10 h-10 border-2 border-background">
+                            <AvatarImage
+                              src="https://bundui-images.netlify.app/avatars/08.png"
+                              alt="User 1"
+                            />
+                            <AvatarFallback>U1</AvatarFallback>
+                          </Avatar>
+                          <Avatar className="w-10 h-10 border-2 border-background">
+                            <AvatarImage
+                              src="https://bundui-images.netlify.app/avatars/04.png"
+                              alt="User 2"
+                            />
+                            <AvatarFallback>U2</AvatarFallback>
+                          </Avatar>
+                          <Avatar className="w-10 h-10 border-2 border-background">
+                            <AvatarImage
+                              src="https://bundui-images.netlify.app/avatars/05.png"
+                              alt="User 3"
+                            />
+                            <AvatarFallback>U3</AvatarFallback>
+                          </Avatar>
+                          <Avatar className="w-10 h-10 border-2 border-background">
+                            <AvatarImage
+                              src="https://bundui-images.netlify.app/avatars/06.png"
+                              alt="User 4"
+                            />
+                            <AvatarFallback>U4</AvatarFallback>
+                          </Avatar>
+                          <Avatar className="w-10 h-10 border-2 border-background">
+                            <AvatarImage
+                              src="https://bundui-images.netlify.app/avatars/07.png"
+                              alt="User 5"
+                            />
+                            <AvatarFallback>U5</AvatarFallback>
+                          </Avatar>
+                        </div>
+                      </div>
+                      {/* Highlights Section */}
+                      <div className="space-y-4">
+                        <h3 className="text-base font-semibold">Highlights</h3>
+                        <div className="space-y-4">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm">
+                              Avg. Bids per Project
+                            </span>
+                            <div className="flex items-center gap-1 text-green-500">
+                              <ArrowUpRight className="w-4 h-4" />
+                              <span className="font-medium">6.1</span>
+                            </div>
+                          </div>
+                          <Separator />
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm">
+                              Projects With No Bids
+                            </span>
+                            <div className="flex items-center gap-1 text-red-500">
+                              <ArrowDownLeft className="w-4 h-4" />
+                              <span className="font-medium">12</span>
+                            </div>
+                          </div>
+                          <Separator />
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm">Total Bids Received</span>
+                            <div className="flex items-center gap-1 text-green-500">
+                              <ArrowUpRight className="w-4 h-4" />
+                              <span className="font-medium">342</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  <Card className="border-1 col-span-full lg:col-span-3 h-fit shadow-none border-neutral-200 rounded-md">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <AlertTriangle className="h-4 w-4 text-amber-600" />
+                        Tenders with no bids in 7 days
+                      </CardTitle>
+                      <CardDescription>
+                        Consider updating details
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      {reminders.noBidsIn7Days.length === 0 ? (
+                        <p className="text-sm text-muted-foreground">
+                          No items to show.
+                        </p>
+                      ) : (
+                        <ul className="space-y-3">
+                          {reminders.noBidsIn7Days.map((t) => (
+                            <li
+                              key={t.id}
+                              className="flex items-center justify-between"
+                            >
+                              <div className="min-w-0">
+                                <p className="truncate font-medium">
+                                  {t.title}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                  Posted {formatDate(t.postedAt)} • {t.category}
+                                </p>
+                              </div>
+                              <Badge variant="outline" className="shrink-0">
+                                {t.bidsReceived} bids
+                              </Badge>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </CardContent>
+                  </Card>
+                </div>
+              </section>
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <Card className="border border-gray-200 shadow-sm">
+                    <CardHeader>
+                      <CardTitle className="text-lg font-semibold flex items-center">
+                        <Star className="h-5 w-5 mr-2 text-yellow-500" />
+                        Average Rating Given by Freelancers
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <div className="text-4xl font-bold text-gray-900 flex items-center">
+                        {analyticsData.averageRatingGivenByFreelancers}
+                        <span className="text-xl text-gray-500 ml-2">
+                          / 5.0
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-500 mt-2">
+                        Based on {analyticsData.reviewsFromBidders.length}{" "}
+                        reviews
+                      </p>
+
+                      {/* Badge Tiers */}
+                      <div className="mt-6 space-y-3">
+                        {/* Bronze - current badge */}
+                        <div className="flex justify-between items-center p-3 border border-emerald-600 rounded-lg bg-emerald-50">
+                          <div>
+                            <p className="text-base font-semibold text-emerald-700">
+                              Bronze
+                            </p>
+                            <p className="text-sm text-emerald-600">
+                              2+ projects • 4.5+ rating
+                            </p>
+                          </div>
+                          <span className="px-3 py-1 text-sm font-bold border border-emerald-600 text-emerald-700 rounded-full">
+                            Bronze
+                          </span>
+                        </div>
+
+                        {/* Gold */}
+                        <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg">
+                          <div>
+                            <p className="text-base font-semibold text-gray-800">
+                              Gold
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              10+ projects • 4.8+ rating
+                            </p>
+                          </div>
+                          <span className="px-3 py-1 text-sm font-bold border border-gray-300 text-gray-700 rounded-full">
+                            Gold
+                          </span>
+                        </div>
+
+                        {/* Platinum */}
+                        <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg">
+                          <div>
+                            <p className="text-base font-semibold text-gray-800">
+                              Platinum
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              25+ projects • 4.9+ rating
+                            </p>
+                          </div>
+                          <span className="px-3 py-1 text-sm font-bold border border-gray-300 text-gray-700 rounded-full">
+                            Platinum
+                          </span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border border-gray-200 shadow-sm">
+                    <CardHeader>
+                      <CardTitle className="text-lg font-semibold">
+                        Reviews from Bidders
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-0 space-y-4">
+                      {analyticsData.reviewsFromBidders.map((review) => (
+                        <div
+                          key={review.id}
+                          className="flex items-start space-x-4 border-b pb-4 last:border-b-0"
+                        >
+                          <Avatar className="h-10 w-10">
+                            <AvatarImage
+                              src={
+                                review.bidderAvatar ||
+                                "/placeholder.svg?height=40&width=40&query=user avatar"
+                              }
+                              alt={review.bidderName}
+                            />
+                            <AvatarFallback>
+                              {review.bidderName.charAt(0)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1">
+                            <div className="flex justify-between items-center">
+                              <h4 className="font-semibold text-gray-900">
+                                {review.bidderName}
+                              </h4>
+                              <div className="flex items-center text-sm text-yellow-500">
+                                {Array.from({ length: review.rating }).map(
+                                  (_, i) => (
+                                    <Star
+                                      key={i}
+                                      className="h-4 w-4 fill-current"
+                                    />
+                                  )
+                                )}
+                                {Array.from({ length: 5 - review.rating }).map(
+                                  (_, i) => (
+                                    <Star
+                                      key={i}
+                                      className="h-4 w-4 text-gray-300"
+                                    />
+                                  )
+                                )}
+                              </div>
+                            </div>
+                            <p className="text-sm text-gray-700 mt-1">
+                              {review.comment}
+                            </p>
+                            <p className="text-xs text-gray-500 mt-1">
+                              {review.date}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            </div>{" "}
+          </SidebarInset>
+        </TabsContent>
         <TabsContent value="received">
           {" "}
           <SidebarInset className="bg-transparent container py-1 px-2 md:py-3 md:px-3 ">
@@ -465,39 +964,86 @@ export default function Component() {
             <div className="flex flex-1 flex-col gap-6">
               {/* Snapshot cards */}
               <section>
-                <div className="grid gap-2 md:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
-                  <StatCard
-                    title="Total Tenders Posted"
-                    value={String(totalTenders)}
-                    icon={<ListOrdered className="h-5 w-5" />}
-                    subtle="All time"
-                  />
-                  <StatCard
-                    title="Bids Received"
-                    value={String(totalBids)}
-                    icon={<Inbox className="h-5 w-5" />}
-                    subtle="Across all tenders"
-                  />
-                  <StatCard
-                    title="Pending Tender Approvals"
-                    value={String(pendingApprovals)}
-                    icon={<Clock className="h-5 w-5" />}
-                    subtle="Awaiting review"
-                  />
-                  <StatCard
-                    title="Average Bid per Tender"
-                    value={avgBidsPerTender.toFixed(1)}
-                    icon={<Gauge className="h-5 w-5" />}
-                    subtle="Avg number of bids"
-                  />
-                  <StatCard
-                    title="Total Tender Value"
-                    value={`$${totalTenderValue.toLocaleString()}`}
-                    icon={<BookOpen className="h-5 w-5" />}
-                    subtle="Across all tenders"
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <Card className="border border-gray-200 shadow-sm">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm font-medium text-gray-600 flex items-center justify-between">
+                        <span className="flex items-center">
+                          <FileText className="h-4 w-4 mr-2" />
+                          Total Tenders Posted
+                        </span>
+                        <TrendingUp className="h-4 w-4 text-green-500" />
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <div className="text-2xl font-bold text-gray-900">
+                        {analyticsData.totalTendersPosted}
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">
+                        +5 this month
+                      </p>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border border-gray-200 shadow-sm">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm font-medium text-gray-600 flex items-center">
+                        <Hourglass className="h-4 w-4 mr-2" />
+                        Pending Approval
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <div className="text-2xl font-bold text-gray-900">
+                        {analyticsData.pendingApprovalTenders}
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">
+                        Tenders awaiting review
+                      </p>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border border-gray-200 shadow-sm">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm font-medium text-gray-600 flex items-center">
+                        <CheckSquare className="h-4 w-4 mr-2" />
+                        Active (Live) Tenders
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <div className="text-2xl font-bold text-gray-900">
+                        {analyticsData.activeLiveTenders}
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">
+                        Currently open for bids
+                      </p>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border border-gray-200 shadow-sm">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm font-medium text-gray-600 flex items-center">
+                        <XSquare className="h-4 w-4 mr-2" />
+                        Closed/Completed
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <div className="text-2xl font-bold text-gray-900">
+                        {analyticsData.closedCompletedTenders}
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">
+                        Tenders finished or closed
+                      </p>
+                    </CardContent>
+                  </Card>
                 </div>
-              </section>
+              </section>   <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="received" className=" text-xs">
+            Reviews About My Business
+          </TabsTrigger>
+          <TabsTrigger value="given" className=" text-xs">
+            Reviews I've Given
+          </TabsTrigger>
+        </TabsList>
               {/* Charts and lists */}
               <section className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6">
                 {/* Left (main) column */}
@@ -630,514 +1176,140 @@ export default function Component() {
                   </Card>
                 </div>
               </section>
-              <div className="grid grid-cols-12 w-full justify-start gap-2 md:gap-5">
-                <Card className="border-1 shadow-none col-span-full border-neutral-200 rounded-md">
-                  <CardHeader className="pb-3">
-                    <div className="flex flex-row sm:flex-row items-start sm:items-center justify-between gap-2">
-                      <div>
-                        <CardTitle className="text-base">
-                          Recent Tenders
-                        </CardTitle>
-                        <CardDescription>
-                          Latest tenders you’ve posted
-                        </CardDescription>
-                      </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="gap-1 bg-transparent"
-                      >
-                        <BarChart3 className="h-4 w-4" />
-                        <span>View all</span>
-                      </Button>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex flex-col sm:flex-row gap-2">
-                      <div className="relative flex-1">
-                        <Input
-                          placeholder="Search by title, category or status..."
-                          value={query}
-                          onChange={(e) => setQuery(e.target.value)}
-                          className="pl-9"
-                          aria-label="Search tenders"
-                        />
-                        <LineChartIcon className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                      </div>
-                      <Select
-                        value={filterStatus}
-                        onValueChange={(value: TenderStatus | "All") =>
-                          setFilterStatus(value)
-                        }
-                      >
-                        <SelectTrigger className="w-full sm:w-[180px]">
-                          <SelectValue placeholder="Filter by Status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="All">All Statuses</SelectItem>
-                          <SelectItem value="Active">Active</SelectItem>
-                          <SelectItem value="Pending">Pending</SelectItem>
-                          <SelectItem value="Closed">Closed</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    {/* Responsive Table */}
-                    <div className="rounded-lg overflow-x-auto hidden md:block">
-                      <Table className="px-0 ">
-                        <TableHeader className="px-0">
-                          <TableRow>
-                            <TableHead>Title</TableHead>
-                            <TableHead>Category</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead
-                              className="cursor-pointer whitespace-nowrap"
-                              onClick={() => handleSort("postedAt")}
-                            >
-                              <div className="flex items-center gap-1">
-                                Posted At
-                                {sortColumn === "postedAt" &&
-                                  (sortDirection === "asc" ? (
-                                    <ArrowUp className="h-3 w-3" />
-                                  ) : (
-                                    <ArrowDown className="h-3 w-3" />
-                                  ))}
-                              </div>
-                            </TableHead>
-                            <TableHead
-                              className="cursor-pointer whitespace-nowrap"
-                              onClick={() => handleSort("deadline")}
-                            >
-                              <div className="flex items-center gap-1">
-                                Deadline
-                                {sortColumn === "deadline" &&
-                                  (sortDirection === "asc" ? (
-                                    <ArrowUp className="h-3 w-3" />
-                                  ) : (
-                                    <ArrowDown className="h-3 w-3" />
-                                  ))}
-                              </div>
-                            </TableHead>
-                            <TableHead
-                              className="text-right cursor-pointer whitespace-nowrap"
-                              onClick={() => handleSort("bidsReceived")}
-                            >
-                              <div className="flex items-center justify-center gap-1">
-                                Bids Received
-                                {sortColumn === "bidsReceived" &&
-                                  (sortDirection === "asc" ? (
-                                    <ArrowUp className="h-3 w-3" />
-                                  ) : (
-                                    <ArrowDown className="h-3 w-3" />
-                                  ))}
-                              </div>
-                            </TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody className="px-0 ">
-                          {filteredTenders.map((t) => (
-                            <TableRow key={t.id} className=" px-0">
-                              <TableCell className="font-medium px-0 whitespace-nowrap">
-                                <div className="flex items-center gap-2">
-                                  <span>{t.title}</span>
-                                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                                </div>
-                              </TableCell>
-                              <TableCell className="whitespace-nowrap">
-                                {t.category}
-                              </TableCell>
-                              <TableCell>
-                                <StatusBadge status={t.status} />
-                              </TableCell>
-                              <TableCell className="whitespace-nowrap">
-                                {formatDate(t.postedAt)}
-                              </TableCell>
-                              <TableCell className="whitespace-nowrap">
-                                {formatDate(t.deadline)}
-                              </TableCell>
-                              <TableCell className="text-center whitespace-nowrap">
-                                {t.bidsReceived}
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </div>
-                    {/* Mobile Card List */}
-                    <div className="block md:hidden space-y-3">
-                      {filteredTenders.length === 0 ? (
-                        <p className="text-sm text-muted-foreground px-2">
-                          No tenders found.
-                        </p>
-                      ) : (
-                        filteredTenders.map((t) => (
-                          <div
-                            key={t.id}
-                            className=" rounded-lg py-3 flex flex-col gap-2 bg-white "
-                          >
-                            <div className="flex items-center justify-between">
-                              <span className="font-semibold">{t.title}</span>
-                              <StatusBadge status={t.status} />
-                            </div>
-                            <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
-                              <span>{t.category}</span>
-                              <span>• Posted: {formatDate(t.postedAt)}</span>
-                              <span>• Deadline: {formatDate(t.deadline)}</span>
-                            </div>
-                            <div className="flex items-center justify-between mt-1">
-                              <span className="text-xs">
-                                Bids: {t.bidsReceived}
-                              </span>
-                              <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                            </div>
-                          </div>
-                        ))
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          </SidebarInset>
-        </TabsContent>
-        <TabsContent value="given">
-          {" "}
-          <SidebarInset className="bg-transparent container py-1 px-2 md:py-3 md:px-3 ">
-            {/* Page body */}
-            <div className="flex flex-1 flex-col gap-6">
-              {/* Snapshot cards */}
-              <section>
-                <div className="grid gap-2 md:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
-                  <StatCard
-                    title="Total Tenders Posted"
-                    value={String(totalTenders)}
-                    icon={<ListOrdered className="h-5 w-5" />}
-                    subtle="All time"
-                  />
-                  <StatCard
-                    title="Bids Received"
-                    value={String(totalBids)}
-                    icon={<Inbox className="h-5 w-5" />}
-                    subtle="Across all tenders"
-                  />
-                  <StatCard
-                    title="Pending Tender Approvals"
-                    value={String(pendingApprovals)}
-                    icon={<Clock className="h-5 w-5" />}
-                    subtle="Awaiting review"
-                  />
-                  <StatCard
-                    title="Average Bid per Tender"
-                    value={avgBidsPerTender.toFixed(1)}
-                    icon={<Gauge className="h-5 w-5" />}
-                    subtle="Avg number of bids"
-                  />
-                  <StatCard
-                    title="Total Tender Value"
-                    value={`$${totalTenderValue.toLocaleString()}`}
-                    icon={<BookOpen className="h-5 w-5" />}
-                    subtle="Across all tenders"
-                  />
-                </div>
-              </section>
-              {/* Charts and lists */}
-              <section className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6">
-                {/* Left (main) column */}
-                <ProjectsOverviewChart />
-                {/* Right (aside) column */}
-                <div className="md:col-span-5 col-span-1 flex flex-col gap-4 md:gap-4">
-                  {/* User Rating */}
-                  <Card className="w-full p-6">
-                    <CardContent className="p-0 space-y-6">
-                      {/* Total Projects Section */}
-                      <div>
-                        <p className="text-sm text-muted-foreground">
-                          Total Projects Posted
-                        </p>
-                        <h2 className="text-4xl font-bold mt-1">128</h2>
-                      </div>
-                      {/* Recently Active Posters Section */}
-                      <div>
-                        <div className="flex -space-x-2 overflow-hidden">
-                          <Avatar className="w-10 h-10 border-2 border-background">
-                            <AvatarImage
-                              src="https://bundui-images.netlify.app/avatars/08.png"
-                              alt="User 1"
-                            />
-                            <AvatarFallback>U1</AvatarFallback>
-                          </Avatar>
-                          <Avatar className="w-10 h-10 border-2 border-background">
-                            <AvatarImage
-                              src="https://bundui-images.netlify.app/avatars/04.png"
-                              alt="User 2"
-                            />
-                            <AvatarFallback>U2</AvatarFallback>
-                          </Avatar>
-                          <Avatar className="w-10 h-10 border-2 border-background">
-                            <AvatarImage
-                              src="https://bundui-images.netlify.app/avatars/05.png"
-                              alt="User 3"
-                            />
-                            <AvatarFallback>U3</AvatarFallback>
-                          </Avatar>
-                          <Avatar className="w-10 h-10 border-2 border-background">
-                            <AvatarImage
-                              src="https://bundui-images.netlify.app/avatars/06.png"
-                              alt="User 4"
-                            />
-                            <AvatarFallback>U4</AvatarFallback>
-                          </Avatar>
-                          <Avatar className="w-10 h-10 border-2 border-background">
-                            <AvatarImage
-                              src="https://bundui-images.netlify.app/avatars/07.png"
-                              alt="User 5"
-                            />
-                            <AvatarFallback>U5</AvatarFallback>
-                          </Avatar>
-                        </div>
-                      </div>
-                      {/* Highlights Section */}
-                      <div className="space-y-4">
-                        <h3 className="text-base font-semibold">Highlights</h3>
-                        <div className="space-y-4">
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm">
-                              Avg. Bids per Project
-                            </span>
-                            <div className="flex items-center gap-1 text-green-500">
-                              <ArrowUpRight className="w-4 h-4" />
-                              <span className="font-medium">6.1</span>
-                            </div>
-                          </div>
-                          <Separator />
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm">
-                              Projects With No Bids
-                            </span>
-                            <div className="flex items-center gap-1 text-red-500">
-                              <ArrowDownLeft className="w-4 h-4" />
-                              <span className="font-medium">12</span>
-                            </div>
-                          </div>
-                          <Separator />
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm">Total Bids Received</span>
-                            <div className="flex items-center gap-1 text-green-500">
-                              <ArrowUpRight className="w-4 h-4" />
-                              <span className="font-medium">342</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                  <Card className="border-1 col-span-full lg:col-span-3 h-fit shadow-none border-neutral-200 rounded-md">
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-base flex items-center gap-2">
-                        <AlertTriangle className="h-4 w-4 text-amber-600" />
-                        Tenders with no bids in 7 days
+
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <Card className="border border-gray-200 shadow-sm">
+                    <CardHeader>
+                      <CardTitle className="text-lg font-semibold flex items-center">
+                        <Star className="h-5 w-5 mr-2 text-yellow-500" />
+                        Average Rating Given by Freelancers
                       </CardTitle>
-                      <CardDescription>
-                        Consider updating details
-                      </CardDescription>
                     </CardHeader>
-                    <CardContent>
-                      {reminders.noBidsIn7Days.length === 0 ? (
-                        <p className="text-sm text-muted-foreground">
-                          No items to show.
-                        </p>
-                      ) : (
-                        <ul className="space-y-3">
-                          {reminders.noBidsIn7Days.map((t) => (
-                            <li
-                              key={t.id}
-                              className="flex items-center justify-between"
-                            >
-                              <div className="min-w-0">
-                                <p className="truncate font-medium">
-                                  {t.title}
-                                </p>
-                                <p className="text-xs text-muted-foreground">
-                                  Posted {formatDate(t.postedAt)} • {t.category}
-                                </p>
+                    <CardContent className="pt-0">
+                      <div className="text-4xl font-bold text-gray-900 flex items-center">
+                        {analyticsData.averageRatingGivenByFreelancers}
+                        <span className="text-xl text-gray-500 ml-2">
+                          / 5.0
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-500 mt-2">
+                        Based on {analyticsData.reviewsFromBidders.length}{" "}
+                        reviews
+                      </p>
+
+                      {/* Badge Tiers */}
+                      <div className="mt-6 space-y-3">
+                        {/* Bronze - current badge */}
+                        <div className="flex justify-between items-center p-3 border border-emerald-600 rounded-lg bg-emerald-50">
+                          <div>
+                            <p className="text-base font-semibold text-emerald-700">
+                              Bronze
+                            </p>
+                            <p className="text-sm text-emerald-600">
+                              2+ projects • 4.5+ rating
+                            </p>
+                          </div>
+                          <span className="px-3 py-1 text-sm font-bold border border-emerald-600 text-emerald-700 rounded-full">
+                            Bronze
+                          </span>
+                        </div>
+
+                        {/* Gold */}
+                        <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg">
+                          <div>
+                            <p className="text-base font-semibold text-gray-800">
+                              Gold
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              10+ projects • 4.8+ rating
+                            </p>
+                          </div>
+                          <span className="px-3 py-1 text-sm font-bold border border-gray-300 text-gray-700 rounded-full">
+                            Gold
+                          </span>
+                        </div>
+
+                        {/* Platinum */}
+                        <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg">
+                          <div>
+                            <p className="text-base font-semibold text-gray-800">
+                              Platinum
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              25+ projects • 4.9+ rating
+                            </p>
+                          </div>
+                          <span className="px-3 py-1 text-sm font-bold border border-gray-300 text-gray-700 rounded-full">
+                            Platinum
+                          </span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border border-gray-200 shadow-sm">
+                    <CardHeader>
+                      <CardTitle className="text-lg font-semibold">
+                        Reviews from Bidders
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-0 space-y-4">
+                      {analyticsData.reviewsFromBidders.map((review) => (
+                        <div
+                          key={review.id}
+                          className="flex items-start space-x-4 border-b pb-4 last:border-b-0"
+                        >
+                          <Avatar className="h-10 w-10">
+                            <AvatarImage
+                              src={
+                                review.bidderAvatar ||
+                                "/placeholder.svg?height=40&width=40&query=user avatar"
+                              }
+                              alt={review.bidderName}
+                            />
+                            <AvatarFallback>
+                              {review.bidderName.charAt(0)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1">
+                            <div className="flex justify-between items-center">
+                              <h4 className="font-semibold text-gray-900">
+                                {review.bidderName}
+                              </h4>
+                              <div className="flex items-center text-sm text-yellow-500">
+                                {Array.from({ length: review.rating }).map(
+                                  (_, i) => (
+                                    <Star
+                                      key={i}
+                                      className="h-4 w-4 fill-current"
+                                    />
+                                  )
+                                )}
+                                {Array.from({ length: 5 - review.rating }).map(
+                                  (_, i) => (
+                                    <Star
+                                      key={i}
+                                      className="h-4 w-4 text-gray-300"
+                                    />
+                                  )
+                                )}
                               </div>
-                              <Badge variant="outline" className="shrink-0">
-                                {t.bidsReceived} bids
-                              </Badge>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
+                            </div>
+                            <p className="text-sm text-gray-700 mt-1">
+                              {review.comment}
+                            </p>
+                            <p className="text-xs text-gray-500 mt-1">
+                              {review.date}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
                     </CardContent>
                   </Card>
                 </div>
-              </section>
-              <div className="grid grid-cols-12 w-full justify-start gap-2 md:gap-5">
-                <Card className="border-1 shadow-none col-span-full border-neutral-200 rounded-md">
-                  <CardHeader className="pb-3">
-                    <div className="flex flex-row sm:flex-row items-start sm:items-center justify-between gap-2">
-                      <div>
-                        <CardTitle className="text-base">
-                          Recent Tenders
-                        </CardTitle>
-                        <CardDescription>
-                          Latest tenders you’ve posted
-                        </CardDescription>
-                      </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="gap-1 bg-transparent"
-                      >
-                        <BarChart3 className="h-4 w-4" />
-                        <span>View all</span>
-                      </Button>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex flex-col sm:flex-row gap-2">
-                      <div className="relative flex-1">
-                        <Input
-                          placeholder="Search by title, category or status..."
-                          value={query}
-                          onChange={(e) => setQuery(e.target.value)}
-                          className="pl-9"
-                          aria-label="Search tenders"
-                        />
-                        <LineChartIcon className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                      </div>
-                      <Select
-                        value={filterStatus}
-                        onValueChange={(value: TenderStatus | "All") =>
-                          setFilterStatus(value)
-                        }
-                      >
-                        <SelectTrigger className="w-full sm:w-[180px]">
-                          <SelectValue placeholder="Filter by Status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="All">All Statuses</SelectItem>
-                          <SelectItem value="Active">Active</SelectItem>
-                          <SelectItem value="Pending">Pending</SelectItem>
-                          <SelectItem value="Closed">Closed</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    {/* Responsive Table */}
-                    <div className="rounded-lg overflow-x-auto hidden md:block">
-                      <Table className="px-0 ">
-                        <TableHeader className="px-0">
-                          <TableRow>
-                            <TableHead>Title</TableHead>
-                            <TableHead>Category</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead
-                              className="cursor-pointer whitespace-nowrap"
-                              onClick={() => handleSort("postedAt")}
-                            >
-                              <div className="flex items-center gap-1">
-                                Posted At
-                                {sortColumn === "postedAt" &&
-                                  (sortDirection === "asc" ? (
-                                    <ArrowUp className="h-3 w-3" />
-                                  ) : (
-                                    <ArrowDown className="h-3 w-3" />
-                                  ))}
-                              </div>
-                            </TableHead>
-                            <TableHead
-                              className="cursor-pointer whitespace-nowrap"
-                              onClick={() => handleSort("deadline")}
-                            >
-                              <div className="flex items-center gap-1">
-                                Deadline
-                                {sortColumn === "deadline" &&
-                                  (sortDirection === "asc" ? (
-                                    <ArrowUp className="h-3 w-3" />
-                                  ) : (
-                                    <ArrowDown className="h-3 w-3" />
-                                  ))}
-                              </div>
-                            </TableHead>
-                            <TableHead
-                              className="text-right cursor-pointer whitespace-nowrap"
-                              onClick={() => handleSort("bidsReceived")}
-                            >
-                              <div className="flex items-center justify-center gap-1">
-                                Bids Received
-                                {sortColumn === "bidsReceived" &&
-                                  (sortDirection === "asc" ? (
-                                    <ArrowUp className="h-3 w-3" />
-                                  ) : (
-                                    <ArrowDown className="h-3 w-3" />
-                                  ))}
-                              </div>
-                            </TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody className="px-0 ">
-                          {filteredTenders.map((t) => (
-                            <TableRow key={t.id} className=" px-0">
-                              <TableCell className="font-medium px-0 whitespace-nowrap">
-                                <div className="flex items-center gap-2">
-                                  <span>{t.title}</span>
-                                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                                </div>
-                              </TableCell>
-                              <TableCell className="whitespace-nowrap">
-                                {t.category}
-                              </TableCell>
-                              <TableCell>
-                                <StatusBadge status={t.status} />
-                              </TableCell>
-                              <TableCell className="whitespace-nowrap">
-                                {formatDate(t.postedAt)}
-                              </TableCell>
-                              <TableCell className="whitespace-nowrap">
-                                {formatDate(t.deadline)}
-                              </TableCell>
-                              <TableCell className="text-center whitespace-nowrap">
-                                {t.bidsReceived}
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </div>
-                    {/* Mobile Card List */}
-                    <div className="block md:hidden space-y-3">
-                      {filteredTenders.length === 0 ? (
-                        <p className="text-sm text-muted-foreground px-2">
-                          No tenders found.
-                        </p>
-                      ) : (
-                        filteredTenders.map((t) => (
-                          <div
-                            key={t.id}
-                            className=" rounded-lg py-3 flex flex-col gap-2 bg-white "
-                          >
-                            <div className="flex items-center justify-between">
-                              <span className="font-semibold">{t.title}</span>
-                              <StatusBadge status={t.status} />
-                            </div>
-                            <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
-                              <span>{t.category}</span>
-                              <span>• Posted: {formatDate(t.postedAt)}</span>
-                              <span>• Deadline: {formatDate(t.deadline)}</span>
-                            </div>
-                            <div className="flex items-center justify-between mt-1">
-                              <span className="text-xs">
-                                Bids: {t.bidsReceived}
-                              </span>
-                              <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                            </div>
-                          </div>
-                        ))
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
               </div>
-            </div>
+            </div>{" "}
           </SidebarInset>
         </TabsContent>
       </Tabs>
