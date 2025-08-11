@@ -89,6 +89,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import ProjectsOverviewChart from "@/components/ProjectOverviewChart";
 import { Tabs } from "@radix-ui/react-tabs";
 import { TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import Banalytics from "@/components/Banalytics";
 
 type TenderStatus = "Pending" | "Active" | "Closed";
 
@@ -246,9 +247,7 @@ export default function Component() {
   const [filterStatus, setFilterStatus] = React.useState<TenderStatus | "All">(
     "All"
   );
-  const [activeTab, setActiveTab] = React.useState<"received" | "given">(
-    "received"
-  );
+  const [activeTab, setActiveTab] = React.useState<"bids" | "tender">("bids");
 
   const handleSort = (column: SortColumn) => {
     if (sortColumn === column) {
@@ -599,10 +598,10 @@ export default function Component() {
       <Tabs
         value={activeTab}
         className="w-full px-0 container mx-auto"
-        onValueChange={(value) => setActiveTab(value as "received" | "given")}
+        onValueChange={(value) => setActiveTab(value as "bids" | "tender")}
       >
         {" "}
-        <TabsContent value="given" className=" px-0">
+        <TabsContent value="tender" className=" px-0">
           {" "}
           <SidebarInset className="bg-transparent  py-1 px-2 md:py-3 md:px-3 ">
             {/* Page body */}
@@ -683,11 +682,11 @@ export default function Component() {
                 </div>
               </section>{" "}
               <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="received" className=" text-xs">
-                  Reviews About My Business
+                <TabsTrigger value="bids" className=" text-xs">
+                  Bids Analytics
                 </TabsTrigger>
-                <TabsTrigger value="given" className=" text-xs">
-                  Reviews I've Given
+                <TabsTrigger value="tender" className=" text-xs">
+                  Tender Analytics
                 </TabsTrigger>
               </TabsList>
               {/* Charts and lists */}
@@ -957,361 +956,18 @@ export default function Component() {
             </div>{" "}
           </SidebarInset>
         </TabsContent>
-        <TabsContent value="received">
-          {" "}
-          <SidebarInset className="bg-transparent container py-1 px-2 md:py-3 md:px-3 ">
-            {/* Page body */}
-            <div className="flex flex-1 flex-col gap-6">
-              {/* Snapshot cards */}
-              <section>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  <Card className="border border-gray-200 shadow-sm">
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-sm font-medium text-gray-600 flex items-center justify-between">
-                        <span className="flex items-center">
-                          <FileText className="h-4 w-4 mr-2" />
-                          Total Tenders Posted
-                        </span>
-                        <TrendingUp className="h-4 w-4 text-green-500" />
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="pt-0">
-                      <div className="text-2xl font-bold text-gray-900">
-                        {analyticsData.totalTendersPosted}
-                      </div>
-                      <p className="text-xs text-gray-500 mt-1">
-                        +5 this month
-                      </p>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="border border-gray-200 shadow-sm">
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-sm font-medium text-gray-600 flex items-center">
-                        <Hourglass className="h-4 w-4 mr-2" />
-                        Pending Approval
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="pt-0">
-                      <div className="text-2xl font-bold text-gray-900">
-                        {analyticsData.pendingApprovalTenders}
-                      </div>
-                      <p className="text-xs text-gray-500 mt-1">
-                        Tenders awaiting review
-                      </p>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="border border-gray-200 shadow-sm">
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-sm font-medium text-gray-600 flex items-center">
-                        <CheckSquare className="h-4 w-4 mr-2" />
-                        Active (Live) Tenders
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="pt-0">
-                      <div className="text-2xl font-bold text-gray-900">
-                        {analyticsData.activeLiveTenders}
-                      </div>
-                      <p className="text-xs text-gray-500 mt-1">
-                        Currently open for bids
-                      </p>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="border border-gray-200 shadow-sm">
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-sm font-medium text-gray-600 flex items-center">
-                        <XSquare className="h-4 w-4 mr-2" />
-                        Closed/Completed
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="pt-0">
-                      <div className="text-2xl font-bold text-gray-900">
-                        {analyticsData.closedCompletedTenders}
-                      </div>
-                      <p className="text-xs text-gray-500 mt-1">
-                        Tenders finished or closed
-                      </p>
-                    </CardContent>
-                  </Card>
-                </div>
-              </section>   <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="received" className=" text-xs">
-            Reviews About My Business
-          </TabsTrigger>
-          <TabsTrigger value="given" className=" text-xs">
-            Reviews I've Given
-          </TabsTrigger>
-        </TabsList>
-              {/* Charts and lists */}
-              <section className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6">
-                {/* Left (main) column */}
-                <ProjectsOverviewChart />
-                {/* Right (aside) column */}
-                <div className="md:col-span-5 col-span-1 flex flex-col gap-4 md:gap-4">
-                  {/* User Rating */}
-                  <Card className="w-full p-6">
-                    <CardContent className="p-0 space-y-6">
-                      {/* Total Projects Section */}
-                      <div>
-                        <p className="text-sm text-muted-foreground">
-                          Total Projects Posted
-                        </p>
-                        <h2 className="text-4xl font-bold mt-1">128</h2>
-                      </div>
-                      {/* Recently Active Posters Section */}
-                      <div>
-                        <div className="flex -space-x-2 overflow-hidden">
-                          <Avatar className="w-10 h-10 border-2 border-background">
-                            <AvatarImage
-                              src="https://bundui-images.netlify.app/avatars/08.png"
-                              alt="User 1"
-                            />
-                            <AvatarFallback>U1</AvatarFallback>
-                          </Avatar>
-                          <Avatar className="w-10 h-10 border-2 border-background">
-                            <AvatarImage
-                              src="https://bundui-images.netlify.app/avatars/04.png"
-                              alt="User 2"
-                            />
-                            <AvatarFallback>U2</AvatarFallback>
-                          </Avatar>
-                          <Avatar className="w-10 h-10 border-2 border-background">
-                            <AvatarImage
-                              src="https://bundui-images.netlify.app/avatars/05.png"
-                              alt="User 3"
-                            />
-                            <AvatarFallback>U3</AvatarFallback>
-                          </Avatar>
-                          <Avatar className="w-10 h-10 border-2 border-background">
-                            <AvatarImage
-                              src="https://bundui-images.netlify.app/avatars/06.png"
-                              alt="User 4"
-                            />
-                            <AvatarFallback>U4</AvatarFallback>
-                          </Avatar>
-                          <Avatar className="w-10 h-10 border-2 border-background">
-                            <AvatarImage
-                              src="https://bundui-images.netlify.app/avatars/07.png"
-                              alt="User 5"
-                            />
-                            <AvatarFallback>U5</AvatarFallback>
-                          </Avatar>
-                        </div>
-                      </div>
-                      {/* Highlights Section */}
-                      <div className="space-y-4">
-                        <h3 className="text-base font-semibold">Highlights</h3>
-                        <div className="space-y-4">
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm">
-                              Avg. Bids per Project
-                            </span>
-                            <div className="flex items-center gap-1 text-green-500">
-                              <ArrowUpRight className="w-4 h-4" />
-                              <span className="font-medium">6.1</span>
-                            </div>
-                          </div>
-                          <Separator />
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm">
-                              Projects With No Bids
-                            </span>
-                            <div className="flex items-center gap-1 text-red-500">
-                              <ArrowDownLeft className="w-4 h-4" />
-                              <span className="font-medium">12</span>
-                            </div>
-                          </div>
-                          <Separator />
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm">Total Bids Received</span>
-                            <div className="flex items-center gap-1 text-green-500">
-                              <ArrowUpRight className="w-4 h-4" />
-                              <span className="font-medium">342</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                  <Card className="border-1 col-span-full lg:col-span-3 h-fit shadow-none border-neutral-200 rounded-md">
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-base flex items-center gap-2">
-                        <AlertTriangle className="h-4 w-4 text-amber-600" />
-                        Tenders with no bids in 7 days
-                      </CardTitle>
-                      <CardDescription>
-                        Consider updating details
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      {reminders.noBidsIn7Days.length === 0 ? (
-                        <p className="text-sm text-muted-foreground">
-                          No items to show.
-                        </p>
-                      ) : (
-                        <ul className="space-y-3">
-                          {reminders.noBidsIn7Days.map((t) => (
-                            <li
-                              key={t.id}
-                              className="flex items-center justify-between"
-                            >
-                              <div className="min-w-0">
-                                <p className="truncate font-medium">
-                                  {t.title}
-                                </p>
-                                <p className="text-xs text-muted-foreground">
-                                  Posted {formatDate(t.postedAt)} • {t.category}
-                                </p>
-                              </div>
-                              <Badge variant="outline" className="shrink-0">
-                                {t.bidsReceived} bids
-                              </Badge>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </CardContent>
-                  </Card>
-                </div>
-              </section>
-
-              <div className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <Card className="border border-gray-200 shadow-sm">
-                    <CardHeader>
-                      <CardTitle className="text-lg font-semibold flex items-center">
-                        <Star className="h-5 w-5 mr-2 text-yellow-500" />
-                        Average Rating Given by Freelancers
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="pt-0">
-                      <div className="text-4xl font-bold text-gray-900 flex items-center">
-                        {analyticsData.averageRatingGivenByFreelancers}
-                        <span className="text-xl text-gray-500 ml-2">
-                          / 5.0
-                        </span>
-                      </div>
-                      <p className="text-sm text-gray-500 mt-2">
-                        Based on {analyticsData.reviewsFromBidders.length}{" "}
-                        reviews
-                      </p>
-
-                      {/* Badge Tiers */}
-                      <div className="mt-6 space-y-3">
-                        {/* Bronze - current badge */}
-                        <div className="flex justify-between items-center p-3 border border-emerald-600 rounded-lg bg-emerald-50">
-                          <div>
-                            <p className="text-base font-semibold text-emerald-700">
-                              Bronze
-                            </p>
-                            <p className="text-sm text-emerald-600">
-                              2+ projects • 4.5+ rating
-                            </p>
-                          </div>
-                          <span className="px-3 py-1 text-sm font-bold border border-emerald-600 text-emerald-700 rounded-full">
-                            Bronze
-                          </span>
-                        </div>
-
-                        {/* Gold */}
-                        <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg">
-                          <div>
-                            <p className="text-base font-semibold text-gray-800">
-                              Gold
-                            </p>
-                            <p className="text-sm text-gray-600">
-                              10+ projects • 4.8+ rating
-                            </p>
-                          </div>
-                          <span className="px-3 py-1 text-sm font-bold border border-gray-300 text-gray-700 rounded-full">
-                            Gold
-                          </span>
-                        </div>
-
-                        {/* Platinum */}
-                        <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg">
-                          <div>
-                            <p className="text-base font-semibold text-gray-800">
-                              Platinum
-                            </p>
-                            <p className="text-sm text-gray-600">
-                              25+ projects • 4.9+ rating
-                            </p>
-                          </div>
-                          <span className="px-3 py-1 text-sm font-bold border border-gray-300 text-gray-700 rounded-full">
-                            Platinum
-                          </span>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="border border-gray-200 shadow-sm">
-                    <CardHeader>
-                      <CardTitle className="text-lg font-semibold">
-                        Reviews from Bidders
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="pt-0 space-y-4">
-                      {analyticsData.reviewsFromBidders.map((review) => (
-                        <div
-                          key={review.id}
-                          className="flex items-start space-x-4 border-b pb-4 last:border-b-0"
-                        >
-                          <Avatar className="h-10 w-10">
-                            <AvatarImage
-                              src={
-                                review.bidderAvatar ||
-                                "/placeholder.svg?height=40&width=40&query=user avatar"
-                              }
-                              alt={review.bidderName}
-                            />
-                            <AvatarFallback>
-                              {review.bidderName.charAt(0)}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="flex-1">
-                            <div className="flex justify-between items-center">
-                              <h4 className="font-semibold text-gray-900">
-                                {review.bidderName}
-                              </h4>
-                              <div className="flex items-center text-sm text-yellow-500">
-                                {Array.from({ length: review.rating }).map(
-                                  (_, i) => (
-                                    <Star
-                                      key={i}
-                                      className="h-4 w-4 fill-current"
-                                    />
-                                  )
-                                )}
-                                {Array.from({ length: 5 - review.rating }).map(
-                                  (_, i) => (
-                                    <Star
-                                      key={i}
-                                      className="h-4 w-4 text-gray-300"
-                                    />
-                                  )
-                                )}
-                              </div>
-                            </div>
-                            <p className="text-sm text-gray-700 mt-1">
-                              {review.comment}
-                            </p>
-                            <p className="text-xs text-gray-500 mt-1">
-                              {review.date}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
-                    </CardContent>
-                  </Card>
-                </div>
-              </div>
-            </div>{" "}
-          </SidebarInset>
-        </TabsContent>
+        <Banalytics
+          tab={
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="bids" className=" text-xs">
+                Bids Analytics
+              </TabsTrigger>
+              <TabsTrigger value="tender" className=" text-xs">
+                Tender Analytics
+              </TabsTrigger>
+            </TabsList>
+          }
+        />
       </Tabs>
     </SidebarProvider>
   );

@@ -44,6 +44,7 @@ const CreateTenderModal = ({
     description: "",
     category: "",
     budget: "",
+    estimatedTime: "",
     location: "",
     contactEmail: "",
     attachments: null as File | null,
@@ -200,6 +201,23 @@ const CreateTenderModal = ({
                       </motion.div>
                     </div>
 
+                    <motion.div
+                      className="grid gap-2"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.5 }}
+                    >
+                      <Label htmlFor="estimatedTime">Estimated Time</Label>
+                      <Input
+                        id="estimatedTime"
+                        type="text"
+                        value={formData.estimatedTime}
+                        onChange={handleChange}
+                        placeholder="e.g., 6 months, 3-4 weeks"
+                        required
+                      />
+                    </motion.div>
+
                     {[
                       {
                         id: "location",
@@ -221,7 +239,7 @@ const CreateTenderModal = ({
                         className="grid gap-2"
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.5 + index * 0.05 }}
+                        transition={{ delay: 0.55 + index * 0.05 }}
                       >
                         <Label htmlFor={field.id}>{field.label}</Label>
                         <Input
@@ -239,7 +257,7 @@ const CreateTenderModal = ({
                       className="grid gap-2"
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.6 }}
+                      transition={{ delay: 0.65 }}
                     >
                       <Label htmlFor="attachments">
                         Upload Image (Optional)
@@ -260,7 +278,7 @@ const CreateTenderModal = ({
                     <motion.div
                       initial={{ opacity: 0, scale: 0.95 }}
                       animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: 0.65 }}
+                      transition={{ delay: 0.7 }}
                     >
                       <Button
                         type="submit"

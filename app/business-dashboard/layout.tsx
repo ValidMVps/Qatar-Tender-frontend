@@ -49,11 +49,6 @@ export default function DashboardLayout({
       title: "Project Posting",
       links: [
         {
-          name: "Post a Tender",
-          href: "/business-dashboard/post-tender",
-          icon: PlusCircle,
-        },
-        {
           name: "My Posted Tenders",
           href: "/business-dashboard/my-tenders",
           icon: FileText,
@@ -75,7 +70,7 @@ export default function DashboardLayout({
         },
         {
           name: "My Bids",
-          href: "/business-dashboard/my-bids",
+          href: "/business-dashboard/bids",
           icon: PenSquare,
         },
       ],
