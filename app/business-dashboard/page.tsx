@@ -14,6 +14,7 @@ import {
   Edit,
   CheckCircle,
   Bell,
+  Search,
 } from "lucide-react";
 import type React from "react";
 
@@ -165,22 +166,24 @@ export default function DashboardPage() {
   const hasPostedTenders = true; // Replace with actual logic based on user's company data
   const hasPlacedBids = false; // Replace with actual logic based on user's company data
 
-  const ctaButton = hasPostedTenders ? (
-    <Button
-      className=" text-blue-700 shadow-none flex items-center"
-      onClick={() => setOpenTenderModal(true)}
-      variant={"secondary"}
-    >
-      <Plus className="md:mr-2 mr-0 h-4 w-4" /> Post New Tender
-    </Button>
-  ) : (
-    <Button
-      className="bg-green-600 hover:bg-green-700 text-white shadow-md flex items-center"
-      // You might want to use Next.js router for navigation here:
-      // onClick={() => router.push("/browse-tenders")}
-    >
-      <Eye className="md:mr-2 mr-0 h-4 w-4" /> Browse Tenders
-    </Button>
+  const ctaButton = (
+    <div className="flex gap-5">
+      <Button
+        className=" text-blue-700 shadow-none flex items-center"
+        onClick={() => setOpenTenderModal(true)}
+        variant={"secondary"}
+      >
+        <Plus className="md:mr-2 mr-0 h-4 w-4" /> Post New Tender
+      </Button>
+      <Button
+        className=" text-blue-800 shadow-md flex items-center"
+        variant={"secondary"}
+        // You might want to use Next.js router for navigation here:
+        // onClick={() => router.push("/browse-tenders")}
+      >
+        <Search className="md:mr-2 mr-0 h-4 w-4" /> Browse Tenders
+      </Button>
+    </div>
   );
 
   return (

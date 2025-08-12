@@ -16,6 +16,7 @@ import {
   PlusCircle,
   Search,
   PenSquare,
+  Save,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { motion } from "framer-motion";
@@ -72,6 +73,11 @@ export default function DashboardLayout({
           name: "My Bids",
           href: "/business-dashboard/bids",
           icon: PenSquare,
+        },
+        {
+          name: "Saved Jobs",
+          href: "/business-dashboard/saved-jobs",
+          icon: Save,
         },
       ],
     },

@@ -2,7 +2,14 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { CheckCircle, Star, DollarSign, MapPin } from "lucide-react";
+import {
+  CheckCircle,
+  Star,
+  DollarSign,
+  MapPin,
+  EqualApproximately,
+  Save,
+} from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -160,9 +167,9 @@ export default function TenderDetailsPage({
   return (
     <TooltipProvider>
       <div className="container mx-auto py-4 lg:px-0">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Main Tender Details */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-3">
             <Card className="mb-8 border-0 px-0">
               <CardHeader>
                 <div className="flex items-center justify-between mb-2">
@@ -358,12 +365,17 @@ export default function TenderDetailsPage({
                 <div className="text-sm text-gray-600 mb-4">
                   Bids: {tender.proposals}
                 </div>
-                <Button
-                  onClick={() => setShowApplyForm(true)}
-                  className="w-full"
-                >
-                  Apply to Bid
-                </Button>
+                <div className="flex-col">
+                  <Button
+                    onClick={() => setShowApplyForm(true)}
+                    className="w-full mb-4 rounded-md shadow-none hover:shadow-none"
+                  >
+                    Apply to Bid
+                  </Button>
+                  <Button className="w-full  rounded-md" variant={"outline"}>
+                    <Save /> Save Tender
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </div>

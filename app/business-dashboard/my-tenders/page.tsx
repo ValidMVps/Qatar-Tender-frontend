@@ -426,7 +426,7 @@ export default function MyTendersPage() {
       {/* Search and Filter Section */}
       <div className="mb-6 space-y-2 md:space-y-4 w-full">
         <div className="md:grid hidden grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-          <Card className="bg-blue-500 border border-neutral-300 py-2">
+          <Card className="bg-gradient-to-r from-blue-500 via-blue-600/90 to-blue-600 border border-neutral-300 py-2">
             <CardContent className="p-4 flex items-center justify-between">
               <div>
                 <p className="text-sm text-white pb-1">Total Tenders</p>
@@ -437,7 +437,7 @@ export default function MyTendersPage() {
               <FileText className="h-6 w-6 text-white" />
             </CardContent>
           </Card>
-          <Card className="bg-blue-500 border border-neutral-300 py-2">
+          <Card className="bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 border border-neutral-300 py-2">
             <CardContent className="p-4 flex items-center justify-between">
               <div>
                 <p className="text-sm text-white pb-1">Active Tenders</p>
@@ -448,7 +448,7 @@ export default function MyTendersPage() {
               <CheckCircle className="h-6 w-6 text-white" />
             </CardContent>
           </Card>
-          <Card className="bg-blue-500 border border-neutral-300 py-2">
+          <Card className="bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 border border-neutral-300 py-2">
             <CardContent className="p-4 flex items-center justify-between">
               <div>
                 <p className="text-sm text-white pb-1">Awarded Tenders</p>
@@ -459,7 +459,7 @@ export default function MyTendersPage() {
               <Award className="h-6 w-6 text-white" />
             </CardContent>
           </Card>
-          <Card className="bg-blue-500 text-white border border-neutral-300 py-2">
+          <Card className="bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700  text-white border border-neutral-300 py-2">
             <CardContent className="p-4 flex items-center justify-between">
               <div>
                 <p className="text-sm text-white pb-1">Completed Tenders</p>
@@ -470,7 +470,7 @@ export default function MyTendersPage() {
               <CheckCircle className="h-6 w-6 text-white" />
             </CardContent>
           </Card>
-          <Card className="bg-blue-500 text-white border border-neutral-300 py-2">
+          <Card className="bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700  text-white border border-neutral-300 py-2">
             <CardContent className="p-4 flex items-center justify-between">
               <div>
                 <p className="text-sm text-white pb-1">Rejected Tenders</p>
