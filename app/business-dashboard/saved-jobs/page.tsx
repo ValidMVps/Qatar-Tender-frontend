@@ -170,7 +170,7 @@ export default function SavedJobsPage() {
         </Select>
       </div>
 
-      <div className="space-y-4">
+      {/*  <div className="space-y-4">
         {jobsToDisplay.length > 0 ? (
           jobsToDisplay.map((job) => (
             <TenderCard
@@ -193,7 +193,7 @@ export default function SavedJobsPage() {
             </p>
           </div>
         )}
-      </div>
+      </div>*/}
 
       {filteredJobs.length > 0 && (
         <div className="flex justify-between items-center mt-6">
