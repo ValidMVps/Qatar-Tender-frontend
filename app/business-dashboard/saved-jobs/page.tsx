@@ -64,7 +64,7 @@ const savedJobsData = [
     rating: 0,
     amountSpent: "$0",
     location: "United Kingdom",
-    jobType: "Hourly",
+    jobType: "Fixed-Price",
     hourlyRate: "$25.00 - $40.00 - Intermediate",
     estimatedTime: "More than 6 months",
     hoursPerWeek: "Less than 30 hrs/week",
@@ -98,7 +98,7 @@ const savedJobsData = [
     rating: 4.2,
     amountSpent: "$5K+",
     location: "Australia",
-    jobType: "Hourly",
+    jobType: "Fixed-Price",
     hourlyRate: "$30.00 - $50.00 - Expert",
     estimatedTime: "1 to 3 months",
     hoursPerWeek: "More than 30 hrs/week",
@@ -108,7 +108,9 @@ const savedJobsData = [
     proposals: "Less than 5",
   },
 ];
-
+interface Tender {
+  jobType: string;
+}
 export default function SavedJobsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [jobsPerPage, setJobsPerPage] = useState("10");
@@ -170,7 +172,15 @@ export default function SavedJobsPage() {
 
       <div className="space-y-4">
         {jobsToDisplay.length > 0 ? (
-          jobsToDisplay.map((job) => <TenderCard key={job.id} tender={job} />)
+          jobsToDisplay.map((job) => (
+            <TenderCard
+              key={job.id}
+              tender={{
+                ...job,
+                jobType: job.jobType === "Hourly" ? "Hourly" : "Fixed-Price",
+              }}
+            />
+          ))
         ) : (
           <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
             <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />

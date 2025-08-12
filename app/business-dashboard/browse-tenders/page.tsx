@@ -233,8 +233,6 @@ const categoriesData = [
   "Shopify Development",
 ];
 
-
-
 const jobTypes = [
   { label: "Hourly", count: 889 },
   { label: "Fixed-Price", count: 540 },
@@ -307,9 +305,6 @@ export default function ServiceProvidingDashboardPage() {
         : [...prev, category]
     );
   };
-
-
-
 
   const handleProposalCountChange = (countLabel: string) => {
     setSelectedProposalCounts((prev) =>
@@ -447,14 +442,15 @@ export default function ServiceProvidingDashboardPage() {
             )}
           </div>
           <div className="flex items-center space-x-4">
-         
-           { <Button
-              variant="outline"
-              className="flex items-center space-x-2 bg-transparent"
-            >
-              <Save className="h-4 w-4" />
-              <span>Saved jobs (5)</span>
-            </Button>}
+            {
+              <Button
+                variant="outline"
+                className="flex items-center space-x-2 bg-transparent"
+              >
+                <Save className="h-4 w-4" />
+                <span>Saved jobs (5)</span>
+              </Button>
+            }
             <Select defaultValue="newest">
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Sort by: Newest" />
@@ -530,7 +526,6 @@ export default function ServiceProvidingDashboardPage() {
                   </AccordionContent>
                 </AccordionItem>
 
-
                 {/* Number of Bids Filter (Renamed) */}
                 <AccordionItem value="number-of-bids" className="border-b">
                   <AccordionTrigger className="font-semibold text-gray-800 hover:no-underline">
@@ -587,7 +582,7 @@ export default function ServiceProvidingDashboardPage() {
                 </AccordionItem>
 
                 {/* Client History Filter */}
-                <AccordionItem value="client-history" >
+                <AccordionItem value="client-history">
                   <AccordionTrigger className="font-semibold text-gray-800 hover:no-underline">
                     Client history
                   </AccordionTrigger>
@@ -613,10 +608,6 @@ export default function ServiceProvidingDashboardPage() {
                     ))}
                   </AccordionContent>
                 </AccordionItem>
-
-        
-
-         
               </Accordion>
             </CardContent>
           </Card>
@@ -625,7 +616,14 @@ export default function ServiceProvidingDashboardPage() {
           <div className="lg:col-span-3 space-y-4">
             {tendersToDisplay.length > 0 ? (
               tendersToDisplay.map((tender) => (
-                <TenderCard key={tender.id} tender={tender} />
+                <TenderCard
+                  key={tender.id}
+                  tender={{
+                    ...tender,
+                    jobType:
+                      tender.jobType === "Hourly" ? "Hourly" : "Fixed-Price",
+                  }}
+                />
               ))
             ) : (
               <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
@@ -638,8 +636,6 @@ export default function ServiceProvidingDashboardPage() {
                 </p>
               </div>
             )}
-
-          
           </div>
         </div>
       </div>
