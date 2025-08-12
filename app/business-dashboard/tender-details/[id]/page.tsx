@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, use } from "react";
 import Link from "next/link";
 import {
   CheckCircle,
@@ -53,6 +53,11 @@ interface ClientReview {
   rating: number;
   comment: string;
   reviewTime: string;
+}
+
+// Updated interface for Next.js 15
+interface PageProps {
+  params: Promise<{ id: string }>;
 }
 
 // Mock data for demonstration purposes
@@ -130,11 +135,9 @@ const mockClientReviews: ClientReview[] = [
   },
 ];
 
-export default function TenderDetailsPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+export default function TenderDetailsPage({ params }: PageProps) {
+  // Use the 'use' hook to unwrap the Promise
+  const { id } = use(params);
   const [showApplyForm, setShowApplyForm] = useState(false);
   const tender = mockTender; // Using mock data for demonstration
 
