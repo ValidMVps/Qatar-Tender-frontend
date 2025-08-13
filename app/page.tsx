@@ -1628,254 +1628,202 @@ export default function HomePage() {
               </h2>
             </div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-              {features.map((feature, index) => (
-                <div
-                  key={index}
-                  className="text-center reveal-on-scroll opacity-0 translate-y-8 transition-all duration-700 hover:scale-105 p-6"
-                  style={{ transitionDelay: `${index * 100}ms` }}
-                >
-                  <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg flex items-center justify-center mx-auto mb-6 text-2xl hover:from-blue-200 hover:to-blue-300 transition-all duration-300 shadow-sm">
-                    {feature.icon}
-                  </div>
-                  <h3 className="text-xl font-semibold text-gray-900 font-sans mb-4">
-                    {feature.title}
-                  </h3>
-                  <p className="text-gray-600 leading-relaxed">
-                    {feature.description}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Dashboard Showcase Section */}
-        <section className="py-20 bg-gradient-to-b from-blue-50/30 to-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
-              {/* Dashboard mockups with reveal animations */}
-              <div className="bg-gradient-to-br from-white to-blue-50/30 rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 reveal-on-scroll opacity-0 translate-y-8 transition-all duration-700">
-                <div className="mb-6">
-                  <div className="text-sm text-gray-500 mb-2">
-                    Al-Rashid Construction
-                  </div>
-                  <div className="text-lg font-semibold text-gray-900 mb-4">
-                    Tender Performance
-                  </div>
-                  <div className="grid grid-cols-7 gap-2 text-xs text-gray-500 mb-2">
-                    <div>Sun</div>
-                    <div>Mon</div>
-                    <div>Tue</div>
-                    <div>Wed</div>
-                    <div>Thu</div>
-                    <div>Fri</div>
-                    <div>Sat</div>
-                  </div>
-                  <div className="grid grid-cols-7 gap-2 text-xs mb-4">
-                    <div className="text-gray-900">12</div>
-                    <div className="text-gray-900">32</div>
-                    <div className="text-gray-900">43</div>
-                    <div className="text-gray-900">23</div>
-                    <div className="text-gray-900">84</div>
-                    <div className="text-gray-900">15</div>
-                    <div className="text-gray-900">54</div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="bg-gradient-to-br from-blue-100 to-blue-200 rounded-full w-20 h-20 flex items-center justify-center">
-                      <div className="text-center">
-                        <div className="text-lg font-bold text-gray-900">
-                          21,950
+            <div className="grid gap-8 max-w-6xl mx-auto pb-20">
+              {" "}
+              {/* Dashboard Showcase Section */}
+              <section className=" bg-gradient-to-b from-blue-50/30 to-white">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
+                    {/* Dashboard mockups with reveal animations */}
+                    <div className="bg-gradient-to-br from-white to-blue-50/30 rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 reveal-on-scroll opacity-0 translate-y-8 transition-all duration-700">
+                      <div className="mb-6">
+                        <div className="text-sm text-gray-500 mb-2">
+                          Al-Rashid Construction
+                        </div>
+                        <div className="text-lg font-semibold text-gray-900 mb-4">
+                          Tender Performance
+                        </div>
+                        <div className="grid grid-cols-7 gap-2 text-xs text-gray-500 mb-2">
+                          <div>Sun</div>
+                          <div>Mon</div>
+                          <div>Tue</div>
+                          <div>Wed</div>
+                          <div>Thu</div>
+                          <div>Fri</div>
+                          <div>Sat</div>
+                        </div>
+                        <div className="grid grid-cols-7 gap-2 text-xs mb-4">
+                          <div className="text-gray-900">12</div>
+                          <div className="text-gray-900">32</div>
+                          <div className="text-gray-900">43</div>
+                          <div className="text-gray-900">23</div>
+                          <div className="text-gray-900">84</div>
+                          <div className="text-gray-900">15</div>
+                          <div className="text-gray-900">54</div>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <div className="bg-gradient-to-br from-blue-100 to-blue-200 rounded-full w-20 h-20 flex items-center justify-center">
+                            <div className="text-center">
+                              <div className="text-lg font-bold text-gray-900">
+                                21,950
+                              </div>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-xs text-gray-500 mb-1">
+                              March 2025
+                            </div>
+                            <div className="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
+                              <div className="w-3/4 h-full bg-gradient-to-r from-blue-400 to-blue-300 rounded-full"></div>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-xs text-gray-500 mb-1">
-                        March 2025
+                      <div className="border-t border-gray-100 pt-4">
+                        <h3 className="text-xl font-semibold text-gray-900 font-sans mb-2">
+                          Tender Dashboard
+                        </h3>
+                        <p className="text-gray-600 text-sm">
+                          Monitor your tender submissions, win rates, and
+                          upcoming opportunities in one centralized dashboard.
+                        </p>
                       </div>
-                      <div className="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
-                        <div className="w-3/4 h-full bg-gradient-to-r from-blue-400 to-blue-300 rounded-full"></div>
+                    </div>
+
+                    {/* Additional dashboard cards... */}
+                    <div className="bg-gradient-to-br from-white to-blue-50/30 rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 reveal-on-scroll opacity-0 translate-y-8 transition-all duration-700 delay-100">
+                      <div className="text-center mb-6">
+                        <div className="w-16 h-16 bg-gradient-to-br from-green-100 to-green-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                          <CheckCircle className="w-8 h-8 text-green-600" />
+                        </div>
+                        <div className="text-2xl font-bold text-gray-900 mb-2">
+                          Tender Won
+                        </div>
+                        <div className="text-sm text-gray-500 mb-4">
+                          You have successfully won the tender
+                        </div>
+                        <div className="text-sm text-gray-500 mb-2">
+                          Contract value
+                        </div>
+                        <div className="text-3xl font-bold text-gray-900">
+                          QAR 2.7M
+                        </div>
+                      </div>
+                      <div className="border-t border-gray-100 pt-4">
+                        <h3 className="text-xl font-semibold text-gray-900 font-sans mb-2">
+                          Success Tracking
+                        </h3>
+                        <p className="text-gray-600 text-sm">
+                          Track your successful tender wins and monitor contract
+                          values across all projects.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="bg-gradient-to-br from-white to-blue-50/30 rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 reveal-on-scroll opacity-0 translate-y-8 transition-all duration-700 delay-300">
+                      <div className="mb-6">
+                        <div className="text-3xl font-bold text-gray-900 mb-2">
+                          QAR 21.6M ↗
+                        </div>
+                        <div className="text-sm text-gray-500 mb-4">
+                          Total tender value pipeline
+                        </div>
+                        <div className="relative h-24 bg-gradient-to-r from-gray-50 to-blue-50/30 rounded-lg p-4">
+                          <div className="absolute bottom-4 right-4 bg-gray-600 text-white text-xs px-2 py-1 rounded">
+                            QAR 1.2M
+                          </div>
+                          <svg className="w-full h-full" viewBox="0 0 200 60">
+                            <path
+                              d="M 10 50 Q 50 20 100 30 T 190 25"
+                              stroke="#60a5fa"
+                              strokeWidth="2"
+                              fill="none"
+                              className="animate-pulse"
+                            />
+                            <circle cx="190" cy="25" r="3" fill="#60a5fa" />
+                          </svg>
+                        </div>
+                      </div>
+                      <div className="border-t border-gray-100 pt-4">
+                        <h3 className="text-xl font-semibold text-gray-900 font-sans mb-2">
+                          Pipeline Analytics
+                        </h3>
+                        <p className="text-gray-600 text-sm">
+                          Track your tender pipeline value and forecast
+                          potential revenue from active bids.
+                        </p>
                       </div>
                     </div>
                   </div>
-                </div>
-                <div className="border-t border-gray-100 pt-4">
-                  <h3 className="text-xl font-semibold text-gray-900 font-sans mb-2">
-                    Tender Dashboard
-                  </h3>
-                  <p className="text-gray-600 text-sm">
-                    Monitor your tender submissions, win rates, and upcoming
-                    opportunities in one centralized dashboard.
-                  </p>
-                </div>
-              </div>
 
-              {/* Additional dashboard cards... */}
-              <div className="bg-gradient-to-br from-white to-blue-50/30 rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 reveal-on-scroll opacity-0 translate-y-8 transition-all duration-700 delay-100">
-                <div className="text-center mb-6">
-                  <div className="w-16 h-16 bg-gradient-to-br from-green-100 to-green-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <CheckCircle className="w-8 h-8 text-green-600" />
-                  </div>
-                  <div className="text-2xl font-bold text-gray-900 mb-2">
-                    Tender Won
-                  </div>
-                  <div className="text-sm text-gray-500 mb-4">
-                    You have successfully won the tender
-                  </div>
-                  <div className="text-sm text-gray-500 mb-2">
-                    Contract value
-                  </div>
-                  <div className="text-3xl font-bold text-gray-900">
-                    QAR 2.7M
-                  </div>
-                </div>
-                <div className="border-t border-gray-100 pt-4">
-                  <h3 className="text-xl font-semibold text-gray-900 font-sans mb-2">
-                    Success Tracking
-                  </h3>
-                  <p className="text-gray-600 text-sm">
-                    Track your successful tender wins and monitor contract
-                    values across all projects.
-                  </p>
-                </div>
-              </div>
+                  {/* Trust Section */}
+                  <div className="text-center mb-16 reveal-on-scroll opacity-0 translate-y-8 transition-all duration-700">
+                    <h2 className="text-3xl md:text-4xl font-bold text-gray-900 font-sans mb-4">
+                      Trusted by Qatar businesses,
+                      <br />
+                      designed for growth
+                    </h2>
+                    <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+                      See how Qatar companies streamline their tendering
+                      processes and win more contracts with our platform.
+                    </p>
 
-              <div className="bg-gradient-to-br from-white to-blue-50/30 rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 reveal-on-scroll opacity-0 translate-y-8 transition-all duration-700 delay-200">
-                <div className="mb-6">
-                  <div className="space-y-4 mb-6">
-                    <div className="flex items-center justify-center">
-                      <Button className="bg-gradient-to-r from-blue-400 to-blue-300 hover:from-blue-300 hover:to-blue-200 text-white font-medium px-6 py-2 rounded-lg transition-all duration-200">
-                        ✓ Automate Workflows
+                    <div className="flex justify-center space-x-4 mb-12">
+                      <Button
+                        variant="outline"
+                        className="border-gray-300 text-gray-700 hover:bg-gray-50 px-6 py-2 rounded-full bg-transparent"
+                      >
+                        Construction
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="border-gray-300 text-gray-700 hover:bg-gray-50 px-6 py-2 rounded-full bg-transparent"
+                      >
+                        Engineering
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="border-gray-300 text-gray-700 hover:bg-gray-50 px-6 py-2 rounded-full bg-transparent"
+                      >
+                        Consulting
                       </Button>
                     </div>
-                    <div className="space-y-3 text-sm text-gray-600">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center text-xs font-bold">
-                          1
+                  </div>
+
+                  {/* Testimonial Card with Background Image */}
+                  <div className="relative rounded-2xl overflow-hidden shadow-lg reveal-on-scroll opacity-0 translate-y-8 transition-all duration-700 delay-200">
+                    <img
+                      src="/placeholder.svg?height=400&width=800"
+                      alt="Modern Qatar office workspace"
+                      className="w-full h-96 object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-r from-black/20 to-transparent"></div>
+                    <div className="absolute bottom-6 right-6 bg-white rounded-xl p-6 max-w-md shadow-lg">
+                      <div className="flex items-center space-x-3 mb-4">
+                        <div className="w-12 h-12 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center">
+                          <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-300 rounded-full"></div>
                         </div>
-                        <span>Deadline Reminders</span>
-                      </div>
-                      <div className="flex items-center space-x-3">
-                        <div className="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center text-xs font-bold">
-                          2
+                        <div>
+                          <div className="font-semibold text-gray-900">
+                            Ahmed Al-Mansouri
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            CEO, Al-Mansouri Construction
+                          </div>
                         </div>
-                        <span>Document Auto-Classification</span>
                       </div>
+                      <p className="text-gray-600 mb-4 leading-relaxed">
+                        "Qatar Tender Platform has revolutionized how we manage
+                        tenders. We've increased our win rate by 40% and saved
+                        countless hours on administrative tasks."
+                      </p>
+                      <Button className="bg-gradient-to-r from-blue-400 to-blue-300 hover:from-blue-300 hover:to-blue-200 text-white font-medium px-6 py-2 rounded-lg transition-all duration-200">
+                        Start your growth →
+                      </Button>
                     </div>
                   </div>
                 </div>
-                <div className="border-t border-gray-100 pt-4">
-                  <h3 className="text-xl font-semibold text-gray-900 font-sans mb-2">
-                    Process Automation
-                  </h3>
-                  <p className="text-gray-600 text-sm">
-                    Automate repetitive tender processes and never miss
-                    important deadlines again.
-                  </p>
-                </div>
-              </div>
-
-              <div className="bg-gradient-to-br from-white to-blue-50/30 rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 reveal-on-scroll opacity-0 translate-y-8 transition-all duration-700 delay-300">
-                <div className="mb-6">
-                  <div className="text-3xl font-bold text-gray-900 mb-2">
-                    QAR 21.6M ↗
-                  </div>
-                  <div className="text-sm text-gray-500 mb-4">
-                    Total tender value pipeline
-                  </div>
-                  <div className="relative h-24 bg-gradient-to-r from-gray-50 to-blue-50/30 rounded-lg p-4">
-                    <div className="absolute bottom-4 right-4 bg-gray-600 text-white text-xs px-2 py-1 rounded">
-                      QAR 1.2M
-                    </div>
-                    <svg className="w-full h-full" viewBox="0 0 200 60">
-                      <path
-                        d="M 10 50 Q 50 20 100 30 T 190 25"
-                        stroke="#60a5fa"
-                        strokeWidth="2"
-                        fill="none"
-                        className="animate-pulse"
-                      />
-                      <circle cx="190" cy="25" r="3" fill="#60a5fa" />
-                    </svg>
-                  </div>
-                </div>
-                <div className="border-t border-gray-100 pt-4">
-                  <h3 className="text-xl font-semibold text-gray-900 font-sans mb-2">
-                    Pipeline Analytics
-                  </h3>
-                  <p className="text-gray-600 text-sm">
-                    Track your tender pipeline value and forecast potential
-                    revenue from active bids.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Trust Section */}
-            <div className="text-center mb-16 reveal-on-scroll opacity-0 translate-y-8 transition-all duration-700">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 font-sans mb-4">
-                Trusted by Qatar businesses,
-                <br />
-                designed for growth
-              </h2>
-              <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-                See how Qatar companies streamline their tendering processes and
-                win more contracts with our platform.
-              </p>
-
-              <div className="flex justify-center space-x-4 mb-12">
-                <Button
-                  variant="outline"
-                  className="border-gray-300 text-gray-700 hover:bg-gray-50 px-6 py-2 rounded-full bg-transparent"
-                >
-                  Construction
-                </Button>
-                <Button
-                  variant="outline"
-                  className="border-gray-300 text-gray-700 hover:bg-gray-50 px-6 py-2 rounded-full bg-transparent"
-                >
-                  Engineering
-                </Button>
-                <Button
-                  variant="outline"
-                  className="border-gray-300 text-gray-700 hover:bg-gray-50 px-6 py-2 rounded-full bg-transparent"
-                >
-                  Consulting
-                </Button>
-              </div>
-            </div>
-
-            {/* Testimonial Card with Background Image */}
-            <div className="relative rounded-2xl overflow-hidden shadow-lg reveal-on-scroll opacity-0 translate-y-8 transition-all duration-700 delay-200">
-              <img
-                src="/placeholder.svg?height=400&width=800"
-                alt="Modern Qatar office workspace"
-                className="w-full h-96 object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-r from-black/20 to-transparent"></div>
-              <div className="absolute bottom-6 right-6 bg-white rounded-xl p-6 max-w-md shadow-lg">
-                <div className="flex items-center space-x-3 mb-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center">
-                    <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-300 rounded-full"></div>
-                  </div>
-                  <div>
-                    <div className="font-semibold text-gray-900">
-                      Ahmed Al-Mansouri
-                    </div>
-                    <div className="text-sm text-gray-500">
-                      CEO, Al-Mansouri Construction
-                    </div>
-                  </div>
-                </div>
-                <p className="text-gray-600 mb-4 leading-relaxed">
-                  "Qatar Tender Platform has revolutionized how we manage
-                  tenders. We've increased our win rate by 40% and saved
-                  countless hours on administrative tasks."
-                </p>
-                <Button className="bg-gradient-to-r from-blue-400 to-blue-300 hover:from-blue-300 hover:to-blue-200 text-white font-medium px-6 py-2 rounded-lg transition-all duration-200">
-                  Start your growth →
-                </Button>
-              </div>
+              </section>
             </div>
           </div>
         </section>
