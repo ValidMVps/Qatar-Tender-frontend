@@ -267,12 +267,17 @@ export default function SignupWizard() {
             </Button>
           )}
           {step === 2 && (
-            <Button
-              onClick={onSubmit}
-              className="bg-blue-600 text-white px-6 py-2 hover:bg-blue-700"
+            <Link
+              href={
+                form.accountType !== "business"
+                  ? "/dashboard"
+                  : "/business-dashboard"
+              }
             >
-              Submit <MailCheck className="ml-2 h-4 w-4" />
-            </Button>
+              <Button className="bg-blue-600 text-white px-6 py-2 hover:bg-blue-700">
+                Submit <MailCheck className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
           )}
           {step === 3 && (
             <Button
