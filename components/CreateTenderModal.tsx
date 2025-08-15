@@ -45,6 +45,7 @@ const CreateTenderModal = ({
     category: "",
     budget: "",
     estimatedTime: "",
+    deadline: "", // ✅ New deadline field
     location: "",
     contactEmail: "",
     attachments: null as File | null,
@@ -201,23 +202,41 @@ const CreateTenderModal = ({
                       </motion.div>
                     </div>
 
-                    <motion.div
-                      className="grid gap-2"
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.5 }}
-                    >
-                      <Label htmlFor="estimatedTime">Estimated Time</Label>
-                      <Input
-                        id="estimatedTime"
-                        type="text"
-                        value={formData.estimatedTime}
-                        onChange={handleChange}
-                        placeholder="e.g., 6 months, 3-4 weeks"
-                        required
-                      />
-                    </motion.div>
-
+                    <div className="grid grid-cols-2 gap-6">
+                      {" "}
+                      <motion.div
+                        className="grid gap-2"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.5 }}
+                      >
+                        <Label htmlFor="estimatedTime">Estimated Time</Label>
+                        <Input
+                          id="estimatedTime"
+                          type="text"
+                          value={formData.estimatedTime}
+                          onChange={handleChange}
+                          placeholder="e.g., 6 months, 3-4 weeks"
+                          required
+                        />
+                      </motion.div>
+                      {/* ✅ New Deadline Field */}
+                      <motion.div
+                        className="grid gap-2"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.52 }}
+                      >
+                        <Label htmlFor="deadline">Deadline</Label>
+                        <Input
+                          id="deadline"
+                          type="date"
+                          value={formData.deadline}
+                          onChange={handleChange}
+                          required
+                        />
+                      </motion.div>
+                    </div>
                     {[
                       {
                         id: "location",

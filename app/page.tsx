@@ -386,12 +386,7 @@ function HeroSection() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="flex items-center justify-center mb-8 reveal-on-scroll opacity-0 translate-y-8 transition-all duration-700">
-          <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-full px-4 py-2 flex items-center space-x-2">
-            <CheckCircle className="w-4 h-4 text-green-600" />
-            <span className="text-sm text-green-800 font-medium">
-              Trusted by 500+ Qatar businesses
-            </span>
-          </div>
+         
         </div>
 
         <div className="max-w-3xl reveal-on-scroll opacity-0 translate-y-8 transition-all duration-700 delay-100">
@@ -1539,12 +1534,6 @@ export default function HomePage() {
         >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
             <div className="flex items-center justify-center mb-8 reveal-on-scroll opacity-0 translate-y-8 transition-all duration-700">
-              <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-full px-4 py-2 flex items-center space-x-2">
-                <CheckCircle className="w-4 h-4 text-green-600" />
-                <span className="text-sm text-green-800 font-medium">
-                  Trusted by 500+ Qatar businesses
-                </span>
-              </div>
             </div>
 
             <div className="max-w-3xl reveal-on-scroll opacity-0 translate-y-8 transition-all duration-700 delay-100">

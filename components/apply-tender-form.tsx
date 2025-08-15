@@ -32,6 +32,7 @@ export function ApplyTenderForm({
   const [currentStep, setCurrentStep] = useState(0); // 0: Bid Details, 1: Payment, 2: Confirmation
   const [bidAmount, setBidAmount] = useState<string>("");
   const [coverLetter, setCoverLetter] = useState<string>("");
+  const [bidImage, setBidImage] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
@@ -63,6 +64,7 @@ export function ApplyTenderForm({
     setCurrentStep(0); // Reset form to first step
     setBidAmount("");
     setCoverLetter("");
+    setBidImage(null);
     onClose();
   };
 
@@ -107,6 +109,22 @@ export function ApplyTenderForm({
                 onChange={(e) => setCoverLetter(e.target.value)}
                 required
               />
+            </div>
+            <div>
+              <Label htmlFor="bid-image" className="mb-2 block">
+                Upload Supporting Document / Image (Optional)
+              </Label>
+              <Input
+                id="bid-image"
+                type="file"
+                accept="image/*"
+                onChange={(e) => setBidImage(e.target.files?.[0] || null)}
+              />
+              {bidImage && (
+                <p className="text-xs text-gray-500 mt-1">
+                  Selected: {bidImage.name}
+                </p>
+              )}
             </div>
             <Button type="submit" className="w-full">
               Proceed to Payment

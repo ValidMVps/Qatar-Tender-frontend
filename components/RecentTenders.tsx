@@ -32,6 +32,7 @@ import {
   ArrowDown,
   ChevronRight,
 } from "lucide-react";
+import Link from "next/link";
 
 type TenderStatus = "Active" | "Pending" | "Closed";
 
@@ -144,10 +145,13 @@ export default function RecentTenders() {
               <CardTitle className="text-base">Recent Tenders</CardTitle>
               <CardDescription>Latest tenders you’ve posted</CardDescription>
             </div>
-            <Button variant="outline" size="sm" className="gap-1">
-              <BarChart3 className="h-4 w-4" />
-              <span>View all</span>
-            </Button>
+            <Link href={'/business-dashboard/my-tenders'}>
+              {" "}
+              <Button variant="outline" size="sm" className="gap-1">
+                <BarChart3 className="h-4 w-4" />
+                <span>View all</span>
+              </Button>
+            </Link>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">

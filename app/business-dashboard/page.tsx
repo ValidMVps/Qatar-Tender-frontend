@@ -175,14 +175,17 @@ export default function DashboardPage() {
       >
         <Plus className="md:mr-2 mr-0 h-4 w-4" /> Post New Tender
       </Button>
-      <Button
-        className=" text-blue-800 shadow-md flex items-center"
-        variant={"secondary"}
-        // You might want to use Next.js router for navigation here:
-        // onClick={() => router.push("/browse-tenders")}
-      >
-        <Search className="md:mr-2 mr-0 h-4 w-4" /> Browse Tenders
-      </Button>
+      <Link href={"/business-dashboard/browse-tenders"}>
+        {" "}
+        <Button
+          className=" text-blue-800 shadow-md flex items-center"
+          variant={"secondary"}
+          // You might want to use Next.js router for navigation here:
+          // onClick={() => router.push("/browse-tenders")}
+        >
+          <Search className="md:mr-2 mr-0 h-4 w-4" /> Browse Tenders
+        </Button>
+      </Link>
     </div>
   );
 
@@ -222,7 +225,9 @@ export default function DashboardPage() {
                   Recent Bids You&apos;ve Placed
                 </CardTitle>
                 <Button variant="outline" size="sm" asChild>
-                  <Link href="#">View All Bids</Link>
+                  <Link href="/business-dashboard/bids">
+                    View All Bids
+                  </Link>
                 </Button>
               </CardHeader>
               <CardContent>

@@ -144,7 +144,7 @@ export default function DashboardPage() {
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between py-8 px-7 rounded-lg bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 shadow-sm">
           <div className="mb-4 md:mb-0">
             <h1 className="md:text-3xl text-xl font-medium pb-2 text-white">
-              Welcome back AHmed
+              Welcome back Ahmed
             </h1>
             <p className="text-md text-blue-100">
               Here's an overview of your posting and bidding activity today.
