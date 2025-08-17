@@ -10,9 +10,9 @@ import { ProjectDetailsSidebar } from "@/components/project-details-sidebar";
 import ChatSection from "@/components/ChatSection";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 
-import { useTranslation } from '../../../lib/hooks/useTranslation';
+import { useTranslation } from "../../../lib/hooks/useTranslation";
 export default function Component() {
-    const { t } = useTranslation();
+  const { t } = useTranslation();
 
   const [isReviewDialogOpen, setIsReviewDialogOpen] = React.useState(false);
   const [isProjectListOpen, setIsProjectListOpen] = React.useState(false); // State for mobile project list sheet
@@ -42,12 +42,14 @@ export default function Component() {
           <div className="flex items-center h-16 justify-between px-4 py-3 border-b">
             <div className="flex items-center gap-2">
               <Inbox className="h-5 w-5 text-muted-foreground" />
-              <span className="font-semibold">{t('inbox')}</span>
+              <span className="font-semibold">{t("inbox")}</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">All</span>
+              <span className="text-sm text-muted-foreground">{t("all")}</span>
               <Switch />
-              <span className="text-sm text-muted-foreground">{t('unread')}</span>
+              <span className="text-sm text-muted-foreground">
+                {t("unread")}
+              </span>
             </div>
           </div>
           {/* Search */}
@@ -55,7 +57,7 @@ export default function Component() {
             <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
-                placeholder="Search projects..."
+                placeholder={t("search_projects")}
                 type="search"
                 className="pl-9"
               />
@@ -73,7 +75,7 @@ export default function Component() {
                 <div className="flex items-center justify-between">
                   <div className="font-semibold">Office Renovation</div>
                   <div className="text-xs text-muted-foreground">
-                    2 days ago
+                    {t("2_days_ago")}
                   </div>
                 </div>
                 <div className="text-sm text-muted-foreground line-clamp-2">
@@ -81,7 +83,7 @@ export default function Component() {
                   flooring, lighting, and furniture.
                 </div>
                 <div className="flex flex-wrap gap-2 pt-2">
-                  <Badge variant="secondary">{t('active')}</Badge>
+                  <Badge variant="secondary">{t("active")}</Badge>
                 </div>
               </Link>
               {/* Project 2 */}
@@ -95,7 +97,7 @@ export default function Component() {
                     Smart City Initiative Phase 2
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    1 week ago
+                    {t("1_week_ago")}
                   </div>
                 </div>
                 <div className="text-sm text-muted-foreground line-clamp-2">
@@ -103,7 +105,7 @@ export default function Component() {
                   focusing on IoT, public safety, and energy efficiency.
                 </div>
                 <div className="flex flex-wrap gap-2 pt-2">
-                  <Badge variant="secondary">{t('active')}</Badge>
+                  <Badge variant="secondary">{t("active")}</Badge>
                 </div>
               </Link>
               {/* Project 3 */}
@@ -117,7 +119,7 @@ export default function Component() {
                     Educational Facilities Upgrade
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    3 weeks ago
+                    {t("3_weeks_ago")}
                   </div>
                 </div>
                 <div className="text-sm text-muted-foreground line-clamp-2">
@@ -125,7 +127,7 @@ export default function Component() {
                   equipment, smart classrooms, and infrastructure improvements.
                 </div>
                 <div className="flex flex-wrap gap-2 pt-2">
-                  <Badge variant="secondary">{t('active')}</Badge>
+                  <Badge variant="secondary">{t("active")}</Badge>
                 </div>
               </Link>
               {/* Project 4 */}
@@ -139,7 +141,7 @@ export default function Component() {
                     National Green Spaces Program
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    1 month ago
+                    {t("1_month_ago")}
                   </div>
                 </div>
                 <div className="text-sm text-muted-foreground line-clamp-2">
@@ -147,7 +149,7 @@ export default function Component() {
                   corridors across the country.
                 </div>
                 <div className="flex flex-wrap gap-2 pt-2">
-                  <Badge variant="secondary">{t('active')}</Badge>
+                  <Badge variant="secondary">{t("active")}</Badge>
                 </div>
               </Link>
             </nav>
@@ -187,12 +189,16 @@ export default function Component() {
             <div className="flex items-center h-16 justify-between px-4 py-3 border-b">
               <div className="flex items-center gap-2">
                 <Inbox className="h-5 w-5 text-muted-foreground" />
-                <span className="font-semibold">{t('inbox')}</span>
+                <span className="font-semibold">{t("inbox")}</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-sm text-muted-foreground">All</span>
+                <span className="text-sm text-muted-foreground">
+                  {t("all")}
+                </span>
                 <Switch />
-                <span className="text-sm text-muted-foreground">{t('unread')}</span>
+                <span className="text-sm text-muted-foreground">
+                  {t("unread")}
+                </span>
               </div>
             </div>
             {/* Search */}
@@ -200,7 +206,7 @@ export default function Component() {
               <div className="relative w-full">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
-                  placeholder="Search projects..."
+                  placeholder={t("search_projects")}
                   type="search"
                   className="pl-9"
                 />
@@ -218,7 +224,7 @@ export default function Component() {
                   <div className="flex items-center justify-between">
                     <div className="font-semibold">Office Renovation</div>
                     <div className="text-xs text-muted-foreground">
-                      2 days ago
+                      {t("2_days_ago")}
                     </div>
                   </div>
                   <div className="text-sm text-muted-foreground line-clamp-2">
@@ -226,7 +232,7 @@ export default function Component() {
                     flooring, lighting, and furniture.
                   </div>
                   <div className="flex flex-wrap gap-2 pt-2">
-                    <Badge variant="secondary">{t('active')}</Badge>
+                    <Badge variant="secondary">{t("active")}</Badge>
                   </div>
                 </Link>
                 {/* Project 2 */}
@@ -240,7 +246,7 @@ export default function Component() {
                       Smart City Initiative Phase 2
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      1 week ago
+                      {t("1_week_ago")}
                     </div>
                   </div>
                   <div className="text-sm text-muted-foreground line-clamp-2">
@@ -248,7 +254,7 @@ export default function Component() {
                     focusing on IoT, public safety, and energy efficiency.
                   </div>
                   <div className="flex flex-wrap gap-2 pt-2">
-                    <Badge variant="secondary">{t('active')}</Badge>
+                    <Badge variant="secondary">{t("active")}</Badge>
                   </div>
                 </Link>
                 {/* Project 3 */}
@@ -262,7 +268,7 @@ export default function Component() {
                       Educational Facilities Upgrade
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      3 weeks ago
+                      {t("3_weeks_ago")}
                     </div>
                   </div>
                   <div className="text-sm text-muted-foreground line-clamp-2">
@@ -271,7 +277,7 @@ export default function Component() {
                     improvements.
                   </div>
                   <div className="flex flex-wrap gap-2 pt-2">
-                    <Badge variant="secondary">{t('active')}</Badge>
+                    <Badge variant="secondary">{t("active")}</Badge>
                   </div>
                 </Link>
                 {/* Project 4 */}
@@ -285,7 +291,7 @@ export default function Component() {
                       National Green Spaces Program
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      1 month ago
+                      {t("1_month_ago")}
                     </div>
                   </div>
                   <div className="text-sm text-muted-foreground line-clamp-2">
@@ -293,7 +299,7 @@ export default function Component() {
                     green corridors across the country.
                   </div>
                   <div className="flex flex-wrap gap-2 pt-2">
-                    <Badge variant="secondary">{t('active')}</Badge>
+                    <Badge variant="secondary">{t("active")}</Badge>
                   </div>
                 </Link>
               </nav>

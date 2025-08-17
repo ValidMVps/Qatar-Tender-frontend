@@ -30,7 +30,8 @@ import {
 } from "@/components/ui/card";
 import { motion, AnimatePresence } from "framer-motion";
 
-import { useTranslation } from '../lib/hooks/useTranslation';
+import { useTranslation } from "../lib/hooks/useTranslation";
+
 const CreateTenderModal = ({
   open,
   onOpenChange,
@@ -46,7 +47,7 @@ const CreateTenderModal = ({
     category: "",
     budget: "",
     estimatedTime: "",
-    deadline: "", // ✅ New deadline field
+    deadline: "",
     location: "",
     contactEmail: "",
     attachments: null as File | null,
@@ -55,8 +56,7 @@ const CreateTenderModal = ({
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-      const { t } = useTranslation();
-
+    const { t } = useTranslation();
     const { id, value, files } = e.target as HTMLInputElement;
     if (files) {
       setFormData({ ...formData, attachments: files[0] });
@@ -80,7 +80,8 @@ const CreateTenderModal = ({
     console.log("Submitting:", Object.fromEntries(payload.entries()));
     router.push("/tenders");
   };
-    const { t } = useTranslation();
+
+  const { t } = useTranslation();
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -102,11 +103,12 @@ const CreateTenderModal = ({
                     transition={{ delay: 0.1 }}
                   >
                     <CardTitle className="text-3xl font-bold">
-                      Create New Tender
+                      {t("create_new_tender")}
                     </CardTitle>
                     <CardDescription>
-                      Fill in the details below to post a new tender on the
-                      Qatar marketplace.
+                      {t(
+                        "fill_in_the_details_below_to_post_a_new_tender_on_the_qatar_marketplace"
+                      )}
                     </CardDescription>
                   </motion.div>
                 </CardHeader>
@@ -116,7 +118,7 @@ const CreateTenderModal = ({
                     {[
                       {
                         id: "title",
-                        label: "Tender Title",
+                        label: t("tender_title"),
                         component: (
                           <Input
                             id="title"
@@ -129,7 +131,7 @@ const CreateTenderModal = ({
                       },
                       {
                         id: "description",
-                        label: "Description",
+                        label: t("description"),
                         component: (
                           <Textarea
                             id="description"
@@ -161,28 +163,32 @@ const CreateTenderModal = ({
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.4 }}
                       >
-                        <Label htmlFor="category">{t('category')}</Label>
+                        <Label htmlFor="category">{t("category")}</Label>
                         <Select
                           value={formData.category}
                           onValueChange={handleSelectChange}
                           required
                         >
                           <SelectTrigger id="category">
-                            <SelectValue placeholder="Select a category" />
+                            <SelectValue placeholder={t("select_a_category")} />
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="construction">
-                              {t('construction')}
+                              {t("construction")}
                             </SelectItem>
                             <SelectItem value="it-services">
-                              IT Services
+                              {t("it_services")}
                             </SelectItem>
                             <SelectItem value="consulting">
-                              {t('consulting')}
+                              {t("consulting")}
                             </SelectItem>
-                            <SelectItem value="supplies">{t('supplies')}</SelectItem>
-                            <SelectItem value="logistics">{t('logistics')}</SelectItem>
-                            <SelectItem value="other">{t('other')}</SelectItem>
+                            <SelectItem value="supplies">
+                              {t("supplies")}
+                            </SelectItem>
+                            <SelectItem value="logistics">
+                              {t("logistics")}
+                            </SelectItem>
+                            <SelectItem value="other">{t("other")}</SelectItem>
                           </SelectContent>
                         </Select>
                       </motion.div>
@@ -193,7 +199,9 @@ const CreateTenderModal = ({
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.45 }}
                       >
-                        <Label htmlFor="budget">Estimated Budget (QAR)</Label>
+                        <Label htmlFor="budget">
+                          {t("estimated_budget_qar")}
+                        </Label>
                         <Input
                           id="budget"
                           type="number"
@@ -207,14 +215,15 @@ const CreateTenderModal = ({
                     </div>
 
                     <div className="grid grid-cols-2 gap-6">
-                      {" "}
                       <motion.div
                         className="grid gap-2"
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.5 }}
                       >
-                        <Label htmlFor="estimatedTime">Estimated Time</Label>
+                        <Label htmlFor="estimatedTime">
+                          {t("estimated_time")}
+                        </Label>
                         <Input
                           id="estimatedTime"
                           type="text"
@@ -224,14 +233,14 @@ const CreateTenderModal = ({
                           required
                         />
                       </motion.div>
-                      {/* ✅ New Deadline Field */}
+
                       <motion.div
                         className="grid gap-2"
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.52 }}
                       >
-                        <Label htmlFor="deadline">{t('deadline')}</Label>
+                        <Label htmlFor="deadline">{t("deadline")}</Label>
                         <Input
                           id="deadline"
                           type="date"
@@ -241,17 +250,18 @@ const CreateTenderModal = ({
                         />
                       </motion.div>
                     </div>
+
                     {[
                       {
                         id: "location",
-                        label: "Location",
+                        label: t("location"),
                         placeholder: "e.g., Doha, Qatar",
                         type: "text",
                         value: formData.location,
                       },
                       {
                         id: "contactEmail",
-                        label: "Contact Email",
+                        label: t("contact_email"),
                         placeholder: "contact@example.com",
                         type: "email",
                         value: formData.contactEmail,
@@ -283,7 +293,7 @@ const CreateTenderModal = ({
                       transition={{ delay: 0.65 }}
                     >
                       <Label htmlFor="attachments">
-                        Upload Image (Optional)
+                        {t("upload_image_optional")}
                       </Label>
                       <Input
                         id="attachments"
@@ -292,7 +302,7 @@ const CreateTenderModal = ({
                         onChange={handleChange}
                       />
                       <p className="text-sm text-muted-foreground">
-                        Max file size: 5MB. Supported formats: JPG, JPEG, PNG.
+                        {t("max_file_size_5mb_supported_formats_jpg_jpeg_png")}
                       </p>
                     </motion.div>
                   </CardContent>
@@ -307,7 +317,7 @@ const CreateTenderModal = ({
                         type="submit"
                         className="w-min bg-blue-600 rounded-md text-white"
                       >
-                        Post Tender
+                        {t("post_tender")}
                       </Button>
                     </motion.div>
                   </CardFooter>

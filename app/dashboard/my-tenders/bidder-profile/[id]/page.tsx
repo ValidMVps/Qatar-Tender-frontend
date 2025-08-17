@@ -24,7 +24,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 
-import { useTranslation } from '../../../../../lib/hooks/useTranslation';
+import { useTranslation } from "../../../../../lib/hooks/useTranslation";
+
 // Mock bidder data
 const getBidderProfileData = (id: string) => {
   const profiles = {
@@ -99,7 +100,7 @@ const getBidderProfileData = (id: string) => {
 };
 
 export default function BidderProfilePage() {
-    const { t } = useTranslation();
+  const { t } = useTranslation();
 
   const params = useParams();
   const router = useRouter();
@@ -110,13 +111,13 @@ export default function BidderProfilePage() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Card className="w-full max-w-md text-center p-8">
-          <h2 className="text-2xl font-bold mb-4">Bidder Not Found</h2>
+          <h2 className="text-2xl font-bold mb-4">{t("bidder_not_found")}</h2>
           <p className="mb-6">
-            The requested bidder profile could not be found.
+            {t("the_requested_bidder_profile_could_not_be_found")}
           </p>
           <Button onClick={() => router.back()}>
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Go Back
+            {t("go_back")}
           </Button>
         </Card>
       </div>
@@ -126,106 +127,106 @@ export default function BidderProfilePage() {
   return (
     <div className="container  py-1 px-2 md:py-3 md:px-3 space-y-4 md:space-y-6">
       <Card className="border-0 bg-transparent px-0">
-      <CardHeader className="p-2 md:p-6 border-b flex flex-col md:flex-row md:items-center md:justify-between">
-        <div className="flex flex-col md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-4 pb-3">
-        <div>
-          <CardTitle className="text-xl md:text-2xl font-semibold pb-1">
-          {bidder.name}
-          </CardTitle>
-          <CardDescription className="text-sm text-gray-600 flex items-center">
-          <Star className="h-4 w-4 text-yellow-400 mr-1" />
-          {bidder.overallRating} ({bidder.totalReviews} reviews)
-          </CardDescription>
-        </div>
-        </div>
-      </CardHeader>
+        <CardHeader className="p-2 md:p-6 border-b flex flex-col md:flex-row md:items-center md:justify-between">
+          <div className="flex flex-col md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-4 pb-3">
+            <div>
+              <CardTitle className="text-xl md:text-2xl font-semibold pb-1">
+                {bidder.name}
+              </CardTitle>
+              <CardDescription className="text-sm text-gray-600 flex items-center">
+                <Star className="h-4 w-4 text-yellow-400 mr-1" />
+                {bidder.overallRating} ({bidder.totalReviews} {t("reviews")})
+              </CardDescription>
+            </div>
+          </div>
+        </CardHeader>
 
-      <CardContent className="p-0 md:p-6 space-y-6 pt-3">
-        {/* About */}
-        <section className="break-words">
-        <h3 className="text-lg font-semibold mb-2">{t('about')}</h3>
-        <p className="text-gray-700">{bidder.bio}</p>
-        </section>
+        <CardContent className="p-0 md:p-6 space-y-6 pt-3">
+          {/* About */}
+          <section className="break-words">
+            <h3 className="text-lg font-semibold mb-2">{t("about")}</h3>
+            <p className="text-gray-700">{bidder.bio}</p>
+          </section>
 
-        <Separator />
+          <Separator />
 
-        {/* Contact */}
-        <section>
-        <h3 className="text-lg font-semibold mb-2">
-          Contact Information
-        </h3>
-        <div className="space-y-2 text-gray-700">
-          <p className="flex items-start md:items-center break-all">
-          <Mail className="w-4 h-4 mr-2 flex-shrink-0 mt-1 md:mt-0" />
-          {bidder.email}
-          </p>
-          <p className="flex items-center">
-          <Phone className="w-4 h-4 mr-2 flex-shrink-0" />
-          {bidder.phone}
-          </p>
-          <p className="flex items-start md:items-center">
-          <MapPin className="w-4 h-4 mr-2 flex-shrink-0 mt-1 md:mt-0" />
-          {bidder.address}
-          </p>
-        </div>
-        </section>
-
-        <Separator />
-
-        {/* Projects & Reviews */}
-        <section>
-        <h3 className="text-lg font-semibold mb-4">Projects & Reviews</h3>
-
-        <div className="space-y-6">
-          {bidder.projectHistory.map((project) => (
-          <Card
-            key={project.id}
-            className="p-3 md:p-5 border-0 border-b-1 rounded-none"
-          >
-            {/* Project Header */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
-            <div className="flex items-start gap-3">
-              <Briefcase className="h-5 w-5 text-blue-600 mt-1" />
-              <div>
-              <p className="font-medium text-base">
-                {project.name}
+          {/* Contact */}
+          <section>
+            <h3 className="text-lg font-semibold mb-2">
+              {t("contact_information")}
+            </h3>
+            <div className="space-y-2 text-gray-700">
+              <p className="flex items-start md:items-center break-all">
+                <Mail className="w-4 h-4 mr-2 flex-shrink-0 mt-1 md:mt-0" />
+                {bidder.email}
               </p>
-              <p className="text-sm text-gray-500 flex items-center mt-1">
-                <Calendar className="h-3 w-3 mr-1" />
-                {project.date}
+              <p className="flex items-center">
+                <Phone className="w-4 h-4 mr-2 flex-shrink-0" />
+                {bidder.phone}
               </p>
-              </div>
+              <p className="flex items-start md:items-center">
+                <MapPin className="w-4 h-4 mr-2 flex-shrink-0 mt-1 md:mt-0" />
+                {bidder.address}
+              </p>
             </div>
+          </section>
 
-            <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-start">
-              <Badge>{project.status}</Badge>
-              <span className="flex items-center text-yellow-500 text-sm">
-              {project.rating}
-              <Star className="h-4 w-4 fill-current ml-1" />
-              </span>
-            </div>
-            </div>
+          <Separator />
 
-            {/* Reviews */}
-            {project.reviews && project.reviews.length > 0 && (
-            <div className="mt-4 space-y-3">
-              {project.reviews.map((review) => (
-              <div
-                key={review.id}
-                className="bg-gray-50 p-3 rounded-md border border-gray-200"
-              >
-                <p className="text-sm text-gray-700">
-                {review.comment}
-                </p>
-              </div>
+          {/* Projects & Reviews */}
+          <section>
+            <h3 className="text-lg font-semibold mb-4">
+              {t("projects_reviews")}
+            </h3>
+
+            <div className="space-y-6">
+              {bidder.projectHistory.map((project) => (
+                <Card
+                  key={project.id}
+                  className="p-3 md:p-5 border-0 border-b-1 rounded-none"
+                >
+                  {/* Project Header */}
+                  <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+                    <div className="flex items-start gap-3">
+                      <Briefcase className="h-5 w-5 text-blue-600 mt-1" />
+                      <div>
+                        <p className="font-medium text-base">{project.name}</p>
+                        <p className="text-sm text-gray-500 flex items-center mt-1">
+                          <Calendar className="h-3 w-3 mr-1" />
+                          {project.date}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-start">
+                      <Badge>{t(project.status.toLowerCase())}</Badge>
+                      <span className="flex items-center text-yellow-500 text-sm">
+                        {project.rating}
+                        <Star className="h-4 w-4 fill-current ml-1" />
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Reviews */}
+                  {project.reviews && project.reviews.length > 0 && (
+                    <div className="mt-4 space-y-3">
+                      {project.reviews.map((review) => (
+                        <div
+                          key={review.id}
+                          className="bg-gray-50 p-3 rounded-md border border-gray-200"
+                        >
+                          <p className="text-sm text-gray-700">
+                            {review.comment}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </Card>
               ))}
             </div>
-            )}
-          </Card>
-          ))}
-        </div>
-        </section>
-      </CardContent>
+          </section>
+        </CardContent>
       </Card>
     </div>
   );

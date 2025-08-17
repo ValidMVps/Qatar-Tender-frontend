@@ -584,11 +584,12 @@ export default function TenderDetailPage() {
               <Clock className="h-5 w-5 text-gray-600 mr-2" />
               <div>
                 <h3 className="text-sm font-medium text-gray-800">
-                  Tender Pending Approval
+                  {t("tender_pending_approval")}
                 </h3>
                 <p className="text-sm text-gray-700 mt-1">
-                  This tender is currently under admin review. Bids and Q&A will
-                  be available once the tender is active.
+                  {t(
+                    "this_tender_is_currently_under_admin_review_bids_and_qa_will_be_available_once_the_tender_is_active"
+                  )}
                 </p>
               </div>
             </div>
@@ -605,7 +606,7 @@ export default function TenderDetailPage() {
               <div className="flex items-center space-x-4 text-sm text-gray-600">
                 <span className="flex items-center">
                   <Calendar className="h-4 w-4 mr-1" />
-                  Posted: {tenderData.postedDate}
+                  {t("posted")}: {tenderData.postedDate}
                 </span>
                 <span className="flex items-center">
                   <MapPin className="h-4 w-4 mr-1" />
@@ -639,7 +640,7 @@ export default function TenderDetailPage() {
                       : "border-transparent text-gray-500 hover:text-gray-700"
                   }`}
                 >
-                  Bids ({bids.length})
+                  {t("bids")} ({bids.length})
                 </button>
                 <button
                   onClick={() => setActiveTab("qa")}
@@ -649,7 +650,7 @@ export default function TenderDetailPage() {
                       : "border-transparent text-gray-500 hover:text-gray-700"
                   }`}
                 >
-                  Q&A ({qaData.length})
+                  {t("q_and_a")} ({qaData.length})
                 </button>
               </nav>
             </div>
@@ -676,12 +677,12 @@ export default function TenderDetailPage() {
 
                                     {bid.status === "awarded" && (
                                       <Badge className="bg-black text-white border-black">
-                                        AWARDED
+                                        {t("awarded")}
                                       </Badge>
                                     )}
                                     {bid.status === "rejected" && (
                                       <Badge className="bg-gray-600 text-white border-gray-600">
-                                        REJECTED
+                                        {t("rejected")}
                                       </Badge>
                                     )}
                                   </div>
@@ -691,9 +692,11 @@ export default function TenderDetailPage() {
                                       {bid.providerRating}
                                     </span>
                                     <span>
-                                      {bid.completedProjects} projects
+                                      {bid.completedProjects} {t("projects")}
                                     </span>
-                                    <span>{bid.onTimeDelivery}% on-time</span>
+                                    <span>
+                                      {bid.onTimeDelivery}% {t("on_time")}
+                                    </span>
                                   </div>
                                 </div>
                               </div>
@@ -702,7 +705,7 @@ export default function TenderDetailPage() {
                                   {bid.bidAmount} QAR
                                 </div>
                                 <div className="text-sm text-gray-500">
-                                  Submitted: {bid.submittedDate}
+                                  {t("submitted")}: {bid.submittedDate}
                                 </div>
                               </div>
                             </div>
@@ -718,7 +721,7 @@ export default function TenderDetailPage() {
                                     className="bg-black hover:bg-gray-800"
                                   >
                                     <Award className="h-4 w-4 mr-1" />
-                                    Award Bid
+                                    {t("award_bid")}
                                   </Button>
                                   <Button
                                     onClick={() => handleRejectBid(bid.id)}
@@ -733,8 +736,9 @@ export default function TenderDetailPage() {
                               )}
                               {bid.status === "pending" && hasAwardedBid && (
                                 <div className="text-sm text-gray-500 italic">
-                                  Bid cannot be awarded - another bid has
-                                  already been selected
+                                  {t(
+                                    "bid_cannot_be_awarded_another_bid_selected"
+                                  )}
                                 </div>
                               )}
                             </div>
@@ -761,7 +765,7 @@ export default function TenderDetailPage() {
                         <div className="space-y-1 text-sm text-gray-700 mb-4">
                           <p className="flex items-center gap-2">
                             <Briefcase className="h-4 w-4 text-gray-500" />
-                            {bid.completedProjects} Projects Completed
+                            {bid.completedProjects} {t("projects_completed")}
                           </p>
                         </div>
                         <Link
@@ -772,7 +776,7 @@ export default function TenderDetailPage() {
                             size="sm"
                             className="w-full cursor-pointer bg-black hover:bg-gray-800"
                           >
-                            View Full Profile
+                            {t("view_full_profile")}
                           </Button>
                         </Link>
                       </PopoverContent>
@@ -782,10 +786,10 @@ export default function TenderDetailPage() {
                   <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
                     <Building2 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                     <h3 className="text-lg font-medium text-gray-900 mb-2">
-                      No bids yet
+                      {t("no_bids_yet")}
                     </h3>
                     <p className="text-gray-600">
-                      Providers haven't submitted any bids for this tender yet.
+                      {t("providers_have_not_submitted_any_bids_yet")}
                     </p>
                   </div>
                 )}
@@ -817,7 +821,7 @@ export default function TenderDetailPage() {
                             <div className="pl-8 border-l-2 border-gray-200">
                               <div className="flex items-center space-x-3 mb-2">
                                 <span className="font-medium text-gray-700">
-                                  Your Answer
+                                  {t("your_answer")}
                                 </span>
                                 <span className="text-sm text-gray-500">
                                   {qa.answerDate}
@@ -830,7 +834,7 @@ export default function TenderDetailPage() {
                           ) : (
                             <div className="pl-8">
                               <Textarea
-                                placeholder="Type your answer..."
+                                placeholder={t("type_your_answer")}
                                 value={newAnswer}
                                 onChange={(e) => setNewAnswer(e.target.value)}
                                 className="mb-3"
@@ -852,11 +856,10 @@ export default function TenderDetailPage() {
                   <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
                     <MessageSquare className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                     <h3 className="text-lg font-medium text-gray-900 mb-2">
-                      No questions yet
+                      {t("no_questions_yet")}
                     </h3>
                     <p className="text-gray-600">
-                      Providers haven't asked any questions about this tender
-                      yet.
+                      {t("providers_have_not_asked_any_questions_yet")}
                     </p>
                   </div>
                 )}
@@ -873,16 +876,16 @@ export default function TenderDetailPage() {
                     <LockIcon className="h-8 w-8 text-gray-600" />
                   </div>
                   <h3 className="text-xl font-medium text-gray-800 mb-2">
-                    Content Locked
+                    {t("content_locked")}
                   </h3>
                   <p className="text-gray-700 max-w-md mx-auto mb-4">
-                    Bids and Q&A sections are hidden until your tender is active
-                    by an administrator. This helps ensure quality and
-                    compliance with platform guidelines.
+                    {t(
+                      "bids_and_qa_sections_are_hidden_until_tender_is_active"
+                    )}
                   </p>
                   <Badge className="bg-gray-100 text-gray-800 border-gray-200">
                     <Clock className="h-3 w-3 mr-1" />
-                    Pending Admin Approval
+                    {t("pending_admin_approval")}
                   </Badge>
                 </div>
               </CardContent>

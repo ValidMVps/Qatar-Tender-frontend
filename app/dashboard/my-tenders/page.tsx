@@ -48,7 +48,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import EditTenderModal from "@/components/EdittenderModal";
 
-import { useTranslation } from '../../../lib/hooks/useTranslation';
+import { useTranslation } from "../../../lib/hooks/useTranslation";
 // Sample data with more diverse scenarios
 const sampleTenders = [
   {
@@ -236,7 +236,7 @@ const sampleTenders = [
 ];
 
 export default function MyTendersPage() {
-    const { t } = useTranslation();
+  const { t } = useTranslation();
 
   const [activeTab, setActiveTab] = useState("all");
   const [tenders, setTenders] = useState(sampleTenders);
@@ -432,7 +432,7 @@ export default function MyTendersPage() {
           <Card className="bg-blue-500 border border-neutral-300 py-2">
             <CardContent className="p-4 flex items-center justify-between">
               <div>
-                <p className="text-sm text-white pb-1">Total Tenders</p>
+                <p className="text-sm text-white pb-1">{t("total_tenders")}</p>
                 <p className="text-xl font-semibold text-white">
                   {tenders.length}
                 </p>
@@ -443,7 +443,7 @@ export default function MyTendersPage() {
           <Card className="bg-blue-500 border border-neutral-300 py-2">
             <CardContent className="p-4 flex items-center justify-between">
               <div>
-                <p className="text-sm text-white pb-1">Active Tenders</p>
+                <p className="text-sm text-white pb-1">{t("active_tenders")}</p>
                 <p className="text-xl font-semibold text-white">
                   {tenders.filter((t) => t.status === "active").length}
                 </p>
@@ -454,7 +454,9 @@ export default function MyTendersPage() {
           <Card className="bg-blue-500 border border-neutral-300 py-2">
             <CardContent className="p-4 flex items-center justify-between">
               <div>
-                <p className="text-sm text-white pb-1">Awarded Tenders</p>
+                <p className="text-sm text-white pb-1">
+                  {t("awarded_tenders")}
+                </p>
                 <p className="text-xl font-semibold text-white">
                   {tenders.filter((t) => t.awardedBid).length}
                 </p>
@@ -465,7 +467,9 @@ export default function MyTendersPage() {
           <Card className="bg-blue-500 text-white border border-neutral-300 py-2">
             <CardContent className="p-4 flex items-center justify-between">
               <div>
-                <p className="text-sm text-white pb-1">Completed Tenders</p>
+                <p className="text-sm text-white pb-1">
+                  {t("completed_tenders")}
+                </p>
                 <p className="text-xl font-semibold text-white">
                   {tenders.filter((t) => t.isCompleted).length}
                 </p>
@@ -476,7 +480,9 @@ export default function MyTendersPage() {
           <Card className="bg-blue-500 text-white border border-neutral-300 py-2">
             <CardContent className="p-4 flex items-center justify-between">
               <div>
-                <p className="text-sm text-white pb-1">Rejected Tenders</p>
+                <p className="text-sm text-white pb-1">
+                  {t("rejected_tenders")}
+                </p>
                 <p className="text-xl font-semibold text-white">
                   {tenders.filter((t) => t.isCompleted).length}
                 </p>
@@ -489,7 +495,7 @@ export default function MyTendersPage() {
           <div className="relative flex-1 md:w-full">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
-              placeholder="Search tenders by title, description, or category..."
+              placeholder={t("search_tenders_by_title_description_or_category")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10 h-11 border-neutral-300 w-full focus:border-blue-500 focus:ring-blue-500"
@@ -502,10 +508,10 @@ export default function MyTendersPage() {
             >
               <SelectTrigger className="w-[200px] h-11 border-neutral-300 focus:border-blue-500 focus:ring-blue-500">
                 <Filter className="h-4 w-4 mr-2 " />
-                <SelectValue placeholder="All Categories" />
+                <SelectValue placeholder={t("all_categories")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
+                <SelectItem value="all">{t("all_categories")}</SelectItem>
                 {categories.map((category) => (
                   <SelectItem key={category} value={category}>
                     {category}
@@ -523,20 +529,18 @@ export default function MyTendersPage() {
         className="w-full mb-6"
       >
         <TabsList className=" w-full grid-cols-3 sm:grid-cols-6 gap-2 md:grid hidden">
-          {/* Changed grid-cols-6 on small screens and below to grid-cols-3 for better wrapping */}
-          <TabsTrigger value="all">All</TabsTrigger>
-          <TabsTrigger value="active">{t('active')}</TabsTrigger>
-          <TabsTrigger value="awarded">{t('awarded')}</TabsTrigger>
-          <TabsTrigger value="closed">{t('closed')}</TabsTrigger>
-          <TabsTrigger value="rejected">{t('rejected')}</TabsTrigger>
-          <TabsTrigger value="completed">{t('completed')}</TabsTrigger>
+          <TabsTrigger value="all">{t("all")}</TabsTrigger>
+          <TabsTrigger value="active">{t("active")}</TabsTrigger>
+          <TabsTrigger value="awarded">{t("awarded")}</TabsTrigger>
+          <TabsTrigger value="closed">{t("closed")}</TabsTrigger>
+          <TabsTrigger value="rejected">{t("rejected")}</TabsTrigger>
+          <TabsTrigger value="completed">{t("completed")}</TabsTrigger>
         </TabsList>
         <TabsContent value={activeTab} className="mt-4">
           <div className="space-y-2 md:space-y-4">
             {filteredTenders.length > 0 ? (
               filteredTenders.map((tender) => (
                 <Link href={`/dashboard/tender/${tender.id}`}>
-                  {" "}
                   <Card
                     key={tender.id}
                     className="border border-neutral-200/50 rounded-lg"
@@ -563,11 +567,11 @@ export default function MyTendersPage() {
                           <div className="md:flex hidden flex-wrap items-center gap-4 text-sm text-gray-500">
                             <span className="flex items-center">
                               <Calendar className="h-4 w-4 mr-1" />
-                              Posted: {tender.postedDate}
+                              {t("posted")}: {tender.postedDate}
                             </span>
                             <span className="flex items-center">
                               <Users className="h-4 w-4 mr-1" />
-                              {tender.bidsCount} bids
+                              {tender.bidsCount} {t("bids")}
                             </span>
                             <span className="flex items-center">
                               <DollarSign className="h-4 w-4 mr-1" />
@@ -585,7 +589,6 @@ export default function MyTendersPage() {
                             )}`}
                           >
                             <div className="hidden">
-                              {" "}
                               {getStatusIcon(tender)}
                             </div>
                             <span className="text-xs">
@@ -600,7 +603,7 @@ export default function MyTendersPage() {
                                 className="text-blue-600 hover:text-blue-700 md:flex hidden hover:bg-blue-50"
                               >
                                 <Eye className="h-4 w-4 mr-1" />
-                                {t('view')}
+                                {t("view")}
                               </Button>
                             </Link>
                           )}
@@ -621,7 +624,7 @@ export default function MyTendersPage() {
                                       onClick={() => setOpenTenderModal(true)}
                                     >
                                       <Edit className="h-4 w-4 mr-2" />
-                                      Edit Tender
+                                      {t("edit_tender")}
                                     </div>
                                   )}
 
@@ -638,11 +641,9 @@ export default function MyTendersPage() {
                                       className=" w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
                                     >
                                       <XCircle className="h-4 w-4 mr-2" />
-                                      Close Tender
+                                      {t("close_tender")}
                                     </button>
                                   )}
-
-                                {/* Reapply button moved to rejection reason modal */}
 
                                 <EditTenderModal
                                   open={openTenderModal}
@@ -659,7 +660,7 @@ export default function MyTendersPage() {
                                   className=" w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center"
                                 >
                                   <Trash2 className="h-4 w-4 mr-2" />
-                                  Close Tender
+                                  {t("delete_tender")}
                                 </button>
                               </div>
                             </div>
@@ -675,7 +676,7 @@ export default function MyTendersPage() {
                               <AlertTriangle className="h-5 w-5 text-red-500 mr-2 mt-0.5" />
                               <div>
                                 <p className="text-sm font-medium text-red-800">
-                                  Rejection Reason:
+                                  {t("rejection_reason")}
                                 </p>
                                 <p className="text-sm text-red-700">
                                   {tender.rejectionReason}
@@ -688,7 +689,7 @@ export default function MyTendersPage() {
                               className="bg-red-600 hover:bg-red-700 ml-0 md:ml-4"
                             >
                               <RefreshCcw className="h-4 w-4 mr-1" />
-                              {t('reapply')}
+                              {t("reapply")}
                             </Button>
                           </div>
                         )}
@@ -700,15 +701,15 @@ export default function MyTendersPage() {
               <div className="text-center py-12 bg-white rounded-lg border border-neutral-300">
                 <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  No tenders found
+                  {t("no_tenders_found")}
                 </h3>
                 <p className="text-gray-600 mb-6">
                   {searchQuery ||
                   (selectedCategory && selectedCategory !== "all")
-                    ? "No tenders match your search criteria. Try adjusting your search or filters."
+                    ? t("no_tenders_match_search_criteria")
                     : activeTab === "all"
-                    ? "You haven't created any tenders yet."
-                    : `No tenders match the "${activeTab}" status.`}
+                    ? t("no_tenders_created_yet")
+                    : t("no_tenders_match_status", { status: activeTab })}
                 </p>
                 {activeTab === "all" &&
                   !searchQuery &&
@@ -716,7 +717,7 @@ export default function MyTendersPage() {
                     <Link href="/create-tender">
                       <Button className="bg-blue-600 hover:bg-blue-700">
                         <Plus className="h-4 w-4 mr-2" />
-                        Post Your First Tender
+                        {t("post_your_first_tender")}
                       </Button>
                     </Link>
                   )}
@@ -734,17 +735,17 @@ export default function MyTendersPage() {
               <div className="mb-5">
                 <h3 className="text-lg font-medium text-gray-900 mb-2">
                   {showConfirmModal.action === "delete"
-                    ? "Confirm Delete"
+                    ? t("confirm_delete")
                     : showConfirmModal.action === "close"
-                    ? "Confirm Close Tender"
-                    : "Confirm Action"}
+                    ? t("confirm_close_tender")
+                    : t("confirm_action")}
                 </h3>
                 <p className="text-gray-600">
                   {showConfirmModal.action === "delete"
-                    ? "Are you sure you want to delete this tender? This action cannot be undone."
+                    ? t("confirm_delete_message")
                     : showConfirmModal.action === "close"
-                    ? "Are you sure you want to close this tender? No more bids will be accepted."
-                    : "Are you sure you want to proceed with this action?"}
+                    ? t("confirm_close_tender_message")
+                    : t("confirm_action_message")}
                 </p>
               </div>
               <div className="flex justify-end space-x-3 flex-wrap gap-2">
@@ -759,7 +760,7 @@ export default function MyTendersPage() {
                     })
                   }
                 >
-                  {t('cancel')}
+                  {t("cancel")}
                 </Button>
                 <Button
                   size="sm"
@@ -783,10 +784,10 @@ export default function MyTendersPage() {
                   }}
                 >
                   {showConfirmModal.action === "delete"
-                    ? "Delete"
+                    ? t("delete")
                     : showConfirmModal.action === "close"
-                    ? "Close Tender"
-                    : "Confirm"}
+                    ? t("close_tender")
+                    : t("confirm")}
                 </Button>
               </div>
             </CardContent>
@@ -802,17 +803,16 @@ export default function MyTendersPage() {
         <DialogContent className="sm:max-w-[600px] w-full">
           <DialogHeader>
             <DialogTitle>
-              Reapply for Tender: {showReapplyModal.tender?.title}
+              {t("reapply_for_tender")}: {showReapplyModal.tender?.title}
             </DialogTitle>
             <DialogDescription>
-              Edit the details below and reapply for this tender. Its status
-              will change to draft.
+              {t("edit_details_and_reapply")}
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
               <label htmlFor="title" className="text-right">
-                {t('title')}
+                {t("title")}
               </label>
               <Input
                 id="title"
@@ -828,7 +828,7 @@ export default function MyTendersPage() {
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <label htmlFor="description" className="text-right">
-                {t('description')}
+                {t("description")}
               </label>
               <Textarea
                 id="description"
@@ -844,7 +844,7 @@ export default function MyTendersPage() {
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <label htmlFor="budget" className="text-right">
-                Budget (QAR)
+                {t("budget_qar")}
               </label>
               <Input
                 id="budget"
@@ -865,9 +865,9 @@ export default function MyTendersPage() {
               variant="outline"
               onClick={() => setShowReapplyModal({ show: false, tender: null })}
             >
-              {t('cancel')}
+              {t("cancel")}
             </Button>
-            <Button onClick={submitReapply}>{t('reapply')}</Button>
+            <Button onClick={submitReapply}>{t("reapply")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
