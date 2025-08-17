@@ -216,7 +216,9 @@ function StatCard({
       <Card className="w-full border-0 border-b-1  md:hidden flex justify-between items-center shadow-none bg-white text-black border-neutral-200 rounded-none ">
         <CardTitle className="text-sm font-medium">
           {title}
-          {subtle ? <p className="text-xs text-black/70 font-normal mt-0">{subtle}</p> : null}
+          {subtle ? (
+            <p className="text-xs text-black/70 font-normal mt-0">{subtle}</p>
+          ) : null}
         </CardTitle>
         <CardContent className="flex items-center justify-center x py-3">
           <div className="text-lg font-semibold">{value}</div>
@@ -735,7 +737,9 @@ export default function Component() {
                 {/* Mobile Card List */}
                 <div className="block md:hidden space-y-3">
                   {filteredTenders.length === 0 ? (
-                    <p className="text-sm text-muted-foreground px-2">No tenders found.</p>
+                    <p className="text-sm text-muted-foreground px-2">
+                      No tenders found.
+                    </p>
                   ) : (
                     filteredTenders.map((t) => (
                       <div
@@ -752,7 +756,9 @@ export default function Component() {
                           <span>• Deadline: {formatDate(t.deadline)}</span>
                         </div>
                         <div className="flex items-center justify-between mt-1">
-                          <span className="text-xs">Bids: {t.bidsReceived}</span>
+                          <span className="text-xs">
+                            Bids: {t.bidsReceived}
+                          </span>
                           <ChevronRight className="h-4 w-4 text-muted-foreground" />
                         </div>
                       </div>

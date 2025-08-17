@@ -16,7 +16,6 @@ import {
 } from "@/components/ui/select";
 import Image from "next/image";
 import { Moon, Sun, Upload } from "lucide-react";
-
 export default function SettingsPage() {
   // Company Profile States
   const [companyName, setCompanyName] = useState("Acme Solutions Inc.");
@@ -177,21 +176,10 @@ export default function SettingsPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-6 px-0">
-              <div className="space-y-2">
-                <Label htmlFor="appLanguage" className="mb-3">
+              <div className="flex flex-col space-y-3 max-w-40">
+                <Label htmlFor="appLanguage" className="mb-4">
                   Application Language
                 </Label>
-                <Select value={appLanguage} onValueChange={setAppLanguage}>
-                  <SelectTrigger id="appLanguage" className="mt-2">
-                    <SelectValue placeholder="Select language" />
-                  </SelectTrigger>
-                  <SelectContent className="mt-3">
-                    <SelectItem value="en">English</SelectItem>
-                    <SelectItem value="ar">العربية (Arabic)</SelectItem>
-                    <SelectItem value="es">Español (Spanish)</SelectItem>
-                    <SelectItem value="fr">Français (French)</SelectItem>
-                  </SelectContent>
-                </Select>
               </div>
 
               <div className="space-y-3 md:col-span-3">

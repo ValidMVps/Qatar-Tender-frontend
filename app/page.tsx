@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import Lenis from "lenis";
 import Link from "next/link";
+import { LanguageSwitcher } from "@/components/Languageswitcher";
 
 interface NavLink {
   href: string;
@@ -296,6 +297,7 @@ function Navbar() {
           : "bg-white/90 backdrop-blur-sm"
       }`}
     >
+      <header></header>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex-shrink-0">
@@ -385,9 +387,7 @@ function HeroSection() {
       className="pt-16 bg-gradient-to-br from-blue-50/50 via-white to-blue-50/30 min-h-screen"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <div className="flex items-center justify-center mb-8 reveal-on-scroll opacity-0 translate-y-8 transition-all duration-700">
-         
-        </div>
+        <div className="flex items-center justify-center mb-8 reveal-on-scroll opacity-0 translate-y-8 transition-all duration-700"></div>
 
         <div className="max-w-3xl reveal-on-scroll opacity-0 translate-y-8 transition-all duration-700 delay-100">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 font-sans leading-tight mb-6">
@@ -598,7 +598,7 @@ function DashboardShowcaseSection() {
           </div>
 
           {/* Top Right - Success */}
-          <div className="bg-gradient-to-br from-white to-blue-50/30 rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 reveal-on-scroll opacity-0 translate-y-8 transition-all duration-700 delay-100">
+          <div className="bg-gradient-to-br from-white to-blue-50/30 rounded-xl p-6 shadow-sm hover:shadow-md  border border-gray-100 reveal-on-scroll opacity-0 translate-y-8 transition-all duration-700 delay-100">
             <div className="text-center mb-6">
               <div className="w-16 h-16 bg-gradient-to-br from-green-100 to-green-200 rounded-full flex items-center justify-center mx-auto mb-4">
                 <CheckCircle className="w-8 h-8 text-green-600" />
@@ -660,7 +660,7 @@ function DashboardShowcaseSection() {
           </div>
 
           {/* Bottom Right - Financial Tracking */}
-          <div className="bg-gradient-to-br from-white to-blue-50/30 rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 reveal-on-scroll opacity-0 translate-y-8 transition-all duration-700 delay-300">
+          <div className="bg-gradient-to-br from-white to-blue-50/30 rounded-xl p-6 shadow-sm hover:shadow-md  border border-gray-100 reveal-on-scroll opacity-0 translate-y-8 transition-all duration-700 delay-300">
             <div className="mb-6">
               <div className="text-3xl font-bold text-gray-900 mb-2">
                 QAR 21.6M ↗
@@ -1141,7 +1141,7 @@ function FAQSection() {
           {faqs.map((faq, index) => (
             <div
               key={index}
-              className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-sm transition-all duration-300 bg-gradient-to-br from-white to-blue-50/20 reveal-on-scroll opacity-0 translate-y-8 transition-all duration-700"
+              className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-sm bg-gradient-to-br from-white to-blue-50/20 reveal-on-scroll opacity-0 translate-y-8 transition-all duration-700"
               style={{ transitionDelay: `${index * 100}ms` }}
             >
               <button
@@ -1533,8 +1533,7 @@ export default function HomePage() {
           className="pt-16 bg-gradient-to-br from-blue-50/50 via-white to-blue-50/30 min-h-screen"
         >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-            <div className="flex items-center justify-center mb-8 reveal-on-scroll opacity-0 translate-y-8 transition-all duration-700">
-            </div>
+            <div className="flex items-center justify-center mb-8 reveal-on-scroll opacity-0 translate-y-8 transition-all duration-700"></div>
 
             <div className="max-w-3xl reveal-on-scroll opacity-0 translate-y-8 transition-all duration-700 delay-100">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 font-sans leading-tight mb-6">
@@ -1680,7 +1679,7 @@ export default function HomePage() {
                     </div>
 
                     {/* Additional dashboard cards... */}
-                    <div className="bg-gradient-to-br from-white to-blue-50/30 rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 reveal-on-scroll opacity-0 translate-y-8 transition-all duration-700 delay-100">
+                    <div className="bg-gradient-to-br from-white to-blue-50/30 rounded-xl p-6 shadow-sm hover:shadow-md border border-gray-100 reveal-on-scroll opacity-0 translate-y-8 transition-all duration-700 delay-100">
                       <div className="text-center mb-6">
                         <div className="w-16 h-16 bg-gradient-to-br from-green-100 to-green-200 rounded-full flex items-center justify-center mx-auto mb-4">
                           <CheckCircle className="w-8 h-8 text-green-600" />

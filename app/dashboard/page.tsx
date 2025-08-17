@@ -44,6 +44,7 @@ import CreateTenderModal from "@/components/CreateTenderModal";
 import { TenderCarder } from "@/components/TenderCarder";
 import { OverviewChart } from "@/components/OverviewChart";
 import RecentTenders from "@/components/RecentTenders";
+import GoogleTranslate from "next-google-translate-widget";
 
 interface Tender {
   id: string;
@@ -140,7 +141,6 @@ export default function DashboardPage() {
     >
       {/* Welcome Box */}
       <main className="flex-1  py-1 px-1 md:py-9 md:px-3  space-y-7">
-       
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between py-8 px-7 rounded-lg bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 shadow-sm">
           <div className="mb-4 md:mb-0">
             <h1 className="md:text-3xl text-xl font-medium pb-2 text-white">
@@ -155,7 +155,7 @@ export default function DashboardPage() {
             <Button
               className=" text-blue-700 flex items-center "
               onClick={() => setOpenTenderModal(true)}
-              variant={'secondary'}
+              variant={"secondary"}
             >
               <Plus className="md:mr-2 mr-0 h-4 w-4" /> Post New Tender
             </Button>
