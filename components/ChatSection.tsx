@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Send, PanelLeft, EllipsisVertical } from "lucide-react";
 
+import { useTranslation } from "../lib/hooks/useTranslation";
 interface ChatSectionProps extends React.ComponentPropsWithoutRef<"div"> {
   onOpenProjectList: () => void; // New prop for opening project list
   onOpenProjectDetails: () => void; // New prop for opening project details
@@ -16,6 +17,7 @@ function ChatSection({
   onOpenProjectDetails,
   ...props
 }: ChatSectionProps) {
+  const { t } = useTranslation();
   return (
     // Main container is a flex column, taking full height
     <div
@@ -44,7 +46,7 @@ function ChatSection({
             <AvatarFallback>PO</AvatarFallback>
           </Avatar>
           <div className="grid gap-1">
-            <div className="font-semibold text-lg">Sarah</div>
+            <div className="font-semibold text-lg">{t("sarah")}</div>
           </div>
         </div>
         {/* Right Section */}
@@ -95,7 +97,9 @@ function ChatSection({
         {/* Message 2 */}
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="font-semibold text-[#060607]">Contractor</span>
+            <span className="font-semibold text-[#060607]">
+              {t("contractor")}
+            </span>
             <span className="text-xs text-[#6a7480]">Today at 10:15 AM</span>
           </div>
           <div className="max-w-none text-[#2e3338] text-[10px] md:text-[15px] leading-relaxed space-y-3">

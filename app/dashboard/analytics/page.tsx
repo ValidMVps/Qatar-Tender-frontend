@@ -83,6 +83,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import ProjectsOverviewChart from "@/components/ProjectOverviewChart";
 
+import { useTranslation } from "../../../lib/hooks/useTranslation";
 type TenderStatus = "Pending" | "Active" | "Closed";
 
 type Tender = {
@@ -182,12 +183,16 @@ function formatDate(d: string) {
 }
 
 function StatusBadge({ status }: { status: TenderStatus }) {
+  const { t } = useTranslation();
   if (status === "Active")
     return (
-      <Badge className="bg-blue-600 hover:bg-blue-600 text-white">Active</Badge>
+      <Badge className="bg-blue-600 hover:bg-blue-600 text-white">
+        {t("active")}
+      </Badge>
     );
-  if (status === "Pending") return <Badge variant="secondary">Pending</Badge>;
-  return <Badge variant="outline">Closed</Badge>;
+  if (status === "Pending")
+    return <Badge variant="secondary">{t("pending")}</Badge>;
+  return <Badge variant="outline">{t("closed")}</Badge>;
 }
 
 function StatCard({
@@ -201,6 +206,8 @@ function StatCard({
   icon: React.ReactNode;
   subtle?: string;
 }) {
+  const { t } = useTranslation();
+
   return (
     <>
       <Card className="h-full border-1 md:block hidden shadow-none bg-blue-500 text-white border-neutral-200 rounded-md">
@@ -232,6 +239,8 @@ type SortColumn = "postedAt" | "deadline" | "bidsReceived" | null;
 type SortDirection = "asc" | "desc";
 
 export default function Component() {
+  const { t } = useTranslation();
+
   const [query, setQuery] = React.useState("");
   const [sortColumn, setSortColumn] = React.useState<SortColumn>(null);
   const [sortDirection, setSortDirection] =
@@ -538,7 +547,9 @@ export default function Component() {
                   </div>
                   {/* Highlights Section */}
                   <div className="space-y-4">
-                    <h3 className="text-base font-semibold">Highlights</h3>
+                    <h3 className="text-base font-semibold">
+                      {t("highlights")}
+                    </h3>
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
                         <span className="text-sm">Avg. Bids per Project</span>
@@ -647,9 +658,9 @@ export default function Component() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="All">All Statuses</SelectItem>
-                      <SelectItem value="Active">Active</SelectItem>
-                      <SelectItem value="Pending">Pending</SelectItem>
-                      <SelectItem value="Closed">Closed</SelectItem>
+                      <SelectItem value="Active">{t("active")}</SelectItem>
+                      <SelectItem value="Pending">{t("pending")}</SelectItem>
+                      <SelectItem value="Closed">{t("closed")}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -658,9 +669,9 @@ export default function Component() {
                   <Table className="px-0 ">
                     <TableHeader className="px-0">
                       <TableRow>
-                        <TableHead>Title</TableHead>
-                        <TableHead>Category</TableHead>
-                        <TableHead>Status</TableHead>
+                        <TableHead>{t("title")}</TableHead>
+                        <TableHead>{t("category")}</TableHead>
+                        <TableHead>{t("status")}</TableHead>
                         <TableHead
                           className="cursor-pointer whitespace-nowrap"
                           onClick={() => handleSort("postedAt")}

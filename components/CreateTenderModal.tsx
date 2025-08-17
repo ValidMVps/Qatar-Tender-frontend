@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/card";
 import { motion, AnimatePresence } from "framer-motion";
 
+import { useTranslation } from '../lib/hooks/useTranslation';
 const CreateTenderModal = ({
   open,
   onOpenChange,
@@ -54,6 +55,8 @@ const CreateTenderModal = ({
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
+      const { t } = useTranslation();
+
     const { id, value, files } = e.target as HTMLInputElement;
     if (files) {
       setFormData({ ...formData, attachments: files[0] });
@@ -77,6 +80,7 @@ const CreateTenderModal = ({
     console.log("Submitting:", Object.fromEntries(payload.entries()));
     router.push("/tenders");
   };
+    const { t } = useTranslation();
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -157,7 +161,7 @@ const CreateTenderModal = ({
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.4 }}
                       >
-                        <Label htmlFor="category">Category</Label>
+                        <Label htmlFor="category">{t('category')}</Label>
                         <Select
                           value={formData.category}
                           onValueChange={handleSelectChange}
@@ -168,17 +172,17 @@ const CreateTenderModal = ({
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="construction">
-                              Construction
+                              {t('construction')}
                             </SelectItem>
                             <SelectItem value="it-services">
                               IT Services
                             </SelectItem>
                             <SelectItem value="consulting">
-                              Consulting
+                              {t('consulting')}
                             </SelectItem>
-                            <SelectItem value="supplies">Supplies</SelectItem>
-                            <SelectItem value="logistics">Logistics</SelectItem>
-                            <SelectItem value="other">Other</SelectItem>
+                            <SelectItem value="supplies">{t('supplies')}</SelectItem>
+                            <SelectItem value="logistics">{t('logistics')}</SelectItem>
+                            <SelectItem value="other">{t('other')}</SelectItem>
                           </SelectContent>
                         </Select>
                       </motion.div>
@@ -227,7 +231,7 @@ const CreateTenderModal = ({
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.52 }}
                       >
-                        <Label htmlFor="deadline">Deadline</Label>
+                        <Label htmlFor="deadline">{t('deadline')}</Label>
                         <Input
                           id="deadline"
                           type="date"

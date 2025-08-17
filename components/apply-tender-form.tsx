@@ -16,6 +16,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { CheckCircle, Loader2 } from "lucide-react";
 
+import { useTranslation } from "../lib/hooks/useTranslation";
 interface ApplyTenderFormProps {
   isOpen: boolean;
   onClose: () => void;
@@ -67,7 +68,7 @@ export function ApplyTenderForm({
     setBidImage(null);
     onClose();
   };
-
+  const { t } = useTranslation();
   return (
     <Dialog open={isOpen} onOpenChange={handleCloseForm}>
       <DialogContent className="sm:max-w-[425px]">
@@ -150,7 +151,7 @@ export function ApplyTenderForm({
                 onClick={handleBackStep}
                 disabled={isProcessingPayment}
               >
-                Back
+                {t("back")}
               </Button>
               <Button
                 onClick={handleProcessPayment}
@@ -180,7 +181,7 @@ export function ApplyTenderForm({
               You will be notified if your bid is shortlisted or accepted.
             </p>
             <Button onClick={handleCloseForm} className="w-full">
-              Close
+              {t("close")}
             </Button>
           </div>
         )}

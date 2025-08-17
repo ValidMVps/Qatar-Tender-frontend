@@ -34,6 +34,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
+import { useTranslation } from '../lib/hooks/useTranslation';
 type TenderStatus = "Active" | "Pending" | "Closed";
 
 interface Tender {
@@ -60,6 +61,8 @@ function StatusBadge({ status }: { status: TenderStatus }) {
 }
 
 export default function RecentTenders() {
+    const { t } = useTranslation();
+
   const [query, setQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState<TenderStatus | "All">("All");
   const [sortColumn, setSortColumn] = useState<keyof Tender | null>(null);
@@ -177,9 +180,9 @@ export default function RecentTenders() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="All">All Statuses</SelectItem>
-                <SelectItem value="Active">Active</SelectItem>
-                <SelectItem value="Pending">Pending</SelectItem>
-                <SelectItem value="Closed">Closed</SelectItem>
+                <SelectItem value="Active">{t('active')}</SelectItem>
+                <SelectItem value="Pending">{t('pending')}</SelectItem>
+                <SelectItem value="Closed">{t('closed')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -187,9 +190,9 @@ export default function RecentTenders() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Title</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead>{t('title')}</TableHead>
+                  <TableHead>{t('category')}</TableHead>
+                  <TableHead>{t('status')}</TableHead>
                   <TableHead
                     className="cursor-pointer"
                     onClick={() => handleSort("postedAt")}

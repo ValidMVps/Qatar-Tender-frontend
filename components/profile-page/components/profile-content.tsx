@@ -10,14 +10,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 
+import { useTranslation } from '../../../lib/hooks/useTranslation';
 export default function ProfileContent() {
+    const { t } = useTranslation();
+
   return (
     <Tabs defaultValue="personal" className="space-y-6">
       <TabsList className="grid w-full grid-cols-4">
-        <TabsTrigger value="personal">Personal</TabsTrigger>
-        <TabsTrigger value="account">Account</TabsTrigger>
-        <TabsTrigger value="security">Security</TabsTrigger>
-        <TabsTrigger value="notifications">Notifications</TabsTrigger>
+        <TabsTrigger value="personal">{t('personal')}</TabsTrigger>
+        <TabsTrigger value="account">{t('account')}</TabsTrigger>
+        <TabsTrigger value="security">{t('security')}</TabsTrigger>
+        <TabsTrigger value="notifications">{t('notifications')}</TabsTrigger>
       </TabsList>
 
       {/* Personal Information */}
@@ -38,11 +41,11 @@ export default function ProfileContent() {
                 <Input id="lastName" defaultValue="Doe" />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{t('email')}</Label>
                 <Input id="email" type="email" defaultValue="john.doe@example.com" />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="phone">Phone</Label>
+                <Label htmlFor="phone">{t('phone')}</Label>
                 <Input id="phone" defaultValue="+1 (555) 123-4567" />
               </div>
               <div className="space-y-2">
@@ -50,7 +53,7 @@ export default function ProfileContent() {
                 <Input id="jobTitle" defaultValue="Senior Product Designer" />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="company">Company</Label>
+                <Label htmlFor="company">{t('company')}</Label>
                 <Input id="company" defaultValue="Acme Inc." />
               </div>
             </div>
@@ -64,7 +67,7 @@ export default function ProfileContent() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="location">Location</Label>
+              <Label htmlFor="location">{t('location')}</Label>
               <Input id="location" defaultValue="San Francisco, CA" />
             </div>
           </CardContent>
@@ -85,7 +88,7 @@ export default function ProfileContent() {
                 <p className="text-muted-foreground text-sm">Your account is currently active</p>
               </div>
               <Badge variant="outline" className="border-green-200 bg-green-50 text-green-700">
-                Active
+                {t('active')}
               </Badge>
             </div>
             <Separator />
@@ -150,7 +153,7 @@ export default function ProfileContent() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
-                  <Label className="text-base">Password</Label>
+                  <Label className="text-base">{t('password')}</Label>
                   <p className="text-muted-foreground text-sm">Last changed 3 months ago</p>
                 </div>
                 <Button variant="outline">
@@ -168,10 +171,10 @@ export default function ProfileContent() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Badge variant="outline" className="border-green-200 bg-green-50 text-green-700">
-                    Enabled
+                    {t('enabled')}
                   </Badge>
                   <Button variant="outline" size="sm">
-                    Configure
+                    {t('configure')}
                   </Button>
                 </div>
               </div>

@@ -29,6 +29,7 @@ import {
 } from "./ui/breadcrumb";
 import CreateTenderModal from "./CreateTenderModal";
 
+import { useTranslation } from '../lib/hooks/useTranslation';
 // Utility to capitalize and space hyphenated words
 const toTitleCase = (str: string) =>
   str.replace(/-/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
@@ -48,11 +49,13 @@ interface NavbarProps {
 }
 
 export default function BNavbar({
+
   sidebarOpen,
   setSidebarOpen,
   sidebarLinks,
 }: NavbarProps) {
   const pathname = usePathname();
+    const { t } = useTranslation();
 
   const currentUser = {
     name: "Ahmed Al-Mahmoud",
@@ -139,7 +142,7 @@ export default function BNavbar({
                 >
                   <div className="p-3">
                     <div className="text-sm font-semibold px-2 py-1">
-                      Notifications
+                      {t('notifications')}
                     </div>
                     <hr className="my-2" />
                     <div className="flex flex-col space-y-3 max-h-60 overflow-y-auto">
@@ -183,21 +186,21 @@ export default function BNavbar({
                       className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     >
                       <UserCircle className="w-4 h-4 text-gray-500" />
-                      Profile
+                      {t('profile')}
                     </Link>
                     <Link
                       href="/business-dashboard/settings"
                       className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     >
                       <Settings className="w-4 h-4 text-gray-500" />
-                      Settings
+                      {t('settings')}
                     </Link>
                     <Link
                       href="/business-dashboard/help"
                       className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     >
                       <LifeBuoy className="w-4 h-4 text-gray-500" />
-                      Help
+                      {t('help')}
                     </Link>
                     <div className="border-t border-gray-200 my-1" />
                     <Link

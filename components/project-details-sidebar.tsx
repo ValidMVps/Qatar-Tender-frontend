@@ -19,6 +19,7 @@ import {
 import { FileText, DollarSign, Calendar, User, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+import { useTranslation } from "../lib/hooks/useTranslation";
 interface ProjectDetailsSidebarProps
   extends React.ComponentPropsWithoutRef<"div"> {
   selectedProject: {
@@ -49,6 +50,7 @@ export function ProjectDetailsSidebar({
     onMarkComplete();
     setIsDialogOpen(false);
   };
+  const { t } = useTranslation();
   return (
     <div
       className={`flex flex-col h-full border-l bg-background overflow-hidden ${className}`}
@@ -69,7 +71,7 @@ export function ProjectDetailsSidebar({
             <CardContent className="space-y-4 px-0">
               <div>
                 <label className="text-sm font-medium text-gray-600">
-                  Description
+                  {t("description")}
                 </label>
                 <p className="text-sm mt-1 text-gray-800">
                   {selectedProject.description}
@@ -79,7 +81,7 @@ export function ProjectDetailsSidebar({
                 <div>
                   <label className="text-sm font-medium text-gray-600 flex items-center gap-1">
                     <DollarSign className="w-4 h-4" />
-                    Budget
+                    {t("budget")}
                   </label>
                   <p className="text-sm font-semibold mt-1 text-gray-800">
                     {selectedProject.budget}
@@ -87,7 +89,7 @@ export function ProjectDetailsSidebar({
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-600">
-                    Status
+                    {t("status")}
                   </label>
                   <div className="mt-1">
                     <Badge
@@ -137,10 +139,10 @@ export function ProjectDetailsSidebar({
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
                   <div className="flex flex-col gap-2">
-                    <Label htmlFor="rating">Rating</Label>
+                    <Label htmlFor="rating">{t("rating")}</Label>
                     <div className="flex items-center gap-2">
                       <Label htmlFor="rating" className="text-right">
-                        Rating
+                        {t("rating")}
                       </Label>
                       <div className="flex gap-1">
                         {[1, 2, 3, 4, 5].map((star) => (
@@ -159,7 +161,7 @@ export function ProjectDetailsSidebar({
                     </div>
                   </div>
                   <div className="flex flex-col gap-2">
-                    <Label htmlFor="review">Review</Label>
+                    <Label htmlFor="review">{t("review")}</Label>
                     <Textarea
                       id="review"
                       placeholder="Write your feedback..."
@@ -173,7 +175,7 @@ export function ProjectDetailsSidebar({
                     onClick={handleSubmitReview}
                     className="bg-black text-white hover:bg-gray-800"
                   >
-                    Submit
+                    {t("submit")}
                   </Button>
                 </DialogFooter>
               </DialogContent>

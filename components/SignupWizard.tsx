@@ -25,6 +25,7 @@ import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
 
+import { useTranslation } from "../lib/hooks/useTranslation";
 type Step = 1 | 2 | 3;
 type AccountType = "individual" | "business";
 
@@ -63,6 +64,8 @@ const countries = [
 ];
 
 export default function SignupWizard() {
+  const { t } = useTranslation();
+
   const { toast } = useToast();
   const [step, setStep] = useState<Step>(1);
   const [form, setForm] = useState<FormState>({ ...initialState });
@@ -219,7 +222,6 @@ export default function SignupWizard() {
       description: `A new link was sent to ${currentEmail}.`,
     });
   };
-
   return (
     <div className="space-y-8 w-xl rounded-2xl p-8 bg-white border border-gray-100">
       <StepHeader current={step} />
@@ -255,7 +257,7 @@ export default function SignupWizard() {
           {step > 1 && (
             <Button variant="ghost" onClick={onBack} className="px-5 py-2">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back
+              {t("back")}
             </Button>
           )}
           {step === 1 && (
@@ -263,7 +265,7 @@ export default function SignupWizard() {
               onClick={onContinue}
               className="bg-blue-600 text-white px-6 py-2 hover:bg-blue-700"
             >
-              Continue <ArrowRight className="ml-2 h-4 w-4" />
+              {t("continue")} <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           )}
           {step === 2 && (
@@ -275,7 +277,7 @@ export default function SignupWizard() {
               }
             >
               <Button className="bg-blue-600 text-white px-6 py-2 hover:bg-blue-700">
-                Submit <MailCheck className="ml-2 h-4 w-4" />
+                {t("submit")} <MailCheck className="ml-2 h-4 w-4" />
               </Button>
             </Link>
           )}
@@ -296,14 +298,14 @@ export default function SignupWizard() {
           href="/login"
           className="font-medium text-blue-600 hover:underline"
         >
-          Login
+          {t("login")}
         </Link>
       </div>
       <Link
         href="/business-dashboard"
         className="font-medium text-blue-600 hover:underline"
       >
-        BUsiness
+        {t("business")}
       </Link>
     </div>
   );
@@ -318,6 +320,7 @@ function StepOne({
   onSelect: (t: AccountType) => void;
   error?: string;
 }) {
+  const { t } = useTranslation();
   return (
     <div>
       <div className="mb-8 text-base text-muted-foreground">
@@ -325,14 +328,14 @@ function StepOne({
       </div>
       <div className="grid gap-3 sm:grid-cols-1">
         <SelectableCard
-          title="Individual"
+          title={t("individual")}
           description="For contractors, consultants, and freelancers."
           icon={<UserRound className="h-6 w-6" aria-hidden="true" />}
           selected={selected === "individual"}
           onClick={() => onSelect("individual")}
         />
         <SelectableCard
-          title="Business"
+          title={t("business")}
           description="For companies bidding on tenders."
           icon={<Building2 className="h-6 w-6" aria-hidden="true" />}
           selected={selected === "business"}
@@ -398,6 +401,7 @@ function StepTwo({
   onChange: (patch: Partial<FormState>) => void;
 }) {
   const isBiz = form.accountType === "business";
+  const { t } = useTranslation();
   return (
     <div className="space-y-5">
       {isBiz ? (
@@ -453,7 +457,7 @@ function StepTwo({
           </div>
           <div className="space-y-3">
             <Label htmlFor="email" className="text-base font-medium">
-              Email
+              {t("email")}
             </Label>
             <Input
               id="email"
@@ -472,7 +476,7 @@ function StepTwo({
 
       <div className="space-y-3">
         <Label htmlFor="phone" className="text-base font-medium">
-          Phone
+          {t("phone")}
         </Label>
         <div className="flex gap-3  mt-2 ">
           <Select
@@ -480,7 +484,7 @@ function StepTwo({
             onValueChange={(v) => onChange({ countryCode: v })}
           >
             <SelectTrigger className="w-[160px] py-3">
-              <SelectValue placeholder="Code" />
+              <SelectValue placeholder={t("code")} />
             </SelectTrigger>
             <SelectContent>
               {countries.map((c) => (
@@ -513,7 +517,7 @@ function StepTwo({
       {/* Password Field */}
       <div className="space-y-3">
         <Label htmlFor="password" className="text-base font-medium">
-          Password
+          {t("password")}
         </Label>
         <Input
           id="password"

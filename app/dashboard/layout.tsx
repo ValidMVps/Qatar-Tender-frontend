@@ -17,11 +17,14 @@ import {
 import Navbar from "@/components/Navbar";
 import { motion } from "framer-motion";
 
+import { useTranslation } from "../../lib/hooks/useTranslation";
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const { t } = useTranslation();
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
 
@@ -117,7 +120,7 @@ export default function DashboardLayout({
                 sidebarOpen ? "opacity-0 w-0 overflow-hidden" : "opacity-100"
               }`}
             >
-              TenderHub
+              {t("tenderhub")}
             </span>
           </div>
         </div>

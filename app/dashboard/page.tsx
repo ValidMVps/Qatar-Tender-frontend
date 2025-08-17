@@ -46,6 +46,7 @@ import { OverviewChart } from "@/components/OverviewChart";
 import RecentTenders from "@/components/RecentTenders";
 import GoogleTranslate from "next-google-translate-widget";
 
+import { useTranslation } from '../../lib/hooks/useTranslation';
 interface Tender {
   id: string;
   title: string;
@@ -112,21 +113,23 @@ const statsData = [
 ];
 
 export default function DashboardPage() {
+    const { t } = useTranslation();
+
   const [openTenderModal, setOpenTenderModal] = useState(false);
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "active":
         return (
           <Badge className="bg-blue-500 hover:bg-blue-600 text-white">
-            Active
+            {t('active')}
           </Badge>
         );
       case "pending":
-        return <Badge variant="outline">Pending</Badge>;
+        return <Badge variant="outline">{t('pending')}</Badge>;
       case "closed":
-        return <Badge variant="secondary">Closed</Badge>;
+        return <Badge variant="secondary">{t('closed')}</Badge>;
       case "awarded":
-        return <Badge className="bg-emerald-600 text-white">Awarded</Badge>;
+        return <Badge className="bg-emerald-600 text-white">{t('awarded')}</Badge>;
       default:
         return <Badge variant="secondary">{status}</Badge>;
     }

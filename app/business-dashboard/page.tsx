@@ -55,6 +55,7 @@ import {
 } from "@/components/ui/chart";
 import { OverviewChart } from "@/components/OverviewChart";
 
+import { useTranslation } from "../../lib/hooks/useTranslation";
 interface Tender {
   id: string;
   title: string;
@@ -116,17 +117,19 @@ const bidsData: Bid[] = [
 
 // Updated getBidStatusBadge
 const getBidStatusBadge = (status: Bid["status"]) => {
+  const { t } = useTranslation();
+
   switch (status) {
     case "active":
-      return <Badge className="bg-blue-500 text-white">Active</Badge>;
+      return <Badge className="bg-blue-500 text-white">{t("active")}</Badge>;
     case "closed":
-      return <Badge className="bg-gray-500 text-white">Closed</Badge>;
+      return <Badge className="bg-gray-500 text-white">{t("closed")}</Badge>;
     case "awarded":
-      return <Badge className="bg-green-500 text-white">Awarded</Badge>;
+      return <Badge className="bg-green-500 text-white">{t("awarded")}</Badge>;
     case "rejected":
-      return <Badge className="bg-red-500 text-white">Rejected</Badge>;
+      return <Badge className="bg-red-500 text-white">{t("rejected")}</Badge>;
     case "pending":
-      return <Badge variant="outline">Pending</Badge>;
+      return <Badge variant="outline">{t("pending")}</Badge>;
     default:
       return <Badge variant="secondary">{status}</Badge>;
   }
@@ -141,12 +144,14 @@ const biddingSuccessData = [
 ];
 
 export default function DashboardPage() {
+  const { t } = useTranslation();
+
   const [openTenderModal, setOpenTenderModal] = useState(false);
 
   const getBidStatusBadge = (status: Bid["status"]) => {
     switch (status) {
       case "pending":
-        return <Badge variant="outline">Pending</Badge>;
+        return <Badge variant="outline">{t("pending")}</Badge>;
       case "closed":
         return (
           <Badge className="bg-purple-500 hover:bg-purple-600 text-white">
@@ -154,7 +159,9 @@ export default function DashboardPage() {
           </Badge>
         );
       case "awarded":
-        return <Badge className="bg-emerald-600 text-white">Awarded</Badge>;
+        return (
+          <Badge className="bg-emerald-600 text-white">{t("awarded")}</Badge>
+        );
       case "closed":
         return <Badge variant="destructive">closed</Badge>;
       default:
@@ -225,9 +232,7 @@ export default function DashboardPage() {
                   Recent Bids You&apos;ve Placed
                 </CardTitle>
                 <Button variant="outline" size="sm" asChild>
-                  <Link href="/business-dashboard/bids">
-                    View All Bids
-                  </Link>
+                  <Link href="/business-dashboard/bids">View All Bids</Link>
                 </Button>
               </CardHeader>
               <CardContent>
@@ -235,8 +240,8 @@ export default function DashboardPage() {
                   <TableHeader>
                     <TableRow>
                       <TableHead>Tender Title</TableHead>
-                      <TableHead>Amount</TableHead>
-                      <TableHead>Status</TableHead>
+                      <TableHead>{t("amount")}</TableHead>
+                      <TableHead>{t("status")}</TableHead>
                       <TableHead className="text-right">
                         Submission Date
                       </TableHead>

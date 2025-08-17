@@ -13,7 +13,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Mail, Phone, MapPin } from "lucide-react";
 
+import { useTranslation } from '../../../lib/hooks/useTranslation';
 export default function HelpPage() {
+    const { t } = useTranslation();
+
   return (
     <div className="container py-1 px-2 md:py-3 md:px-3">
       <section className="mb-16">
@@ -106,7 +109,7 @@ export default function HelpPage() {
                 </div>
                 <div>
                   <Label htmlFor="message" className="mb-1">
-                    Message
+                    {t('message')}
                   </Label>
                   <Textarea
                     id="message"

@@ -2,13 +2,16 @@ import { Bell } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 
+import { useTranslation } from '../../../lib/hooks/useTranslation';
 export default function Loading() {
+    const { t } = useTranslation();
+
   return (
     <>
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center">
           <Bell className="h-7 w-7 mr-3" />
-          Notifications
+          {t('notifications')}
         </h1>
         <p className="text-gray-600">Stay updated on all your activities and alerts</p>
       </div>

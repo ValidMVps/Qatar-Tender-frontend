@@ -29,6 +29,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { TabsContent, TabsList, TabsTrigger } from "@radix-ui/react-tabs";
 import { ServiceProvidersOverviewChart } from "./ServiceOverviewChart";
 
+import { useTranslation } from "../lib/hooks/useTranslation";
 // --- Types for service-provider view ---
 type ServiceStatus = "Active" | "Pending" | "Completed";
 type Service = {
@@ -228,22 +229,27 @@ function StatusBadge({
 }: {
   status: ServiceStatus | "Pending" | "Accepted" | "Rejected";
 }) {
+  const { t } = useTranslation();
   if (status === "Active")
     return (
-      <Badge className="bg-blue-600 hover:bg-blue-600 text-white">Active</Badge>
+      <Badge className="bg-blue-600 hover:bg-blue-600 text-white">
+        {t("active")}
+      </Badge>
     );
-  if (status === "Pending") return <Badge variant="secondary">Pending</Badge>;
+  if (status === "Pending")
+    return <Badge variant="secondary">{t("pending")}</Badge>;
   if (status === "Accepted")
-    return <Badge className="bg-green-600 text-white">Accepted</Badge>;
+    return <Badge className="bg-green-600 text-white">{t("accepted")}</Badge>;
   if (status === "Rejected")
-    return <Badge className="bg-red-600 text-white">Rejected</Badge>;
-  return <Badge variant="outline">Completed</Badge>;
+    return <Badge className="bg-red-600 text-white">{t("rejected")}</Badge>;
+  return <Badge variant="outline">{t("completed")}</Badge>;
 }
 interface ComponentProps {
   tab: React.ReactNode;
 }
 
 export default function Component({ tab }: ComponentProps) {
+  const { t } = useTranslation();
   const [query, setQuery] = React.useState("");
   const [sortColumn, setSortColumn] = React.useState<
     "submittedAt" | "decisionDate" | "amountOffered" | null
@@ -481,7 +487,9 @@ export default function Component({ tab }: ComponentProps) {
                   </div>
                   {/* Highlights Section */}
                   <div className="space-y-4">
-                    <h3 className="text-base font-semibold">Highlights</h3>
+                    <h3 className="text-base font-semibold">
+                      {t("highlights")}
+                    </h3>
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
                         <span className="text-sm">Avg. Rating Received</span>
@@ -586,53 +594,53 @@ export default function Component({ tab }: ComponentProps) {
                     <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg">
                       <div>
                         <p className="text-base font-semibold text-gray-800">
-                          Bronze
+                          {t("bronze")}
                         </p>
                         <p className="text-sm text-gray-600">
                           2+ jobs completed • 4.5+ rating
                         </p>
                       </div>
                       <span className="px-3 py-1 text-sm font-bold border border-gray-300 text-gray-700 rounded-full">
-                        Bronze
+                        {t("bronze")}
                       </span>
                     </div>
                     <div className="flex justify-between items-center p-3 border border-emerald-600 rounded-lg bg-emerald-50">
                       <div>
                         <p className="text-base font-semibold text-emerald-700">
-                          Silver
+                          {t("silver")}
                         </p>
                         <p className="text-sm text-emerald-600">
                           10+ jobs completed • 4.5+ rating
                         </p>
                       </div>
                       <span className="px-3 py-1 text-sm font-bold border border-emerald-600 text-emerald-700 rounded-full">
-                        Silver
+                        {t("silver")}
                       </span>
                     </div>
                     <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg">
                       <div>
                         <p className="text-base font-semibold text-gray-800">
-                          Gold
+                          {t("gold")}
                         </p>
                         <p className="text-sm text-gray-600">
                           25+ jobs completed • 4.8+ rating
                         </p>
                       </div>
                       <span className="px-3 py-1 text-sm font-bold border border-gray-300 text-gray-700 rounded-full">
-                        Gold
+                        {t("gold")}
                       </span>
                     </div>
                     <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg">
                       <div>
                         <p className="text-base font-semibold text-gray-800">
-                          Platinum
+                          {t("platinum")}
                         </p>
                         <p className="text-sm text-gray-600">
                           50+ jobs completed • 4.9+ rating
                         </p>
                       </div>
                       <span className="px-3 py-1 text-sm font-bold border border-gray-300 text-gray-700 rounded-full">
-                        Platinum
+                        {t("platinum")}
                       </span>
                     </div>
                   </div>

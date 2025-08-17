@@ -91,6 +91,7 @@ import { Tabs } from "@radix-ui/react-tabs";
 import { TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Banalytics from "@/components/Banalytics";
 
+import { useTranslation } from "../../../lib/hooks/useTranslation";
 type TenderStatus = "Pending" | "Active" | "Closed";
 
 type Tender = {
@@ -190,12 +191,16 @@ function formatDate(d: string) {
 }
 
 function StatusBadge({ status }: { status: TenderStatus }) {
+  const { t } = useTranslation();
   if (status === "Active")
     return (
-      <Badge className="bg-blue-600 hover:bg-blue-600 text-white">Active</Badge>
+      <Badge className="bg-blue-600 hover:bg-blue-600 text-white">
+        {t("active")}
+      </Badge>
     );
-  if (status === "Pending") return <Badge variant="secondary">Pending</Badge>;
-  return <Badge variant="outline">Closed</Badge>;
+  if (status === "Pending")
+    return <Badge variant="secondary">{t("pending")}</Badge>;
+  return <Badge variant="outline">{t("closed")}</Badge>;
 }
 
 function StatCard({
@@ -240,6 +245,8 @@ type SortColumn = "postedAt" | "deadline" | "bidsReceived" | null;
 type SortDirection = "asc" | "desc";
 
 export default function Component() {
+  const { t } = useTranslation();
+
   const [query, setQuery] = React.useState("");
   const [sortColumn, setSortColumn] = React.useState<SortColumn>(null);
   const [sortDirection, setSortDirection] =
@@ -747,7 +754,9 @@ export default function Component() {
                       </div>
                       {/* Highlights Section */}
                       <div className="space-y-4">
-                        <h3 className="text-base font-semibold">Highlights</h3>
+                        <h3 className="text-base font-semibold">
+                          {t("highlights")}
+                        </h3>
                         <div className="space-y-4">
                           <div className="flex items-center justify-between">
                             <span className="text-sm">
@@ -848,14 +857,14 @@ export default function Component() {
                         <div className="flex justify-between items-center p-3 border border-emerald-600 rounded-lg bg-emerald-50">
                           <div>
                             <p className="text-base font-semibold text-emerald-700">
-                              Bronze
+                              {t("bronze")}
                             </p>
                             <p className="text-sm text-emerald-600">
                               2+ projects • 4.5+ rating
                             </p>
                           </div>
                           <span className="px-3 py-1 text-sm font-bold border border-emerald-600 text-emerald-700 rounded-full">
-                            Bronze
+                            {t("bronze")}
                           </span>
                         </div>
 
@@ -863,14 +872,14 @@ export default function Component() {
                         <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg">
                           <div>
                             <p className="text-base font-semibold text-gray-800">
-                              Gold
+                              {t("gold")}
                             </p>
                             <p className="text-sm text-gray-600">
                               10+ projects • 4.8+ rating
                             </p>
                           </div>
                           <span className="px-3 py-1 text-sm font-bold border border-gray-300 text-gray-700 rounded-full">
-                            Gold
+                            {t("gold")}
                           </span>
                         </div>
 
@@ -878,14 +887,14 @@ export default function Component() {
                         <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg">
                           <div>
                             <p className="text-base font-semibold text-gray-800">
-                              Platinum
+                              {t("platinum")}
                             </p>
                             <p className="text-sm text-gray-600">
                               25+ projects • 4.9+ rating
                             </p>
                           </div>
                           <span className="px-3 py-1 text-sm font-bold border border-gray-300 text-gray-700 rounded-full">
-                            Platinum
+                            {t("platinum")}
                           </span>
                         </div>
                       </div>

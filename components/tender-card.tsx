@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button"; // Import Button
 import { TooltipProvider } from "@/components/ui/tooltip";
 
+import { useTranslation } from '../lib/hooks/useTranslation';
 interface Tender {
   id: number;
   postedTime: string;
@@ -30,6 +31,8 @@ interface TenderCardProps {
 
 export function TenderCard({ tender }: TenderCardProps) {
   const renderStars = (rating: number) => {
+      const { t } = useTranslation();
+
     const fullStars = Math.floor(rating);
     const hasHalfStar = rating % 1 !== 0;
     const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
@@ -51,7 +54,7 @@ export function TenderCard({ tender }: TenderCardProps) {
       </div>
     );
   };
-
+const { t } = useTranslation();
   return (
     <TooltipProvider>
       <Card className="border border-gray-200 ">
@@ -65,7 +68,7 @@ export function TenderCard({ tender }: TenderCardProps) {
                     variant="destructive"
                     className="bg-red-500/10 text-red-700 border-red-200"
                   >
-                    Urgent
+                    {t('urgent')}
                   </Badge>
                 )}
               </div>

@@ -8,6 +8,7 @@ import Link from "next/link";
 import { MailCheck } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
+import { useTranslation } from '../lib/hooks/useTranslation';
 // This is a simulated server action for demonstration.
 // In a real application, this would be in app/actions/auth.ts or similar.
 async function authenticate(
@@ -28,6 +29,8 @@ async function authenticate(
 }
 
 export default function LoginForm() {
+    const { t } = useTranslation();
+
   const { toast } = useToast();
   const [state, formAction, isPending] = useActionState(
     authenticate,
@@ -49,7 +52,7 @@ export default function LoginForm() {
   return (
     <form action={formAction} className="space-y-6 w-full ">
       <div className="space-y-2">
-        <Label htmlFor="email">Email</Label>
+        <Label htmlFor="email">{t('email')}</Label>
         <Input
           id="email"
           name="email"
@@ -60,7 +63,7 @@ export default function LoginForm() {
       </div>
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <Label htmlFor="password">Password</Label>
+          <Label htmlFor="password">{t('password')}</Label>
           <Link
             href="/forgot-password"
             className="text-sm font-medium text-blue-600 hover:underline"

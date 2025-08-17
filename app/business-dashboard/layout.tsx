@@ -22,6 +22,7 @@ import Navbar from "@/components/Navbar";
 import { motion } from "framer-motion";
 import BNavbar from "@/components/Bnavbar";
 
+import { useTranslation } from "../../lib/hooks/useTranslation";
 export default function DashboardLayout({
   children,
 }: {
@@ -29,7 +30,7 @@ export default function DashboardLayout({
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
-
+  const { t } = useTranslation();
   useEffect(() => {
     document.body.style.overflow = sidebarOpen ? "hidden" : "";
   }, [sidebarOpen]);
@@ -186,7 +187,7 @@ export default function DashboardLayout({
               <Building2 className="h-5 w-5 text-white" />
             </div>
             <span className="text-2xl font-semibold text-gray-900">
-              TenderHub
+              {t("tenderhub")}
             </span>
           </div>
         </div>

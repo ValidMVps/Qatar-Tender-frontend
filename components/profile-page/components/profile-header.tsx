@@ -4,14 +4,17 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Camera, Calendar, Mail, MapPin } from "lucide-react";
 
+import { useTranslation } from '../../../lib/hooks/useTranslation';
 export default function ProfileHeader() {
+    const { t } = useTranslation();
+
   return (
     <Card className="border-0">
       <CardContent className="p-6">
         <div className="flex flex-col items-start gap-6 md:flex-row md:items-center">
           <div className="relative">
             <Avatar className="h-24 w-24">
-              <AvatarImage src="https://bundui-images.netlify.app/avatars/08.png" alt="Profile" />
+              <AvatarImage src="https://bundui-images.netlify.app/avatars/08.png" alt={t('profile')} />
               <AvatarFallback className="text-2xl">JD</AvatarFallback>
             </Avatar>
             <Button

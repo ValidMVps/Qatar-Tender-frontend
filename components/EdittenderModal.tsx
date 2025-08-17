@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "../lib/hooks/useTranslation";
 import {
   Select,
   SelectContent,
@@ -66,6 +67,8 @@ const EditTenderModal = ({
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
+    const { t } = useTranslation();
+
     const { id, value, files } = e.target as HTMLInputElement;
     if (files) {
       setFormData({ ...formData, attachments: files[0] });
@@ -99,6 +102,7 @@ const EditTenderModal = ({
       </Dialog>
     );
   }
+  const { t } = useTranslation();
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -125,7 +129,7 @@ const EditTenderModal = ({
                 </div>
 
                 <div className="grid gap-2">
-                  <Label htmlFor="description">Description</Label>
+                  <Label htmlFor="description">{t("description")}</Label>
                   <Textarea
                     id="description"
                     value={formData.description}
@@ -138,7 +142,7 @@ const EditTenderModal = ({
 
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                   <div className="grid gap-2">
-                    <Label htmlFor="category">Category</Label>
+                    <Label htmlFor="category">{t("category")}</Label>
                     <Select
                       value={formData.category}
                       onValueChange={handleSelectChange}
@@ -149,13 +153,19 @@ const EditTenderModal = ({
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="construction">
-                          Construction
+                          {t("construction")}
                         </SelectItem>
                         <SelectItem value="it-services">IT Services</SelectItem>
-                        <SelectItem value="consulting">Consulting</SelectItem>
-                        <SelectItem value="supplies">Supplies</SelectItem>
-                        <SelectItem value="logistics">Logistics</SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
+                        <SelectItem value="consulting">
+                          {t("consulting")}
+                        </SelectItem>
+                        <SelectItem value="supplies">
+                          {t("supplies")}
+                        </SelectItem>
+                        <SelectItem value="logistics">
+                          {t("logistics")}
+                        </SelectItem>
+                        <SelectItem value="other">{t("other")}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -175,7 +185,7 @@ const EditTenderModal = ({
                 </div>
 
                 <div className="grid gap-2">
-                  <Label htmlFor="location">Location</Label>
+                  <Label htmlFor="location">{t("location")}</Label>
                   <Input
                     id="location"
                     value={formData.location}

@@ -29,6 +29,7 @@ import {
 } from "./ui/breadcrumb";
 import CreateTenderModal from "./CreateTenderModal";
 
+import { useTranslation } from "../lib/hooks/useTranslation";
 interface NavbarProps {
   sidebarOpen: boolean;
   setSidebarOpen: (open: boolean) => void;
@@ -45,7 +46,7 @@ export default function Navbar({
   sidebarLinks,
 }: NavbarProps) {
   const pathname = usePathname();
-
+  const { t } = useTranslation();
   const currentUser = {
     name: "Ahmed Al-Mahmoud",
     email: "ahmed@example.com",
@@ -86,7 +87,7 @@ export default function Navbar({
             <BreadcrumbList>
               {pathSegments.length === 0 ? (
                 <BreadcrumbItem>
-                  <BreadcrumbPage>Dashboard</BreadcrumbPage>
+                  <BreadcrumbPage>{t("dashboard")}</BreadcrumbPage>
                 </BreadcrumbItem>
               ) : (
                 pathSegments.map((segment, index) => {
@@ -136,7 +137,7 @@ export default function Navbar({
                   variant="ghost"
                   size="icon"
                   className="relative text-gray-600 hover:text-gray-900"
-                  aria-label="Notifications"
+                  aria-label={t("notifications")}
                 >
                   <Bell className="h-5 w-5" />
                 </Button>
@@ -155,7 +156,7 @@ export default function Navbar({
                 >
                   <div className="p-3">
                     <div className="text-sm font-semibold px-2 py-1">
-                      Notifications
+                      {t("notifications")}
                     </div>
                     <hr className="my-2" />
                     <div className="flex flex-col space-y-3 max-h-60 overflow-y-auto">
@@ -181,7 +182,9 @@ export default function Navbar({
                         <span className="font-medium text-gray-800">
                           You received a new bid on 'Office Renovation Project'.
                         </span>
-                        <span className="text-xs text-gray-500">Yesterday</span>
+                        <span className="text-xs text-gray-500">
+                          {t("yesterday")}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -217,7 +220,7 @@ export default function Navbar({
                       onClick={() => setProfileDropdownOpen(false)}
                     >
                       <UserCircle className="w-4 h-4 text-gray-500" />
-                      Profile
+                      {t("profile")}
                     </Link>
                     <Link
                       href="/dashboard/settings"
@@ -225,7 +228,7 @@ export default function Navbar({
                       onClick={() => setProfileDropdownOpen(false)}
                     >
                       <Settings className="w-4 h-4 text-gray-500" />
-                      Settings
+                      {t("settings")}
                     </Link>
                     <Link
                       href="/dashboard/help"
@@ -233,7 +236,7 @@ export default function Navbar({
                       onClick={() => setProfileDropdownOpen(false)}
                     >
                       <LifeBuoy className="w-4 h-4 text-gray-500" />
-                      Help
+                      {t("help")}
                     </Link>
                     <div className="border-t border-gray-200 my-1" />
                     <Link

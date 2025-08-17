@@ -24,6 +24,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 
+import { useTranslation } from '../../../../../lib/hooks/useTranslation';
 // Mock bidder data
 const getBidderProfileData = (id: string) => {
   const profiles = {
@@ -98,6 +99,8 @@ const getBidderProfileData = (id: string) => {
 };
 
 export default function BidderProfilePage() {
+    const { t } = useTranslation();
+
   const params = useParams();
   const router = useRouter();
   const bidderId = params.id as string;
@@ -140,7 +143,7 @@ export default function BidderProfilePage() {
       <CardContent className="p-0 md:p-6 space-y-6 pt-3">
         {/* About */}
         <section className="break-words">
-        <h3 className="text-lg font-semibold mb-2">About</h3>
+        <h3 className="text-lg font-semibold mb-2">{t('about')}</h3>
         <p className="text-gray-700">{bidder.bio}</p>
         </section>
 

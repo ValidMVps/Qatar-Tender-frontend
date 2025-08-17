@@ -1,10 +1,12 @@
 import { Building2, LayoutDashboard } from "lucide-react";
 import Link from "next/link";
 import React from "react";
-import { LanguageToggle } from "./language-toggle";
 import { Button } from "./ui/button";
 
+import { useTranslation } from '../lib/hooks/useTranslation';
 function Headerauth() {
+    const { t } = useTranslation();
+
   return (
     <header className="bg-white border-b   border-gray-200 fixed w-full top-0 z-50">
       <div className=" mx-auto px-16 py-4 flex items-center justify-between">
@@ -22,31 +24,31 @@ function Headerauth() {
             href="#features"
             className="text-gray-600 hover:text-gray-900 transition-colors text-sm font-medium scroll-smooth"
           >
-            Features
+            {t('features')}
           </a>
           <a
             href="#process"
             className="text-gray-600 hover:text-gray-900 transition-colors text-sm font-medium scroll-smooth"
           >
-            Process
+            {t('process')}
           </a>
           <a
             href="#pricing"
             className="text-gray-600 hover:text-gray-900 transition-colors text-sm font-medium scroll-smooth"
           >
-            Pricing
+            {t('pricing')}
           </a>{" "}
           <a
             href="#features"
             className="text-gray-600 hover:text-gray-900 transition-colors text-sm font-medium scroll-smooth"
           >
-            Features
+            {t('features')}
           </a>
           <a
             href="#process"
             className="text-gray-600 hover:text-gray-900 transition-colors text-sm font-medium scroll-smooth"
           >
-            Process
+            {t('process')}
           </a>
         </div>
         <nav className="hidden md:flex items-center space-x-8">

@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { useTranslation } from '..\../../../lib/hooks/useTranslation';
 import {
   Popover,
   PopoverContent,
@@ -466,6 +467,8 @@ const chatMessages = [
 ];
 
 export default function TenderDetailPage() {
+    const { t } = useTranslation();
+
   const params = useParams();
   const tenderId = params.id as string;
   const tenderData = getTenderData(tenderId);
@@ -725,7 +728,7 @@ export default function TenderDetailPage() {
                                     className="bg-transparent text-gray-600 border-gray-200 hover:bg-gray-50"
                                   >
                                     <X className="h-4 w-4 mr-1" />
-                                    Reject
+                                    {t('reject')}
                                   </Button>
                                 </>
                               )}
@@ -838,7 +841,7 @@ export default function TenderDetailPage() {
                                 className="bg-black hover:bg-gray-800"
                               >
                                 <Send className="h-4 w-4 mr-1" />
-                                Reply
+                                {t('reply')}
                               </Button>
                             </div>
                           )}

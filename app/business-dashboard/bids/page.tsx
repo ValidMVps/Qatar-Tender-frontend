@@ -64,6 +64,7 @@ import {
 } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 
+import { useTranslation } from '../../../lib/hooks/useTranslation';
 interface Bid {
   id: string;
   tenderId: string;
@@ -188,6 +189,8 @@ const sampleBids: Bid[] = [
 ];
 
 export default function MyBidsPage() {
+    const { t } = useTranslation();
+
   const [activeTab, setActiveTab] = useState("all");
   const [bids, setBids] = useState<Bid[]>(sampleBids);
   const [showBidDetailsModal, setShowBidDetailsModal] = useState(false);
@@ -423,11 +426,11 @@ export default function MyBidsPage() {
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-6 rounded-lg border bg-gray-50 p-1">
           <TabsTrigger value="all">All</TabsTrigger>
-          <TabsTrigger value="active">Active</TabsTrigger>
-          <TabsTrigger value="awarded">Awarded</TabsTrigger>
-          <TabsTrigger value="rejected">Rejected</TabsTrigger>
-          <TabsTrigger value="closed">Closed</TabsTrigger>
-          <TabsTrigger value="pending">Pending</TabsTrigger>
+          <TabsTrigger value="active">{t('active')}</TabsTrigger>
+          <TabsTrigger value="awarded">{t('awarded')}</TabsTrigger>
+          <TabsTrigger value="rejected">{t('rejected')}</TabsTrigger>
+          <TabsTrigger value="closed">{t('closed')}</TabsTrigger>
+          <TabsTrigger value="pending">{t('pending')}</TabsTrigger>
         </TabsList>
         <TabsContent value={activeTab} className="mt-6">
           <div className="bg-white rounded-lg shadow-md border overflow-hidden">
@@ -435,12 +438,12 @@ export default function MyBidsPage() {
               <TableHeader className="bg-gray-50">
                 <TableRow>
                   <TableHead className="px-6 py-3">Tender Title</TableHead>
-                  <TableHead className="px-6 py-3">Category</TableHead>
+                  <TableHead className="px-6 py-3">{t('category')}</TableHead>
                   <TableHead className="px-6 py-3">Your Bid</TableHead>
-                  <TableHead className="px-6 py-3">Submitted</TableHead>
-                  <TableHead className="px-6 py-3">Status</TableHead>
+                  <TableHead className="px-6 py-3">{t('submitted')}</TableHead>
+                  <TableHead className="px-6 py-3">{t('status')}</TableHead>
                   <TableHead className="px-6 py-3 text-right">
-                    Actions
+                    {t('actions')}
                   </TableHead>
                 </TableRow>
               </TableHeader>
@@ -495,14 +498,14 @@ export default function MyBidsPage() {
                               onClick={() => handleViewBidDetails(bid)}
                             >
                               <Eye className="h-4 w-4 mr-2" />
-                              View
+                              {t('view')}
                             </DropdownMenuItem>
                             {bid.status === "pending" && (
                               <DropdownMenuItem
                                 onClick={() => handleEditBid(bid.id)}
                               >
                                 <Pencil className="h-4 w-4 mr-2" />
-                                Edit
+                                {t('edit')}
                               </DropdownMenuItem>
                             )}
                             <DropdownMenuSeparator />
@@ -511,7 +514,7 @@ export default function MyBidsPage() {
                               className="text-red-600"
                             >
                               <Trash2 className="h-4 w-4 mr-2" />
-                              Delete
+                              {t('delete')}
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -654,11 +657,11 @@ export default function MyBidsPage() {
               </Link>
               {selectedBidForDetails.status === "rejected" && (
                 <Button onClick={() => handleReapply(selectedBidForDetails.id)}>
-                  Reapply
+                  {t('reapply')}
                 </Button>
               )}
               <Button onClick={() => setShowBidDetailsModal(false)}>
-                Close
+                {t('close')}
               </Button>
             </DialogFooter>
           </DialogContent>

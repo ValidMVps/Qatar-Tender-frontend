@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
+import { useTranslation } from '../../../lib/hooks/useTranslation';
 interface Notification {
   id: string;
   title: string;
@@ -31,6 +32,8 @@ interface Notification {
 }
 
 export default function NotificationsPage() {
+    const { t } = useTranslation();
+
   const [notifications, setNotifications] = useState<Notification[]>([
     {
       id: "1",
@@ -141,7 +144,7 @@ export default function NotificationsPage() {
           className="border rounded px-3 py-2 text-neutral-950"
         >
           <option value="">All Categories</option>
-          <option value="Tender">Tender</option>
+          <option value="Tender">{t('tender')}</option>
           <option value="Bid">Bid</option>
         </select>
       </div>

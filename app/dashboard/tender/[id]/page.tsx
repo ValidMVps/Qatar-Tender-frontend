@@ -7,7 +7,6 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { AuthGuard } from "@/components/auth-guard";
-import { LanguageToggle } from "@/components/language-toggle";
 import {
   Building2,
   ArrowLeft,
@@ -35,6 +34,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { ProviderBadge } from "@/components/provider-badge"; // Assuming this component exists
+import useTranslation from "@/lib/hooks/useTranslation";
 
 // Sample data - this would come from API based on tender ID
 const getTenderData = (id: string) => {
@@ -466,6 +466,8 @@ const chatMessages = [
 ];
 
 export default function TenderDetailPage() {
+  const { t } = useTranslation();
+
   const params = useParams();
   const tenderId = params.id as string;
   const tenderData = getTenderData(tenderId);
@@ -725,7 +727,7 @@ export default function TenderDetailPage() {
                                     className="bg-transparent text-gray-600 border-gray-200 hover:bg-gray-50"
                                   >
                                     <X className="h-4 w-4 mr-1" />
-                                    Reject
+                                    {t("reject")}
                                   </Button>
                                 </>
                               )}
@@ -838,7 +840,7 @@ export default function TenderDetailPage() {
                                 className="bg-black hover:bg-gray-800"
                               >
                                 <Send className="h-4 w-4 mr-1" />
-                                Reply
+                                {t("reply")}
                               </Button>
                             </div>
                           )}
@@ -874,8 +876,8 @@ export default function TenderDetailPage() {
                     Content Locked
                   </h3>
                   <p className="text-gray-700 max-w-md mx-auto mb-4">
-                    Bids and Q&A sections are hidden until your tender is
-                    active by an administrator. This helps ensure quality and
+                    Bids and Q&A sections are hidden until your tender is active
+                    by an administrator. This helps ensure quality and
                     compliance with platform guidelines.
                   </p>
                   <Badge className="bg-gray-100 text-gray-800 border-gray-200">
@@ -888,8 +890,6 @@ export default function TenderDetailPage() {
           </div>
         )}
       </div>
-
-    
     </div>
   );
 }

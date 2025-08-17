@@ -10,7 +10,10 @@ import { ProjectDetailsSidebar } from "@/components/project-details-sidebar";
 import ChatSection from "@/components/ChatSection";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { useTranslation } from '../../../lib/hooks/useTranslation';
 export default function Component() {
+    const { t } = useTranslation();
+
   const [isReviewDialogOpen, setIsReviewDialogOpen] = React.useState(false);
   const [isProjectListOpen, setIsProjectListOpen] = React.useState(false); // State for mobile project list sheet
   const [isProjectDetailsOpen, setIsProjectDetailsOpen] = React.useState(false); // State for mobile project details sheet
@@ -45,12 +48,12 @@ export default function Component() {
               <div className="flex items-center h-16 justify-between px-4 py-3 border-b">
                 <div className="flex items-center gap-2">
                   <Inbox className="h-5 w-5 text-muted-foreground" />
-                  <span className="font-semibold">Inbox</span>
+                  <span className="font-semibold">{t('inbox')}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-muted-foreground">All</span>
                   <Switch />
-                  <span className="text-sm text-muted-foreground">Unread</span>
+                  <span className="text-sm text-muted-foreground">{t('unread')}</span>
                 </div>
               </div>
               {/* TabsList */}
@@ -95,7 +98,7 @@ export default function Component() {
                       flooring, lighting, and furniture.
                     </div>
                     <div className="flex flex-wrap gap-2 pt-2">
-                      <Badge variant="secondary">Active</Badge>
+                      <Badge variant="secondary">{t('active')}</Badge>
                     </div>
                   </Link>
                   {/* Project 2 */}
@@ -117,7 +120,7 @@ export default function Component() {
                       focusing on IoT, public safety, and energy efficiency.
                     </div>
                     <div className="flex flex-wrap gap-2 pt-2">
-                      <Badge variant="secondary">Active</Badge>
+                      <Badge variant="secondary">{t('active')}</Badge>
                     </div>
                   </Link>
                   {/* Project 3 */}
@@ -140,7 +143,7 @@ export default function Component() {
                       improvements.
                     </div>
                     <div className="flex flex-wrap gap-2 pt-2">
-                      <Badge variant="secondary">Active</Badge>
+                      <Badge variant="secondary">{t('active')}</Badge>
                     </div>
                   </Link>
                   {/* Project 4 */}
@@ -162,7 +165,7 @@ export default function Component() {
                       green corridors across the country.
                     </div>
                     <div className="flex flex-wrap gap-2 pt-2">
-                      <Badge variant="secondary">Active</Badge>
+                      <Badge variant="secondary">{t('active')}</Badge>
                     </div>
                   </Link>
                 </nav>
@@ -202,13 +205,13 @@ export default function Component() {
                 <div className="flex items-center h-16 justify-between px-4 py-3 border-b">
                   <div className="flex items-center gap-2">
                     <Inbox className="h-5 w-5 text-muted-foreground" />
-                    <span className="font-semibold">Inbox</span>
+                    <span className="font-semibold">{t('inbox')}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-muted-foreground">All</span>
                     <Switch />
                     <span className="text-sm text-muted-foreground">
-                      Unread
+                      {t('unread')}
                     </span>
                   </div>
                 </div>
@@ -243,7 +246,7 @@ export default function Component() {
                         flooring, lighting, and furniture.
                       </div>
                       <div className="flex flex-wrap gap-2 pt-2">
-                        <Badge variant="secondary">Active</Badge>
+                        <Badge variant="secondary">{t('active')}</Badge>
                       </div>
                     </Link>
                     {/* Project 2 */}
@@ -265,7 +268,7 @@ export default function Component() {
                         focusing on IoT, public safety, and energy efficiency.
                       </div>
                       <div className="flex flex-wrap gap-2 pt-2">
-                        <Badge variant="secondary">Active</Badge>
+                        <Badge variant="secondary">{t('active')}</Badge>
                       </div>
                     </Link>
                     {/* Project 3 */}
@@ -288,7 +291,7 @@ export default function Component() {
                         improvements.
                       </div>
                       <div className="flex flex-wrap gap-2 pt-2">
-                        <Badge variant="secondary">Active</Badge>
+                        <Badge variant="secondary">{t('active')}</Badge>
                       </div>
                     </Link>
                     {/* Project 4 */}
@@ -310,7 +313,7 @@ export default function Component() {
                         green corridors across the country.
                       </div>
                       <div className="flex flex-wrap gap-2 pt-2">
-                        <Badge variant="secondary">Active</Badge>
+                        <Badge variant="secondary">{t('active')}</Badge>
                       </div>
                     </Link>
                   </nav>
@@ -362,12 +365,12 @@ export default function Component() {
               <div className="flex items-center h-16 justify-between px-4 py-3 border-b">
                 <div className="flex items-center gap-2">
                   <Inbox className="h-5 w-5 text-muted-foreground" />
-                  <span className="font-semibold">Inbox</span>
+                  <span className="font-semibold">{t('inbox')}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-muted-foreground">All</span>
                   <Switch />
-                  <span className="text-sm text-muted-foreground">Unread</span>
+                  <span className="text-sm text-muted-foreground">{t('unread')}</span>
                 </div>
               </div>
               {/* TabsList */}
@@ -412,7 +415,7 @@ export default function Component() {
                       flooring, lighting, and furniture.
                     </div>
                     <div className="flex flex-wrap gap-2 pt-2">
-                      <Badge variant="secondary">Active</Badge>
+                      <Badge variant="secondary">{t('active')}</Badge>
                     </div>
                   </Link>
                   {/* Project 2 */}
@@ -434,7 +437,7 @@ export default function Component() {
                       focusing on IoT, public safety, and energy efficiency.
                     </div>
                     <div className="flex flex-wrap gap-2 pt-2">
-                      <Badge variant="secondary">Active</Badge>
+                      <Badge variant="secondary">{t('active')}</Badge>
                     </div>
                   </Link>
                   {/* Project 3 */}
@@ -457,7 +460,7 @@ export default function Component() {
                       improvements.
                     </div>
                     <div className="flex flex-wrap gap-2 pt-2">
-                      <Badge variant="secondary">Active</Badge>
+                      <Badge variant="secondary">{t('active')}</Badge>
                     </div>
                   </Link>
                   {/* Project 4 */}
@@ -479,7 +482,7 @@ export default function Component() {
                       green corridors across the country.
                     </div>
                     <div className="flex flex-wrap gap-2 pt-2">
-                      <Badge variant="secondary">Active</Badge>
+                      <Badge variant="secondary">{t('active')}</Badge>
                     </div>
                   </Link>
                 </nav>
@@ -519,13 +522,13 @@ export default function Component() {
                 <div className="flex items-center h-16 justify-between px-4 py-3 border-b">
                   <div className="flex items-center gap-2">
                     <Inbox className="h-5 w-5 text-muted-foreground" />
-                    <span className="font-semibold">Inbox</span>
+                    <span className="font-semibold">{t('inbox')}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-muted-foreground">All</span>
                     <Switch />
                     <span className="text-sm text-muted-foreground">
-                      Unread
+                      {t('unread')}
                     </span>
                   </div>
                 </div>
@@ -560,7 +563,7 @@ export default function Component() {
                         flooring, lighting, and furniture.
                       </div>
                       <div className="flex flex-wrap gap-2 pt-2">
-                        <Badge variant="secondary">Active</Badge>
+                        <Badge variant="secondary">{t('active')}</Badge>
                       </div>
                     </Link>
                     {/* Project 2 */}
@@ -582,7 +585,7 @@ export default function Component() {
                         focusing on IoT, public safety, and energy efficiency.
                       </div>
                       <div className="flex flex-wrap gap-2 pt-2">
-                        <Badge variant="secondary">Active</Badge>
+                        <Badge variant="secondary">{t('active')}</Badge>
                       </div>
                     </Link>
                     {/* Project 3 */}
@@ -605,7 +608,7 @@ export default function Component() {
                         improvements.
                       </div>
                       <div className="flex flex-wrap gap-2 pt-2">
-                        <Badge variant="secondary">Active</Badge>
+                        <Badge variant="secondary">{t('active')}</Badge>
                       </div>
                     </Link>
                     {/* Project 4 */}
@@ -627,7 +630,7 @@ export default function Component() {
                         green corridors across the country.
                       </div>
                       <div className="flex flex-wrap gap-2 pt-2">
-                        <Badge variant="secondary">Active</Badge>
+                        <Badge variant="secondary">{t('active')}</Badge>
                       </div>
                     </Link>
                   </nav>

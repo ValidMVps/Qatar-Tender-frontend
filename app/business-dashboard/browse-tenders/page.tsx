@@ -37,6 +37,7 @@ import {
 } from "@/components/ui/tooltip";
 import { TenderCard } from "@/components/tender-card";
 
+import { useTranslation } from '../../../lib/hooks/useTranslation';
 // Sample data for tenders (updated to match screenshot details and new structure)
 const sampleTenders = [
   {
@@ -273,6 +274,8 @@ const projectLengths = [
 ];
 
 export default function ServiceProvidingDashboardPage() {
+    const { t } = useTranslation();
+
   const [searchTerm, setSearchTerm] = useState("webflow");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedExperienceLevels, setSelectedExperienceLevels] = useState<
@@ -489,7 +492,7 @@ export default function ServiceProvidingDashboardPage() {
                 {/* Category Filter */}
                 <AccordionItem value="category" className="border-b">
                   <AccordionTrigger className="font-semibold text-gray-800 hover:no-underline">
-                    Category
+                    {t('category')}
                   </AccordionTrigger>
                   <AccordionContent className="pt-2 pb-4">
                     <Select onValueChange={handleCategoryChange}>

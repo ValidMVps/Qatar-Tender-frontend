@@ -48,6 +48,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import EditTenderModal from "@/components/EdittenderModal";
 
+import { useTranslation } from '../../../lib/hooks/useTranslation';
 // Sample data with more diverse scenarios
 const sampleTenders = [
   {
@@ -235,6 +236,8 @@ const sampleTenders = [
 ];
 
 export default function MyTendersPage() {
+    const { t } = useTranslation();
+
   const [activeTab, setActiveTab] = useState("all");
   const [tenders, setTenders] = useState(sampleTenders);
   const [searchQuery, setSearchQuery] = useState("");
@@ -522,11 +525,11 @@ export default function MyTendersPage() {
         <TabsList className=" w-full grid-cols-3 sm:grid-cols-6 gap-2 md:grid hidden">
           {/* Changed grid-cols-6 on small screens and below to grid-cols-3 for better wrapping */}
           <TabsTrigger value="all">All</TabsTrigger>
-          <TabsTrigger value="active">Active</TabsTrigger>
-          <TabsTrigger value="awarded">Awarded</TabsTrigger>
-          <TabsTrigger value="closed">Closed</TabsTrigger>
-          <TabsTrigger value="rejected">Rejected</TabsTrigger>
-          <TabsTrigger value="completed">Completed</TabsTrigger>
+          <TabsTrigger value="active">{t('active')}</TabsTrigger>
+          <TabsTrigger value="awarded">{t('awarded')}</TabsTrigger>
+          <TabsTrigger value="closed">{t('closed')}</TabsTrigger>
+          <TabsTrigger value="rejected">{t('rejected')}</TabsTrigger>
+          <TabsTrigger value="completed">{t('completed')}</TabsTrigger>
         </TabsList>
         <TabsContent value={activeTab} className="mt-4">
           <div className="space-y-2 md:space-y-4">
@@ -597,7 +600,7 @@ export default function MyTendersPage() {
                                 className="text-blue-600 hover:text-blue-700 md:flex hidden hover:bg-blue-50"
                               >
                                 <Eye className="h-4 w-4 mr-1" />
-                                View
+                                {t('view')}
                               </Button>
                             </Link>
                           )}
@@ -685,7 +688,7 @@ export default function MyTendersPage() {
                               className="bg-red-600 hover:bg-red-700 ml-0 md:ml-4"
                             >
                               <RefreshCcw className="h-4 w-4 mr-1" />
-                              Reapply
+                              {t('reapply')}
                             </Button>
                           </div>
                         )}
@@ -756,7 +759,7 @@ export default function MyTendersPage() {
                     })
                   }
                 >
-                  Cancel
+                  {t('cancel')}
                 </Button>
                 <Button
                   size="sm"
@@ -809,7 +812,7 @@ export default function MyTendersPage() {
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
               <label htmlFor="title" className="text-right">
-                Title
+                {t('title')}
               </label>
               <Input
                 id="title"
@@ -825,7 +828,7 @@ export default function MyTendersPage() {
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <label htmlFor="description" className="text-right">
-                Description
+                {t('description')}
               </label>
               <Textarea
                 id="description"
@@ -862,9 +865,9 @@ export default function MyTendersPage() {
               variant="outline"
               onClick={() => setShowReapplyModal({ show: false, tender: null })}
             >
-              Cancel
+              {t('cancel')}
             </Button>
-            <Button onClick={submitReapply}>Reapply</Button>
+            <Button onClick={submitReapply}>{t('reapply')}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

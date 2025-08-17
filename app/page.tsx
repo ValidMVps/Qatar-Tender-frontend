@@ -22,7 +22,8 @@ import {
 } from "lucide-react";
 import Lenis from "lenis";
 import Link from "next/link";
-import { LanguageSwitcher } from "@/components/Languageswitcher";
+
+import { useTranslation } from "../lib/hooks/useTranslation";
 
 interface NavLink {
   href: string;
@@ -272,7 +273,7 @@ const styles = `
 function Navbar() {
   const [isScrolled, setIsScrolled] = useState<boolean>(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
-
+  const { t } = useTranslation();
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
@@ -327,7 +328,7 @@ function Navbar() {
                 variant="ghost"
                 className="text-gray-700 hover:text-blue-400 hover:bg-gray-50 font-medium px-4 py-2 rounded-lg transition-all duration-200"
               >
-                Login
+                {t("login")}
               </Button>
             </Link>
             <Link href="/signup">
@@ -365,7 +366,7 @@ function Navbar() {
                   variant="ghost"
                   className="w-full text-gray-700 hover:text-blue-400 hover:bg-gray-50 font-medium py-2 rounded-lg transition-all duration-200"
                 >
-                  Login
+                  {t("login")}
                 </Button>
                 <Button className="w-full bg-gradient-to-r from-blue-400 to-blue-300 hover:from-blue-300 hover:to-blue-200 text-white font-semibold py-2 rounded-lg transition-all duration-200 hover:shadow-md">
                   Sign Up
@@ -381,6 +382,7 @@ function Navbar() {
 
 // Hero Section Component
 function HeroSection() {
+  const { t } = useTranslation();
   return (
     <section
       id="home"
@@ -456,6 +458,7 @@ function HeroSection() {
 
 // Features Section Component
 function FeaturesSection() {
+  const { t } = useTranslation();
   const features = [
     {
       icon: "📊",
@@ -503,7 +506,7 @@ function FeaturesSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16 reveal-on-scroll opacity-0 translate-y-8 transition-all duration-700">
           <div className="inline-block bg-gradient-to-r from-gray-200 to-blue-100 text-gray-600 px-4 py-2 rounded-full text-sm font-medium mb-6">
-            Features
+            {t("features")}
           </div>
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 font-sans mb-4">
             Explore the powerful features
@@ -538,6 +541,7 @@ function FeaturesSection() {
 
 // Dashboard Showcase Section Component
 function DashboardShowcaseSection() {
+  const { t } = useTranslation();
   return (
     <section className="py-20 bg-gradient-to-b from-blue-50/30 to-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -713,19 +717,19 @@ function DashboardShowcaseSection() {
               variant="outline"
               className="border-gray-300 text-gray-700 hover:bg-gray-50 px-6 py-2 rounded-full bg-transparent"
             >
-              Construction
+              {t("construction")}
             </Button>
             <Button
               variant="outline"
               className="border-gray-300 text-gray-700 hover:bg-gray-50 px-6 py-2 rounded-full bg-transparent"
             >
-              Engineering
+              {t("engineering")}
             </Button>
             <Button
               variant="outline"
               className="border-gray-300 text-gray-700 hover:bg-gray-50 px-6 py-2 rounded-full bg-transparent"
             >
-              Consulting
+              {t("consulting")}
             </Button>
           </div>
         </div>
@@ -770,6 +774,7 @@ function DashboardShowcaseSection() {
 
 // How It Works Section Component
 function HowItWorksSection() {
+  const { t } = useTranslation();
   const steps = [
     {
       icon: "💾",
@@ -889,6 +894,7 @@ function HowItWorksSection() {
 
 // Testimonials Section Component
 function TestimonialsSection() {
+  const { t } = useTranslation();
   const testimonials = [
     {
       name: "Ahmed Al-Mansouri",
@@ -976,7 +982,7 @@ function TestimonialsSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-4 reveal-on-scroll opacity-0 translate-y-8 transition-all duration-700">
           <div className="inline-block bg-gradient-to-r from-gray-200 to-blue-100 text-gray-600 px-4 py-2 rounded-full text-sm font-medium mb-6">
-            Testimonial
+            {t("testimonial")}
           </div>
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 font-sans mb-16">
             Hear what our users say
@@ -1087,6 +1093,7 @@ function TestimonialsSection() {
 
 // FAQ Section Component
 function FAQSection() {
+  const { t } = useTranslation();
   const [openFAQ, setOpenFAQ] = useState(0);
 
   const faqs = [
@@ -1130,7 +1137,7 @@ function FAQSection() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16 reveal-on-scroll opacity-0 translate-y-8 transition-all duration-700">
           <div className="inline-block bg-gradient-to-r from-gray-200 to-blue-100 text-gray-600 px-4 py-2 rounded-full text-sm font-medium mb-6">
-            FAQs
+            {t("faqs")}
           </div>
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 font-sans mb-4">
             Everything you need to know
@@ -1172,6 +1179,7 @@ function FAQSection() {
 
 // CTA Section Component
 function CTASection() {
+  const { t } = useTranslation();
   return (
     <section className="py-20 bg-gradient-to-b from-white to-blue-50/30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1210,6 +1218,7 @@ function CTASection() {
 
 // Footer Component
 function Footer() {
+  const { t } = useTranslation();
   return (
     <footer
       id="contact"
@@ -1241,7 +1250,7 @@ function Footer() {
                   href="#features"
                   className="text-gray-300 hover:text-blue-300 transition-colors duration-200"
                 >
-                  Features
+                  {t("features")}
                 </a>
               </li>
               <li>
@@ -1265,7 +1274,7 @@ function Footer() {
                   href="#"
                   className="text-gray-300 hover:text-blue-300 transition-colors duration-200"
                 >
-                  Support
+                  {t("support")}
                 </a>
               </li>
             </ul>
@@ -1302,6 +1311,7 @@ function Footer() {
 
 // Main Page Component
 export default function HomePage() {
+  const { t } = useTranslation();
   useEffect(() => {
     let lenis: any;
 
@@ -1607,7 +1617,7 @@ export default function HomePage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16 reveal-on-scroll opacity-0 translate-y-8 transition-all duration-700">
               <div className="inline-block bg-gradient-to-r from-gray-200 to-blue-100 text-gray-600 px-4 py-2 rounded-full text-sm font-medium mb-6">
-                Features
+                {t("features")}
               </div>
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 font-sans mb-4">
                 Explore the powerful features
@@ -1761,19 +1771,19 @@ export default function HomePage() {
                         variant="outline"
                         className="border-gray-300 text-gray-700 hover:bg-gray-50 px-6 py-2 rounded-full bg-transparent"
                       >
-                        Construction
+                        {t("construction")}
                       </Button>
                       <Button
                         variant="outline"
                         className="border-gray-300 text-gray-700 hover:bg-gray-50 px-6 py-2 rounded-full bg-transparent"
                       >
-                        Engineering
+                        {t("engineering")}
                       </Button>
                       <Button
                         variant="outline"
                         className="border-gray-300 text-gray-700 hover:bg-gray-50 px-6 py-2 rounded-full bg-transparent"
                       >
-                        Consulting
+                        {t("consulting")}
                       </Button>
                     </div>
                   </div>
@@ -1915,7 +1925,7 @@ export default function HomePage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-4 reveal-on-scroll opacity-0 translate-y-8 transition-all duration-700">
               <div className="inline-block bg-gradient-to-r from-gray-200 to-blue-100 text-gray-600 px-4 py-2 rounded-full text-sm font-medium mb-6">
-                Testimonial
+                {t("testimonial")}
               </div>
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 font-sans mb-16">
                 Hear what our users say
@@ -2030,7 +2040,7 @@ export default function HomePage() {
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16 reveal-on-scroll opacity-0 translate-y-8 transition-all duration-700">
               <div className="inline-block bg-gradient-to-r from-gray-200 to-blue-100 text-gray-600 px-4 py-2 rounded-full text-sm font-medium mb-6">
-                FAQs
+                {t("faqs")}
               </div>
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 font-sans mb-4">
                 Everything you need to know
@@ -2132,7 +2142,7 @@ export default function HomePage() {
                       href="#features"
                       className="text-gray-300 hover:text-blue-300 transition-colors duration-200"
                     >
-                      Features
+                      {t("features")}
                     </a>
                   </li>
                   <li>
@@ -2156,7 +2166,7 @@ export default function HomePage() {
                       href="#"
                       className="text-gray-300 hover:text-blue-300 transition-colors duration-200"
                     >
-                      Support
+                      {t("support")}
                     </a>
                   </li>
                 </ul>

@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useTranslation } from '../../../lib/hooks/useTranslation';
 import {
   Select,
   SelectContent,
@@ -35,6 +36,8 @@ import {
 } from "lucide-react";
 
 export default function Component() {
+    const { t } = useTranslation();
+
   const [isEditing, setIsEditing] = useState(false);
   const [profileCompletion, setProfileCompletion] = useState(75); // Example value
   const [isProfileCompleted, setIsProfileCompleted] = useState(false);
@@ -182,7 +185,7 @@ export default function Component() {
                       className="rounded-md px-4 py-2 sm:px-6 sm:py-2 flex items-center gap-2 bg-transparent text-sm sm:text-base"
                     >
                       <XIcon className="w-4 h-4" />
-                      Cancel
+                      {t('cancel')}
                     </Button>
                   </>
                 )}
@@ -253,7 +256,7 @@ export default function Component() {
                     htmlFor="email"
                     className="text-gray-700 text-sm sm:text-base"
                   >
-                    Email
+                    {t('email')}
                   </Label>
                   <Input
                     id="email"
@@ -269,7 +272,7 @@ export default function Component() {
                     htmlFor="mobile"
                     className="text-gray-700 text-sm sm:text-base"
                   >
-                    Mobile
+                    {t('mobile')}
                   </Label>
                   <div className="flex gap-2 mt-1">
                     <Select
@@ -278,7 +281,7 @@ export default function Component() {
                       disabled={areInputsDisabled}
                     >
                       <SelectTrigger className="w-[100px] sm:w-[120px]">
-                        <SelectValue placeholder="Country" />
+                        <SelectValue placeholder={t('country')} />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="QA">QA +974</SelectItem>
@@ -300,7 +303,7 @@ export default function Component() {
                     htmlFor="address"
                     className="text-gray-700 text-sm sm:text-base"
                   >
-                    Address
+                    {t('address')}
                   </Label>
                   <Input
                     id="address"
@@ -374,13 +377,13 @@ export default function Component() {
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={handleCloseModal}>
-              Cancel
+              {t('cancel')}
             </Button>
             <Button
               onClick={handleConfirmCompletion}
               className="bg-blue-600 hover:bg-blue-700 text-white"
             >
-              Confirm
+              {t('confirm')}
             </Button>
           </DialogFooter>
         </DialogContent>

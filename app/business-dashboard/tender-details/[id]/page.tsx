@@ -18,6 +18,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { ApplyTenderForm } from "@/components/apply-tender-form";
+import useTranslation from "@/lib/hooks/useTranslation";
 
 interface Tender {
   id: number;
@@ -140,7 +141,7 @@ export default function TenderDetailsPage({ params }: PageProps) {
   const { id } = use(params);
   const [showApplyForm, setShowApplyForm] = useState(false);
   const tender = mockTender; // Using mock data for demonstration
-
+  const { t } = useTranslation();
   const renderStars = (rating: number) => {
     const fullStars = Math.floor(rating);
     const hasHalfStar = rating % 1 !== 0;
@@ -244,7 +245,9 @@ export default function TenderDetailsPage({ params }: PageProps) {
                 </div>
               </CardHeader>
               <CardContent>
-                <h4 className="font-semibold text-lg mb-2">Description</h4>
+                <h4 className="font-semibold text-lg mb-2">
+                  {t("description")}
+                </h4>
                 <p className="text-gray-700 mb-6">{tender.fullDescription}</p>
 
                 {/* Client Reviews Section */}

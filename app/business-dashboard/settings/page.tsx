@@ -17,7 +17,9 @@ import {
 import Image from "next/image";
 import { Moon, Sun, Upload } from "lucide-react";
 
+import { useTranslation } from '../../../lib/hooks/useTranslation';
 export default function SettingsPage() {
+
   // Company Profile States
   const [companyName, setCompanyName] = useState("Acme Solutions Inc.");
   const [industry, setIndustry] = useState("Construction");
@@ -26,7 +28,7 @@ export default function SettingsPage() {
   const [companyLogo, setCompanyLogo] = useState(
     "/placeholder.svg?height=100&width=100&text=Company+Logo"
   );
-
+    const { t } = useTranslation();
   // Notification Settings
   const [newBidNotification, setNewBidNotification] = useState(true);
   const [tenderStatusNotification, setTenderStatusNotification] =
@@ -143,7 +145,7 @@ export default function SettingsPage() {
           <Card className="px-0 border-0">
             <CardHeader className="px-0 border-0">
               <CardTitle className="text-2xl font-semibold text-gray-800">
-                Security
+                {t('security')}
               </CardTitle>
             </CardHeader>
             <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6 px-0">
@@ -196,7 +198,7 @@ export default function SettingsPage() {
                     <SelectValue placeholder="Select language" />
                   </SelectTrigger>
                   <SelectContent className="mt-3">
-                    <SelectItem value="en">English</SelectItem>
+                    <SelectItem value="en">{t('english')}</SelectItem>
                     <SelectItem value="ar">العربية (Arabic)</SelectItem>
                     <SelectItem value="es">Español (Spanish)</SelectItem>
                     <SelectItem value="fr">Français (French)</SelectItem>
@@ -205,7 +207,7 @@ export default function SettingsPage() {
               </div>
 
               <div className="space-y-3 md:col-span-3">
-                <Label className="text-base font-medium">Theme</Label>
+                <Label className="text-base font-medium">{t('theme')}</Label>
                 <p className="text-sm text-muted-foreground">
                   Select the theme for the dashboard.
                 </p>

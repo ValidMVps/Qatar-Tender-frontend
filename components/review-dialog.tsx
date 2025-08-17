@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 
+import { useTranslation } from "../lib/hooks/useTranslation";
 interface ReviewDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
@@ -28,11 +29,14 @@ export function ReviewDialog({
   const [rating, setRating] = React.useState(0);
   const [reviewText, setReviewText] = React.useState("");
   const handleSubmit = () => {
+    const { t } = useTranslation();
+
     onSubmit(rating, reviewText);
     setRating(0);
     setReviewText("");
     onOpenChange(false);
   };
+  const { t } = useTranslation();
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
@@ -46,7 +50,7 @@ export function ReviewDialog({
         <div className="grid gap-4 py-4">
           <div className="flex items-center gap-2">
             <Label htmlFor="rating" className="text-right">
-              Rating
+              {t("rating")}
             </Label>
             <div className="flex gap-1">
               {[1, 2, 3, 4, 5].map((star) => (
@@ -64,7 +68,7 @@ export function ReviewDialog({
             </div>
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="review">Review</Label>
+            <Label htmlFor="review">{t("review")}</Label>
             <Textarea
               id="review"
               placeholder="Write your review here..."
