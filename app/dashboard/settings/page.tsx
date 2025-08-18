@@ -17,10 +17,9 @@ import {
 import Image from "next/image";
 import { Moon, Sun, Upload } from "lucide-react";
 import { useTranslation } from "../../../lib/hooks/useTranslation";
+import { LanguageToggle } from "@/components/LanguageToggle";
 
 export default function SettingsPage() {
-  const { t } = useTranslation();
-
   // Company Profile States
   const [companyName, setCompanyName] = useState("Acme Solutions Inc.");
   const [industry, setIndustry] = useState("Construction");
@@ -29,7 +28,7 @@ export default function SettingsPage() {
   const [companyLogo, setCompanyLogo] = useState(
     "/placeholder.svg?height=100&width=100&text=Company+Logo"
   );
-
+  const { t } = useTranslation();
   // Notification Settings
   const [newBidNotification, setNewBidNotification] = useState(true);
   const [tenderStatusNotification, setTenderStatusNotification] =
@@ -184,6 +183,7 @@ export default function SettingsPage() {
                 <Label htmlFor="appLanguage" className="mb-4">
                   {t("application_language")}
                 </Label>
+                <LanguageToggle />
               </div>
 
               <div className="space-y-3 md:col-span-3">

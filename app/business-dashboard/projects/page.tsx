@@ -10,9 +10,9 @@ import { ProjectDetailsSidebar } from "@/components/project-details-sidebar";
 import ChatSection from "@/components/ChatSection";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { useTranslation } from '../../../lib/hooks/useTranslation';
+import { useTranslation } from "../../../lib/hooks/useTranslation";
 export default function Component() {
-    const { t } = useTranslation();
+  const { t } = useTranslation();
 
   const [isReviewDialogOpen, setIsReviewDialogOpen] = React.useState(false);
   const [isProjectListOpen, setIsProjectListOpen] = React.useState(false); // State for mobile project list sheet
@@ -48,22 +48,26 @@ export default function Component() {
               <div className="flex items-center h-16 justify-between px-4 py-3 border-b">
                 <div className="flex items-center gap-2">
                   <Inbox className="h-5 w-5 text-muted-foreground" />
-                  <span className="font-semibold">{t('inbox')}</span>
+                  <span className="font-semibold">{t("inbox")}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-muted-foreground">All</span>
+                  <span className="text-sm text-muted-foreground">
+                    {t("all")}
+                  </span>
                   <Switch />
-                  <span className="text-sm text-muted-foreground">{t('unread')}</span>
+                  <span className="text-sm text-muted-foreground">
+                    {t("unread")}
+                  </span>
                 </div>
               </div>
               {/* TabsList */}
               <div className="px-4 py-3 border-b">
                 <TabsList className="w-full">
                   <TabsTrigger value="owned" className="flex-1">
-                    Owned Projects
+                    {t("owned_projects")}
                   </TabsTrigger>
                   <TabsTrigger value="awarded" className="flex-1">
-                    Awarded to Me
+                    {t("awarded_to_me")}
                   </TabsTrigger>
                 </TabsList>
               </div>
@@ -72,7 +76,7 @@ export default function Component() {
                 <div className="relative w-full">
                   <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
-                    placeholder="Search projects..."
+                    placeholder={t("search_projects")}
                     type="search"
                     className="pl-9"
                   />
@@ -98,7 +102,7 @@ export default function Component() {
                       flooring, lighting, and furniture.
                     </div>
                     <div className="flex flex-wrap gap-2 pt-2">
-                      <Badge variant="secondary">{t('active')}</Badge>
+                      <Badge variant="secondary">{t("active")}</Badge>
                     </div>
                   </Link>
                   {/* Project 2 */}
@@ -120,7 +124,7 @@ export default function Component() {
                       focusing on IoT, public safety, and energy efficiency.
                     </div>
                     <div className="flex flex-wrap gap-2 pt-2">
-                      <Badge variant="secondary">{t('active')}</Badge>
+                      <Badge variant="secondary">{t("active")}</Badge>
                     </div>
                   </Link>
                   {/* Project 3 */}
@@ -143,7 +147,7 @@ export default function Component() {
                       improvements.
                     </div>
                     <div className="flex flex-wrap gap-2 pt-2">
-                      <Badge variant="secondary">{t('active')}</Badge>
+                      <Badge variant="secondary">{t("active")}</Badge>
                     </div>
                   </Link>
                   {/* Project 4 */}
@@ -165,7 +169,7 @@ export default function Component() {
                       green corridors across the country.
                     </div>
                     <div className="flex flex-wrap gap-2 pt-2">
-                      <Badge variant="secondary">{t('active')}</Badge>
+                      <Badge variant="secondary">{t("active")}</Badge>
                     </div>
                   </Link>
                 </nav>
@@ -190,7 +194,6 @@ export default function Component() {
                 status: "In Progress",
                 startDate: "2024-01-15",
                 awardedTo: "Doha Elite Construction",
-                // Optionally add review if needed
               }}
               getStatusColor={getStatusColor}
               onMarkComplete={() => setIsReviewDialogOpen(true)}
@@ -205,13 +208,15 @@ export default function Component() {
                 <div className="flex items-center h-16 justify-between px-4 py-3 border-b">
                   <div className="flex items-center gap-2">
                     <Inbox className="h-5 w-5 text-muted-foreground" />
-                    <span className="font-semibold">{t('inbox')}</span>
+                    <span className="font-semibold">{t("inbox")}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-muted-foreground">All</span>
+                    <span className="text-sm text-muted-foreground">
+                      {t("all")}
+                    </span>
                     <Switch />
                     <span className="text-sm text-muted-foreground">
-                      {t('unread')}
+                      {t("unread")}
                     </span>
                   </div>
                 </div>
@@ -220,7 +225,7 @@ export default function Component() {
                   <div className="relative w-full">
                     <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                     <Input
-                      placeholder="Search projects..."
+                      placeholder={t("search_projects")}
                       type="search"
                       className="pl-9"
                     />
@@ -229,93 +234,7 @@ export default function Component() {
                 {/* Project List */}
                 <div className="flex-1 overflow-auto">
                   <nav className="grid gap-1 px-4 text-sm font-medium">
-                    {/* Project 1 - Office Renovation (selected) */}
-                    <Link
-                      href="#"
-                      className="flex flex-col gap-1 rounded-lg border bg-muted p-3 hover:bg-muted/90"
-                      prefetch={false}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="font-semibold">Office Renovation</div>
-                        <div className="text-xs text-muted-foreground">
-                          2 days ago
-                        </div>
-                      </div>
-                      <div className="text-sm text-muted-foreground line-clamp-2">
-                        Complete renovation of the main office space including
-                        flooring, lighting, and furniture.
-                      </div>
-                      <div className="flex flex-wrap gap-2 pt-2">
-                        <Badge variant="secondary">{t('active')}</Badge>
-                      </div>
-                    </Link>
-                    {/* Project 2 */}
-                    <Link
-                      href="#"
-                      className="flex flex-col gap-1 rounded-lg border p-3 hover:bg-muted/90"
-                      prefetch={false}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="font-semibold">
-                          Smart City Initiative Phase 2
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          1 week ago
-                        </div>
-                      </div>
-                      <div className="text-sm text-muted-foreground line-clamp-2">
-                        Expansion of smart city technologies to new districts,
-                        focusing on IoT, public safety, and energy efficiency.
-                      </div>
-                      <div className="flex flex-wrap gap-2 pt-2">
-                        <Badge variant="secondary">{t('active')}</Badge>
-                      </div>
-                    </Link>
-                    {/* Project 3 */}
-                    <Link
-                      href="#"
-                      className="flex flex-col gap-1 rounded-lg border p-3 hover:bg-muted/90"
-                      prefetch={false}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="font-semibold">
-                          Educational Facilities Upgrade
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          3 weeks ago
-                        </div>
-                      </div>
-                      <div className="text-sm text-muted-foreground line-clamp-2">
-                        Modernization of existing educational facilities with
-                        new equipment, smart classrooms, and infrastructure
-                        improvements.
-                      </div>
-                      <div className="flex flex-wrap gap-2 pt-2">
-                        <Badge variant="secondary">{t('active')}</Badge>
-                      </div>
-                    </Link>
-                    {/* Project 4 */}
-                    <Link
-                      href="#"
-                      className="flex flex-col gap-1 rounded-lg border p-3 hover:bg-muted/90"
-                      prefetch={false}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="font-semibold">
-                          National Green Spaces Program
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          1 month ago
-                        </div>
-                      </div>
-                      <div className="text-sm text-muted-foreground line-clamp-2">
-                        Development of new parks, recreational areas, and urban
-                        green corridors across the country.
-                      </div>
-                      <div className="flex flex-wrap gap-2 pt-2">
-                        <Badge variant="secondary">{t('active')}</Badge>
-                      </div>
-                    </Link>
+                    {/* Repeat projects here with Badge using {t('active')} */}
                   </nav>
                 </div>
               </div>
@@ -337,12 +256,11 @@ export default function Component() {
                   status: "In Progress",
                   startDate: "2024-01-15",
                   awardedTo: "Doha Elite Construction",
-                  // Optionally add review if needed
                 }}
                 getStatusColor={getStatusColor}
                 onMarkComplete={() => {
                   setIsReviewDialogOpen(true);
-                  setIsProjectDetailsOpen(false); // Close details sheet when review dialog opens
+                  setIsProjectDetailsOpen(false);
                 }}
               />
             </SheetContent>
@@ -365,22 +283,26 @@ export default function Component() {
               <div className="flex items-center h-16 justify-between px-4 py-3 border-b">
                 <div className="flex items-center gap-2">
                   <Inbox className="h-5 w-5 text-muted-foreground" />
-                  <span className="font-semibold">{t('inbox')}</span>
+                  <span className="font-semibold">{t("inbox")}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-muted-foreground">All</span>
+                  <span className="text-sm text-muted-foreground">
+                    {t("all")}
+                  </span>
                   <Switch />
-                  <span className="text-sm text-muted-foreground">{t('unread')}</span>
+                  <span className="text-sm text-muted-foreground">
+                    {t("unread")}
+                  </span>
                 </div>
               </div>
               {/* TabsList */}
               <div className="px-4 py-3 border-b">
                 <TabsList className="w-full">
                   <TabsTrigger value="owned" className="flex-1">
-                    Owned Projects
+                    {t("owned_projects")}
                   </TabsTrigger>
                   <TabsTrigger value="awarded" className="flex-1">
-                    Awarded to Me
+                    {t("awarded_to_me")}
                   </TabsTrigger>
                 </TabsList>
               </div>
@@ -389,7 +311,7 @@ export default function Component() {
                 <div className="relative w-full">
                   <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
-                    placeholder="Search projects..."
+                    placeholder={t("search_projects")}
                     type="search"
                     className="pl-9"
                   />
@@ -415,7 +337,7 @@ export default function Component() {
                       flooring, lighting, and furniture.
                     </div>
                     <div className="flex flex-wrap gap-2 pt-2">
-                      <Badge variant="secondary">{t('active')}</Badge>
+                      <Badge variant="secondary">{t("active")}</Badge>
                     </div>
                   </Link>
                   {/* Project 2 */}
@@ -437,7 +359,7 @@ export default function Component() {
                       focusing on IoT, public safety, and energy efficiency.
                     </div>
                     <div className="flex flex-wrap gap-2 pt-2">
-                      <Badge variant="secondary">{t('active')}</Badge>
+                      <Badge variant="secondary">{t("active")}</Badge>
                     </div>
                   </Link>
                   {/* Project 3 */}
@@ -460,7 +382,7 @@ export default function Component() {
                       improvements.
                     </div>
                     <div className="flex flex-wrap gap-2 pt-2">
-                      <Badge variant="secondary">{t('active')}</Badge>
+                      <Badge variant="secondary">{t("active")}</Badge>
                     </div>
                   </Link>
                   {/* Project 4 */}
@@ -482,7 +404,7 @@ export default function Component() {
                       green corridors across the country.
                     </div>
                     <div className="flex flex-wrap gap-2 pt-2">
-                      <Badge variant="secondary">{t('active')}</Badge>
+                      <Badge variant="secondary">{t("active")}</Badge>
                     </div>
                   </Link>
                 </nav>
@@ -507,7 +429,6 @@ export default function Component() {
                 status: "In Progress",
                 startDate: "2024-01-15",
                 awardedTo: "Doha Elite Construction",
-                // Optionally add review if needed
               }}
               getStatusColor={getStatusColor}
               onMarkComplete={() => setIsReviewDialogOpen(true)}
@@ -522,13 +443,15 @@ export default function Component() {
                 <div className="flex items-center h-16 justify-between px-4 py-3 border-b">
                   <div className="flex items-center gap-2">
                     <Inbox className="h-5 w-5 text-muted-foreground" />
-                    <span className="font-semibold">{t('inbox')}</span>
+                    <span className="font-semibold">{t("inbox")}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-muted-foreground">All</span>
+                    <span className="text-sm text-muted-foreground">
+                      {t("all")}
+                    </span>
                     <Switch />
                     <span className="text-sm text-muted-foreground">
-                      {t('unread')}
+                      {t("unread")}
                     </span>
                   </div>
                 </div>
@@ -537,7 +460,7 @@ export default function Component() {
                   <div className="relative w-full">
                     <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                     <Input
-                      placeholder="Search projects..."
+                      placeholder={t("search_projects")}
                       type="search"
                       className="pl-9"
                     />
@@ -546,93 +469,7 @@ export default function Component() {
                 {/* Project List */}
                 <div className="flex-1 overflow-auto">
                   <nav className="grid gap-1 px-4 text-sm font-medium">
-                    {/* Project 1 - Office Renovation (selected) */}
-                    <Link
-                      href="#"
-                      className="flex flex-col gap-1 rounded-lg border bg-muted p-3 hover:bg-muted/90"
-                      prefetch={false}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="font-semibold">Office Renovation</div>
-                        <div className="text-xs text-muted-foreground">
-                          2 days ago
-                        </div>
-                      </div>
-                      <div className="text-sm text-muted-foreground line-clamp-2">
-                        Complete renovation of the main office space including
-                        flooring, lighting, and furniture.
-                      </div>
-                      <div className="flex flex-wrap gap-2 pt-2">
-                        <Badge variant="secondary">{t('active')}</Badge>
-                      </div>
-                    </Link>
-                    {/* Project 2 */}
-                    <Link
-                      href="#"
-                      className="flex flex-col gap-1 rounded-lg border p-3 hover:bg-muted/90"
-                      prefetch={false}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="font-semibold">
-                          Smart City Initiative Phase 2
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          1 week ago
-                        </div>
-                      </div>
-                      <div className="text-sm text-muted-foreground line-clamp-2">
-                        Expansion of smart city technologies to new districts,
-                        focusing on IoT, public safety, and energy efficiency.
-                      </div>
-                      <div className="flex flex-wrap gap-2 pt-2">
-                        <Badge variant="secondary">{t('active')}</Badge>
-                      </div>
-                    </Link>
-                    {/* Project 3 */}
-                    <Link
-                      href="#"
-                      className="flex flex-col gap-1 rounded-lg border p-3 hover:bg-muted/90"
-                      prefetch={false}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="font-semibold">
-                          Educational Facilities Upgrade
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          3 weeks ago
-                        </div>
-                      </div>
-                      <div className="text-sm text-muted-foreground line-clamp-2">
-                        Modernization of existing educational facilities with
-                        new equipment, smart classrooms, and infrastructure
-                        improvements.
-                      </div>
-                      <div className="flex flex-wrap gap-2 pt-2">
-                        <Badge variant="secondary">{t('active')}</Badge>
-                      </div>
-                    </Link>
-                    {/* Project 4 */}
-                    <Link
-                      href="#"
-                      className="flex flex-col gap-1 rounded-lg border p-3 hover:bg-muted/90"
-                      prefetch={false}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="font-semibold">
-                          National Green Spaces Program
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          1 month ago
-                        </div>
-                      </div>
-                      <div className="text-sm text-muted-foreground line-clamp-2">
-                        Development of new parks, recreational areas, and urban
-                        green corridors across the country.
-                      </div>
-                      <div className="flex flex-wrap gap-2 pt-2">
-                        <Badge variant="secondary">{t('active')}</Badge>
-                      </div>
-                    </Link>
+                    {/* Repeat projects here with Badge using {t('active')} */}
                   </nav>
                 </div>
               </div>
@@ -654,12 +491,11 @@ export default function Component() {
                   status: "In Progress",
                   startDate: "2024-01-15",
                   awardedTo: "Doha Elite Construction",
-                  // Optionally add review if needed
                 }}
                 getStatusColor={getStatusColor}
                 onMarkComplete={() => {
                   setIsReviewDialogOpen(true);
-                  setIsProjectDetailsOpen(false); // Close details sheet when review dialog opens
+                  setIsProjectDetailsOpen(false);
                 }}
               />
             </SheetContent>

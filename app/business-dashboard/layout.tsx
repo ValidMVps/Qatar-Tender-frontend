@@ -23,6 +23,7 @@ import { motion } from "framer-motion";
 import BNavbar from "@/components/Bnavbar";
 
 import { useTranslation } from "../../lib/hooks/useTranslation";
+
 export default function DashboardLayout({
   children,
 }: {
@@ -31,82 +32,83 @@ export default function DashboardLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
   const { t } = useTranslation();
+
   useEffect(() => {
     document.body.style.overflow = sidebarOpen ? "hidden" : "";
   }, [sidebarOpen]);
 
   const sidebarGroups = [
     {
-      title: "Overview",
+      title: t("overview"),
       links: [
-        { name: "Dashboard", href: "/business-dashboard", icon: Home },
+        { name: t("dashboard"), href: "/business-dashboard", icon: Home },
         {
-          name: "Analytics",
+          name: t("analytics"),
           href: "/business-dashboard/analytics",
           icon: BarChart,
         },
       ],
     },
     {
-      title: "Project Posting",
+      title: t("project_posting"),
       links: [
         {
-          name: "My Posted Tenders",
+          name: t("my_posted_tenders"),
           href: "/business-dashboard/my-tenders",
           icon: FileText,
         },
         {
-          name: "Active Projects",
+          name: t("active_projects"),
           href: "/business-dashboard/projects",
           icon: Briefcase,
         },
       ],
     },
     {
-      title: "Bidding",
+      title: t("bidding"),
       links: [
         {
-          name: "Browse Tenders",
+          name: t("browse_tenders"),
           href: "/business-dashboard/browse-tenders",
           icon: Search,
         },
         {
-          name: "My Bids",
+          name: t("my_bids"),
           href: "/business-dashboard/bids",
           icon: PenSquare,
         },
         {
-          name: "Saved Jobs",
+          name: t("saved_jobs"),
           href: "/business-dashboard/saved-jobs",
           icon: Save,
         },
       ],
     },
     {
-      title: "Company Profile",
+      title: t("company_profile"),
       links: [
         {
-          name: "Company Profile",
+          name: t("company_profile"),
           href: "/business-dashboard/profile",
           icon: Building2,
         },
         {
-          name: "Ratings & Reviews",
+          name: t("ratings_and_reviews"),
           href: "/business-dashboard/ratings",
           icon: Star,
         },
       ],
     },
     {
-      title: "System",
+      title: t("system"),
       links: [
         {
-          name: "Settings",
+          name: t("settings"),
           href: "/business-dashboard/settings",
           icon: Settings,
         },
         {
-          name: "Help & Support",
+          name: t("help_and_support"),
           href: "/business-dashboard/help",
           icon: HelpCircle,
         },
@@ -165,7 +167,7 @@ export default function DashboardLayout({
                   <Building2 className="h-5 w-5 text-white" />
                 </div>
                 <span className="ml-2 text-lg font-semibold text-gray-900">
-                  TenderHub Qatar
+                  {t("tenderhub_qatar")}
                 </span>
               </div>
               <button onClick={() => setSidebarOpen(false)}>
@@ -178,9 +180,7 @@ export default function DashboardLayout({
       )}
 
       {/* Desktop sidebar */}
-      <aside
-        className={`bg-white border-r border-gray-200 hidden lg:flex flex-col w-64`}
-      >
+      <aside className="bg-white border-r border-gray-200 hidden lg:flex flex-col w-64">
         <div className="px-4 py-6">
           <div className="flex items-center space-x-3">
             <div className="w-9 h-9 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-sm">
@@ -201,7 +201,7 @@ export default function DashboardLayout({
           setSidebarOpen={setSidebarOpen}
           sidebarLinks={[]} // Navbar no longer needs flat list
         />
-        <main className="flex-1 w-full px-2 sm:px-4 py-0  md:mt-0 mt-[70px] bg-neutral-50/30">
+        <main className="flex-1 w-full px-2 sm:px-4 py-0 md:mt-0 mt-[70px] bg-neutral-50/30">
           {children}
         </main>
       </div>

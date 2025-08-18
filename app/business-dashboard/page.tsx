@@ -56,6 +56,7 @@ import {
 import { OverviewChart } from "@/components/OverviewChart";
 
 import { useTranslation } from "../../lib/hooks/useTranslation";
+
 interface Tender {
   id: string;
   title: string;
@@ -115,25 +116,6 @@ const bidsData: Bid[] = [
   },
 ];
 
-// Updated getBidStatusBadge
-const getBidStatusBadge = (status: Bid["status"]) => {
-  const { t } = useTranslation();
-
-  switch (status) {
-    case "active":
-      return <Badge className="bg-blue-500 text-white">{t("active")}</Badge>;
-    case "closed":
-      return <Badge className="bg-gray-500 text-white">{t("closed")}</Badge>;
-    case "awarded":
-      return <Badge className="bg-green-500 text-white">{t("awarded")}</Badge>;
-    case "rejected":
-      return <Badge className="bg-red-500 text-white">{t("rejected")}</Badge>;
-    case "pending":
-      return <Badge variant="outline">{t("pending")}</Badge>;
-    default:
-      return <Badge variant="secondary">{status}</Badge>;
-  }
-};
 const biddingSuccessData = [
   { month: "Jan", bidsPlaced: 20, bidsWon: 5 },
   { month: "Feb", bidsPlaced: 22, bidsWon: 6 },
@@ -145,52 +127,46 @@ const biddingSuccessData = [
 
 export default function DashboardPage() {
   const { t } = useTranslation();
-
   const [openTenderModal, setOpenTenderModal] = useState(false);
 
   const getBidStatusBadge = (status: Bid["status"]) => {
     switch (status) {
-      case "pending":
-        return <Badge variant="outline">{t("pending")}</Badge>;
+      case "active":
+        return <Badge className="bg-blue-500 text-white">{t("active")}</Badge>;
       case "closed":
-        return (
-          <Badge className="bg-purple-500 hover:bg-purple-600 text-white">
-            closed
-          </Badge>
-        );
+        return <Badge className="bg-gray-500 text-white">{t("closed")}</Badge>;
       case "awarded":
         return (
-          <Badge className="bg-emerald-600 text-white">{t("awarded")}</Badge>
+          <Badge className="bg-green-500 text-white">{t("awarded")}</Badge>
         );
-      case "closed":
-        return <Badge variant="destructive">closed</Badge>;
+      case "rejected":
+        return <Badge className="bg-red-500 text-white">{t("rejected")}</Badge>;
+      case "pending":
+        return <Badge variant="outline">{t("pending")}</Badge>;
       default:
         return <Badge variant="secondary">{status}</Badge>;
     }
   };
 
   // Placeholder logic for dynamic CTA button
-  const hasPostedTenders = true; // Replace with actual logic based on user's company data
-  const hasPlacedBids = false; // Replace with actual logic based on user's company data
+  const hasPostedTenders = true;
+  const hasPlacedBids = false;
 
   const ctaButton = (
     <div className="flex gap-5">
       <Button
-        className=" text-blue-700 shadow-none flex items-center"
+        className="text-blue-700 shadow-none flex items-center"
         onClick={() => setOpenTenderModal(true)}
-        variant={"secondary"}
+        variant="secondary"
       >
-        <Plus className="md:mr-2 mr-0 h-4 w-4" /> Post New Tender
+        <Plus className="md:mr-2 mr-0 h-4 w-4" /> {t("post_new_tender")}
       </Button>
       <Link href={"/business-dashboard/browse-tenders"}>
-        {" "}
         <Button
-          className=" text-blue-800 shadow-md flex items-center"
-          variant={"secondary"}
-          // You might want to use Next.js router for navigation here:
-          // onClick={() => router.push("/browse-tenders")}
+          className="text-blue-800 shadow-md flex items-center"
+          variant="secondary"
         >
-          <Search className="md:mr-2 mr-0 h-4 w-4" /> Browse Tenders
+          <Search className="md:mr-2 mr-0 h-4 w-4" /> {t("browse_tenders")}
         </Button>
       </Link>
     </div>
@@ -202,48 +178,46 @@ export default function DashboardPage() {
         initial="hidden"
         animate="show"
         variants={{ show: { transition: { staggerChildren: 0.1 } } }}
-        className="container mx-auto px-0  py-5"
+        className="container mx-auto px-0 py-5"
       >
         <main className="flex-1 py-1 px-1 md:py-5 md:px-3 space-y-7">
           {/* Welcome Header */}
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between py-8 px-7 rounded-lg bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 shadow-sm">
             <div className="mb-4 md:mb-0">
               <h1 className="md:text-3xl text-xl font-medium pb-2 text-white">
-                Welcome back Acme Corp!
+                {t("welcome_back")} Acme Corp!
               </h1>
               <p className="text-md text-blue-100">
-                Here's an overview of your posting and bidding activity today.
+                {t("overview_of_posting_and_bidding_activity")}
               </p>
             </div>
             <div className="flex-shrink-0">{ctaButton}</div>
           </div>
 
-          {/* Stats Cards - Grouped into two main cards */}
-
           {/* Dual Column Overview: Recent Tenders & Recent Bids */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            {/* Left Column: Recent Tenders Posted by Your Company */}
             <RecentTenders />
 
-            {/* Right Column: Recent Bids You’ve Placed */}
             <Card className="shadow-xs rounded-md border-neutral-200">
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="text-lg font-semibold">
-                  Recent Bids You&apos;ve Placed
+                  {t("recent_bids_placed")}
                 </CardTitle>
                 <Button variant="outline" size="sm" asChild>
-                  <Link href="/business-dashboard/bids">View All Bids</Link>
+                  <Link href="/business-dashboard/bids">
+                    {t("view_all_bids")}
+                  </Link>
                 </Button>
               </CardHeader>
               <CardContent>
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Tender Title</TableHead>
+                      <TableHead>{t("tender_title")}</TableHead>
                       <TableHead>{t("amount")}</TableHead>
                       <TableHead>{t("status")}</TableHead>
                       <TableHead className="text-right">
-                        Submission Date
+                        {t("submission_date")}
                       </TableHead>
                     </TableRow>
                   </TableHeader>
@@ -268,14 +242,13 @@ export default function DashboardPage() {
 
           {/* Charts Section */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            {/* Posting Performance Chart */}
             <Card className="shadow-xs rounded-md border-neutral-200">
               <CardHeader>
                 <CardTitle className="text-lg font-semibold">
-                  Posting Performance
+                  {t("posting_performance")}
                 </CardTitle>
                 <p className="text-sm text-gray-500">
-                  Monthly trend of tenders posted vs bids received.
+                  {t("monthly_trend_of_tenders_posted_vs_bids_received")}
                 </p>
               </CardHeader>
               <CardContent>
@@ -283,14 +256,13 @@ export default function DashboardPage() {
               </CardContent>
             </Card>
 
-            {/* Bidding Success Rate Chart */}
             <Card className="shadow-xs rounded-md border-neutral-200">
               <CardHeader>
                 <CardTitle className="text-lg font-semibold">
-                  Bidding Success Rate
+                  {t("bidding_success_rate")}
                 </CardTitle>
                 <p className="text-sm text-gray-500">
-                  Bids placed vs bids won.
+                  {t("bids_placed_vs_bids_won")}
                 </p>
               </CardHeader>
               <CardContent>
@@ -308,17 +280,19 @@ export default function DashboardPage() {
                       <Bar
                         dataKey="bidsPlaced"
                         fill="#8884d8"
-                        name="Bids Placed"
+                        name={t("bids_placed")}
                       />
-                      <Bar dataKey="bidsWon" fill="#82ca9d" name="Bids Won" />
+                      <Bar
+                        dataKey="bidsWon"
+                        fill="#82ca9d"
+                        name={t("bids_won")}
+                      />
                     </BarChart>
                   </ResponsiveContainer>
                 </ChartContainer>
               </CardContent>
             </Card>
           </div>
-
-          {/* Reminders / Notifications */}
 
           <CreateTenderModal
             open={openTenderModal}

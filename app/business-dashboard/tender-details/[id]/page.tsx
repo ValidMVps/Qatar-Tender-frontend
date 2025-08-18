@@ -178,7 +178,9 @@ export default function TenderDetailsPage({ params }: PageProps) {
               <CardHeader>
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2 text-sm text-gray-500">
-                    <span>Posted {tender.postedTime}</span>
+                    <span>
+                      {t("posted")} {tender.postedTime}
+                    </span>
                     {/* Removed Urgent badge */}
                   </div>
                   <Link href="/business-dashboard/browse-tenders" passHref>
@@ -186,7 +188,7 @@ export default function TenderDetailsPage({ params }: PageProps) {
                       variant="outline"
                       className="text-sm bg-transparent"
                     >
-                      Back to Tenders
+                      {t("back_to_tenders")}
                     </Button>
                   </Link>
                 </div>
@@ -197,7 +199,7 @@ export default function TenderDetailsPage({ params }: PageProps) {
                   {tender.userVerified && (
                     <span className="flex items-center text-blue-600">
                       <CheckCircle className="h-4 w-4 mr-1" />
-                      User verified
+                      {t("user_verified")}
                     </span>
                   )}
                   {tender.rating > 0 && (
@@ -209,7 +211,7 @@ export default function TenderDetailsPage({ params }: PageProps) {
                   {tender.amountSpent && (
                     <span className="flex items-center">
                       <DollarSign className="h-4 w-4 mr-1" />
-                      {tender.amountSpent} spent
+                      {tender.amountSpent} {t("spent")}
                     </span>
                   )}
                   <span className="flex items-center">
@@ -221,7 +223,9 @@ export default function TenderDetailsPage({ params }: PageProps) {
                   {tender.jobType === "Hourly" && (
                     <>
                       {tender.hourlyRate && (
-                        <span>Hourly Rate: {tender.hourlyRate}</span>
+                        <span>
+                          {t("hourly_rate")}: {tender.hourlyRate}
+                        </span>
                       )}
                       {tender.hoursPerWeek && (
                         <span>{tender.hoursPerWeek}</span>
@@ -229,10 +233,14 @@ export default function TenderDetailsPage({ params }: PageProps) {
                     </>
                   )}
                   {tender.jobType === "Fixed-Price" && tender.budget && (
-                    <span className="font-medium">Budget: {tender.budget}</span>
+                    <span className="font-medium">
+                      {t("budget")}: {tender.budget}
+                    </span>
                   )}
                   {tender.estimatedTime && (
-                    <span>Estimated Time: {tender.estimatedTime}</span>
+                    <span>
+                      {t("estimated_time")}: {tender.estimatedTime}
+                    </span>
                   )}
                 </div>
                 <div className="flex flex-wrap gap-2 mb-4">
@@ -253,7 +261,7 @@ export default function TenderDetailsPage({ params }: PageProps) {
                 {/* Client Reviews Section */}
                 <div className="mb-6">
                   <h4 className="font-semibold text-lg mb-4">
-                    Client Reviews ({mockClientReviews.length})
+                    {t("client_reviews")} ({mockClientReviews.length})
                   </h4>
                   {mockClientReviews.length > 0 ? (
                     <div className="space-y-4">
@@ -281,7 +289,7 @@ export default function TenderDetailsPage({ params }: PageProps) {
                     </div>
                   ) : (
                     <p className="text-center text-gray-500">
-                      No client reviews available yet.
+                      {t("no_client_reviews_available_yet")}
                     </p>
                   )}
                 </div>
@@ -289,19 +297,21 @@ export default function TenderDetailsPage({ params }: PageProps) {
                 {/* Q&A Section */}
                 <div className="mb-6">
                   <h4 className="font-semibold text-lg mb-4">
-                    Questions & Answers
+                    {t("questions_and_answers")}
                   </h4>
                   <Tabs defaultValue="qa" className="w-full">
                     <TabsList className="grid w-full grid-cols-2">
                       <TabsTrigger value="qa">
-                        Q&A (
+                        {t("qa")} (
                         {
                           mockQuestionsAnswers.filter((q) => q.answer !== null)
                             .length
                         }
                         )
                       </TabsTrigger>
-                      <TabsTrigger value="ask">Ask a Question</TabsTrigger>
+                      <TabsTrigger value="ask">
+                        {t("ask_a_question")}
+                      </TabsTrigger>
                     </TabsList>
                     <TabsContent value="qa" className="mt-4">
                       {mockQuestionsAnswers.filter((q) => q.answer !== null)
@@ -312,19 +322,18 @@ export default function TenderDetailsPage({ params }: PageProps) {
                             .map((qa) => (
                               <Card key={qa.id} className="p-4">
                                 <p className="font-medium text-gray-800 mb-1">
-                                  Q: {qa.question}
+                                  {t("q")}: {qa.question}
                                 </p>
                                 <p className="text-sm text-gray-600 mb-2">
-                                  {/* Removed Asked by */}
                                   {qa.askedTime}
                                 </p>
                                 {qa.answer ? (
                                   <p className="text-gray-700">
-                                    A: {qa.answer}
+                                    {t("a")}: {qa.answer}
                                   </p>
                                 ) : (
                                   <p className="text-gray-500 italic">
-                                    No answer yet.
+                                    {t("no_answer_yet")}
                                   </p>
                                 )}
                               </Card>
@@ -332,7 +341,7 @@ export default function TenderDetailsPage({ params }: PageProps) {
                         </div>
                       ) : (
                         <p className="text-center text-gray-500">
-                          No questions answered yet.
+                          {t("no_questions_answered_yet")}
                         </p>
                       )}
                     </TabsContent>
@@ -340,16 +349,16 @@ export default function TenderDetailsPage({ params }: PageProps) {
                       <form className="space-y-4">
                         <div>
                           <Label htmlFor="new-question" className="mb-2 block">
-                            Your Question
+                            {t("your_question")}
                           </Label>
                           <Textarea
                             id="new-question"
-                            placeholder="Type your question here..."
+                            placeholder={t("type_your_question_here")}
                             rows={4}
                           />
                         </div>
                         <Button type="submit" className="w-full">
-                          Submit Question
+                          {t("submit_question")}
                         </Button>
                       </form>
                     </TabsContent>
@@ -364,22 +373,22 @@ export default function TenderDetailsPage({ params }: PageProps) {
             <Card className="border-0">
               <CardHeader>
                 <CardTitle className="text-xl font-semibold">
-                  Tender Application
+                  {t("tender_application")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-sm text-gray-600 mb-4">
-                  Bids: {tender.proposals}
+                  {t("bids")}: {tender.proposals}
                 </div>
                 <div className="flex-col">
                   <Button
                     onClick={() => setShowApplyForm(true)}
                     className="w-full mb-4 rounded-md shadow-none hover:shadow-none"
                   >
-                    Apply to Bid
+                    {t("apply_to_bid")}
                   </Button>
                   <Button className="w-full  rounded-md" variant={"outline"}>
-                    <Save /> Save Tender
+                    <Save /> {t("save_tender")}
                   </Button>
                 </div>
               </CardContent>

@@ -64,7 +64,7 @@ import {
 } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 
-import { useTranslation } from '../../../lib/hooks/useTranslation';
+import { useTranslation } from "../../../lib/hooks/useTranslation";
 interface Bid {
   id: string;
   tenderId: string;
@@ -189,7 +189,7 @@ const sampleBids: Bid[] = [
 ];
 
 export default function MyBidsPage() {
-    const { t } = useTranslation();
+  const { t } = useTranslation();
 
   const [activeTab, setActiveTab] = useState("all");
   const [bids, setBids] = useState<Bid[]>(sampleBids);
@@ -329,40 +329,14 @@ export default function MyBidsPage() {
         <Card className="bg-blue-500 text-white">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-white">
-              Total Bids
+              {t("total_bids")}
             </CardTitle>
             <FileText className="h-4 w-4 text-white" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-white">{totalBids}</div>
-            <p className="text-xs text-white opacity-80">All submitted bids</p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-blue-500 text-white">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-white">
-              Active Bids
-            </CardTitle>
-            <TrendingUp className="h-4 w-4 text-white" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-white">{activeBids}</div>
-            <p className="text-xs text-white opacity-80">Pending & awarded</p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-blue-500 text-white">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-white">
-              Awarded Bids
-            </CardTitle>
-            <CheckCircle className="h-4 w-4 text-white" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-white">{awardedBids}</div>
             <p className="text-xs text-white opacity-80">
-              Successfully awarded
+              {t("all_submitted_bids")}
             </p>
           </CardContent>
         </Card>
@@ -370,36 +344,70 @@ export default function MyBidsPage() {
         <Card className="bg-blue-500 text-white">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-white">
-              Rejected Bids
+              {t("active_bids")}
             </CardTitle>
-            <AlertCircle className="h-4 w-4 text-white" />
+            <TrendingUp className="h-4 w-4 text-white" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white">{rejectedBids}</div>
-            <p className="text-xs text-white opacity-80">Not successful</p>
+            <div className="text-2xl font-bold text-white">{activeBids}</div>
+            <p className="text-xs text-white opacity-80">
+              {t("pending_and_awarded")}
+            </p>
           </CardContent>
         </Card>
 
         <Card className="bg-blue-500 text-white">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-white">
-              Closed Bids
+              {t("awarded_bids")}
+            </CardTitle>
+            <CheckCircle className="h-4 w-4 text-white" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-white">{awardedBids}</div>
+            <p className="text-xs text-white opacity-80">
+              {t("successfully_awarded")}
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-blue-500 text-white">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-white">
+              {t("rejected_bids")}
+            </CardTitle>
+            <AlertCircle className="h-4 w-4 text-white" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-white">{rejectedBids}</div>
+            <p className="text-xs text-white opacity-80">
+              {t("not_successful")}
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-blue-500 text-white">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-white">
+              {t("closed_bids")}
             </CardTitle>
             <Lock className="h-4 w-4 text-white" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-white">{closedBids}</div>
-            <p className="text-xs text-white opacity-80">Tender completed</p>
+            <p className="text-xs text-white opacity-80">
+              {t("tender_completed")}
+            </p>
           </CardContent>
         </Card>
       </div>
 
       {/* Search and Filter Section */}
-      <div className="flex flex-col sm:flex-row gap-4 items-center justify-between  rounded-lg ">
+      <div className="flex flex-col sm:flex-row gap-4 items-center justify-between rounded-lg ">
         <div className="relative flex-1 min-w-0">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
           <Input
-            placeholder="Search bids by title, client, or category..."
+            placeholder={t("search_bids_placeholder")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10"
@@ -408,10 +416,10 @@ export default function MyBidsPage() {
         <div className="flex items-center gap-2">
           <Select value={selectedCategory} onValueChange={setSelectedCategory}>
             <SelectTrigger className="w-48">
-              <SelectValue placeholder="Select category" />
+              <SelectValue placeholder={t("select_category")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Categories</SelectItem>
+              <SelectItem value="all">{t("all_categories")}</SelectItem>
               {categories.slice(1).map((category) => (
                 <SelectItem key={category} value={category}>
                   {category}
@@ -425,25 +433,28 @@ export default function MyBidsPage() {
       {/* Tabs Section */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-6 rounded-lg border bg-gray-50 p-1">
-          <TabsTrigger value="all">All</TabsTrigger>
-          <TabsTrigger value="active">{t('active')}</TabsTrigger>
-          <TabsTrigger value="awarded">{t('awarded')}</TabsTrigger>
-          <TabsTrigger value="rejected">{t('rejected')}</TabsTrigger>
-          <TabsTrigger value="closed">{t('closed')}</TabsTrigger>
-          <TabsTrigger value="pending">{t('pending')}</TabsTrigger>
+          <TabsTrigger value="all">{t("all")}</TabsTrigger>
+          <TabsTrigger value="active">{t("active")}</TabsTrigger>
+          <TabsTrigger value="awarded">{t("awarded")}</TabsTrigger>
+          <TabsTrigger value="rejected">{t("rejected")}</TabsTrigger>
+          <TabsTrigger value="closed">{t("closed")}</TabsTrigger>
+          <TabsTrigger value="pending">{t("pending")}</TabsTrigger>
         </TabsList>
+
         <TabsContent value={activeTab} className="mt-6">
           <div className="bg-white rounded-lg shadow-md border overflow-hidden">
             <Table>
               <TableHeader className="bg-gray-50">
                 <TableRow>
-                  <TableHead className="px-6 py-3">Tender Title</TableHead>
-                  <TableHead className="px-6 py-3">{t('category')}</TableHead>
-                  <TableHead className="px-6 py-3">Your Bid</TableHead>
-                  <TableHead className="px-6 py-3">{t('submitted')}</TableHead>
-                  <TableHead className="px-6 py-3">{t('status')}</TableHead>
+                  <TableHead className="px-6 py-3">
+                    {t("tender_title")}
+                  </TableHead>
+                  <TableHead className="px-6 py-3">{t("category")}</TableHead>
+                  <TableHead className="px-6 py-3">{t("your_bid")}</TableHead>
+                  <TableHead className="px-6 py-3">{t("submitted")}</TableHead>
+                  <TableHead className="px-6 py-3">{t("status")}</TableHead>
                   <TableHead className="px-6 py-3 text-right">
-                    {t('actions')}
+                    {t("actions")}
                   </TableHead>
                 </TableRow>
               </TableHeader>
@@ -470,7 +481,7 @@ export default function MyBidsPage() {
                       <TableCell className="px-6 py-4">
                         <div className="font-semibold">{bid.bidAmount} QAR</div>
                         <div className="text-xs text-gray-500">
-                          Budget: {bid.budget} QAR
+                          {t("budget")}: {bid.budget} QAR
                         </div>
                       </TableCell>
                       <TableCell className="px-6 py-4">
@@ -498,14 +509,14 @@ export default function MyBidsPage() {
                               onClick={() => handleViewBidDetails(bid)}
                             >
                               <Eye className="h-4 w-4 mr-2" />
-                              {t('view')}
+                              {t("view")}
                             </DropdownMenuItem>
                             {bid.status === "pending" && (
                               <DropdownMenuItem
                                 onClick={() => handleEditBid(bid.id)}
                               >
                                 <Pencil className="h-4 w-4 mr-2" />
-                                {t('edit')}
+                                {t("edit")}
                               </DropdownMenuItem>
                             )}
                             <DropdownMenuSeparator />
@@ -514,7 +525,7 @@ export default function MyBidsPage() {
                               className="text-red-600"
                             >
                               <Trash2 className="h-4 w-4 mr-2" />
-                              {t('delete')}
+                              {t("delete")}
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -529,9 +540,9 @@ export default function MyBidsPage() {
                     >
                       <div className="flex flex-col items-center gap-2">
                         <Search className="h-8 w-8 text-gray-300" />
-                        <p>No bids found matching your criteria.</p>
+                        <p>{t("no_bids_found")}</p>
                         <p className="text-sm">
-                          Try adjusting your search or filters.
+                          {t("try_adjusting_search_filters")}
                         </p>
                       </div>
                     </TableCell>
@@ -555,28 +566,30 @@ export default function MyBidsPage() {
                 {selectedBidForDetails.tenderTitle}
               </DialogTitle>
               <DialogDescription className="mt-1">
-                Details of your submitted bid and the original tender.
+                {t("bid_details_description")}
               </DialogDescription>
             </DialogHeader>
 
             <div className="grid gap-6 py-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
-                  <h3 className="font-semibold text-lg">Your Bid Details</h3>
+                  <h3 className="font-semibold text-lg">
+                    {t("your_bid_details")}
+                  </h3>
                   <div className="space-y-2 text-sm">
                     <p className="flex items-center">
                       <DollarSign className="h-4 w-4 mr-2 text-gray-500" />
-                      <strong>Bid:</strong> {selectedBidForDetails.bidAmount}{" "}
-                      QAR
+                      <strong>{t("bid")}:</strong>{" "}
+                      {selectedBidForDetails.bidAmount} QAR
                     </p>
                     <p className="flex items-center">
                       <Calendar className="h-4 w-4 mr-2 text-gray-500" />
-                      <strong>Submitted:</strong>{" "}
+                      <strong>{t("submitted")}:</strong>{" "}
                       {selectedBidForDetails.submittedAt}
                     </p>
                     <p className="flex items-center">
                       {getStatusIcon(selectedBidForDetails.status)}
-                      <strong className="ml-2">Status:</strong>
+                      <strong className="ml-2">{t("status")}:</strong>
                       <Badge
                         className={`ml-2 text-xs border ${getStatusColor(
                           selectedBidForDetails.status
@@ -587,7 +600,9 @@ export default function MyBidsPage() {
                     </p>
                   </div>
                   <div>
-                    <h4 className="font-semibold mb-1">Bid Description:</h4>
+                    <h4 className="font-semibold mb-1">
+                      {t("bid_description")}:
+                    </h4>
                     <p className="text-sm text-gray-700">
                       {selectedBidForDetails.bidDescription}
                     </p>
@@ -595,36 +610,40 @@ export default function MyBidsPage() {
                 </div>
 
                 <div className="space-y-4">
-                  <h3 className="font-semibold text-lg">Tender Overview</h3>
+                  <h3 className="font-semibold text-lg">
+                    {t("tender_overview")}
+                  </h3>
                   <div className="space-y-2 text-sm">
                     <p className="flex items-center">
                       <DollarSign className="h-4 w-4 mr-2 text-gray-500" />
-                      <strong>Budget:</strong> {selectedBidForDetails.budget}{" "}
-                      QAR
+                      <strong>{t("budget")}:</strong>{" "}
+                      {selectedBidForDetails.budget} QAR
                     </p>
                     <p className="flex items-center">
                       <Calendar className="h-4 w-4 mr-2 text-gray-500" />
-                      <strong>Deadline:</strong>{" "}
+                      <strong>{t("deadline")}:</strong>{" "}
                       {selectedBidForDetails.deadline}
                     </p>
                     <p className="flex items-center">
                       <FileText className="h-4 w-4 mr-2 text-gray-500" />
-                      <strong>Category:</strong>{" "}
+                      <strong>{t("category")}:</strong>{" "}
                       {selectedBidForDetails.category}
                     </p>
                     <p className="flex items-center">
                       <Info className="h-4 w-4 mr-2 text-gray-500" />
-                      <strong>Location:</strong>{" "}
+                      <strong>{t("location")}:</strong>{" "}
                       {selectedBidForDetails.location}
                     </p>
                     <p className="flex items-center">
                       <Info className="h-4 w-4 mr-2 text-gray-500" />
-                      <strong>Client:</strong>{" "}
+                      <strong>{t("client")}:</strong>{" "}
                       {selectedBidForDetails.clientName}
                     </p>
                   </div>
                   <div>
-                    <h4 className="font-semibold mb-1">Tender Description:</h4>
+                    <h4 className="font-semibold mb-1">
+                      {t("tender_description")}:
+                    </h4>
                     <p className="text-sm text-gray-700">
                       {selectedBidForDetails.description}
                     </p>
@@ -638,7 +657,7 @@ export default function MyBidsPage() {
                     <Info className="h-5 w-5 text-red-600 mr-3 shrink-0" />
                     <div>
                       <h3 className="font-semibold text-red-800 mb-1">
-                        Rejection Reason
+                        {t("rejection_reason")}
                       </h3>
                       <p className="text-sm text-red-800">
                         {selectedBidForDetails.rejectionReason}
@@ -653,15 +672,15 @@ export default function MyBidsPage() {
               <Link
                 href={`/business-dashboard/service-providing/tender-details/${selectedBidForDetails.tenderId}`}
               >
-                <Button variant="outline">View Original Tender</Button>
+                <Button variant="outline">{t("view_original_tender")}</Button>
               </Link>
               {selectedBidForDetails.status === "rejected" && (
                 <Button onClick={() => handleReapply(selectedBidForDetails.id)}>
-                  {t('reapply')}
+                  {t("reapply")}
                 </Button>
               )}
               <Button onClick={() => setShowBidDetailsModal(false)}>
-                {t('close')}
+                {t("close")}
               </Button>
             </DialogFooter>
           </DialogContent>

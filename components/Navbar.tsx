@@ -30,6 +30,7 @@ import {
 import CreateTenderModal from "./CreateTenderModal";
 
 import { useTranslation } from "../lib/hooks/useTranslation";
+import { LanguageToggle } from "./LanguageToggle";
 
 interface NavbarProps {
   sidebarOpen: boolean;

@@ -37,7 +37,7 @@ import {
 } from "@/components/ui/tooltip";
 import { TenderCard } from "@/components/tender-card";
 
-import { useTranslation } from '../../../lib/hooks/useTranslation';
+import { useTranslation } from "../../../lib/hooks/useTranslation";
 // Sample data for tenders (updated to match screenshot details and new structure)
 const sampleTenders = [
   {
@@ -234,47 +234,8 @@ const categoriesData = [
   "Shopify Development",
 ];
 
-const jobTypes = [
-  { label: "Hourly", count: 889 },
-  { label: "Fixed-Price", count: 540 },
-];
-
-const fixedPriceRanges = [
-  { label: "Less than $100", min: 0, max: 99, count: 103 },
-  { label: "$100 to $500", min: 100, max: 500, count: 234 },
-  { label: "$500 - $1K", min: 500, max: 1000, count: 95 },
-  { label: "$1K - $5K", min: 1000, max: 5000, count: 99 },
-  { label: "$5K+", min: 5000, max: Number.POSITIVE_INFINITY, count: 9 },
-];
-
-const proposalCounts = [
-  { label: "Less than 5", min: 0, max: 4, count: 121 },
-  { label: "5 to 10", min: 5, max: 10, count: 250 },
-  { label: "10 to 15", min: 10, max: 15, count: 210 },
-  { label: "15 to 20", min: 15, max: 20, count: 203 },
-  { label: "20 to 50", min: 20, max: 50, count: 509 },
-];
-
-const clientInfoFilters = [
-  // { label: "My previous clients", count: 0 }, // Removed as per request
-  { label: "Payment verified", count: 1311 }, // Will be displayed as "User verified"
-];
-
-const clientHistoryFilters = [
-  { label: "No hires", count: 401 },
-  { label: "1 to 9 hires", count: 449 },
-  { label: "10+ hires", count: 577 },
-];
-
-const projectLengths = [
-  { label: "Less than one month", count: 803 },
-  { label: "1 to 3 months", count: 1014 },
-  { label: "3 to 6 months", count: 593 },
-  { label: "More than 6 months", count: 639 },
-];
-
 export default function ServiceProvidingDashboardPage() {
-    const { t } = useTranslation();
+  const { t } = useTranslation();
 
   const [searchTerm, setSearchTerm] = useState("webflow");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -308,6 +269,44 @@ export default function ServiceProvidingDashboardPage() {
         : [...prev, category]
     );
   };
+  const jobTypes = [
+    { label: t("hourly"), count: 889 },
+    { label: t("fixed_price"), count: 540 },
+  ];
+
+  const fixedPriceRanges = [
+    { label: t("less_than_100"), min: 0, max: 99, count: 103 },
+    { label: t("100_to_500"), min: 100, max: 500, count: 234 },
+    { label: t("500_to_1k"), min: 500, max: 1000, count: 95 },
+    { label: t("1k_to_5k"), min: 1000, max: 5000, count: 99 },
+    { label: t("5k_plus"), min: 5000, max: Number.POSITIVE_INFINITY, count: 9 },
+  ];
+
+  const proposalCounts = [
+    { label: t("less_than_5"), min: 0, max: 4, count: 121 },
+    { label: t("5_to_10"), min: 5, max: 10, count: 250 },
+    { label: t("10_to_15"), min: 10, max: 15, count: 210 },
+    { label: t("15_to_20"), min: 15, max: 20, count: 203 },
+    { label: t("20_to_50"), min: 20, max: 50, count: 509 },
+  ];
+
+  const clientInfoFilters = [
+    // { label: "My previous clients", count: 0 }, // Removed as per request
+    { label: t("payment_verified"), count: 1311 }, // Will be displayed as "User verified"
+  ];
+
+  const clientHistoryFilters = [
+    { label: t("no_hires"), count: 401 },
+    { label: t("1_to_9_hires"), count: 449 },
+    { label: t("10_plus_hires"), count: 577 },
+  ];
+
+  const projectLengths = [
+    { label: t("less_than_one_month"), count: 803 },
+    { label: t("1_to_3_months"), count: 1014 },
+    { label: t("3_to_6_months"), count: 593 },
+    { label: t("more_than_6_months"), count: 639 },
+  ];
 
   const handleProposalCountChange = (countLabel: string) => {
     setSelectedProposalCounts((prev) =>
@@ -451,21 +450,21 @@ export default function ServiceProvidingDashboardPage() {
                 className="flex items-center space-x-2 bg-transparent"
               >
                 <Save className="h-4 w-4" />
-                <span>Saved jobs (5)</span>
+                <span>{t("saved_jobs")} (5)</span>
               </Button>
             }
             <Select defaultValue="newest">
               <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Sort by: Newest" />
+                <SelectValue placeholder={t("sort_by_newest")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="newest">Sort by: Newest</SelectItem>
-                <SelectItem value="oldest">Sort by: Oldest</SelectItem>
+                <SelectItem value="newest">{t("sort_by_newest")}</SelectItem>
+                <SelectItem value="oldest">{t("sort_by_oldest")}</SelectItem>
                 <SelectItem value="budget-high">
-                  Sort by: Budget (High to Low)
+                  {t("sort_by_budget_high_to_low")}
                 </SelectItem>
                 <SelectItem value="budget-low">
-                  Sort by: Budget (Low to High)
+                  {t("sort_by_budget_low_to_high")}
                 </SelectItem>
               </SelectContent>
             </Select>
@@ -492,12 +491,12 @@ export default function ServiceProvidingDashboardPage() {
                 {/* Category Filter */}
                 <AccordionItem value="category" className="border-b">
                   <AccordionTrigger className="font-semibold text-gray-800 hover:no-underline">
-                    {t('category')}
+                    {t("category")}
                   </AccordionTrigger>
                   <AccordionContent className="pt-2 pb-4">
                     <Select onValueChange={handleCategoryChange}>
                       <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select Categories" />
+                        <SelectValue placeholder={t("select_categories")} />
                       </SelectTrigger>
                       <SelectContent>
                         {categoriesData.map((category) => (
@@ -532,7 +531,7 @@ export default function ServiceProvidingDashboardPage() {
                 {/* Number of Bids Filter (Renamed) */}
                 <AccordionItem value="number-of-bids" className="border-b">
                   <AccordionTrigger className="font-semibold text-gray-800 hover:no-underline">
-                    Number of bids
+                    {t("number_of_bids")}
                   </AccordionTrigger>
                   <AccordionContent className="pt-2 pb-4 space-y-2">
                     {proposalCounts.map((count) => (
@@ -558,7 +557,7 @@ export default function ServiceProvidingDashboardPage() {
                 {/* Client Info Filter (My previous clients removed) */}
                 <AccordionItem value="client-info" className="border-b">
                   <AccordionTrigger className="font-semibold text-gray-800 hover:no-underline">
-                    Client info
+                    {t("client_info")}
                   </AccordionTrigger>
                   <AccordionContent className="pt-2 pb-4 space-y-2">
                     {clientInfoFilters.map((info) => (
@@ -575,7 +574,7 @@ export default function ServiceProvidingDashboardPage() {
                         />
                         <Label htmlFor={`client-info-${info.label}`}>
                           {info.label === "Payment verified"
-                            ? "User verified"
+                            ? t("user_verified")
                             : info.label}{" "}
                           ({info.count})
                         </Label>
@@ -587,7 +586,7 @@ export default function ServiceProvidingDashboardPage() {
                 {/* Client History Filter */}
                 <AccordionItem value="client-history">
                   <AccordionTrigger className="font-semibold text-gray-800 hover:no-underline">
-                    Client history
+                    {t("client_history")}
                   </AccordionTrigger>
                   <AccordionContent className="pt-2 pb-4 space-y-2">
                     {clientHistoryFilters.map((history) => (
@@ -632,10 +631,10 @@ export default function ServiceProvidingDashboardPage() {
               <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
                 <Search className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  No tenders found
+                  {t("no_tenders_found")}
                 </h3>
                 <p className="text-gray-600 mb-6">
-                  Adjust your filters or try a different search term.
+                  {t("adjust_filters_or_try_different_search")}
                 </p>
               </div>
             )}

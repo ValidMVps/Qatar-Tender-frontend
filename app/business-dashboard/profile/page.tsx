@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useTranslation } from '../../../lib/hooks/useTranslation';
+import { useTranslation } from "../../../lib/hooks/useTranslation";
 import {
   Select,
   SelectContent,
@@ -35,10 +35,10 @@ import {
 } from "lucide-react";
 
 export default function Component() {
-    const { t } = useTranslation();
+  const { t } = useTranslation();
 
   const [isEditing, setIsEditing] = useState(false);
-  const [profileCompletion, setProfileCompletion] = useState(0); // Initial value 0
+  const [profileCompletion, setProfileCompletion] = useState(0);
   const [isProfileCompleted, setIsProfileCompleted] = useState(false);
   const [showCompletionModal, setShowCompletionModal] = useState(false);
   const [profileData, setProfileData] = useState({
@@ -51,29 +51,22 @@ export default function Component() {
     commercialRegistrationNumber: "123-456-789",
     companyDescription:
       "Leading provider of innovative solutions in the tech industry.",
-    companyWebsite: "", // Default empty
+    companyWebsite: "",
   });
 
-  // Initialize profile completion on component mount
   useEffect(() => {
     updateProfileCompletion();
-  }, [profileData]); // Recalculate when profileData changes
+  }, [profileData]);
 
-  const handleEditClick = () => {
-    setIsEditing(true);
-  };
+  const handleEditClick = () => setIsEditing(true);
 
   const handleSaveClick = () => {
-    // In a real application, you would send this data to a backend
     console.log("Saving profile data:", profileData);
     setIsEditing(false);
     updateProfileCompletion();
   };
 
-  const handleCancelClick = () => {
-    // Reset to original data or fetch again
-    setIsEditing(false);
-  };
+  const handleCancelClick = () => setIsEditing(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -101,32 +94,25 @@ export default function Component() {
     if (profileData.companyDescription) completedFields++;
     if (profileData.companyWebsite) completedFields++;
 
-    // Assuming 8 fields for 100% completion
     setProfileCompletion(Math.min(100, (completedFields / 8) * 100));
   };
 
-  const handleCompleteProfileClick = () => {
-    setShowCompletionModal(true);
-  };
+  const handleCompleteProfileClick = () => setShowCompletionModal(true);
 
   const handleConfirmCompletion = () => {
     setIsProfileCompleted(true);
     setShowCompletionModal(false);
-    setIsEditing(false); // Lock editing after completion
+    setIsEditing(false);
   };
 
-  const handleCloseModal = () => {
-    setShowCompletionModal(false);
-  };
+  const handleCloseModal = () => setShowCompletionModal(false);
 
   const areInputsDisabled = !isEditing || isProfileCompleted;
 
   return (
     <div className="flex min-h-screen bg-white container mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex-1 flex flex-col">
-        {/* Profile Content */}
         <main className="flex-1 p-0 sm:p-6 overflow-auto">
-          {/* Profile Summary Section (Full Width) */}
           <div className="pb-6 mb-6 border-b border-gray-200">
             <div className="flex flex-col sm:flex-row items-center justify-between flex-wrap gap-4">
               <div className="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
@@ -134,7 +120,7 @@ export default function Component() {
                   <Avatar className="w-20 h-20 md:w-28 md:h-28">
                     <AvatarImage
                       src="/placeholder.svg?height=112&width=112"
-                      alt="Company Logo"
+                      alt={t("company_logo")}
                     />
                     <AvatarFallback>QC</AvatarFallback>
                   </Avatar>
@@ -185,14 +171,14 @@ export default function Component() {
                 {isProfileCompleted ? (
                   <div className="flex items-center gap-2 text-blue-600 font-medium">
                     <CheckCircleIcon className="w-5 h-5" />
-                    <span>Verification Pending</span>
+                    <span>{t("verification_pending")}</span>
                   </div>
                 ) : !isEditing ? (
                   <Button
                     onClick={handleEditClick}
                     className="bg-[#5A4DFF] hover:bg-[#4a3dff] text-white rounded-md px-4 py-2 sm:px-6 sm:py-2 text-sm sm:text-base"
                   >
-                    Edit Profile
+                    {t("edit_profile")}
                   </Button>
                 ) : (
                   <>
@@ -201,7 +187,7 @@ export default function Component() {
                       className="bg-green-500 hover:bg-green-600 text-white rounded-md px-4 py-2 sm:px-6 sm:py-2 flex items-center gap-2 text-sm sm:text-base"
                     >
                       <SaveIcon className="w-4 h-4" />
-                      Save Changes
+                      {t("save_changes")}
                     </Button>
                     <Button
                       onClick={handleCancelClick}
@@ -209,17 +195,16 @@ export default function Component() {
                       className="rounded-md px-4 py-2 sm:px-6 sm:py-2 flex items-center gap-2 bg-transparent text-sm sm:text-base"
                     >
                       <XIcon className="w-4 h-4" />
-                      {t('cancel')}
+                      {t("cancel")}
                     </Button>
                   </>
                 )}
               </div>
             </div>
-            {/* Profile Completion Bar */}
             <div className="mt-8 pt-6 border-t border-gray-100">
               <div className="flex items-center justify-between mb-2">
                 <Label className="text-gray-700 font-semibold text-sm sm:text-base">
-                  Profile Completion
+                  {t("profile_completion")}
                 </Label>
                 <span className="text-sm font-medium text-gray-700">
                   {profileCompletion}%
@@ -230,32 +215,31 @@ export default function Component() {
                 className="h-3 bg-gray-200 [&>*]:bg-[#5A4DFF]"
               />
               <p className="text-xs sm:text-sm text-gray-500 mt-2">
-                Complete your profile to unlock all features.
+                {t("complete_your_profile_to_unlock_all_features")}
               </p>
               {profileCompletion === 100 && !isProfileCompleted && (
                 <Button
                   onClick={handleCompleteProfileClick}
                   className="mt-4 bg-blue-600 hover:bg-blue-700 text-white rounded-md px-4 py-2 sm:px-6 sm:py-2 text-sm sm:text-base"
                 >
-                  Complete Profile
+                  {t("complete_profile")}
                 </Button>
               )}
             </div>
           </div>
-          {/* Tabbed Profile Form */}
           <Tabs defaultValue="profile-details" className="w-full mt-6">
             <TabsList className="grid w-full grid-cols-2 bg-gray-100 rounded-lg p-1">
               <TabsTrigger
                 value="profile-details"
                 className="data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-md text-sm sm:text-base"
               >
-                Company Details
+                {t("company_details")}
               </TabsTrigger>
               <TabsTrigger
                 value="account-verification"
                 className="data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-md text-sm sm:text-base"
               >
-                Commercial Registration
+                {t("commercial_registration")}
               </TabsTrigger>
             </TabsList>
             <TabsContent value="profile-details" className="pt-6">
@@ -265,7 +249,7 @@ export default function Component() {
                     htmlFor="companyName"
                     className="text-gray-700 text-sm sm:text-base"
                   >
-                    Company Name
+                    {t("company_name")}
                   </Label>
                   <Input
                     id="companyName"
@@ -280,7 +264,7 @@ export default function Component() {
                     htmlFor="contactPersonName"
                     className="text-gray-700 text-sm sm:text-base"
                   >
-                    Contact Person Name
+                    {t("contact_person_name")}
                   </Label>
                   <Input
                     id="contactPersonName"
@@ -295,7 +279,7 @@ export default function Component() {
                     htmlFor="personalEmail"
                     className="text-gray-700 text-sm sm:text-base"
                   >
-                    Personal Email
+                    {t("personal_email")}
                   </Label>
                   <Input
                     id="personalEmail"
@@ -311,7 +295,7 @@ export default function Component() {
                     htmlFor="companyEmail"
                     className="text-gray-700 text-sm sm:text-base"
                   >
-                    Company Email
+                    {t("company_email")}
                   </Label>
                   <Input
                     id="companyEmail"
@@ -327,7 +311,7 @@ export default function Component() {
                     htmlFor="companyPhoneNumber"
                     className="text-gray-700 text-sm sm:text-base"
                   >
-                    Company Phone
+                    {t("company_phone")}
                   </Label>
                   <div className="flex gap-2 mt-1">
                     <Select
@@ -336,7 +320,7 @@ export default function Component() {
                       disabled={areInputsDisabled}
                     >
                       <SelectTrigger className="w-[100px] sm:w-[120px]">
-                        <SelectValue placeholder={t('country')} />
+                        <SelectValue placeholder={t("country")} />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="QA">QA +974</SelectItem>
@@ -358,7 +342,7 @@ export default function Component() {
                     htmlFor="companyDescription"
                     className="text-gray-700 text-sm sm:text-base"
                   >
-                    Company Description
+                    {t("company_description")}
                   </Label>
                   <Input
                     id="companyDescription"
@@ -374,17 +358,16 @@ export default function Component() {
               <div className="grid grid-cols-1 gap-6">
                 <div>
                   <h3 className="text-base sm:text-lg font-semibold text-gray-900">
-                    Commercial Registration Verification
+                    {t("commercial_registration_verification")}
                   </h3>
                   <p className="text-xs sm:text-sm text-gray-500 mb-4">
-                    This info is used to verify your company&apos;s
-                    registration.
+                    {t("this_info_is_used_to_verify_your_company_registration")}
                   </p>
                   <Label
                     htmlFor="commercialRegistrationNumber"
                     className="text-gray-700 text-sm sm:text-base"
                   >
-                    Commercial Registration Number
+                    {t("commercial_registration_number")}
                   </Label>
                   <Input
                     id="commercialRegistrationNumber"
@@ -396,22 +379,22 @@ export default function Component() {
                 </div>
                 <div>
                   <Label className="text-gray-700 text-sm sm:text-base">
-                    Upload CR Document (PDF, JPG, PNG)
+                    {t("upload_cr_document_pdf_jpg_png")}
                   </Label>
                   <div className="mt-1 border-2 border-dashed border-gray-300 rounded-lg p-4 sm:p-6 text-center flex flex-col items-center justify-center space-y-3">
                     <UploadIcon className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" />
                     <p className="text-xs sm:text-sm text-gray-600">
-                      Drag and drop your file here, or click to browse
+                      {t("drag_and_drop_your_file_here_or_click_to_browse")}
                     </p>
                     <Button
                       variant="outline"
                       className="px-4 py-2 sm:px-6 sm:py-2 bg-transparent text-sm sm:text-base"
                       disabled={areInputsDisabled}
                     >
-                      Choose File
+                      {t("choose_file")}
                     </Button>
                     <p className="text-xs text-gray-500">
-                      PDF, JPG, PNG up to 10MB
+                      {t("pdf_jpg_png_up_to_10mb")}
                     </p>
                   </div>
                 </div>
@@ -420,26 +403,25 @@ export default function Component() {
           </Tabs>
         </main>
       </div>
-      {/* Confirmation Dialog */}
       <Dialog open={showCompletionModal} onOpenChange={setShowCompletionModal}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Confirm Profile Completion</DialogTitle>
+            <DialogTitle>{t("confirm_profile_completion")}</DialogTitle>
             <DialogDescription>
-              Are you sure you want to complete your profile? Once confirmed,
-              your profile will be submitted for verification and you will no
-              longer be able to edit it.
+              {t(
+                "are_you_sure_you_want_to_complete_your_profile_once_confirmed_your_profile_will_be_submitted_for_verification_and_you_will_no_longer_be_able_to_edit_it"
+              )}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={handleCloseModal}>
-              {t('cancel')}
+              {t("cancel")}
             </Button>
             <Button
               onClick={handleConfirmCompletion}
               className="bg-blue-600 hover:bg-blue-700 text-white"
             >
-              {t('confirm')}
+              {t("confirm")}
             </Button>
           </DialogFooter>
         </DialogContent>

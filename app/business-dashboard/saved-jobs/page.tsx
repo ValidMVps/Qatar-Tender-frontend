@@ -20,6 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { TenderCard } from "@/components/tender-card";
+import useTranslation from "@/lib/hooks/useTranslation";
 
 // Sample data for saved jobs (using the same structure as tenders for TenderCard compatibility)
 const savedJobsData = [
@@ -129,14 +130,14 @@ export default function SavedJobsPage() {
   const startIndex = (currentPage - 1) * Number.parseInt(jobsPerPage);
   const endIndex = startIndex + Number.parseInt(jobsPerPage);
   const jobsToDisplay = filteredJobs.slice(startIndex, endIndex);
-
+  const { t } = useTranslation();
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-6 gap-6">
         <div className="relative flex-1">
           <Input
             type="text"
-            placeholder="Search saved jobs..."
+            placeholder={t("search_saved_jobs")}
             className="pl-10 pr-10 rounded-full h-10"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -155,22 +156,22 @@ export default function SavedJobsPage() {
         </div>
         <Select defaultValue="newest">
           <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Sort by: Newest" />
+            <SelectValue placeholder={t("sort_by_newest")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="newest">Sort by: Newest</SelectItem>
-            <SelectItem value="oldest">Sort by: Oldest</SelectItem>
+            <SelectItem value="newest">{t("sort_by_newest")}</SelectItem>
+            <SelectItem value="oldest">{t("sort_by_oldest")}</SelectItem>
             <SelectItem value="budget-high">
-              Sort by: Budget (High to Low)
+              {t("sort_by_budget_high_to_low")}
             </SelectItem>
             <SelectItem value="budget-low">
-              Sort by: Budget (Low to High)
+              {t("sort_by_budget_low_to_high")}
             </SelectItem>
           </SelectContent>
         </Select>
       </div>
 
-    {  <div className="space-y-4">
+      <div className="space-y-4">
         {jobsToDisplay.length > 0 ? (
           jobsToDisplay.map((job) => (
             <TenderCard
@@ -185,21 +186,22 @@ export default function SavedJobsPage() {
           <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
             <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">
-              No saved jobs found
+              {t("no_saved_jobs_found")}
             </h3>
             <p className="text-gray-600 mb-6">
-              You haven't saved any jobs yet. Browse tenders to find
-              opportunities!
+              {t(
+                "you_havent_saved_any_jobs_yet_browse_tenders_to_find_opportunities"
+              )}
             </p>
           </div>
         )}
-      </div>}
+      </div>
 
       {filteredJobs.length > 0 && (
         <div className="flex justify-between items-center mt-6">
           <Select value={jobsPerPage} onValueChange={setJobsPerPage}>
             <SelectTrigger className="w-[120px]">
-              <SelectValue placeholder="Jobs Per Page" />
+              <SelectValue placeholder={t("jobs_per_page")} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="10">10</SelectItem>

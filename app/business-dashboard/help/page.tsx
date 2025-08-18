@@ -13,9 +13,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Mail, Phone, MapPin } from "lucide-react";
 
-import { useTranslation } from '../../../lib/hooks/useTranslation';
+import { useTranslation } from "../../../lib/hooks/useTranslation";
+
 export default function HelpPage() {
-    const { t } = useTranslation();
+  const { t } = useTranslation();
 
   return (
     <div className="container py-1 px-2 md:py-3 md:px-3">
@@ -25,44 +26,41 @@ export default function HelpPage() {
           <div className="space-y-4 order-2 md:order-1">
             <div>
               <h3 className="text-xl md:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-3 md:mb-6">
-                Frequently Asked Questions
+                {t("frequently_asked_questions")}
               </h3>
               <Accordion type="single" collapsible className="w-full">
                 {[
                   {
-                    title: "How do I post a new tender?",
-                    content:
-                      'To post a new tender, go to "Dashboard" and click "Post Tender". Fill in all required details like description, budget, and deadline.',
+                    title: t("how_do_i_post_a_new_tender"),
+                    content: t("how_do_i_post_a_new_tender_content"),
                   },
                   {
-                    title: "How can I track my tender's progress?",
-                    content:
-                      'Go to "My Tenders" from the sidebar. You can view status, submitted bids, and project milestones.',
+                    title: t("how_can_i_track_my_tenders_progress"),
+                    content: t("how_can_i_track_my_tenders_progress_content"),
                   },
                   {
-                    title: "What if I need to modify a tender after posting?",
-                    content:
-                      'In "My Tenders", select the tender and click "Edit". Major changes may need re-approval or notify bidders.',
+                    title: t("what_if_i_need_to_modify_a_tender_after_posting"),
+                    content: t(
+                      "what_if_i_need_to_modify_a_tender_after_posting_content"
+                    ),
                   },
                   {
-                    title: "How do I contact a service provider?",
-                    content:
-                      'After submitting or awarding a bid, use the "Chats" section from the sidebar to message providers directly.',
+                    title: t("how_do_i_contact_a_service_provider"),
+                    content: t("how_do_i_contact_a_service_provider_content"),
                   },
                   {
-                    title: "Can I cancel a tender?",
-                    content:
-                      "Yes, go to 'My Tenders', select the tender, and click 'Cancel'. All active bidders will be notified.",
+                    title: t("can_i_cancel_a_tender"),
+                    content: t("can_i_cancel_a_tender_content"),
                   },
                   {
-                    title: "Is there a fee to post tenders?",
-                    content:
-                      "No, posting tenders is currently free. Fees may apply later for featured listings or premium tools.",
+                    title: t("is_there_a_fee_to_post_tenders"),
+                    content: t("is_there_a_fee_to_post_tenders_content"),
                   },
                   {
-                    title: "How do I report an issue with a provider?",
-                    content:
-                      "Go to the provider’s profile and click 'Report'. You can also reach out to support directly.",
+                    title: t("how_do_i_report_an_issue_with_a_provider"),
+                    content: t(
+                      "how_do_i_report_an_issue_with_a_provider_content"
+                    ),
                   },
                 ].map((item, index) => (
                   <AccordionItem
@@ -70,7 +68,7 @@ export default function HelpPage() {
                     value={`item-${index + 1}`}
                     className="border-b py-1 md:py-2 px-0"
                   >
-                    <AccordionTrigger className="bg- dark:bg-neutral-900 px-1 md:px-4 py-3 text-xs md:text-base font-medium text-left  dark:hover:bg-neutral-800 transition-colors duration-200">
+                    <AccordionTrigger className="bg- dark:bg-neutral-900 px-1 md:px-4 py-3 text-xs md:text-base font-medium text-left dark:hover:bg-neutral-800 transition-colors duration-200">
                       {item.title}
                     </AccordionTrigger>
                     <AccordionContent className="px-4 pb-4 text-gray-700 dark:text-gray-300">
@@ -87,38 +85,38 @@ export default function HelpPage() {
             <Card className="rounded-md border-0 md:border-1 md:border-neutral-200/70 h-min">
               <CardHeader className="px-0 md:px-6">
                 <CardTitle className="text-lg font-semibold">
-                  Send us a message
+                  {t("send_us_a_message")}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-5  px-0 md:px-7">
+              <CardContent className="space-y-5 px-0 md:px-7">
                 <div>
                   <Label htmlFor="name" className="mb-1">
-                    Your Name
+                    {t("your_name")}
                   </Label>
-                  <Input id="name" placeholder="John Doe" />
+                  <Input id="name" placeholder={t("john_doe")} />
                 </div>
                 <div>
                   <Label htmlFor="email" className="mb-1">
-                    Your Email
+                    {t("your_email")}
                   </Label>
                   <Input
                     id="email"
                     type="email"
-                    placeholder="john.doe@example.com"
+                    placeholder={t("john_doe@example_com")}
                   />
                 </div>
                 <div>
                   <Label htmlFor="message" className="mb-1">
-                    {t('message')}
+                    {t("message")}
                   </Label>
                   <Textarea
                     id="message"
                     rows={5}
-                    placeholder="Type your message here..."
+                    placeholder={t("type_your_message_here")}
                   />
                 </div>
                 <Button className="w-full bg-blue-600 text-white rounded-sm">
-                  Send Message
+                  {t("send_message")}
                 </Button>
               </CardContent>
             </Card>
@@ -126,7 +124,7 @@ export default function HelpPage() {
             <Card className="rounded-md border-neutral-200/70">
               <CardHeader>
                 <CardTitle className="text-lg font-semibold">
-                  Reach us directly
+                  {t("reach_us_directly")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4 text-sm">
@@ -145,7 +143,7 @@ export default function HelpPage() {
                 <div className="flex items-center space-x-3">
                   <MapPin className="h-5 w-5 text-gray-500 dark:text-gray-400" />
                   <span className="text-gray-700 dark:text-gray-300">
-                    Doha, Qatar
+                    {t("doha_qatar")}
                   </span>
                 </div>
               </CardContent>

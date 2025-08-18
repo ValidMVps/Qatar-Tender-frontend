@@ -5,6 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import useTranslation from "@/lib/hooks/useTranslation";
 import {
   ResponsiveContainer,
   AreaChart,
@@ -23,12 +24,13 @@ const dummyServices = [
 ];
 
 export function ServiceProvidersOverviewChart() {
+  const { t } = useTranslation();
   return (
     <Card className="w-full flex flex-col md:col-span-7 col-span-1 mx-auto h-full justify-between rounded-sm md:rounded-lg">
       <CardHeader>
-        <CardTitle>Service Providers Overview</CardTitle>
+        <CardTitle>{t("service_providers_overview")}</CardTitle>
         <CardDescription>
-          Revenue and jobs completed over the last 5 days
+          {t("revenue_and_jobs_completed_over_the_last_5_days")}
         </CardDescription>
       </CardHeader>
       <CardContent className="flex-1 px-2 sm:px-4 min-h-[250px]">
@@ -54,14 +56,14 @@ export function ServiceProvidersOverviewChart() {
               <Area
                 type="monotone"
                 dataKey="revenue"
-                name="Revenue"
+                name={t("revenue")}
                 stroke="#3B82F6"
                 fill="url(#colorBlue)"
               />
               <Area
                 type="monotone"
                 dataKey="jobsCompleted"
-                name="Jobs Completed"
+                name={t("jobs_completed")}
                 stroke="#3B82F6"
                 fill="url(#colorBlue)"
               />

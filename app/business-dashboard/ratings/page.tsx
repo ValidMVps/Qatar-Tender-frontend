@@ -514,43 +514,43 @@ const ReviewsRatingsPage: React.FC = () => {
       </p>
     </div>
   );
-
+  const { t } = useTranslation();
   return (
     <div className="min-h-screen bg-gray-50 container mx-auto px-0 py-8 ">
       <div className="mx-auto space-y-8">
         {/* Analytics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <AnalyticsCard
-            title="Average Rating"
+            title={t("average_rating")}
             value={mockAnalytics.averageRating.toFixed(1)}
             icon={<TrendingUp className="w-4 h-4" />}
-            description="Out of 5 stars"
+            description={t("out_of_5_stars")}
           />
           <AnalyticsCard
-            title="Total Reviews"
+            title={t("total_reviews")}
             value={mockAnalytics.totalReviews}
             icon={<MessageSquare className="w-4 h-4" />}
-            description="From completed projects"
+            description={t("from_completed_projects")}
           />
           <AnalyticsCard
-            title="5-Star Reviews"
+            title={t("5_star_reviews")}
             value={`${mockAnalytics.fiveStarPercentage}%`}
             icon={<Award className="w-4 h-4" />}
-            description="Excellent ratings"
+            description={t("excellent_ratings")}
           />
           <AnalyticsCard
-            title="Top Quality"
+            title={t("top_quality")}
             value={mockAnalytics.mostFrequentTag}
             icon={<Clock className="w-4 h-4" />}
-            description="Most mentioned attribute"
+            description={t("most_mentioned_attribute")}
           />
         </div>
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="received">Reviews Received</TabsTrigger>
-            <TabsTrigger value="given">Reviews Given by Me</TabsTrigger>
+            <TabsTrigger value="received">{t("reviews_received")}</TabsTrigger>
+            <TabsTrigger value="given">{t("reviews_given_by_me")}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="received" className="space-y-8">
@@ -560,7 +560,9 @@ const ReviewsRatingsPage: React.FC = () => {
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                   <Input
-                    placeholder="Search by contractor name, project, or review content..."
+                    placeholder={t(
+                      "search_by_contractor_name_project_or_review_content"
+                    )}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-10 border-gray-300 focus:border-gray-500"
@@ -568,15 +570,15 @@ const ReviewsRatingsPage: React.FC = () => {
                 </div>
                 <Select value={ratingFilter} onValueChange={setRatingFilter}>
                   <SelectTrigger className="w-full sm:w-48 border-gray-300">
-                    <SelectValue placeholder="Filter by rating" />
+                    <SelectValue placeholder={t("filter_by_rating")} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Ratings</SelectItem>
-                    <SelectItem value="5">5 Stars</SelectItem>
-                    <SelectItem value="4">4 Stars</SelectItem>
-                    <SelectItem value="3">3 Stars</SelectItem>
-                    <SelectItem value="2">2 Stars</SelectItem>
-                    <SelectItem value="1">1 Star</SelectItem>
+                    <SelectItem value="all">{t("all_ratings")}</SelectItem>
+                    <SelectItem value="5">5 {t("stars")}</SelectItem>
+                    <SelectItem value="4">4 {t("stars")}</SelectItem>
+                    <SelectItem value="3">3 {t("stars")}</SelectItem>
+                    <SelectItem value="2">2 {t("stars")}</SelectItem>
+                    <SelectItem value="1">1 {t("star")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -601,7 +603,9 @@ const ReviewsRatingsPage: React.FC = () => {
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                   <Input
-                    placeholder="Search by project owner name, project, or review content..."
+                    placeholder={t(
+                      "search_by_project_owner_name_project_or_review_content"
+                    )}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-10 border-gray-300 focus:border-gray-500"
@@ -609,15 +613,15 @@ const ReviewsRatingsPage: React.FC = () => {
                 </div>
                 <Select value={ratingFilter} onValueChange={setRatingFilter}>
                   <SelectTrigger className="w-full sm:w-48 border-gray-300">
-                    <SelectValue placeholder="Filter by rating" />
+                    <SelectValue placeholder={t("filter_by_rating")} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Ratings</SelectItem>
-                    <SelectItem value="5">5 Stars</SelectItem>
-                    <SelectItem value="4">4 Stars</SelectItem>
-                    <SelectItem value="3">3 Stars</SelectItem>
-                    <SelectItem value="2">2 Stars</SelectItem>
-                    <SelectItem value="1">1 Star</SelectItem>
+                    <SelectItem value="all">{t("all_ratings")}</SelectItem>
+                    <SelectItem value="5">5 {t("stars")}</SelectItem>
+                    <SelectItem value="4">4 {t("stars")}</SelectItem>
+                    <SelectItem value="3">3 {t("stars")}</SelectItem>
+                    <SelectItem value="2">2 {t("stars")}</SelectItem>
+                    <SelectItem value="1">1 {t("star")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

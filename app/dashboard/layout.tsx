@@ -18,6 +18,7 @@ import Navbar from "@/components/Navbar";
 import { motion } from "framer-motion";
 
 import { useTranslation } from "../../lib/hooks/useTranslation";
+import { LanguageToggle } from "@/components/LanguageToggle";
 export default function DashboardLayout({
   children,
 }: {
@@ -35,7 +36,11 @@ export default function DashboardLayout({
   const sidebarLinks = [
     { name: t("dashboard"), href: "/dashboard", icon: Home },
     { name: t("my_tenders"), href: "/dashboard/my-tenders", icon: FileText },
-    { name: t("active_projects"), href: "/dashboard/projects", icon: Briefcase },
+    {
+      name: t("active_projects"),
+      href: "/dashboard/projects",
+      icon: Briefcase,
+    },
     { name: t("ratings_reviews"), href: "/dashboard/ratings", icon: Star },
     { name: t("settings"), href: "/dashboard/settings", icon: Settings },
     { name: t("help_support"), href: "/dashboard/help", icon: HelpCircle },
@@ -157,6 +162,7 @@ export default function DashboardLayout({
           setSidebarOpen={setSidebarOpen}
           sidebarLinks={sidebarLinks}
         />
+
         <main className="flex-1 w-full px-2 sm:px-4 py-0  md:mt-0 mt-[70px] bg-neutral-50/30">
           {children}
         </main>
