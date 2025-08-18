@@ -1,69 +1,66 @@
 "use client";
 
-import { useActionState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { MailCheck } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-
-import { useTranslation } from '../lib/hooks/useTranslation';
-// This is a simulated server action for demonstration.
-// In a real application, this would be in app/actions/auth.ts or similar.
-async function authenticate(
-  prevState: { message: string } | undefined,
-  formData: FormData
-): Promise<{ message: string }> {
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
-
-  // Simulate network delay
-  await new Promise((resolve) => setTimeout(resolve, 1500));
-
-  if (email === "test@example.com" && password === "Password123!") {
-    return { message: "Login successful! Redirecting..." };
-  } else {
-    return { message: "Invalid credentials. Please try again." };
-  }
-}
+import { useTranslation } from "../lib/hooks/useTranslation";
+import { useAuth } from "@/context/AuthContext";
 
 export default function LoginForm() {
-    const { t } = useTranslation();
-
+  const { t } = useTranslation();
   const { toast } = useToast();
-  const [state, formAction, isPending] = useActionState(
-    authenticate,
-    undefined
-  );
+  const { login } = useAuth();
 
-  // Show toast message based on authentication result
-  // In a real app, you'd likely redirect on success
-  if (state?.message) {
-    toast({
-      title: state.message.includes("successful") ? "Success" : "Error",
-      description: state.message,
-      variant: state.message.includes("successful") ? "default" : "destructive",
-    });
-    // You might add a redirect here for successful login
-    // For example: if (state.message.includes("successful")) { router.push('/dashboard'); }
-  }
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isPending, setIsPending] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsPending(true);
+
+    const result = await login(email, password);
+
+    if (result.success) {
+      toast({
+        title: "Success",
+        description: "Login successful! Redirecting...",
+        variant: "default",
+      });
+      // Redirect is already handled inside AuthContext.login()
+    } else {
+      toast({
+        title: "Error",
+        description: result.error || "Invalid credentials",
+        variant: "destructive",
+      });
+    }
+
+    setIsPending(false);
+  };
 
   return (
-    <form action={formAction} className="space-y-6 w-full ">
+    <form onSubmit={handleSubmit} className="space-y-6 w-full">
       <div className="space-y-2">
-        <Label htmlFor="email">{t('email')}</Label>
+        <Label htmlFor="email">{t("email")}</Label>
         <Input
           id="email"
           name="email"
           type="email"
           placeholder="you@example.com"
           required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
         />
       </div>
+
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <Label htmlFor="password">{t('password')}</Label>
+          <Label htmlFor="password">{t("password")}</Label>
           <Link
             href="/forgot-password"
             className="text-sm font-medium text-blue-600 hover:underline"
@@ -77,8 +74,11 @@ export default function LoginForm() {
           type="password"
           placeholder="••••••••"
           required
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
         />
       </div>
+
       <Button
         type="submit"
         className="w-full bg-blue-600 text-white hover:bg-blue-700 rounded-md"
@@ -87,6 +87,7 @@ export default function LoginForm() {
         {isPending ? "Logging in..." : "Login"}
         <MailCheck className="ml-2 h-4 w-4" />
       </Button>
+
       <div className="mt-4 text-center text-sm text-muted-foreground">
         Don&apos;t have an account?{" "}
         <Link

@@ -4,6 +4,7 @@ import "./globals.css";
 import GoogleTranslate from "next-google-translate-widget";
 import Script from "next/script";
 import { LanguageProvider } from "@/components/LanguageProvider";
+import { AuthProvider } from "@/context/AuthContext";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -29,7 +30,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <LanguageProvider> {children}</LanguageProvider>
+        <AuthProvider>
+          <LanguageProvider>{children}</LanguageProvider>
+        </AuthProvider>
       </body>
     </html>
   );

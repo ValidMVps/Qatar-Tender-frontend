@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -20,12 +21,15 @@ import {
   MailCheck,
   RefreshCw,
   UserRound,
+  Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
 
 import { useTranslation } from "../lib/hooks/useTranslation";
+import { useAuth } from "@/context/AuthContext";
+
 type Step = 1 | 2 | 3;
 type AccountType = "individual" | "business";
 
@@ -65,12 +69,16 @@ const countries = [
 
 export default function SignupWizard() {
   const { t } = useTranslation();
-
+  const { register, resendVerificationEmail, isLoading } = useAuth();
   const { toast } = useToast();
+  const router = useRouter();
+
   const [step, setStep] = useState<Step>(1);
   const [form, setForm] = useState<FormState>({ ...initialState });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [resendCooldown, setResendCooldown] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [registrationSuccess, setRegistrationSuccess] = useState(false);
 
   const currentEmail = useMemo(() => {
     return form.accountType === "business" ? form.companyEmail : form.email;
@@ -93,10 +101,12 @@ export default function SignupWizard() {
 
   const validateStep = (s: Step): boolean => {
     const nextErrors: Record<string, string> = {};
+
     if (s === 1) {
       if (!form.accountType)
         nextErrors.accountType = "Please choose an account type.";
     }
+
     if (s === 2) {
       const emailToCheck =
         form.accountType === "business" ? form.companyEmail : form.email;
@@ -109,6 +119,7 @@ export default function SignupWizard() {
             ? "Company name is required."
             : "Full name is required.";
       }
+
       if (!emailToCheck.trim()) {
         nextErrors.email = "Email is required.";
       } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailToCheck)) {
@@ -133,6 +144,7 @@ export default function SignupWizard() {
         nextErrors.password = "Include at least one special character.";
       }
     }
+
     setErrors(nextErrors);
     return Object.keys(nextErrors).length === 0;
   };
@@ -149,7 +161,7 @@ export default function SignupWizard() {
     if (step === 1) setStep(2);
   };
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
     if (!validateStep(2)) {
       toast({
         title: "Validation failed",
@@ -158,12 +170,67 @@ export default function SignupWizard() {
       });
       return;
     }
-    setStep(3);
-    toast({
-      title: "Verification email sent",
-      description: `We've sent a link to ${currentEmail}.`,
-    });
-    setResendCooldown(30);
+
+    setIsSubmitting(true);
+    setErrors({});
+
+    try {
+      // Prepare registration data
+      const registrationData = {
+        email: currentEmail,
+        password: form.password,
+        userType: form.accountType!,
+        phone: `${form.countryCode}${form.phone}`,
+        ...(form.accountType === "individual"
+          ? { fullName: form.fullName }
+          : { companyName: form.companyName }),
+      };
+
+      const result = await register(registrationData);
+
+      if (result.success) {
+        // Registration successful - user created but not verified yet
+        setRegistrationSuccess(true);
+        setStep(3); // Show verification step
+        setResendCooldown(30);
+        toast({
+          title: "Registration successful!",
+          description:
+            result.message ||
+            `We've sent a verification email to ${currentEmail}. Please check your email and click the verification link.`,
+        });
+      } else {
+        // Handle specific errors
+        if (result.error?.includes("already exists")) {
+          setErrors({
+            email: "This email is already registered. Try logging in instead.",
+          });
+        } else {
+          setErrors({
+            general: result.error || "Registration failed. Please try again.",
+          });
+        }
+
+        toast({
+          title: "Registration failed",
+          description:
+            result.error || "Please check your information and try again.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Registration error:", error);
+      setErrors({
+        general: "Network error. Please check your connection and try again.",
+      });
+      toast({
+        title: "Network error",
+        description: "Please check your connection and try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const onBack = () => {
@@ -176,13 +243,7 @@ export default function SignupWizard() {
     const cc = countries[Math.floor(Math.random() * countries.length)].code;
     const serial = Math.floor(100 + Math.random() * 899);
     const phone = String(Math.floor(1000000 + Math.random() * 8999999));
-    const fullName = sample([
-      "Layla Al-Thani",
-      "Hamad Al-Khalifa",
-      "Noor Al-Suwaidi",
-      "Faisal Al-Mansoori",
-      "Maryam Al-Mahmoud",
-    ]);
+
     const companyName = sample([
       "Doha Build Co.",
       "Gulf Infra Group",
@@ -190,41 +251,78 @@ export default function SignupWizard() {
       "Pearl Contracting",
       "Corniche Holdings",
     ]);
-    const emailLocal = fullName.toLowerCase().replace(/[^a-z]/g, "") || "user";
     const companyLocal =
       companyName.toLowerCase().replace(/[^a-z]/g, "") || "company";
     const domain = sample(["qatartenders.qa", "qtr-mail.com", "example.qa"]);
 
     const next: FormState = {
       accountType: acct,
-      fullName,
-      email: `${emailLocal}${serial}@${domain}`,
+      fullName: acct === "individual" ? "Ahmed" : "", // Individual → Ahmed, Business → leave empty
+      email: "", // always empty
       companyName,
-      companyEmail: `${companyLocal}${serial}@${domain}`,
+      companyEmail:
+        acct === "business" ? `${companyLocal}${serial}@${domain}` : "",
       countryCode: cc,
       phone,
       password: `P@ssw0rd${serial}`,
     };
+
     setForm(next);
     setErrors({});
     if (step === 1) setStep(2);
+
     toast({
       title: "Demo data filled",
-      description: "You can edit any field before submitting.",
+      description:
+        "Email left blank. Name set to Ahmed for individual accounts.",
     });
   };
 
-  const resend = () => {
+  const resend = async () => {
     if (resendCooldown > 0) return;
-    setResendCooldown(30);
-    toast({
-      title: "Resent verification",
-      description: `A new link was sent to ${currentEmail}.`,
-    });
+
+    setIsSubmitting(true);
+
+    try {
+      const result = await resendVerificationEmail(currentEmail);
+
+      if (result.success) {
+        setResendCooldown(30);
+        toast({
+          title: "Verification email sent",
+          description:
+            result.message ||
+            `A new verification link was sent to ${currentEmail}.`,
+        });
+      } else {
+        toast({
+          title: "Failed to resend",
+          description: result.error || "Please try again later.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Resend verification error:", error);
+      toast({
+        title: "Network error",
+        description: "Please check your connection and try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
   return (
     <div className="space-y-8 w-xl rounded-2xl p-8 bg-white border border-gray-100">
       <StepHeader current={step} />
+
+      {errors.general && (
+        <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-sm text-red-600">{errors.general}</p>
+        </div>
+      )}
+
       <div className="space-y-8">
         {step === 1 && (
           <StepOne
@@ -248,52 +346,84 @@ export default function SignupWizard() {
           />
         )}
       </div>
+
       <div className="flex flex-wrap items-center justify-between gap-4 pt-1">
-        <Button variant="outline" onClick={fillRandom} className="px-5 py-2">
-          Fill with random data
-        </Button>
+        {step !== 3 && (
+          <Button
+            variant="outline"
+            onClick={fillRandom}
+            className="px-5 py-2"
+            disabled={isSubmitting}
+          >
+            Fill with random data
+          </Button>
+        )}
 
         <div className="flex items-center gap-3">
-          {step > 1 && (
-            <Button variant="ghost" onClick={onBack} className="px-5 py-2">
+          {step > 1 && !registrationSuccess && (
+            <Button
+              variant="ghost"
+              onClick={onBack}
+              className="px-5 py-2"
+              disabled={isSubmitting}
+            >
               <ArrowLeft className="mr-2 h-4 w-4" />
               {t("back")}
             </Button>
           )}
+
           {step === 1 && (
             <Button
               onClick={onContinue}
               className="bg-blue-600 text-white px-6 py-2 hover:bg-blue-700"
+              disabled={isSubmitting}
             >
               {t("continue")} <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           )}
+
           {step === 2 && (
-            <Link
-              href={
-                form.accountType !== "business"
-                  ? "/dashboard"
-                  : "/business-dashboard"
-              }
-            >
-              <Button className="bg-blue-600 text-white px-6 py-2 hover:bg-blue-700">
-                {t("submit")} <MailCheck className="ml-2 h-4 w-4" />
-              </Button>
-            </Link>
-          )}
-          {step === 3 && (
             <Button
-              variant="secondary"
-              onClick={() => setStep(2)}
-              className="px-5 py-2"
+              onClick={onSubmit}
+              className="bg-blue-600 text-white px-6 py-2 hover:bg-blue-700"
+              disabled={isSubmitting}
             >
-              Edit details
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Creating account...
+                </>
+              ) : (
+                <>
+                  {t("submit")} <MailCheck className="ml-2 h-4 w-4" />
+                </>
+              )}
             </Button>
-          )}{" "}
+          )}
+
+          {step === 3 && (
+            <div className="flex gap-3">
+              <Button
+                variant="secondary"
+                onClick={() => setStep(2)}
+                className="px-5 py-2"
+                disabled={isSubmitting}
+              >
+                Edit details
+              </Button>
+              <Button
+                onClick={() => router.push("/login")}
+                className="bg-green-600 text-white px-6 py-2 hover:bg-green-700"
+              >
+                Continue to Login
+              </Button>
+            </div>
+          )}
         </div>
-      </div>{" "}
+      </div>
+
       <div className="mt-4 text-center text-sm text-muted-foreground">
-        Don&apos;t have an account?{" "}
+        Already have an account?{" "}
         <Link
           href="/login"
           className="font-medium text-blue-600 hover:underline"
@@ -301,12 +431,6 @@ export default function SignupWizard() {
           {t("login")}
         </Link>
       </div>
-      <Link
-        href="/business-dashboard"
-        className="font-medium text-blue-600 hover:underline"
-      >
-        {t("business")}
-      </Link>
     </div>
   );
 }
@@ -368,7 +492,7 @@ function SelectableCard({
       className={cn(
         "group flex gap-6 relative text-left",
         "rounded-xl border bg-white p-5 transition-all",
-        "hover:shadow-xs focus-visible:outline-none  ",
+        "hover:shadow-xs focus-visible:outline-none",
         selected ? "border-blue-400" : "border-neutral-200"
       )}
     >
@@ -402,6 +526,7 @@ function StepTwo({
 }) {
   const isBiz = form.accountType === "business";
   const { t } = useTranslation();
+
   return (
     <div className="space-y-5">
       {isBiz ? (
@@ -415,7 +540,10 @@ function StepTwo({
               placeholder="e.g., Doha Build Co."
               value={form.companyName}
               onChange={(e) => onChange({ companyName: e.target.value })}
-              className="py-3 mt-2 text-base"
+              className={cn(
+                "py-3 mt-2 text-base",
+                errors.name && "border-red-500"
+              )}
             />
             {errors.name && (
               <p className="text-sm text-red-600 mt-2">{errors.name}</p>
@@ -431,7 +559,10 @@ function StepTwo({
               placeholder="name@company.qa"
               value={form.companyEmail}
               onChange={(e) => onChange({ companyEmail: e.target.value })}
-              className="py-3  mt-2  text-base"
+              className={cn(
+                "py-3 mt-2 text-base",
+                errors.email && "border-red-500"
+              )}
             />
             {errors.email && (
               <p className="text-sm text-red-600 mt-2">{errors.email}</p>
@@ -449,7 +580,10 @@ function StepTwo({
               placeholder="e.g., Layla Al-Thani"
               value={form.fullName}
               onChange={(e) => onChange({ fullName: e.target.value })}
-              className="py-3  mt-2  text-base"
+              className={cn(
+                "py-3 mt-2 text-base",
+                errors.name && "border-red-500"
+              )}
             />
             {errors.name && (
               <p className="text-sm text-red-600 mt-2">{errors.name}</p>
@@ -465,7 +599,10 @@ function StepTwo({
               placeholder="you@example.qa"
               value={form.email}
               onChange={(e) => onChange({ email: e.target.value })}
-              className="py-3  mt-2  text-base"
+              className={cn(
+                "py-3 mt-2 text-base",
+                errors.email && "border-red-500"
+              )}
             />
             {errors.email && (
               <p className="text-sm text-red-600 mt-2">{errors.email}</p>
@@ -478,7 +615,7 @@ function StepTwo({
         <Label htmlFor="phone" className="text-base font-medium">
           {t("phone")}
         </Label>
-        <div className="flex gap-3  mt-2 ">
+        <div className="flex gap-3 mt-2">
           <Select
             value={form.countryCode}
             onValueChange={(v) => onChange({ countryCode: v })}
@@ -498,7 +635,10 @@ function StepTwo({
             id="phone"
             inputMode="numeric"
             placeholder="Phone number"
-            className="flex-1 py-3 text-base"
+            className={cn(
+              "flex-1 py-3 text-base",
+              errors.phone && "border-red-500"
+            )}
             value={form.phone}
             onChange={(e) => {
               const onlyDigits = e.target.value.replace(/[^\d]/g, "");
@@ -514,7 +654,6 @@ function StepTwo({
         </p>
       </div>
 
-      {/* Password Field */}
       <div className="space-y-3">
         <Label htmlFor="password" className="text-base font-medium">
           {t("password")}
@@ -525,13 +664,20 @@ function StepTwo({
           placeholder="Enter your password"
           value={form.password}
           onChange={(e) => onChange({ password: e.target.value })}
-          className="py-3 text-base  mt-2 "
+          className={cn(
+            "py-3 text-base mt-2",
+            errors.password && "border-red-500"
+          )}
         />
         {errors.password && (
           <div className="text-sm text-red-600 mt-2">
             <p>{errors.password}</p>
           </div>
         )}
+        <p className="text-xs text-muted-foreground mt-2">
+          Password must be at least 8 characters with letters, numbers, and
+          special characters.
+        </p>
       </div>
     </div>
   );
@@ -549,18 +695,25 @@ function StepThree({
   return (
     <div className="space-y-8">
       <div className="flex items-start gap-6">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
-          <CheckCircle2 className="h-7 w-7" aria-hidden="true" />
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 text-blue-700">
+          <MailCheck className="h-7 w-7" aria-hidden="true" />
         </div>
         <div className="space-y-3">
-          <h3 className="text-xl font-semibold">Check your email</h3>
+          <h3 className="text-xl font-semibold">Verify your email address</h3>
           <p className="text-base text-muted-foreground leading-relaxed">
             We&apos;ve sent a verification link to{" "}
             <span className="font-medium text-foreground">
               {email || "your email address"}
             </span>
-            . Click the link to verify and complete your signup.
+            . Please check your email and click the verification link to
+            activate your account.
           </p>
+          <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <p className="text-sm text-yellow-800">
+              <strong>Important:</strong> You must verify your email before you
+              can log in to your account.
+            </p>
+          </div>
         </div>
       </div>
       <div className="flex items-center gap-4">
@@ -572,10 +725,12 @@ function StepThree({
           className="px-6 py-3"
         >
           <RefreshCw className="mr-2 h-4 w-4" />
-          {cooldown > 0 ? `Resend in ${cooldown}s` : "Resend link"}
+          {cooldown > 0
+            ? `Resend in ${cooldown}s`
+            : "Resend verification email"}
         </Button>
         <span className="text-sm text-muted-foreground">
-          Didn&apos;t receive it? Check spam or try again.
+          Didn&apos;t receive it? Check your spam folder or try again.
         </span>
       </div>
     </div>
@@ -585,6 +740,7 @@ function StepThree({
 function sample<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
 }
+
 function StepHeader({ current }: { current: Step }) {
   const steps = [
     { id: 1, label: "Account Type" },
@@ -604,12 +760,10 @@ function StepHeader({ current }: { current: Step }) {
               key={s.id}
               className="flex flex-col items-center relative flex-1"
             >
-              {/* Connector line - only show for first two steps */}
               {i < steps.length - 1 && (
                 <div className="absolute top-5 left-1/2 w-full h-px bg-neutral-200 z-0" />
               )}
 
-              {/* Step circle */}
               <div
                 className={cn(
                   "flex h-10 w-10 items-center justify-center rounded-full text-sm font-medium transition-colors relative z-10 bg-white",
@@ -624,7 +778,6 @@ function StepHeader({ current }: { current: Step }) {
                 {isComplete ? <CheckCircle2 className="h-5 w-5" /> : s.id}
               </div>
 
-              {/* Step label */}
               <span
                 className={cn(
                   "text-sm font-medium mt-2 text-center",

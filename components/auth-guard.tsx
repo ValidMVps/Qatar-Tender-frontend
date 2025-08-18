@@ -1,96 +1,55 @@
-"use client"
+"use client";
 
-import type React from "react"
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import { Building2 } from "lucide-react"
-
-interface AuthGuardProps {
-  children: React.ReactNode
-  requiredRole?: "poster" | "provider" | "business" // Added 'business' role
+interface User {
+  _id: string;
+  name: string;
+  email: string;
+  isVerified: boolean;
 }
 
-export function AuthGuard({ children, requiredRole }: AuthGuardProps) {
-  const [isLoading, setIsLoading] = useState(true)
-  const [isAuthorized, setIsAuthorized] = useState(false)
-  const router = useRouter()
+export default function AuthGuard({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
+  const [loading, setLoading] = useState(true);
+  const [authorized, setAuthorized] = useState(false);
 
   useEffect(() => {
-    const checkAuth = () => {
+    const checkAuth = async () => {
       try {
-        const userDataString = localStorage.getItem("userData")
-        console.log("AuthGuard: localStorage userDataString:", userDataString)
-
-        if (!userDataString) {
-          console.log("AuthGuard: No user data found, redirecting to /login after delay.")
-          // Add a small delay to ensure localStorage is fully settled,
-          // especially after a quick redirect from signup.
-          setTimeout(() => {
-            router.push("/login")
-          }, 100) // 100ms delay
-          return
+        const token = localStorage.getItem("token");
+        if (!token) {
+          router.replace("/login");
+          return;
         }
 
-        const user = JSON.parse(userDataString)
-        console.log("AuthGuard: Parsed user data:", user)
-        console.log("AuthGuard: Required role:", requiredRole)
-
-        // KYC is no longer mandatory at signup, so we don't redirect to kyc-pending here.
-        // If KYC becomes a post-signup requirement, it would be handled elsewhere.
-
-        if (requiredRole) {
-          // Handle role-based access
-          // 'poster' role is for 'individual' accounts and 'business' accounts (who can also post)
-          if (requiredRole === "poster" && user.accountType !== "individual" && user.accountType !== "business") {
-            console.log("AuthGuard: Role mismatch for poster, redirecting to /unauthorized")
-            router.push("/unauthorized")
-            return
+        const { data } = await axios.get<User>(
+          "http://localhost:5000/api/users/profile",
+          {
+            headers: { Authorization: `Bearer ${token}` },
           }
+        );
 
-          // 'provider' role is only for 'business' accounts
-          if (requiredRole === "provider" && user.accountType !== "business") {
-            console.log("AuthGuard: Role mismatch for provider, redirecting to /unauthorized")
-            router.push("/unauthorized")
-            return
-          }
-
-          // 'business' role is only for 'business' accounts (used in business-dashboard layout)
-          if (requiredRole === "business" && user.accountType !== "business") {
-            console.log("AuthGuard: Role mismatch for business, redirecting to /unauthorized")
-            router.push("/unauthorized")
-            return
-          }
+        if (data && data.isVerified) {
+          setAuthorized(true);
+        } else {
+          router.replace("/verify");
         }
-
-        console.log("AuthGuard: User authorized.")
-        setIsAuthorized(true)
-        setIsLoading(false)
       } catch (error) {
-        console.error("AuthGuard: Auth check error:", error)
-        router.push("/login")
+        router.replace("/login");
+      } finally {
+        setLoading(false);
       }
-    }
+    };
 
-    checkAuth()
-  }, [router, requiredRole])
+    checkAuth();
+  }, [router]);
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center mx-auto mb-4 animate-pulse">
-            <Building2 className="h-6 w-6 text-white" />
-          </div>
-          <p className="text-gray-600">Loading...</p>
-        </div>
-      </div>
-    )
+  if (loading) {
+    return <div className="p-4 text-center">Checking authentication...</div>;
   }
 
-  if (!isAuthorized) {
-    return null
-  }
-
-  return <>{children}</>
+  return authorized ? <>{children}</> : null;
 }
