@@ -34,7 +34,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
-import { useTranslation } from '../lib/hooks/useTranslation';
+import { useTranslation } from "../lib/hooks/useTranslation";
 type TenderStatus = "Active" | "Pending" | "Closed";
 
 interface Tender {
@@ -61,7 +61,7 @@ function StatusBadge({ status }: { status: TenderStatus }) {
 }
 
 export default function RecentTenders() {
-    const { t } = useTranslation();
+  const { t } = useTranslation();
 
   const [query, setQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState<TenderStatus | "All">("All");
@@ -145,14 +145,15 @@ export default function RecentTenders() {
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between gap-2">
             <div>
-              <CardTitle className="text-base">Recent Tenders</CardTitle>
-              <CardDescription>Latest tenders you’ve posted</CardDescription>
+              <CardTitle className="text-base">{t("recent_tenders")}</CardTitle>
+              <CardDescription>
+                {t("latest_tenders_you_ve_posted")}
+              </CardDescription>
             </div>
-            <Link href={'/business-dashboard/my-tenders'}>
-              {" "}
+            <Link href={"/business-dashboard/my-tenders"}>
               <Button variant="outline" size="sm" className="gap-1">
                 <BarChart3 className="h-4 w-4" />
-                <span>View all</span>
+                <span>{t("view_all")}</span>
               </Button>
             </Link>
           </div>
@@ -161,11 +162,11 @@ export default function RecentTenders() {
           <div className="flex gap-2">
             <div className="relative flex-1">
               <Input
-                placeholder="Search by title, category or status..."
+                placeholder={t("search_by_title_category_or_status")}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 className="pl-9"
-                aria-label="Search tenders"
+                aria-label={t("search_tenders")}
               />
               <LineChartIcon className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             </div>
@@ -176,13 +177,13 @@ export default function RecentTenders() {
               }
             >
               <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Filter by Status" />
+                <SelectValue placeholder={t("filter_by_status")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="All">All Statuses</SelectItem>
-                <SelectItem value="Active">{t('active')}</SelectItem>
-                <SelectItem value="Pending">{t('pending')}</SelectItem>
-                <SelectItem value="Closed">{t('closed')}</SelectItem>
+                <SelectItem value="All">{t("all_statuses")}</SelectItem>
+                <SelectItem value="Active">{t("active")}</SelectItem>
+                <SelectItem value="Pending">{t("pending")}</SelectItem>
+                <SelectItem value="Closed">{t("closed")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -190,15 +191,15 @@ export default function RecentTenders() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>{t('title')}</TableHead>
-                  <TableHead>{t('category')}</TableHead>
-                  <TableHead>{t('status')}</TableHead>
+                  <TableHead>{t("title")}</TableHead>
+                  <TableHead>{t("category")}</TableHead>
+                  <TableHead>{t("status")}</TableHead>
                   <TableHead
                     className="cursor-pointer"
                     onClick={() => handleSort("postedAt")}
                   >
                     <div className="flex items-center gap-1">
-                      Posted At
+                      {t("posted_at")}
                       {sortColumn === "postedAt" &&
                         (sortDirection === "asc" ? (
                           <ArrowUp className="h-3 w-3" />
@@ -212,7 +213,7 @@ export default function RecentTenders() {
                     onClick={() => handleSort("deadline")}
                   >
                     <div className="flex items-center gap-1">
-                      Deadline
+                      {t("deadline")}
                       {sortColumn === "deadline" &&
                         (sortDirection === "asc" ? (
                           <ArrowUp className="h-3 w-3" />
@@ -226,7 +227,7 @@ export default function RecentTenders() {
                     onClick={() => handleSort("bidsReceived")}
                   >
                     <div className="flex items-center justify-center gap-1">
-                      Bids
+                      {t("bids")}
                       {sortColumn === "bidsReceived" &&
                         (sortDirection === "asc" ? (
                           <ArrowUp className="h-3 w-3" />

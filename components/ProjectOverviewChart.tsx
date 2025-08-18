@@ -17,6 +17,7 @@ import {
   ResponsiveContainer,
   Tooltip,
 } from "recharts";
+import useTranslation from "@/lib/hooks/useTranslation";
 
 // ✅ Tender Data
 const dummyTenders = [
@@ -269,6 +270,8 @@ const formatTenderChartData = (tenders: typeof dummyTenders) => {
 };
 
 export default function ProjectsOverviewChart() {
+  const { t } = useTranslation();
+
   const [activeRange, setActiveRange] = useState<
     "3months" | "30days" | "7days"
   >("3months");
@@ -296,110 +299,109 @@ export default function ProjectsOverviewChart() {
   const getSubtitle = () => {
     switch (activeRange) {
       case "30days":
-        return "Total for the last 30 days";
+        return t("total_for_the_last_30_days");
 
       case "3months":
       default:
-        return "Total for the last 3 months";
+        return t("total_for_the_last_3_months");
     }
   };
 
   return (
     <Card className="w-full flex flex-col md:col-span-7 col-span-1 mx-auto h-full justify-between rounded-sm md:rounded-lg">
       <CardHeader className="flex flex-row flex-wrap items-start justify-between space-y-0 md:pb-2 gap-2">
-      <div className="space-y-1">
-        <CardTitle className="text-lg font-semibold">
-        Tenders Overview
-        </CardTitle>
-        <CardDescription className="text-sm text-muted-foreground">
-        {getSubtitle()}
-        </CardDescription>
-      </div>
-      <div className="flex flex-wrap gap-2">
-        <Button
-        variant={activeRange === "3months" ? "secondary" : "outline"}
-        size="sm"
-        className="h-8 text-xs"
-        onClick={() => setActiveRange("3months")}
-        >
-        Last 3 months
-        </Button>
-        <Button
-        variant={activeRange === "30days" ? "secondary" : "outline"}
-        size="sm"
-        className="h-8 text-xs"
-        onClick={() => setActiveRange("30days")}
-        >
-        Last 30 days
-        </Button>
-     
-      </div>
+        <div className="space-y-1">
+          <CardTitle className="text-lg font-semibold">
+            {t("tenders_overview")}
+          </CardTitle>
+          <CardDescription className="text-sm text-muted-foreground">
+            {getSubtitle()}
+          </CardDescription>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Button
+            variant={activeRange === "3months" ? "secondary" : "outline"}
+            size="sm"
+            className="h-8 text-xs"
+            onClick={() => setActiveRange("3months")}
+          >
+            {t("last_3_months")}
+          </Button>
+          <Button
+            variant={activeRange === "30days" ? "secondary" : "outline"}
+            size="sm"
+            className="h-8 text-xs"
+            onClick={() => setActiveRange("30days")}
+          >
+            {t("last_30_days")}
+          </Button>
+        </div>
       </CardHeader>
 
       <CardContent className="flex-1  px-2 sm:px-4 min-h-[250px]">
-      <div className=" h-full w-full">
-        <ResponsiveContainer width="100%" height="100%">
-        <AreaChart
-          data={chartData}
-          margin={{ top: 10, right: 0, left: 0, bottom: 0 }}
-        >
-          <XAxis
-          dataKey="date"
-          stroke="#888888"
-          fontSize={10}
-          tickLine={false}
-          axisLine={false}
-          interval="preserveStartEnd"
-          />
-          <YAxis
-          width={0}
-          stroke="#e0e0e0"
-          fontSize={10}
-          tickLine={false}
-          axisLine={false}
-          tick={false}
-          domain={[0, "dataMax + 20"]}
-          />
-          <Tooltip
-          cursor={{ strokeDasharray: "3 3" }}
-          contentStyle={{
-            backgroundColor: "hsl(var(--background))",
-            border: "1px solid hsl(var(--border))",
-            borderRadius: "0.5rem",
-          }}
-          labelStyle={{ color: "hsl(var(--foreground))" }}
-          itemStyle={{ color: "hsl(var(--foreground))" }}
-          />
-          <Area
-          type="monotone"
-          dataKey="total"
-          stackId="1"
-          stroke="#3B82F6"
-          fill="url(#colorTotal)"
-          fillOpacity={0.6}
-          />
-          <Area
-          type="monotone"
-          dataKey="projects"
-          stackId="1"
-          stroke="#60A5FA"
-          fill="url(#colorProjects)"
-          fillOpacity={0.8}
-          />
+        <div className=" h-full w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart
+              data={chartData}
+              margin={{ top: 10, right: 0, left: 0, bottom: 0 }}
+            >
+              <XAxis
+                dataKey="date"
+                stroke="#888888"
+                fontSize={10}
+                tickLine={false}
+                axisLine={false}
+                interval="preserveStartEnd"
+              />
+              <YAxis
+                width={0}
+                stroke="#e0e0e0"
+                fontSize={10}
+                tickLine={false}
+                axisLine={false}
+                tick={false}
+                domain={[0, "dataMax + 20"]}
+              />
+              <Tooltip
+                cursor={{ strokeDasharray: "3 3" }}
+                contentStyle={{
+                  backgroundColor: "hsl(var(--background))",
+                  border: "1px solid hsl(var(--border))",
+                  borderRadius: "0.5rem",
+                }}
+                labelStyle={{ color: "hsl(var(--foreground))" }}
+                itemStyle={{ color: "hsl(var(--foreground))" }}
+              />
+              <Area
+                type="monotone"
+                dataKey="total"
+                stackId="1"
+                stroke="#3B82F6"
+                fill="url(#colorTotal)"
+                fillOpacity={0.6}
+              />
+              <Area
+                type="monotone"
+                dataKey="projects"
+                stackId="1"
+                stroke="#60A5FA"
+                fill="url(#colorProjects)"
+                fillOpacity={0.8}
+              />
 
-          <defs>
-          <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.8} />
-            <stop offset="95%" stopColor="#3B82F6" stopOpacity={0} />
-          </linearGradient>
-          <linearGradient id="colorProjects" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#60A5FA" stopOpacity={0.8} />
-            <stop offset="95%" stopColor="#60A5FA" stopOpacity={0} />
-          </linearGradient>
-          </defs>
-        </AreaChart>
-        </ResponsiveContainer>
-      </div>
+              <defs>
+                <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.8} />
+                  <stop offset="95%" stopColor="#3B82F6" stopOpacity={0} />
+                </linearGradient>
+                <linearGradient id="colorProjects" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#60A5FA" stopOpacity={0.8} />
+                  <stop offset="95%" stopColor="#60A5FA" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
       </CardContent>
     </Card>
   );

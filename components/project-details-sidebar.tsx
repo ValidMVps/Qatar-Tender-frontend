@@ -59,7 +59,7 @@ export function ProjectDetailsSidebar({
       <ScrollArea className="h-full">
         <div className="p-6">
           <h3 className="text-lg font-semibold mb-6 text-black">
-            Project Details
+            {t("project_details")}
           </h3>
           <Card className="mb-6 bg-transparent px-0 border-0 rounded-lg shadow-none">
             <CardHeader className="px-0">
@@ -104,7 +104,7 @@ export function ProjectDetailsSidebar({
               <div>
                 <label className="text-sm font-medium text-gray-600 flex items-center gap-1">
                   <Calendar className="w-4 h-4" />
-                  Start Date
+                  {t("start_date")}
                 </label>
                 <p className="text-sm mt-1 text-gray-800">
                   {selectedProject.startDate}
@@ -113,7 +113,7 @@ export function ProjectDetailsSidebar({
               <div>
                 <label className="text-sm font-medium text-gray-600 flex items-center gap-1">
                   <User className="w-4 h-4" />
-                  Awarded To
+                  {t("awarded_to")}
                 </label>
                 <p className="text-sm mt-1 text-gray-800">
                   {selectedProject.awardedTo}
@@ -130,12 +130,14 @@ export function ProjectDetailsSidebar({
                   variant="default"
                   onClick={openReviewDialog}
                 >
-                  {selectedProject.review ? "Edit Review" : "Mark as Completed"}
+                  {selectedProject.review
+                    ? t("edit_review")
+                    : t("mark_as_completed")}
                 </Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-md">
                 <DialogHeader>
-                  <DialogTitle>Submit Review</DialogTitle>
+                  <DialogTitle>{t("submit_review")}</DialogTitle>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
                   <div className="flex flex-col gap-2">
@@ -164,7 +166,7 @@ export function ProjectDetailsSidebar({
                     <Label htmlFor="review">{t("review")}</Label>
                     <Textarea
                       id="review"
-                      placeholder="Write your feedback..."
+                      placeholder={t("write_your_feedback")}
                       value={reviewText}
                       onChange={(e) => setReviewText(e.target.value)}
                     />

@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useTranslation } from '../../../lib/hooks/useTranslation';
+import { useTranslation } from "../../../lib/hooks/useTranslation";
 import {
   Select,
   SelectContent,
@@ -36,7 +36,7 @@ import {
 } from "lucide-react";
 
 export default function Component() {
-    const { t } = useTranslation();
+  const { t } = useTranslation();
 
   const [isEditing, setIsEditing] = useState(false);
   const [profileCompletion, setProfileCompletion] = useState(75); // Example value
@@ -56,15 +56,12 @@ export default function Component() {
   };
 
   const handleSaveClick = () => {
-    // In a real application, you would send this data to a backend
     console.log("Saving profile data:", profileData);
     setIsEditing(false);
-    // Simulate profile completion update
     updateProfileCompletion();
   };
 
   const handleCancelClick = () => {
-    // Reset to original data or fetch again
     setIsEditing(false);
   };
 
@@ -92,8 +89,6 @@ export default function Component() {
     if (profileData.mobileNumber) completedFields++;
     if (profileData.address) completedFields++;
     if (profileData.nationalId) completedFields++;
-
-    // Assuming 5 fields for 100% completion
     setProfileCompletion(Math.min(100, (completedFields / 5) * 100));
   };
 
@@ -104,7 +99,7 @@ export default function Component() {
   const handleConfirmCompletion = () => {
     setIsProfileCompleted(true);
     setShowCompletionModal(false);
-    setIsEditing(false); // Lock editing after completion
+    setIsEditing(false);
   };
 
   const handleCloseModal = () => {
@@ -116,9 +111,8 @@ export default function Component() {
   return (
     <div className="flex min-h-screen bg-white container mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex-1 flex flex-col">
-        {/* Profile Content */}
         <main className="flex-1 p-0 sm:p-6 overflow-auto">
-          {/* Profile Summary Section (Full Width) */}
+          {/* Profile Summary */}
           <div className="pb-6 mb-6 border-b border-gray-200">
             <div className="flex flex-col sm:flex-row items-center justify-between flex-wrap gap-4">
               <div className="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
@@ -140,19 +134,19 @@ export default function Component() {
                 </div>
                 <div>
                   <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
-                    John Doe
+                    {t("john_doe")}
                   </h2>
                   <p className="text-base sm:text-lg text-gray-600">
-                    Senior Product Designer
+                    {t("senior_product_designer")}
                   </p>
                   <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-6 text-sm sm:text-base text-gray-500 mt-3">
                     <div className="flex items-center gap-2">
                       <MailIcon className="w-4 h-4 sm:w-5 sm:h-5" />
-                      <span>john.doe@example.com</span>
+                      <span>{t("john_doe_email")}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <CalendarIcon className="w-4 h-4 sm:w-5 sm:h-5" />
-                      <span>Joined March 2023</span>
+                      <span>{t("joined_march_2023")}</span>
                     </div>
                   </div>
                 </div>
@@ -161,14 +155,14 @@ export default function Component() {
                 {isProfileCompleted ? (
                   <div className="flex items-center gap-2 text-blue-600 font-medium">
                     <CheckCircleIcon className="w-5 h-5" />
-                    <span>Verification Pending</span>
+                    <span>{t("verification_pending")}</span>
                   </div>
                 ) : !isEditing ? (
                   <Button
                     onClick={handleEditClick}
                     className="bg-[#5A4DFF] hover:bg-[#4a3dff] text-white rounded-md px-4 py-2 sm:px-6 sm:py-2 text-sm sm:text-base"
                   >
-                    Edit Profile
+                    {t("edit_profile")}
                   </Button>
                 ) : (
                   <>
@@ -177,7 +171,7 @@ export default function Component() {
                       className="bg-green-500 hover:bg-green-600 text-white rounded-md px-4 py-2 sm:px-6 sm:py-2 flex items-center gap-2 text-sm sm:text-base"
                     >
                       <SaveIcon className="w-4 h-4" />
-                      Save Changes
+                      {t("save_changes")}
                     </Button>
                     <Button
                       onClick={handleCancelClick}
@@ -185,17 +179,18 @@ export default function Component() {
                       className="rounded-md px-4 py-2 sm:px-6 sm:py-2 flex items-center gap-2 bg-transparent text-sm sm:text-base"
                     >
                       <XIcon className="w-4 h-4" />
-                      {t('cancel')}
+                      {t("cancel")}
                     </Button>
                   </>
                 )}
               </div>
             </div>
+
             {/* Profile Completion Bar */}
             <div className="mt-8 pt-6 border-t border-gray-100">
               <div className="flex items-center justify-between mb-2">
                 <Label className="text-gray-700 font-semibold text-sm sm:text-base">
-                  Profile Completion
+                  {t("profile_completion")}
                 </Label>
                 <span className="text-sm font-medium text-gray-700">
                   {profileCompletion}%
@@ -206,32 +201,33 @@ export default function Component() {
                 className="h-3 bg-gray-200 [&>*]:bg-[#5A4DFF]"
               />
               <p className="text-xs sm:text-sm text-gray-500 mt-2">
-                Complete your profile to unlock all features.
+                {t("complete_your_profile_to_unlock_all_features")}
               </p>
               {profileCompletion === 100 && !isProfileCompleted && (
                 <Button
                   onClick={handleCompleteProfileClick}
                   className="mt-4 bg-blue-600 hover:bg-blue-700 text-white rounded-md px-4 py-2 sm:px-6 sm:py-2 text-sm sm:text-base"
                 >
-                  Complete Profile
+                  {t("complete_profile")}
                 </Button>
               )}
             </div>
           </div>
-          {/* Tabbed Profile Form */}
+
+          {/* Tabs */}
           <Tabs defaultValue="profile-details" className="w-full mt-6">
             <TabsList className="grid w-full grid-cols-2 bg-gray-100 rounded-lg p-1">
               <TabsTrigger
                 value="profile-details"
                 className="data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-md text-sm sm:text-base"
               >
-                Profile Details
+                {t("profile_details")}
               </TabsTrigger>
               <TabsTrigger
                 value="account-verification"
                 className="data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-md text-sm sm:text-base"
               >
-                Account Verification
+                {t("account_verification")}
               </TabsTrigger>
             </TabsList>
             <TabsContent value="profile-details" className="pt-6">
@@ -241,7 +237,7 @@ export default function Component() {
                     htmlFor="fullName"
                     className="text-gray-700 text-sm sm:text-base"
                   >
-                    Full Name
+                    {t("full_name")}
                   </Label>
                   <Input
                     id="fullName"
@@ -256,7 +252,7 @@ export default function Component() {
                     htmlFor="email"
                     className="text-gray-700 text-sm sm:text-base"
                   >
-                    {t('email')}
+                    {t("email")}
                   </Label>
                   <Input
                     id="email"
@@ -272,7 +268,7 @@ export default function Component() {
                     htmlFor="mobile"
                     className="text-gray-700 text-sm sm:text-base"
                   >
-                    {t('mobile')}
+                    {t("mobile")}
                   </Label>
                   <div className="flex gap-2 mt-1">
                     <Select
@@ -281,12 +277,12 @@ export default function Component() {
                       disabled={areInputsDisabled}
                     >
                       <SelectTrigger className="w-[100px] sm:w-[120px]">
-                        <SelectValue placeholder={t('country')} />
+                        <SelectValue placeholder={t("country")} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="QA">QA +974</SelectItem>
-                        <SelectItem value="US">US +1</SelectItem>
-                        <SelectItem value="UK">UK +44</SelectItem>
+                        <SelectItem value="QA">{t("qa_code")}</SelectItem>
+                        <SelectItem value="US">{t("us_code")}</SelectItem>
+                        <SelectItem value="UK">{t("uk_code")}</SelectItem>
                       </SelectContent>
                     </Select>
                     <Input
@@ -303,7 +299,7 @@ export default function Component() {
                     htmlFor="address"
                     className="text-gray-700 text-sm sm:text-base"
                   >
-                    {t('address')}
+                    {t("address")}
                   </Label>
                   <Input
                     id="address"
@@ -315,20 +311,21 @@ export default function Component() {
                 </div>
               </div>
             </TabsContent>
+
             <TabsContent value="account-verification" className="pt-6">
               <div className="grid grid-cols-1 gap-6">
                 <div>
                   <h3 className="text-base sm:text-lg font-semibold text-gray-900">
-                    Account Verification
+                    {t("account_verification")}
                   </h3>
                   <p className="text-xs sm:text-sm text-gray-500 mb-4">
-                    This info is used to verify your identity.
+                    {t("info_used_to_verify_identity")}
                   </p>
                   <Label
                     htmlFor="nationalId"
                     className="text-gray-700 text-sm sm:text-base"
                   >
-                    National ID
+                    {t("national_id")}
                   </Label>
                   <Input
                     id="nationalId"
@@ -340,22 +337,22 @@ export default function Component() {
                 </div>
                 <div>
                   <Label className="text-gray-700 text-sm sm:text-base">
-                    Upload National ID (PDF, JPG, PNG)
+                    {t("upload_national_id")}
                   </Label>
                   <div className="mt-1 border-2 border-dashed border-gray-300 rounded-lg p-4 sm:p-6 text-center flex flex-col items-center justify-center space-y-3">
                     <UploadIcon className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" />
                     <p className="text-xs sm:text-sm text-gray-600">
-                      Drag and drop your file here, or click to browse
+                      {t("drag_drop_or_browse")}
                     </p>
                     <Button
                       variant="outline"
                       className="px-4 py-2 sm:px-6 sm:py-2 bg-transparent text-sm sm:text-base"
                       disabled={areInputsDisabled}
                     >
-                      Choose File
+                      {t("choose_file")}
                     </Button>
                     <p className="text-xs text-gray-500">
-                      PDF, JPG, PNG up to 10MB
+                      {t("file_formats_and_size")}
                     </p>
                   </div>
                 </div>
@@ -364,26 +361,25 @@ export default function Component() {
           </Tabs>
         </main>
       </div>
+
       {/* Confirmation Dialog */}
       <Dialog open={showCompletionModal} onOpenChange={setShowCompletionModal}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Confirm Profile Completion</DialogTitle>
+            <DialogTitle>{t("confirm_profile_completion")}</DialogTitle>
             <DialogDescription>
-              Are you sure you want to complete your profile? Once confirmed,
-              your profile will be submitted for verification and you will no
-              longer be able to edit it.
+              {t("confirm_profile_completion_description")}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={handleCloseModal}>
-              {t('cancel')}
+              {t("cancel")}
             </Button>
             <Button
               onClick={handleConfirmCompletion}
               className="bg-blue-600 hover:bg-blue-700 text-white"
             >
-              {t('confirm')}
+              {t("confirm")}
             </Button>
           </DialogFooter>
         </DialogContent>
