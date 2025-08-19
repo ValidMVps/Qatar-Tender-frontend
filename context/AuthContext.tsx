@@ -89,43 +89,52 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   // Enhanced auth check function
   const checkAuth = async () => {
+    console.log("🔍 Starting auth check...");
+
     try {
       // First check if we have a valid access token
-      if (authService.isAuthenticated()) {
+      const hasValidToken = authService.isAuthenticated();
+      console.log("📝 Has valid access token:", hasValidToken);
+
+      if (hasValidToken) {
         const userData = await authService.getCurrentUser();
         if (userData) {
+          console.log("✅ User data retrieved successfully");
           setUser(userData);
           return;
         }
-        console.log(userData);
       }
 
       // If no valid access token, check if we have a refresh token
       const refreshToken = getRefreshTokenFromCookie();
+      console.log("🔄 Refresh token exists:", !!refreshToken);
+
       if (refreshToken) {
         console.log(
-          "Access token missing but refresh token found, attempting refresh..."
+          "🔄 Access token missing but refresh token found, attempting refresh..."
         );
         const refreshSuccess = await attemptTokenRefresh();
+        console.log("🔄 Refresh attempt result:", refreshSuccess);
 
         if (refreshSuccess) {
           // Try to get user data again after refresh
           const userData = await authService.getCurrentUser();
           if (userData) {
+            console.log("✅ User data retrieved after refresh");
             setUser(userData);
             return;
           }
-          console.log(userData);
         }
-        console.log(user);
       }
 
       // If we get here, authentication failed
+      console.log("❌ Authentication failed - no valid tokens");
       setUser(null);
     } catch (error) {
-      console.error("Error checking auth status:", error);
+      console.error("❌ Error checking auth status:", error);
       setUser(null);
     } finally {
+      console.log("🏁 Auth check complete, setting loading to false");
       setIsLoading(false);
     }
   };
@@ -134,6 +143,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   useEffect(() => {
     checkAuth();
   }, []);
+
+  // Re-check auth when focus returns to window (when you open computer)
+  useEffect(() => {
+    const handleFocus = () => {
+      if (!isLoading && !user) {
+        checkAuth();
+      }
+    };
+
+    window.addEventListener("focus", handleFocus);
+    return () => window.removeEventListener("focus", handleFocus);
+  }, [isLoading, user]);
 
   // Add periodic token refresh check (optional but recommended)
   useEffect(() => {

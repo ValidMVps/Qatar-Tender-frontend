@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 
@@ -15,22 +15,33 @@ export function ProtectedRoute({
 }: ProtectedRouteProps) {
   const { user, isLoading } = useAuth();
   const router = useRouter();
+  const [hasAttemptedAuth, setHasAttemptedAuth] = useState(false);
 
   useEffect(() => {
+    // Only proceed when loading is complete
     if (!isLoading) {
-      if (!user) {
-        router.push("/login");
-        return;
-      }
+      setHasAttemptedAuth(true);
 
-      if (allowedUserTypes && !allowedUserTypes.includes(user.userType)) {
-        // Redirect to appropriate dashboard if user type not allowed
-        const redirectPath = getRedirectPath(user.userType);
-        router.push(redirectPath);
-        return;
-      }
+      // Add a small delay to allow any token refresh to complete
+      const timeoutId = setTimeout(() => {
+        if (!user) {
+          console.log("No user found after auth check, redirecting to login");
+          router.push("/login");
+          return;
+        }
+
+        if (allowedUserTypes && !allowedUserTypes.includes(user.userType)) {
+          // Redirect to appropriate dashboard if user type not allowed
+          const redirectPath = getRedirectPath(user.userType);
+          router.push(redirectPath);
+          return;
+        }
+
+        console.log("User is authenticated:", user);
+      }, 100); // Small delay to allow refresh to complete
+
+      return () => clearTimeout(timeoutId);
     }
-    console.log("User is authenticated:", user);
   }, [user, isLoading, router, allowedUserTypes]);
 
   const getRedirectPath = (userType: string) => {
@@ -45,7 +56,8 @@ export function ProtectedRoute({
     }
   };
 
-  if (isLoading) {
+  // Show loading while authentication is being checked OR while we haven't attempted auth yet
+  if (isLoading || !hasAttemptedAuth) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
