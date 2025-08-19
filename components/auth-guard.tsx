@@ -1,22 +1,25 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/context/AuthContext';
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
   allowedUserTypes?: string[];
 }
 
-export function ProtectedRoute({ children, allowedUserTypes }: ProtectedRouteProps) {
+export function ProtectedRoute({
+  children,
+  allowedUserTypes,
+}: ProtectedRouteProps) {
   const { user, isLoading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
     if (!isLoading) {
       if (!user) {
-        router.push('/login');
+        router.push("/login");
         return;
       }
 
@@ -27,17 +30,18 @@ export function ProtectedRoute({ children, allowedUserTypes }: ProtectedRoutePro
         return;
       }
     }
+    console.log("User is authenticated:", user);
   }, [user, isLoading, router, allowedUserTypes]);
 
   const getRedirectPath = (userType: string) => {
     switch (userType) {
-      case 'admin':
-        return '/admin';
-      case 'business':
-        return '/business-dashboard';
-      case 'individual':
+      case "admin":
+        return "/admin";
+      case "business":
+        return "/business-dashboard";
+      case "individual":
       default:
-        return '/dashboard';
+        return "/dashboard";
     }
   };
 
@@ -73,6 +77,8 @@ export function withAuth<P extends object>(
     );
   };
 
-  AuthenticatedComponent.displayName = `withAuth(${Component.displayName || Component.name})`;
+  AuthenticatedComponent.displayName = `withAuth(${
+    Component.displayName || Component.name
+  })`;
   return AuthenticatedComponent;
 }
