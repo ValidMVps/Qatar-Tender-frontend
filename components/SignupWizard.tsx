@@ -695,10 +695,7 @@ function StepThree({
   return (
     <div className="space-y-8">
       <div className="flex items-start gap-6">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 text-blue-700">
-          <MailCheck className="h-7 w-7" aria-hidden="true" />
-        </div>
-        <div className="space-y-3">
+        <div className="space-y-6">
           <h3 className="text-xl font-semibold">Verify your email address</h3>
           <p className="text-base text-muted-foreground leading-relaxed">
             We&apos;ve sent a verification link to{" "}

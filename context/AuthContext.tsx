@@ -1,4 +1,3 @@
-// contexts/AuthContext.tsx
 "use client";
 
 import React, {
@@ -9,7 +8,7 @@ import React, {
   ReactNode,
 } from "react";
 import { useRouter } from "next/navigation";
-import { authService, User } from "@/utils/auth";
+import { authService, RegisterData, User } from "@/utils/auth";
 
 interface AuthContextType {
   user: User | null;
@@ -40,15 +39,6 @@ interface AuthContextType {
   ) => Promise<{ success: boolean; message?: string; error?: string }>;
 }
 
-interface RegisterData {
-  email: string;
-  password: string;
-  userType: "individual" | "business";
-  phone: string;
-  fullName?: string;
-  companyName?: string;
-}
-
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({
@@ -60,13 +50,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   // Check authentication status on mount
   useEffect(() => {
-    const checkAuth = () => {
+    const checkAuth = async () => {
       try {
-        const isAuth = authService.isAuthenticated();
-        const userData = authService.getUser();
-
-        if (isAuth && userData) {
-          setUser(userData);
+        if (authService.isAuthenticated()) {
+          const userData = await authService.getCurrentUser();
+          console.log(userData);
+          if (userData) {
+            setUser(userData);
+          } else {
+            setUser(null);
+          }
         } else {
           setUser(null);
         }
@@ -77,20 +70,19 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         setIsLoading(false);
       }
     };
+    console.log(user);
 
     checkAuth();
   }, []);
+  console.log(user);
 
-  // Handle login
   const login = async (email: string, password: string) => {
     setIsLoading(true);
-
     try {
       const result = await authService.login(email, password);
 
       if (result.success && result.user) {
         setUser(result.user);
-
         // Redirect based on user type
         const redirectPath = getRedirectPath(result.user.userType);
         router.push(redirectPath);
@@ -105,10 +97,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
-  // Handle register
   const register = async (userData: RegisterData) => {
     setIsLoading(true);
-
     try {
       const result = await authService.register(userData);
       return result;
@@ -120,24 +110,19 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
-  // Handle logout
   const logout = () => {
     setUser(null);
     authService.logout();
-    router.push("/login");
   };
 
-  // Handle forgot password
   const forgotPassword = async (email: string) => {
     return await authService.forgotPassword(email);
   };
 
-  // Handle verify reset code
   const verifyResetCode = async (email: string, code: string) => {
     return await authService.verifyResetCode(email, code);
   };
 
-  // Handle reset password
   const resetPassword = async (
     email: string,
     code: string,
@@ -146,7 +131,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     return await authService.resetPassword(email, code, newPassword);
   };
 
-  // Get redirect path based on user type
+  const resendVerificationEmail = async (email: string) => {
+    return await authService.resendVerificationEmail(email);
+  };
+
   const getRedirectPath = (userType: string) => {
     switch (userType) {
       case "admin":
@@ -169,9 +157,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     forgotPassword,
     verifyResetCode,
     resetPassword,
-    resendVerificationEmail: function (email: string): Promise<{ success: boolean; message?: string; error?: string; }> {
-      throw new Error("Function not implemented.");
-    }
+    resendVerificationEmail,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
@@ -184,67 +170,4 @@ export const useAuth = () => {
     throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
-};
-
-// HOC for protecting routes
-export const withAuth = <P extends object>(
-  Component: React.ComponentType<P>,
-  allowedUserTypes?: string[]
-) => {
-  const AuthenticatedComponent: React.FC<P> = (props) => {
-    const { user, isLoading } = useAuth();
-    const router = useRouter();
-
-    useEffect(() => {
-      if (!isLoading) {
-        if (!user) {
-          router.push("/login");
-          return;
-        }
-
-        if (allowedUserTypes && !allowedUserTypes.includes(user.userType)) {
-          // Redirect to appropriate dashboard if user type not allowed
-          const redirectPath = getRedirectPath(user.userType);
-          router.push(redirectPath);
-          return;
-        }
-      }
-    }, [user, isLoading, router]);
-
-    if (isLoading) {
-      return (
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-        </div>
-      );
-    }
-
-    if (!user) {
-      return null; // Will redirect in useEffect
-    }
-
-    if (allowedUserTypes && !allowedUserTypes.includes(user.userType)) {
-      return null; // Will redirect in useEffect
-    }
-
-    return <Component {...props} />;
-  };
-
-  const getRedirectPath = (userType: string) => {
-    switch (userType) {
-      case "admin":
-        return "/admin";
-      case "business":
-        return "/business-dashboard";
-      case "individual":
-      default:
-        return "/dashboard";
-    }
-  };
-
-  AuthenticatedComponent.displayName = `withAuth(${
-    Component.displayName || Component.name
-  })`;
-
-  return AuthenticatedComponent;
 };

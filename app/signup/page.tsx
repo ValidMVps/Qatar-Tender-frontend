@@ -32,20 +32,7 @@ import SignupWizard from "@/components/SignupWizard";
 
 type AccountType = "individual" | "business" | null;
 
-interface FormData {
-  accountType: AccountType;
-  fullName: string;
-  email: string;
-  mobile: string;
-  countryCode: string;
-  nationalId: string;
-  nationalIdFile: File | null;
-  companyName: string;
-  crNumber: string;
-  crFile: File | null;
-  companyEmail: string;
-  companyPhone: string;
-}
+
 
 export default function SignupPage() {
 
