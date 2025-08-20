@@ -19,6 +19,7 @@ import {
   Edit,
   CheckCircle,
   Icon,
+  Cross,
 } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -45,99 +46,38 @@ import { TenderCarder } from "@/components/TenderCarder";
 import { OverviewChart } from "@/components/OverviewChart";
 import RecentTenders from "@/components/RecentTenders";
 import GoogleTranslate from "next-google-translate-widget";
-
 import { useTranslation } from "../../lib/hooks/useTranslation";
-
-interface Tender {
-  id: string;
-  title: string;
-  department: string;
-  value: string;
-  postedDate: string;
-  status: "active" | "draft" | "closed" | "awarded";
-  applicants: number;
-  publishedDate: string;
-  category: string;
-}
-
-const statusConfig: Record<
-  string,
-  { label: string; color: string; icon: React.ElementType }
-> = {
-  active: {
-    label: "active",
-    color: "bg-blue-100 text-blue-700 border-blue-200",
-    icon: BadgeCheck,
-  },
-  closed: {
-    label: "closed",
-    color: "bg-gray-100 text-gray-700 border-gray-200",
-    icon: FileText,
-  },
-  draft: {
-    label: "draft",
-    color: "bg-yellow-100 text-yellow-700 border-yellow-200",
-    icon: Edit,
-  },
-  awarded: {
-    label: "awarded",
-    color: "bg-green-100 text-green-700 border-green-200",
-    icon: UserRoundCheck,
-  },
-};
-
-const statsData = [
-  {
-    title: "total_tenders_posted",
-    value: "12",
-    icon: FileText,
-    description: "last_30_days",
-  },
-  {
-    title: "active_tenders",
-    value: "3",
-    icon: CheckCircle,
-    description: "currently_open",
-  },
-  {
-    title: "bids_received",
-    value: "47",
-    icon: Users,
-    description: "across_all_tenders",
-  },
-  {
-    title: "total_spent",
-    value: "$2,500",
-    icon: DollarSign,
-    description: "this_month",
-  },
-];
+import { useAuth } from "@/context/AuthContext";
 
 export default function DashboardPage() {
   const { t } = useTranslation();
   const [openTenderModal, setOpenTenderModal] = useState(false);
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "active":
-        return (
-          <Badge className="bg-blue-500 hover:bg-blue-600 text-white">
-            {t("active")}
-          </Badge>
-        );
-      case "pending":
-        return <Badge variant="outline">{t("pending")}</Badge>;
-      case "closed":
-        return <Badge variant="secondary">{t("closed")}</Badge>;
-      case "awarded":
-        return (
-          <Badge className="bg-emerald-600 text-white">{t("awarded")}</Badge>
-        );
-      default:
-        return <Badge variant="secondary">{status}</Badge>;
-    }
-  };
+  const { user, isLoading, profile } = useAuth();
 
+  const statsData = [
+    {
+      title: "total_tenders_posted",
+      value: profile?.totalTenders,
+      icon: FileText,
+    },
+    {
+      title: "active_tenders",
+      value: profile?.activeTenders,
+      icon: CheckCircle,
+    },
+    {
+      title: "Rejected Tenders",
+      value: profile?.rejectedTenders,
+      icon: Cross,
+    },
+    {
+      title: "total_spent",
+      value: profile?.totalSpent + "$",
+      icon: DollarSign,
+    },
+  ];
+  console.log("profile:", profile);
   return (
     <motion.div
       initial="hidden"
@@ -150,7 +90,7 @@ export default function DashboardPage() {
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between py-8 px-7 rounded-lg bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 shadow-sm">
           <div className="mb-4 md:mb-0">
             <h1 className="md:text-3xl text-xl font-medium pb-2 text-white">
-              {t("welcome_back")} Ahmed
+              {t("welcome_back")} {profile?.fullName}
             </h1>
             <p className="text-md text-blue-100">
               {t("overview_of_your_posting_and_bidding_activity_today")}
@@ -186,11 +126,6 @@ export default function DashboardPage() {
                   <div className="text-2xl font-bold text-gray-900">
                     {stat.value}
                   </div>
-                  {stat.description && (
-                    <p className="text-xs text-gray-500 mt-1">
-                      {t(stat.description)}
-                    </p>
-                  )}
                 </CardContent>
               </Card>
             );

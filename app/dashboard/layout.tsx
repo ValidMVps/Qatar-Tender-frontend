@@ -49,7 +49,7 @@ export default function DashboardLayout({
   ];
 
   return (
-    <ProtectedRoute>
+    <ProtectedRoute allowedUserTypes={["individual"]}>
       <div className="min-h-screen bg-gray-50 flex flex-col lg:flex-row">
         {/* Mobile overlay menu */}
         {sidebarOpen && (

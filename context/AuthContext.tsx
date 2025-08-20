@@ -8,11 +8,33 @@ import React, {
   ReactNode,
 } from "react";
 import { useRouter } from "next/navigation";
-import { authService, RegisterData, User } from "@/utils/auth";
-import { jwtDecode } from "jwt-decode";
+import { authService, RegisterData, User, api } from "@/utils/auth"; // import api here
+
+// Profile type (based on your backend schema)
+interface Profile {
+  _id: string;
+  user: string;
+  phone?: string;
+  fullName?: string;
+  address?: string;
+  rating?: number;
+  ratingCount?: number;
+  userType?: "individual" | "business" | "admin";
+  createdAt?: string;
+  updatedAt?: string;
+
+  // ✅ Add virtuals
+  totalTenders?: number;
+  activeTenders?: number;
+  rejectedTenders?: number;
+  completedTenders?: number;
+  awardedTenders?: number;
+  totalSpent?: number;
+}
 
 interface AuthContextType {
   user: User | null;
+  profile: Profile | null;
   isLoading: boolean;
   isAuthenticated: boolean;
   login: (
@@ -46,105 +68,60 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
-  // Helper function to attempt token refresh
-  const attemptTokenRefresh = async (): Promise<boolean> => {
+  // ✅ Fetch profile block using api instance
+  const fetchProfile = async () => {
     try {
-      const refreshToken = getRefreshTokenFromCookie();
-      if (!refreshToken) {
-        return false;
-      }
-
-      // Call your refresh endpoint directly
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/users/refresh-token`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ refreshToken }),
-        }
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.accessToken) {
-          // Set the new tokens
-          setTokenCookie(data.accessToken);
-          if (data.refreshToken) {
-            setRefreshTokenCookie(data.refreshToken);
-          }
-          return true;
-        }
-      }
-      return false;
-    } catch (error) {
-      console.error("Token refresh failed:", error);
-      return false;
+      const res = await api.get("/api/profiles"); // use global api
+      setProfile(res.data);
+    } catch (err) {
+      console.error("Failed to fetch profile:", err);
+      setProfile(null);
     }
   };
 
-  // Enhanced auth check function
+  // ✅ Check auth (and also load profile if logged in)
   const checkAuth = async () => {
-    console.log("🔍 Starting auth check...");
-
     try {
-      // First check if we have a valid access token
-      const hasValidToken = authService.isAuthenticated();
-      console.log("📝 Has valid access token:", hasValidToken);
-
-      if (hasValidToken) {
+      if (authService.isAuthenticated()) {
         const userData = await authService.getCurrentUser();
         if (userData) {
-          console.log("✅ User data retrieved successfully");
           setUser(userData);
+          await fetchProfile(); // get profile after user
           return;
         }
       }
 
-      // If no valid access token, check if we have a refresh token
-      const refreshToken = getRefreshTokenFromCookie();
-      console.log("🔄 Refresh token exists:", !!refreshToken);
-
-      if (refreshToken) {
-        console.log(
-          "🔄 Access token missing but refresh token found, attempting refresh..."
-        );
-        const refreshSuccess = await attemptTokenRefresh();
-        console.log("🔄 Refresh attempt result:", refreshSuccess);
-
-        if (refreshSuccess) {
-          // Try to get user data again after refresh
-          const userData = await authService.getCurrentUser();
-          if (userData) {
-            console.log("✅ User data retrieved after refresh");
-            setUser(userData);
-            return;
-          }
+      const refreshSuccess = await authService.refreshToken();
+      if (refreshSuccess) {
+        const userData = await authService.getCurrentUser();
+        if (userData) {
+          setUser(userData);
+          await fetchProfile();
+          return;
         }
       }
 
-      // If we get here, authentication failed
-      console.log("❌ Authentication failed - no valid tokens");
       setUser(null);
+      setProfile(null);
     } catch (error) {
-      console.error("❌ Error checking auth status:", error);
+      console.error("Auth check failed:", error);
       setUser(null);
+      setProfile(null);
     } finally {
-      console.log("🏁 Auth check complete, setting loading to false");
       setIsLoading(false);
     }
   };
 
-  // Check authentication status on mount
+  // Run on mount
   useEffect(() => {
     checkAuth();
   }, []);
 
-  // Re-check auth when focus returns to window (when you open computer)
+  // Re-check when window regains focus
   useEffect(() => {
     const handleFocus = () => {
       if (!isLoading && !user) {
@@ -156,31 +133,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     return () => window.removeEventListener("focus", handleFocus);
   }, [isLoading, user]);
 
-  // Add periodic token refresh check (optional but recommended)
-  useEffect(() => {
-    if (user) {
-      const interval = setInterval(() => {
-        // Check if token is about to expire (within 2 minutes)
-        const token = getTokenFromCookie();
-        if (token) {
-          try {
-            const decoded = jwtDecode(token);
-            const timeUntilExpiry = decoded.exp! * 1000 - Date.now();
-
-            // If token expires in less than 2 minutes, refresh it
-            if (timeUntilExpiry < 2 * 60 * 1000) {
-              attemptTokenRefresh();
-            }
-          } catch (error) {
-            console.error("Error checking token expiry:", error);
-          }
-        }
-      }, 60000); // Check every minute
-
-      return () => clearInterval(interval);
-    }
-  }, [user]);
-
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     try {
@@ -188,7 +140,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
       if (result.success && result.user) {
         setUser(result.user);
-        // Redirect based on user type
+        await fetchProfile(); // ✅ fetch profile after login
         const redirectPath = getRedirectPath(result.user.userType);
         router.push(redirectPath);
       }
@@ -217,6 +169,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   const logout = () => {
     setUser(null);
+    setProfile(null);
     authService.logout();
   };
 
@@ -254,6 +207,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   const value: AuthContextType = {
     user,
+    profile, // ✅ profile now globally available
     isLoading,
     isAuthenticated: !!user,
     login,
@@ -268,7 +222,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-// Custom hook to use auth context
+// Custom hook
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
@@ -276,46 +230,3 @@ export const useAuth = () => {
   }
   return context;
 };
-
-// Helper functions (add these to your auth.ts file or import them)
-function getTokenFromCookie(): string | null {
-  if (typeof document === "undefined") return null;
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; auth_token=`);
-  if (parts.length === 2) {
-    return decodeURIComponent(parts.pop()!.split(";").shift()!);
-  }
-  return null;
-}
-
-function getRefreshTokenFromCookie(): string | null {
-  if (typeof document === "undefined") return null;
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; refresh_token=`);
-  if (parts.length === 2) {
-    return decodeURIComponent(parts.pop()!.split(";").shift()!);
-  }
-  return null;
-}
-
-function setTokenCookie(token: string) {
-  if (typeof document === "undefined") return;
-  try {
-    const decoded = jwtDecode(token);
-    const expiresIn = decoded.exp! * 1000 - Date.now();
-    const maxAge = Math.floor(expiresIn / 1000);
-    document.cookie = `auth_token=${encodeURIComponent(
-      token
-    )}; max-age=${maxAge}; path=/; secure; samesite=strict`;
-  } catch (error) {
-    console.error("Error setting token cookie:", error);
-  }
-}
-
-function setRefreshTokenCookie(refreshToken: string) {
-  if (typeof document === "undefined") return;
-  const maxAge = 7 * 24 * 60 * 60; // 7 days in seconds
-  document.cookie = `refresh_token=${encodeURIComponent(
-    refreshToken
-  )}; max-age=${maxAge}; path=/; secure; samesite=strict`;
-}

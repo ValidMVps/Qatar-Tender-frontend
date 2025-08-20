@@ -1,5 +1,11 @@
-import axios, { AxiosResponse } from "axios";
+// utils/auth.ts
+import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+import {
+  setTokenCookie,
+  getTokenFromCookie,
+  clearTokens,
+} from "@/utils/tokenHelpers";
 
 export interface User {
   _id: string;
@@ -22,56 +28,53 @@ export interface RegisterData {
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
-// Create axios instance
+// Create axios instance with credentials to send cookies
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
+  withCredentials: true, // This enables cookies
 });
 
 // Request interceptor to add token
 api.interceptors.request.use((config) => {
   const token = getTokenFromCookie();
-  if (token) {
+  if (token && config && config.headers) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
 });
 
-// Response interceptor for token refresh
+// Simplified response interceptor (auth instance)
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
+    if (!originalRequest) return Promise.reject(error);
+
+    // Only attempt refresh once per request
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {
-        const refreshToken = getRefreshTokenFromCookie();
-        if (!refreshToken) {
-          authService.logout();
-          return Promise.reject(error);
-        }
+        // Use axios.post directly with withCredentials to preserve cookie refresh behavior
+        const response = await axios.post(
+          `${API_BASE_URL}/api/users/refresh-token`,
+          {},
+          { withCredentials: true }
+        );
 
-        const response = await api.post("/api/users/refresh-token", {
-          refreshToken: refreshToken,
-        });
-
-        const { accessToken, refreshToken: newRefreshToken } = response.data;
-
-        if (accessToken) {
-          setTokenCookie(accessToken);
-          if (newRefreshToken) {
-            setRefreshTokenCookie(newRefreshToken);
-          }
-          originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+        if (response.data.accessToken) {
+          setTokenCookie(response.data.accessToken);
+          originalRequest.headers = originalRequest.headers || {};
+          originalRequest.headers.Authorization = `Bearer ${response.data.accessToken}`;
           return api(originalRequest);
         }
       } catch (refreshError) {
-        // Refresh failed, redirect to login
-        authService.logout();
+        // Only clear tokens, don't redirect here
+        clearTokens();
         return Promise.reject(refreshError);
       }
     }
@@ -79,62 +82,6 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
-// Cookie helpers
-function setTokenCookie(token: string) {
-  if (typeof document === "undefined") return;
-
-  try {
-    const decoded = jwtDecode(token);
-    const expiresIn = decoded.exp! * 1000 - Date.now();
-    const maxAge = Math.floor(expiresIn / 1000);
-
-    document.cookie = `auth_token=${encodeURIComponent(
-      token
-    )}; max-age=${maxAge}; path=/; secure; samesite=strict`;
-  } catch (error) {
-    console.error("Error setting token cookie:", error);
-  }
-}
-
-function getTokenFromCookie(): string | null {
-  if (typeof document === "undefined") return null;
-
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; auth_token=`);
-  if (parts.length === 2) {
-    return decodeURIComponent(parts.pop()!.split(";").shift()!);
-  }
-  return null;
-}
-
-function removeTokenCookie() {
-  if (typeof document === "undefined") return;
-  document.cookie = "auth_token=; max-age=0; path=/; secure; samesite=strict";
-  document.cookie =
-    "refresh_token=; max-age=0; path=/; secure; samesite=strict";
-}
-
-function setRefreshTokenCookie(refreshToken: string) {
-  if (typeof document === "undefined") return;
-
-  // Set refresh token for 7 days (longer than access token)
-  const maxAge = 7 * 24 * 60 * 60; // 7 days in seconds
-  document.cookie = `refresh_token=${encodeURIComponent(
-    refreshToken
-  )}; max-age=${maxAge}; path=/; secure; samesite=strict`;
-}
-
-function getRefreshTokenFromCookie(): string | null {
-  if (typeof document === "undefined") return null;
-
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; refresh_token=`);
-  if (parts.length === 2) {
-    return decodeURIComponent(parts.pop()!.split(";").shift()!);
-  }
-  return null;
-}
 
 class AuthService {
   async register(userData: RegisterData) {
@@ -152,16 +99,10 @@ class AuthService {
   async login(email: string, password: string) {
     try {
       const response = await api.post("/api/users/login", { email, password });
-      const { accessToken, refreshToken, ...userData } = response.data;
+      const { accessToken, ...userData } = response.data;
 
       if (accessToken) {
         setTokenCookie(accessToken);
-
-        // Store refresh token if provided (when not using backend cookies)
-        if (refreshToken) {
-          setRefreshTokenCookie(refreshToken);
-        }
-
         return { success: true, user: userData };
       }
 
@@ -176,14 +117,11 @@ class AuthService {
 
   async logout() {
     try {
-      const refreshToken = getRefreshTokenFromCookie();
-      if (refreshToken) {
-        await api.post("/api/users/logout", { refreshToken });
-      }
+      await api.post("/api/users/logout");
     } catch (error) {
       console.error("Logout error:", error);
     } finally {
-      removeTokenCookie();
+      clearTokens();
       if (typeof window !== "undefined") {
         window.location.href = "/login";
       }
@@ -265,6 +203,25 @@ class AuthService {
       const now = Date.now() / 1000;
       return decoded.exp! > now;
     } catch {
+      return false;
+    }
+  }
+
+  // Simple refresh method for manual use
+  async refreshToken(): Promise<boolean> {
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/api/users/refresh-token`,
+        {},
+        { withCredentials: true }
+      );
+      if (response.data.accessToken) {
+        setTokenCookie(response.data.accessToken);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error("Token refresh failed:", error);
       return false;
     }
   }
