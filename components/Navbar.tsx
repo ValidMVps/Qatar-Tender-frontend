@@ -31,13 +31,14 @@ import CreateTenderModal from "./CreateTenderModal";
 
 import { useTranslation } from "../lib/hooks/useTranslation";
 import { LanguageToggle } from "./LanguageToggle";
+import { useAuth } from "@/context/AuthContext";
 
 interface NavbarProps {
   sidebarOpen: boolean;
   setSidebarOpen: (open: boolean) => void;
   sidebarLinks?: { name: string; href: string; icon: React.ElementType }[];
 }
-
+const { logout } = useAuth();
 // Capitalize utility for breadcrumb display (not for translation keys)
 const toTitleCase = (str: string) =>
   str.replace(/-/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
@@ -59,6 +60,10 @@ export default function Navbar({
   const [openTenderModal, setOpenTenderModal] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
 
+  const logoutfunction = () => {
+    setProfileDropdownOpen(false);
+    logout();
+  };
   // For mobile breadcrumb fallback
   const pageName =
     pathSegments.length > 0
@@ -239,14 +244,13 @@ export default function Navbar({
                       {t("help")}
                     </Link>
                     <div className="border-t border-gray-200 my-1" />
-                    <Link
-                      href="/login"
+                    <div
                       className="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-gray-100 transition-all"
-                      onClick={() => setProfileDropdownOpen(false)}
+                      onClick={() => logoutfunction()}
                     >
                       <LogOut className="w-4 h-4 text-red-500" />
                       {t("sign_out")}
-                    </Link>
+                    </div>
                   </div>
                 </motion.div>
               )}
