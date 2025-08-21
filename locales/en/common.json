@@ -36,7 +36,6 @@
   "mobile_app_development": "Mobile App Development",
   "legal_advisory_services": "Legal Advisory Services",
   "data_migration_project": "Data Migration Project",
-  "my_tenders": "My Tenders",
   "user_1": "User 1",
   "user_2": "User 2",
   "user_3": "User 3",
@@ -1039,5 +1038,17 @@
   "projects_and_reviews": "Projects & Reviews",
   "how_do_i_report_an_issue_with_a_provider_content": "Go to the provider’s profile and click 'Report'. You can also reach out to support directly.",
   "ratings_and_reviews": "Ratings & Reviews",
-  "help_and_support": "Help & Support"
+  "help_and_support": "Help & Support",
+  "no_tenders_match_status": "No tenders match the selected status.",
+  "sort_by": "Sort by",
+  "newest": "Newest first",
+  "oldest": "Oldest first",
+  "highest_budget": "Highest budget",
+  "lowest_budget": "Lowest budget",
+  "most_bids": "Most bids",
+  "least_bids": "Least bids",
+  "deadline_soonest": "Soonest deadline",
+  "my_tenders": "My Tenders",
+  "deadline_farthest": "Farthest deadline",
+  "confirm_close_tender_message": "Are you sure you want to close this tender?"
 }

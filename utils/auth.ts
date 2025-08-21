@@ -1,11 +1,10 @@
-// utils/auth.ts
-import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import {
   setTokenCookie,
   getTokenFromCookie,
   clearTokens,
 } from "@/utils/tokenHelpers";
+import { api } from "@/lib/apiClient";
 
 export interface User {
   _id: string;
@@ -25,63 +24,6 @@ export interface RegisterData {
   fullName?: string;
   companyName?: string;
 }
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-
-// Create axios instance with credentials to send cookies
-const api = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
-  withCredentials: true, // This enables cookies
-});
-
-// Request interceptor to add token
-api.interceptors.request.use((config) => {
-  const token = getTokenFromCookie();
-  if (token && config && config.headers) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
-
-// Simplified response interceptor (auth instance)
-api.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
-
-    if (!originalRequest) return Promise.reject(error);
-
-    // Only attempt refresh once per request
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-
-      try {
-        // Use axios.post directly with withCredentials to preserve cookie refresh behavior
-        const response = await axios.post(
-          `${API_BASE_URL}/api/users/refresh-token`,
-          {},
-          { withCredentials: true }
-        );
-
-        if (response.data.accessToken) {
-          setTokenCookie(response.data.accessToken);
-          originalRequest.headers = originalRequest.headers || {};
-          originalRequest.headers.Authorization = `Bearer ${response.data.accessToken}`;
-          return api(originalRequest);
-        }
-      } catch (refreshError) {
-        // Only clear tokens, don't redirect here
-        clearTokens();
-        return Promise.reject(refreshError);
-      }
-    }
-
-    return Promise.reject(error);
-  }
-);
 
 class AuthService {
   async register(userData: RegisterData) {
@@ -132,7 +74,7 @@ class AuthService {
     try {
       const response = await api.get("/api/users/profile");
       return response.data;
-    } catch (error) {
+    } catch {
       return null;
     }
   }
@@ -207,11 +149,10 @@ class AuthService {
     }
   }
 
-  // Simple refresh method for manual use
   async refreshToken(): Promise<boolean> {
     try {
-      const response = await axios.post(
-        `${API_BASE_URL}/api/users/refresh-token`,
+      const response = await api.post(
+        "/api/users/refresh-token",
         {},
         { withCredentials: true }
       );
@@ -228,4 +169,3 @@ class AuthService {
 }
 
 export const authService = new AuthService();
-export { api };

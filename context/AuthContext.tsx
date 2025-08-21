@@ -8,7 +8,8 @@ import React, {
   ReactNode,
 } from "react";
 import { useRouter } from "next/navigation";
-import { authService, RegisterData, User, api } from "@/utils/auth"; // import api here
+import { authService, RegisterData, User } from "@/utils/auth"; // import api here
+import { api } from "@/lib/apiClient";
 
 // Profile type (based on your backend schema)
 interface Profile {

@@ -2,13 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -31,6 +25,18 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 
 import { useTranslation } from "../lib/hooks/useTranslation";
+import { createTender } from "@/app/services/tenderService";
+
+// This should be replaced with actual category data from your backend
+// Make sure to fetch these from your API
+const CATEGORIES = [
+  { _id: "68a30ba6a357d6980cb93ee4", name: "Cleaning Services" },
+  { _id: "68a30ba6a357d6980cb93ee5", name: "Construction" },
+  { _id: "68a30ba6a357d6980cb93ee6", name: "IT Services" },
+  { _id: "68a30ba6a357d6980cb93ee7", name: "Consulting" },
+  { _id: "68a30ba6a357d6980cb93ee8", name: "Supplies" },
+  { _id: "68a30ba6a357d6980cb93ee9", name: "Logistics" },
+];
 
 const CreateTenderModal = ({
   open,
@@ -40,26 +46,26 @@ const CreateTenderModal = ({
   onOpenChange: (open: boolean) => void;
 }) => {
   const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { t } = useTranslation();
 
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    category: "",
-    budget: "",
-    estimatedTime: "",
+    category: "68a30ba6a357d6980cb93ee4",
+    estimatedBudget: "",
     deadline: "",
     location: "",
     contactEmail: "",
-    attachments: null as File | null,
+    image: null as File | null,
   });
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    const { t } = useTranslation();
     const { id, value, files } = e.target as HTMLInputElement;
-    if (files) {
-      setFormData({ ...formData, attachments: files[0] });
+    if (id === "image" && files) {
+      setFormData({ ...formData, image: files[0] });
     } else {
       setFormData({ ...formData, [id]: value });
     }
@@ -71,17 +77,47 @@ const CreateTenderModal = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
-    const payload = new FormData();
-    Object.entries(formData).forEach(([key, value]) => {
-      if (value) payload.append(key, value as string | Blob);
-    });
+    try {
+      const payload = {
+        title: formData.title,
+        description: formData.description,
+        category: formData.category,
+        location: formData.location,
+        contactEmail: formData.contactEmail,
+        estimatedBudget: formData.estimatedBudget,
+        deadline: new Date(formData.deadline).toISOString(),
+      };
 
-    console.log("Submitting:", Object.fromEntries(payload.entries()));
-    router.push("/tenders");
+      console.log("Submitting tender data:", payload);
+
+      const result = await createTender(payload);
+      console.log("Tender created successfully:", result);
+
+      setFormData({
+        title: "",
+        description: "",
+        category: "",
+        estimatedBudget: "",
+        deadline: "",
+        location: "",
+        contactEmail: "",
+        image: null,
+      });
+
+      onOpenChange(false);
+      router.refresh();
+    } catch (error: any) {
+      console.error("Failed to create tender:", error);
+      alert(
+        error.response?.data?.message ||
+          "Failed to create tender. Please try again."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
-
-  const { t } = useTranslation();
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -124,7 +160,7 @@ const CreateTenderModal = ({
                             id="title"
                             value={formData.title}
                             onChange={handleChange}
-                            placeholder="e.g., Construction of New Office Building"
+                            placeholder="e.g., Need Cleaning Service"
                             required
                           />
                         ),
@@ -173,22 +209,14 @@ const CreateTenderModal = ({
                             <SelectValue placeholder={t("select_a_category")} />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="construction">
-                              {t("construction")}
-                            </SelectItem>
-                            <SelectItem value="it-services">
-                              {t("it_services")}
-                            </SelectItem>
-                            <SelectItem value="consulting">
-                              {t("consulting")}
-                            </SelectItem>
-                            <SelectItem value="supplies">
-                              {t("supplies")}
-                            </SelectItem>
-                            <SelectItem value="logistics">
-                              {t("logistics")}
-                            </SelectItem>
-                            <SelectItem value="other">{t("other")}</SelectItem>
+                            {CATEGORIES.map((category) => (
+                              <SelectItem
+                                key={category._id}
+                                value={category._id}
+                              >
+                                {category.name}
+                              </SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                       </motion.div>
@@ -199,41 +227,23 @@ const CreateTenderModal = ({
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.45 }}
                       >
-                        <Label htmlFor="budget">
+                        <Label htmlFor="estimatedBudget">
                           {t("estimated_budget_qar")}
                         </Label>
                         <Input
-                          id="budget"
+                          id="estimatedBudget"
                           type="number"
-                          value={formData.budget}
+                          value={formData.estimatedBudget}
                           onChange={handleChange}
-                          placeholder="e.g., 500000"
+                          placeholder="e.g., 1500"
                           min="0"
+                          step="0.01"
                           required
                         />
                       </motion.div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-6">
-                      <motion.div
-                        className="grid gap-2"
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.5 }}
-                      >
-                        <Label htmlFor="estimatedTime">
-                          {t("estimated_time")}
-                        </Label>
-                        <Input
-                          id="estimatedTime"
-                          type="text"
-                          value={formData.estimatedTime}
-                          onChange={handleChange}
-                          placeholder="e.g., 6 months, 3-4 weeks"
-                          required
-                        />
-                      </motion.div>
-
+                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                       <motion.div
                         className="grid gap-2"
                         initial={{ opacity: 0, y: 10 }}
@@ -243,48 +253,47 @@ const CreateTenderModal = ({
                         <Label htmlFor="deadline">{t("deadline")}</Label>
                         <Input
                           id="deadline"
-                          type="date"
+                          type="datetime-local"
                           value={formData.deadline}
                           onChange={handleChange}
                           required
                         />
                       </motion.div>
-                    </div>
 
-                    {[
-                      {
-                        id: "location",
-                        label: t("location"),
-                        placeholder: "e.g., Doha, Qatar",
-                        type: "text",
-                        value: formData.location,
-                      },
-                      {
-                        id: "contactEmail",
-                        label: t("contact_email"),
-                        placeholder: "contact@example.com",
-                        type: "email",
-                        value: formData.contactEmail,
-                      },
-                    ].map((field, index) => (
                       <motion.div
-                        key={field.id}
                         className="grid gap-2"
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.55 + index * 0.05 }}
+                        transition={{ delay: 0.55 }}
                       >
-                        <Label htmlFor={field.id}>{field.label}</Label>
+                        <Label htmlFor="location">{t("location")}</Label>
                         <Input
-                          id={field.id}
-                          type={field.type}
-                          value={field.value}
+                          id="location"
+                          type="text"
+                          value={formData.location}
                           onChange={handleChange}
-                          placeholder={field.placeholder}
+                          placeholder="e.g., West Bay, Doha, Qatar"
                           required
                         />
                       </motion.div>
-                    ))}
+                    </div>
+
+                    <motion.div
+                      className="grid gap-2"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.6 }}
+                    >
+                      <Label htmlFor="contactEmail">{t("contact_email")}</Label>
+                      <Input
+                        id="contactEmail"
+                        type="email"
+                        value={formData.contactEmail}
+                        onChange={handleChange}
+                        placeholder="contact@example.com"
+                        required
+                      />
+                    </motion.div>
 
                     <motion.div
                       className="grid gap-2"
@@ -292,11 +301,11 @@ const CreateTenderModal = ({
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.65 }}
                     >
-                      <Label htmlFor="attachments">
+                      <Label htmlFor="image">
                         {t("upload_image_optional")}
                       </Label>
                       <Input
-                        id="attachments"
+                        id="image"
                         type="file"
                         accept="image/png, image/jpeg, image/jpg"
                         onChange={handleChange}
@@ -316,8 +325,9 @@ const CreateTenderModal = ({
                       <Button
                         type="submit"
                         className="w-min bg-blue-600 rounded-md text-white"
+                        disabled={isSubmitting}
                       >
-                        {t("post_tender")}
+                        {isSubmitting ? t("posting") : t("post_tender")}
                       </Button>
                     </motion.div>
                   </CardFooter>

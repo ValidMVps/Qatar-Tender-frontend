@@ -38,7 +38,6 @@ interface NavbarProps {
   setSidebarOpen: (open: boolean) => void;
   sidebarLinks?: { name: string; href: string; icon: React.ElementType }[];
 }
-const { logout } = useAuth();
 // Capitalize utility for breadcrumb display (not for translation keys)
 const toTitleCase = (str: string) =>
   str.replace(/-/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
@@ -59,6 +58,7 @@ export default function Navbar({
   const [open, setOpen] = useState(false);
   const [openTenderModal, setOpenTenderModal] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const { logout } = useAuth();
 
   const logoutfunction = () => {
     setProfileDropdownOpen(false);

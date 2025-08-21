@@ -1039,5 +1039,16 @@
   "requested_bidder_profile_not_found": "لم يتم العثور على ملف المزود المطلوب.",
   "projects_and_reviews": "المشاريع والتقييمات",
   "ratings_and_reviews": "التقييمات والمراجعات",
-  "help_and_support": "المساعدة والدعم"
+  "help_and_support": "المساعدة والدعم",
+  "no_tenders_match_status": "لا توجد مناقصات تتطابق مع الحالة المحددة.",
+  "sort_by": "فرز حسب",
+  "newest": "الأحدث أولاً",
+  "oldest": "الأقدم أولاً",
+  "highest_budget": "أعلى ميزانية",
+  "lowest_budget": "أدنى ميزانية",
+  "most_bids": "أكثر العطاءات",
+  "least_bids": "أقل العطاءات",
+  "deadline_soonest": "أقرب موعد نهائي",
+  "deadline_farthest": "أبعد موعد نهائي",
+  "confirm_close_tender_message": "هل أنت متأكد أنك تريد إغلاق هذه المناقصة؟"
 }

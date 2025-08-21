@@ -1,4 +1,3 @@
-// lib/apiClient.ts
 import axios from "axios";
 import {
   getTokenFromCookie,
@@ -8,23 +7,26 @@ import {
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
-const apiClient = axios.create({
+// Create axios instance
+const api = axios.create({
   baseURL: API_BASE_URL,
-  headers: { "Content-Type": "application/json" },
-  withCredentials: true, // important for cookie-based refresh
+  headers: {
+    "Content-Type": "application/json",
+  },
+  withCredentials: true,
 });
 
-// Request: attach token if present
-apiClient.interceptors.request.use((config) => {
+// Request interceptor (add token if exists)
+api.interceptors.request.use((config) => {
   const token = getTokenFromCookie();
-  if (token && config && config.headers) {
+  if (token && config.headers) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
 });
 
-// Response: try refresh once on 401
-apiClient.interceptors.response.use(
+// Response interceptor (handle refresh token)
+api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
@@ -33,19 +35,19 @@ apiClient.interceptors.response.use(
 
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
+
       try {
-        // call refresh endpoint directly using axios (no interceptors)
-        const refreshRes = await axios.post(
+        const response = await axios.post(
           `${API_BASE_URL}/api/users/refresh-token`,
           {},
           { withCredentials: true }
         );
 
-        if (refreshRes.data?.accessToken) {
-          setTokenCookie(refreshRes.data.accessToken);
+        if (response.data.accessToken) {
+          setTokenCookie(response.data.accessToken);
           originalRequest.headers = originalRequest.headers || {};
-          originalRequest.headers.Authorization = `Bearer ${refreshRes.data.accessToken}`;
-          return apiClient(originalRequest);
+          originalRequest.headers.Authorization = `Bearer ${response.data.accessToken}`;
+          return api(originalRequest);
         }
       } catch (refreshError) {
         clearTokens();
@@ -57,4 +59,4 @@ apiClient.interceptors.response.use(
   }
 );
 
-export default apiClient;
+export { api, API_BASE_URL };
