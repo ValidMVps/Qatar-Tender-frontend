@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useMemo, useEffect } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -33,51 +33,54 @@ import {
   DollarSign,
   Calendar,
   Mail,
-  ChevronRight,
+  Edit3,
 } from "lucide-react";
 
 import { useTranslation } from "../lib/hooks/useTranslation";
-import { createTender } from "@/app/services/tenderService";
+import { getTender, updateTender } from "@/app/services/tenderService";
 import { uploadToCloudinary } from "@/utils/uploadToCloudinary";
 import { detectContactInfo, VALIDATION_RULES } from "@/utils/validationcehck";
 import { getCategories } from "@/app/services/categoryService";
-import { useAuth } from "@/context/AuthContext";
+
+// Constants for validation
 
 // Step configuration
 const STEPS = [
   {
     id: "basic",
     title: "Basic Information",
-    description: "Tender title and description",
+    description: "Update tender title and description",
     icon: FileText,
     fields: ["title", "description"],
   },
   {
     id: "details",
     title: "Project Details",
-    description: "Category and budget information",
+    description: "Update category and budget information",
     icon: DollarSign,
     fields: ["category", "estimatedBudget"],
   },
   {
     id: "schedule",
     title: "Schedule & Location",
-    description: "Deadline and project location",
+    description: "Update deadline and project location",
     icon: Calendar,
     fields: ["deadline", "location"],
   },
   {
     id: "contact",
     title: "Contact & Final Details",
-    description: "Contact information and image upload",
+    description: "Update contact information and image",
     icon: Mail,
     fields: ["contactEmail", "image"],
   },
 ];
+
 type Category = {
   _id: string;
   name: string;
 };
+
 interface FormErrors {
   title?: string;
   description?: string;
@@ -90,19 +93,30 @@ interface FormErrors {
   general?: string;
 }
 
-const CreateTenderModal = ({
-  open,
-  onOpenChange,
-}: {
+interface EditTenderModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-}) => {
+  tenderId?: string | null;
+  onUpdated?: (updatedTender: any) => void;
+}
+
+const ReopenTenderModal = ({
+  open,
+  onOpenChange,
+  tenderId,
+  onUpdated,
+}: EditTenderModalProps) => {
   const router = useRouter();
+  const { t } = useTranslation();
+
+  // State management
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-  const { t } = useTranslation();
+  const [loading, setLoading] = useState(true);
   const [CATEGORIES, setCategories] = useState<Category[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
+
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -111,8 +125,14 @@ const CreateTenderModal = ({
     deadline: "",
     location: "",
     contactEmail: "",
-    image: "https://pbs.twimg.com/media/Gy7Ag4iboAEZ7Sx?format=jpg&name=small",
+    image: "",
   });
+
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [touchedFields, setTouchedFields] = useState<Set<string>>(new Set());
+  const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
+
+  // Fetch categories
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -125,10 +145,54 @@ const CreateTenderModal = ({
     fetchCategories();
   }, []);
 
-  const [errors, setErrors] = useState<FormErrors>({});
-  const [touchedFields, setTouchedFields] = useState<Set<string>>(new Set());
-  const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
-  const [isUploading, setIsUploading] = useState(false);
+  // Fetch existing tender data
+  useEffect(() => {
+    let mounted = true;
+    const fetchTender = async () => {
+      if (!tenderId || !open) {
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+      setErrors({});
+
+      try {
+        const data = await getTender(tenderId);
+        if (!mounted) return;
+
+        setFormData({
+          title: data.title || "",
+          description: data.description || "",
+          category: data.category?._id || data.category || "",
+          estimatedBudget: data.estimatedBudget
+            ? String(data.estimatedBudget)
+            : "",
+          location: data.location || "",
+          contactEmail: data.contactEmail || data.postedBy?.email || "",
+          deadline: data.deadline
+            ? new Date(data.deadline).toISOString().slice(0, 16)
+            : "",
+          image: data.image || "",
+        });
+      } catch (err: any) {
+        console.error("Failed to load tender for edit:", err);
+        setErrors({
+          general:
+            err?.response?.data?.message ||
+            err?.message ||
+            "Failed to load tender",
+        });
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+
+    fetchTender();
+    return () => {
+      mounted = false;
+    };
+  }, [open, tenderId]);
 
   // Validation functions
   const validateField = useCallback(
@@ -202,7 +266,6 @@ const CreateTenderModal = ({
           const deadline = new Date(value);
           const now = new Date();
           if (deadline <= now) return t("deadline_must_be_in_the_future");
-          // Check if deadline is more than 2 years in the future
           const twoYearsFromNow = new Date(
             now.getFullYear() + 2,
             now.getMonth(),
@@ -254,7 +317,7 @@ const CreateTenderModal = ({
     return currentStepFields.every((field) => {
       const value = formData[field as keyof typeof formData];
       const error = validateField(field, value);
-      return !error && (field === "image" || value); // image is optional
+      return !error && (field === "image" || value);
     });
   }, [currentStep, formData, validateField]);
 
@@ -263,104 +326,53 @@ const CreateTenderModal = ({
     const target = e.target;
     const { id, value, files } = target;
 
-    // Mark field as touched
     setTouchedFields((prev) => new Set([...prev, id]));
 
-    // IMAGE upload flow
     if (id === "image" && files && files[0]) {
       const file = files[0];
 
-      console.log("🖼️ Image file selected:", {
-        name: file.name,
-        size: file.size,
-        type: file.type,
-        lastModified: file.lastModified,
-      });
-
-      // Client-side validations
       const allowedTypes = ["image/png", "image/jpeg", "image/jpg"];
       if (!allowedTypes.includes(file.type)) {
-        console.error("❌ Invalid file type:", file.type);
         setErrors((prev) => ({
           ...prev,
           image: `Only ${allowedTypes.join(", ")} files are allowed`,
         }));
-        // Reset the file input
         target.value = "";
         return;
       }
 
-      const maxSize = 5 * 1024 * 1024; // 5MB
+      const maxSize = 5 * 1024 * 1024;
       if (file.size > maxSize) {
-        console.error("❌ File too large:", file.size, "bytes");
         setErrors((prev) => ({
           ...prev,
           image: `File size must be less than ${maxSize / 1024 / 1024}MB`,
         }));
-        // Reset the file input
         target.value = "";
         return;
       }
 
-      // Clear previous errors and start upload
       setErrors((prev) => ({ ...prev, image: undefined }));
       setIsUploading(true);
 
       try {
-        console.log("🚀 Starting upload process...");
         const uploadedUrl = await uploadToCloudinary(file);
-
-        // Verify the URL is valid
-        if (!uploadedUrl || typeof uploadedUrl !== "string") {
-          throw new Error("Invalid URL returned from upload");
-        }
-
-        console.log("✅ Upload completed successfully!");
-        console.log("🔗 Uploaded URL:", uploadedUrl);
-
-        // Update form data with the new image URL
-        setFormData((prev) => {
-          const updated = { ...prev, image: uploadedUrl };
-          console.log("📝 Updated formData:", updated);
-          return updated;
-        });
-
-        // Optional: Show success message
-        setErrors((prev) => ({
-          ...prev,
-          image: undefined,
-        }));
-      } catch (uploadError) {
-        console.error("💥 Upload failed:", uploadError);
-
-        // Set specific error message
+        setFormData((prev) => ({ ...prev, image: uploadedUrl }));
+        setErrors((prev) => ({ ...prev, image: undefined }));
+      } catch (uploadError: any) {
         setErrors((prev) => ({
           ...prev,
           image:
-            typeof uploadError === "object" &&
-            uploadError !== null &&
-            "message" in uploadError &&
-            typeof (uploadError as any).message === "string"
-              ? (uploadError as any).message
-              : "Image upload failed. Please try again.",
+            uploadError?.message || "Image upload failed. Please try again.",
         }));
-
-        // Reset the file input so user can try again
         target.value = "";
-
-        // Don't change the existing image URL in formData
-        // This way, if there was a previous successful upload, it stays
       } finally {
         setIsUploading(false);
       }
     } else {
-      // Handle other form fields (text, textarea, etc.)
       setFormData((prev) => ({ ...prev, [id]: value }));
-
-      // Log other field changes for debugging
-      console.log(`📝 Field ${id} updated:`, value);
     }
   };
+
   const handleSelectChange = (value: string) => {
     setTouchedFields((prev) => new Set([...prev, "category"]));
     setFormData((prev) => ({ ...prev, category: value }));
@@ -384,14 +396,7 @@ const CreateTenderModal = ({
     }
   };
 
-  const goToStep = (stepIndex: number) => {
-    // Allow navigation to previous steps or if current step is valid
-    if (stepIndex <= currentStep || isCurrentStepValid) {
-      setCurrentStep(stepIndex);
-    }
-  };
-
-  // Comprehensive form validation
+  // Form validation
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
     let isValid = true;
@@ -404,7 +409,6 @@ const CreateTenderModal = ({
       }
     });
 
-    // Additional cross-field validation
     const allContactDetections = [
       ...detectContactInfo(formData.title),
       ...detectContactInfo(formData.description),
@@ -425,106 +429,65 @@ const CreateTenderModal = ({
     setErrors(newErrors);
     return isValid;
   };
-  const { user } = useAuth();
+
+  // Handle form submission
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
     setIsSubmitting(true);
     setErrors({});
 
-    console.log("🚀 Form submission started");
-    console.log("📋 Current formData:", formData);
+    if (!tenderId) {
+      setErrors({ general: "Tender ID is missing" });
+      setIsSubmitting(false);
+      return;
+    }
 
-    // Mark all fields as touched for validation display
     setTouchedFields(new Set(Object.keys(formData)));
 
-    // Validate form
     if (!validateForm()) {
-      console.error("❌ Form validation failed");
       setIsSubmitting(false);
       return;
     }
 
     try {
-      // Prepare payload
-      const payload = {
-        title: formData.title.trim(),
-        description: formData.description.trim(),
+      // Build JSON payload
+      const payload: Record<string, any> = {
+        title: formData.title?.trim(),
+        description: formData.description?.trim(),
+        location: formData.location?.trim(),
+        contactEmail: formData.contactEmail?.trim(),
+        estimatedBudget: formData.estimatedBudget,
+        deadline: formData.deadline,
         category: formData.category,
-        location: formData.location.trim(),
-        contactEmail: formData.contactEmail.trim(),
-        estimatedBudget: parseFloat(formData.estimatedBudget),
-        deadline: new Date(formData.deadline).toISOString(),
-        image: formData.image || null, // Explicitly handle null/empty
       };
 
-      console.log("📤 Payload being sent:", payload);
-      console.log("🖼️ Image in payload:", {
-        value: payload.image,
-        type: typeof payload.image,
-        length: payload.image?.length,
-        isNull: payload.image === null,
-        isEmpty: payload.image === "",
-        isUndefined: payload.image === undefined,
-      });
+      // Only include `image` if you plan to send its URL/base64 string.
+      if (formData.image && typeof formData.image === "string") {
+        payload.image = formData.image;
+      }
 
-      // Call the API
-      const result = await createTender(payload);
-      console.log("✅ Tender created successfully:", result);
-      console.log("🖼️ Created tender image value:", result.image);
+      // Call your service (should send JSON)
+      const updated = await updateTender(tenderId, payload);
 
-      // Show success animation
       setShowSuccess(true);
 
-      // Reset form after delay
       setTimeout(() => {
-        setFormData({
-          title: "",
-          description: "",
-          category: "",
-          estimatedBudget: "",
-          deadline: "",
-          location: "",
-          contactEmail: "",
-          image: "", // Reset to empty string
-        });
-        setTouchedFields(new Set());
-        setErrors({});
+        onUpdated?.(updated);
+        setShowSuccess(false);
+        onOpenChange(false);
         setCurrentStep(0);
         setCompletedSteps(new Set());
-        setShowSuccess(false);
-
-        onOpenChange(false);
-        router.push(
-          user?.userType == "business"
-            ? "/dashboard/my-tenders"
-            : "/business-dashboard/my-tenders"
-        );
-      }, 3000);
-    } catch (error) {
-      console.error("💥 Tender creation failed:", error);
-      if (typeof error === "object" && error !== null && "response" in error) {
-        // @ts-expect-error: error.response may exist on some error types
-        console.error("📋 Error details:", error.response?.data);
-      }
-
+        setTouchedFields(new Set());
+        setErrors({});
+      }, 2000);
+    } catch (error: any) {
+      console.error("Failed to update tender:", error);
       setShowSuccess(false);
-      let errorMessage = t("failed_to_create_tender_please_try_again");
-      if (typeof error === "object" && error !== null) {
-        if (
-          "response" in error &&
-          typeof (error as any).response === "object" &&
-          (error as any).response !== null
-        ) {
-          errorMessage = (error as any).response?.data?.message || errorMessage;
-        } else if (
-          "message" in error &&
-          typeof (error as any).message === "string"
-        ) {
-          errorMessage = (error as any).message || errorMessage;
-        }
-      }
       setErrors({
-        general: errorMessage,
+        general:
+          error?.response?.data?.message ||
+          error?.message ||
+          "Failed to update tender",
       });
     } finally {
       setIsSubmitting(false);
@@ -549,42 +512,28 @@ const CreateTenderModal = ({
         >
           <div className="text-center">
             {isSubmitting && !showSuccess ? (
-              // Loading State
               <motion.div className="space-y-6">
-                {/* Animated Logo/Icon */}
                 <motion.div
-                  animate={{
-                    rotate: [0, 360],
-                    scale: [1, 1.1, 1],
-                  }}
-                  transition={{
-                    rotate: { duration: 2, repeat: Infinity, ease: "linear" },
-                    scale: {
-                      duration: 1.5,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                    },
-                  }}
+                  animate={{ rotate: [0, 360] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
                   className="w-20 h-20 mx-auto bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center"
                 >
-                  <FileText className="w-10 h-10 text-white" />
+                  <Edit3 className="w-10 h-10 text-white" />
                 </motion.div>
 
-                {/* Loading Text */}
                 <div className="space-y-3">
                   <motion.h3
                     animate={{ opacity: [0.5, 1, 0.5] }}
                     transition={{ duration: 1.5, repeat: Infinity }}
                     className="text-xl font-semibold text-gray-900 dark:text-white"
                   >
-                    {t("creating_your_tender")}
+                    {t("updating_your_tender")}
                   </motion.h3>
                   <p className="text-gray-600 dark:text-gray-400">
-                    {t("please_wait_while_we_process_your_request")}
+                    {t("please_wait_while_we_process_your_changes")}
                   </p>
                 </div>
 
-                {/* Progress Bar */}
                 <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                   <motion.div
                     className="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full"
@@ -593,138 +542,30 @@ const CreateTenderModal = ({
                     transition={{ duration: 2, ease: "easeInOut" }}
                   />
                 </div>
-
-                {/* Loading Steps */}
-                <div className="space-y-2 text-sm text-gray-500 dark:text-gray-400">
-                  <motion.div
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.5 }}
-                    className="flex items-center gap-2"
-                  >
-                    <motion.div
-                      animate={{ scale: [0, 1] }}
-                      transition={{ delay: 0.5 }}
-                      className="w-2 h-2 bg-green-500 rounded-full"
-                    />
-                    {t("validating_information")}
-                  </motion.div>
-                  <motion.div
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 1 }}
-                    className="flex items-center gap-2"
-                  >
-                    <motion.div
-                      animate={{ scale: [0, 1] }}
-                      transition={{ delay: 1 }}
-                      className="w-2 h-2 bg-green-500 rounded-full"
-                    />
-                    {t("processing_submission")}
-                  </motion.div>
-                  <motion.div
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 1.5 }}
-                    className="flex items-center gap-2"
-                  >
-                    <motion.div
-                      animate={{ scale: [0, 1] }}
-                      transition={{ delay: 1.5 }}
-                      className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"
-                    />
-                    {t("finalizing_tender")}
-                  </motion.div>
-                </div>
               </motion.div>
             ) : (
-              // Success State
               <motion.div
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 className="space-y-6"
               >
-                {/* Success Animation */}
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: [0, 1.2, 1] }}
                   transition={{ duration: 0.6, ease: "easeOut" }}
                   className="w-20 h-20 mx-auto bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center"
                 >
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: 0.3 }}
-                  >
-                    <CheckCircle2 className="w-10 h-10 text-white" />
-                  </motion.div>
+                  <CheckCircle2 className="w-10 h-10 text-white" />
                 </motion.div>
 
-                {/* Success Text */}
                 <div className="space-y-3">
-                  <motion.h3
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4 }}
-                    className="text-xl font-semibold text-gray-900 dark:text-white"
-                  >
-                    {t("tender_created_successfully")}
-                  </motion.h3>
-                  <motion.p
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.6 }}
-                    className="text-gray-600 dark:text-gray-400"
-                  >
-                    {t("redirecting_to_your_tenders")}
-                  </motion.p>
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                    {t("tender_updated_successfully")}
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    {t("your_changes_have_been_saved")}
+                  </p>
                 </div>
-
-                {/* Success Effects */}
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.8 }}
-                  className="space-y-2 text-sm text-green-600 dark:text-green-400"
-                >
-                  <div className="flex items-center justify-center gap-2">
-                    <CheckCircle2 className="w-4 h-4" />
-                    {t("tender_information_saved")}
-                  </div>
-                  <div className="flex items-center justify-center gap-2">
-                    <CheckCircle2 className="w-4 h-4" />
-                    {t("notifications_sent_to_relevant_contractors")}
-                  </div>
-                </motion.div>
-
-                {/* Confetti Effect */}
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="absolute inset-0 pointer-events-none"
-                >
-                  {[...Array(20)].map((_, i) => (
-                    <motion.div
-                      key={i}
-                      className="absolute w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full"
-                      initial={{
-                        x: "50%",
-                        y: "50%",
-                        scale: 0,
-                      }}
-                      animate={{
-                        x: `${50 + (Math.random() - 0.5) * 100}%`,
-                        y: `${50 + (Math.random() - 0.5) * 100}%`,
-                        scale: [0, 1, 0],
-                      }}
-                      transition={{
-                        duration: 2,
-                        delay: i * 0.1,
-                        ease: "easeOut",
-                      }}
-                    />
-                  ))}
-                </motion.div>
               </motion.div>
             )}
           </div>
@@ -747,7 +588,6 @@ const CreateTenderModal = ({
             exit={{ opacity: 0, x: -20 }}
             className="space-y-6"
           >
-            {/* Title Field */}
             <div className="relative grid gap-1">
               <Label
                 htmlFor="title"
@@ -786,7 +626,6 @@ const CreateTenderModal = ({
               </div>
             </div>
 
-            {/* Description Field */}
             <div className="relative grid gap-1">
               <Label
                 htmlFor="description"
@@ -844,7 +683,6 @@ const CreateTenderModal = ({
             exit={{ opacity: 0, x: -20 }}
             className="space-y-6"
           >
-            {/* Category Field */}
             <div className="relative grid gap-1">
               <Label
                 htmlFor="category"
@@ -888,7 +726,6 @@ const CreateTenderModal = ({
               </div>
             </div>
 
-            {/* Budget Field */}
             <div className="relative grid gap-1">
               <Label
                 htmlFor="estimatedBudget"
@@ -927,7 +764,6 @@ const CreateTenderModal = ({
               </div>
             </div>
 
-            {/* Budget Guidelines */}
             <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 border border-blue-200 dark:border-blue-800">
               <h4 className="font-medium text-blue-900 dark:text-blue-100 mb-2">
                 {t("budget_guidelines")}
@@ -950,7 +786,6 @@ const CreateTenderModal = ({
             exit={{ opacity: 0, x: -20 }}
             className="space-y-6"
           >
-            {/* Deadline Field */}
             <div className="relative grid gap-1">
               <Label
                 htmlFor="deadline"
@@ -986,7 +821,6 @@ const CreateTenderModal = ({
               </div>
             </div>
 
-            {/* Location Field */}
             <div className="relative grid gap-1">
               <Label
                 htmlFor="location"
@@ -1023,7 +857,6 @@ const CreateTenderModal = ({
               </div>
             </div>
 
-            {/* Timeline Tips */}
             <div className="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-4 border border-amber-200 dark:border-amber-800">
               <h4 className="font-medium text-amber-900 dark:text-amber-100 mb-2">
                 {t("timeline_tips")}
@@ -1046,7 +879,6 @@ const CreateTenderModal = ({
             exit={{ opacity: 0, x: -20 }}
             className="space-y-6"
           >
-            {/* Contact Email Field */}
             <div className="relative grid gap-1">
               <Label
                 htmlFor="contactEmail"
@@ -1082,13 +914,12 @@ const CreateTenderModal = ({
               </div>
             </div>
 
-            {/* Image Upload Field */}
             <div className="relative grid gap-1">
               <Label
                 htmlFor="image"
                 className="absolute -top-3 left-4 bg-white dark:bg-gray-900 px-1 text-gray-500 text-sm"
               >
-                {t("upload_image_optional")}
+                {t("update_image_optional")}
               </Label>
               <Input
                 id="image"
@@ -1096,12 +927,15 @@ const CreateTenderModal = ({
                 accept="image/png,image/jpeg,image/jpg"
                 onChange={handleChange}
                 onBlur={() => handleBlur("image")}
+                disabled={isUploading}
                 className={`rounded-full border border-gray-300 dark:border-gray-700 px-4 py-2 focus:ring-2 focus:ring-blue-400 focus:outline-none ${
                   fieldErrors.image ? "border-red-500" : ""
-                }`}
+                } ${isUploading ? "opacity-50 cursor-not-allowed" : ""}`}
               />
               <div className="h-5 mt-1">
-                {fieldErrors.image ? (
+                {isUploading ? (
+                  <p className="text-xs text-blue-600">Uploading image...</p>
+                ) : fieldErrors.image ? (
                   <motion.p
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -1116,6 +950,22 @@ const CreateTenderModal = ({
                 )}
               </div>
             </div>
+
+            {/* Current Image Preview */}
+            {formData.image && (
+              <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+                <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-3">
+                  Current Image
+                </h4>
+                <div className="flex items-center justify-center">
+                  <img
+                    src={formData.image}
+                    alt="Current tender image"
+                    className="max-w-full h-32 object-cover rounded-lg border border-gray-200 dark:border-gray-600"
+                  />
+                </div>
+              </div>
+            )}
 
             {/* Preview Section */}
             <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
@@ -1168,12 +1018,43 @@ const CreateTenderModal = ({
     }
   };
 
+  // Loading screen for initial data fetch
+  if (loading) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-md bg-white dark:bg-gray-900/95 rounded-3xl shadow-2xl p-8 border-none">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.97 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-center space-y-4"
+          >
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+              className="w-16 h-16 mx-auto bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center"
+            >
+              <FileText className="w-8 h-8 text-white" />
+            </motion.div>
+            <div>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                Loading Tender Details
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400 mt-1">
+                Please wait while we fetch the tender information...
+              </p>
+            </div>
+          </motion.div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
         <AnimatePresence>
           {open && (
-            <DialogContent className="max-w-4xl max-h-[75vh] overflow-y-auto bg-white dark:bg-gray-900/95 rounded-3xl shadow-2xl p-8 border-none">
+            <DialogContent className="max-w-4xl max-h-[79vh] overflow-y-auto bg-white dark:bg-gray-900/95 rounded-3xl shadow-2xl p-8 border-none">
               <motion.div
                 key="modal"
                 initial={{ opacity: 0, scale: 0.97, y: 20 }}
@@ -1190,7 +1071,7 @@ const CreateTenderModal = ({
                       transition={{ delay: 0.1 }}
                     >
                       <CardTitle className="text-3xl font-semibold tracking-tight text-gray-900 dark:text-white text-center">
-                        {t("create_new_tender")}
+                        {t("reopen_tender")}
                       </CardTitle>
                       <CardDescription className="text-gray-500 dark:text-gray-400 mt-1 text-center">
                         {STEPS[currentStep].description}
@@ -1200,6 +1081,7 @@ const CreateTenderModal = ({
 
                   {/* Step Indicator */}
 
+                  {/* Error Display */}
                   {errors.general && (
                     <motion.div
                       initial={{ opacity: 0 }}
@@ -1213,15 +1095,15 @@ const CreateTenderModal = ({
                     </motion.div>
                   )}
 
-                  <form onSubmit={handleSubmit}>
-                    <CardContent>
+                  <form onSubmit={handleSubmit} className="">
+                    <CardContent className="">
                       <AnimatePresence mode="wait">
                         {renderStepContent()}
                       </AnimatePresence>
                     </CardContent>
 
                     {/* Footer Navigation */}
-                    <CardFooter className="flex justify-between items-center mt-6">
+                    <CardFooter className="flex justify-between items-center mt-6 ">
                       <Button
                         type="button"
                         variant="outline"
@@ -1271,7 +1153,7 @@ const CreateTenderModal = ({
                             ) : (
                               <CheckCircle2 className="w-4 h-4" />
                             )}
-                            {isSubmitting ? t("posting") : t("post_tender")}
+                            {isSubmitting ? t("updating") : t("update_tender")}
                           </Button>
                         </motion.div>
                       )}
@@ -1292,4 +1174,4 @@ const CreateTenderModal = ({
   );
 };
 
-export default CreateTenderModal;
+export default ReopenTenderModal;

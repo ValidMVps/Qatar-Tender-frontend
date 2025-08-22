@@ -58,6 +58,7 @@ import { useAuth } from "@/context/AuthContext";
 import MyTenderCard from "@/components/MyTenderCard";
 import { getTender, updateTender } from "@/app/services/tenderService"; // keep available if needed
 import { UiTender } from "@/types/ui";
+import CreateTenderModal from "@/components/CreateTenderModal";
 
 type ApiTender = {
   _id: string;
@@ -226,8 +227,6 @@ export default function MyTendersPage() {
     }
   };
 
-
-
   // Filtering
   const filteredTenders = tenders.filter((tender) => {
     // Tab filter
@@ -316,8 +315,6 @@ export default function MyTendersPage() {
       setShowConfirmModal({ show: false, action: "", tenderId: null });
     }
   };
-
- 
 
   const handleReapplyTender = (tenderId: string) => {
     const tenderToReapply = tenders.find((t) => t.id === tenderId);
@@ -536,7 +533,6 @@ export default function MyTendersPage() {
           </div>
         </div>
       </div>
-
       <Tabs
         value={activeTab}
         onValueChange={setActiveTab}
@@ -558,8 +554,6 @@ export default function MyTendersPage() {
                 <MyTenderCard
                   key={tender.id}
                   tender={tender}
-                  onDelete={handleDeleteTender}
-                  onClose={handleCloseTender}
                   onReapply={handleReapplyTender}
                   onUpdate={handleUpdateTender} // <-- pass update handler
                   t={t}
@@ -593,70 +587,11 @@ export default function MyTendersPage() {
             )}
           </div>
         </TabsContent>
-      </Tabs>
-
-      {/* Confirmation Modal */}
-      {showConfirmModal.show && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-xs bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <Card className="w-full max-w-md mx-auto border border-neutral-300">
-            <CardContent className="p-6">
-              <div className="mb-5">
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  {showConfirmModal.action === "delete"
-                    ? t("confirm_delete")
-                    : showConfirmModal.action === "close"
-                    ? t("confirm_close_tender")
-                    : t("confirm_action")}
-                </h3>
-                <p className="text-gray-600">
-                  {showConfirmModal.action === "delete"
-                    ? t("confirm_delete_message")
-                    : showConfirmModal.action === "close"
-                    ? t("confirm_close_tender_message")
-                    : t("confirm_action_message")}
-                </p>
-              </div>
-              <div className="flex justify-end space-x-3 flex-wrap gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() =>
-                    setShowConfirmModal({
-                      show: false,
-                      action: "",
-                      tenderId: null,
-                    })
-                  }
-                >
-                  {t("cancel")}
-                </Button>
-                <Button
-                  size="sm"
-                  className={
-                    showConfirmModal.action === "delete"
-                      ? "bg-red-600 hover:bg-red-700"
-                      : "bg-blue-600 hover:bg-blue-700"
-                  }
-                  onClick={() => {
-                    if (showConfirmModal.action === "delete") {
-                      handleConfirmDelete();
-                    } else if (showConfirmModal.action === "close") {
-                      handleConfirmClose();
-                    }
-                  }}
-                >
-                  {showConfirmModal.action === "delete"
-                    ? t("delete")
-                    : showConfirmModal.action === "close"
-                    ? t("close_tender")
-                    : t("confirm")}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-
+      </Tabs>{" "}
+      <CreateTenderModal
+        open={openTenderModal}
+        onOpenChange={setOpenTenderModal}
+      />
       {/* Reapply Tender Modal */}
       <Dialog
         open={showReapplyModal.show}

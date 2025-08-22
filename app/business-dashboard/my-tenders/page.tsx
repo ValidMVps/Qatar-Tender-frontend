@@ -1,6 +1,7 @@
+// app/dashboard/my-tenders/page.tsx
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -26,6 +27,9 @@ import {
   RefreshCcw,
   Search,
   Filter,
+  MapPin,
+  Mail,
+  Clock,
 } from "lucide-react";
 import Link from "next/link";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -49,204 +53,46 @@ import { Textarea } from "@/components/ui/textarea";
 import EditTenderModal from "@/components/EdittenderModal";
 
 import { useTranslation } from "../../../lib/hooks/useTranslation";
-// Sample data with more diverse scenarios
-const sampleTenders = [
-  {
-    id: 1,
-    title: "Office Building Construction Project",
-    description:
-      "We are looking for a qualified contractor to handle this important construction project in West Bay. The project involves complete construction of a 5-story office building with modern amenities.",
-    budget: "150,000",
-    deadline: "2024-02-15",
-    status: "active",
-    bidsCount: 8,
-    awardedBid: true,
-    isCompleted: false,
-    category: "Construction",
-    location: "West Bay, Doha",
-    createdAt: "2024-01-10",
-    postedDate: "Jan 10, 2024",
-  },
+import { getUserTenders } from "@/app/services/tenderService";
+import { useAuth } from "@/context/AuthContext";
+import MyTenderCard from "@/components/MyTenderCard";
+import { getTender, updateTender } from "@/app/services/tenderService"; // keep available if needed
+import { UiTender } from "@/types/ui";
+import CreateTenderModal from "@/components/CreateTenderModal";
 
-  {
-    id: 3,
-    title: "HVAC System Installation",
-    description:
-      "Complete HVAC system installation for a 5-story commercial building. Includes design, installation, testing, and 2-year maintenance contract.",
-    budget: "85,000",
-    deadline: "2024-01-25",
-    status: "closed",
-    bidsCount: 6,
-    awardedBid: true,
-    isCompleted: true,
-    category: "Maintenance",
-    location: "Al Rayyan, Qatar",
-    createdAt: "2024-01-05",
-    postedDate: "Jan 5, 2024",
-  },
-  {
-    id: 4,
-    title: "Legal Advisory Services",
-    description:
-      "Seeking legal expertise for contract review and compliance with Qatar regulations. Ongoing consultation needed for 6 months.",
-    budget: "35,000",
-    deadline: "2024-02-28",
-    status: "active",
-    bidsCount: 4,
-    awardedBid: false,
-    isCompleted: false,
-    category: "Legal",
-    location: "Doha, Qatar",
-    createdAt: "2024-01-15",
-    postedDate: "Jan 15, 2024",
-  },
-
-  {
-    id: 6,
-    title: "Digital Marketing Campaign",
-    description:
-      "Comprehensive digital marketing strategy for our new product launch. Includes social media, Google Ads, content creation, and analytics reporting.",
-    budget: "45,000",
-    deadline: "2024-02-10",
-    status: "active",
-    bidsCount: 12,
-    awardedBid: true,
-    isCompleted: false,
-    category: "Marketing",
-    location: "Doha, Qatar",
-    createdAt: "2024-01-08",
-    postedDate: "Jan 8, 2024",
-  },
-
-  {
-    id: 8,
-    title: "Catering Services Contract",
-    description:
-      "Daily catering services for our office of 150 employees. Includes breakfast, lunch, and evening snacks with dietary options.",
-    budget: "180,000",
-    deadline: "2024-03-01",
-    status: "active",
-    bidsCount: 15,
-    awardedBid: false,
-    isCompleted: false,
-    category: "Food & Beverage",
-    location: "Al Sadd, Doha",
-    createdAt: "2024-01-20",
-    postedDate: "Jan 20, 2024",
-  },
-  {
-    id: 9,
-    title: "Interior Design and Fit-out",
-    description:
-      "Complete interior design and fit-out for new office space. Modern, functional design with meeting rooms, open workspace, and executive offices.",
-    budget: "95,000",
-    deadline: "2024-01-30",
-    status: "closed",
-    bidsCount: 9,
-    awardedBid: true,
-    isCompleted: true,
-    category: "Interior Design",
-    location: "The Pearl, Doha",
-    createdAt: "2024-01-03",
-    postedDate: "Jan 3, 2024",
-  },
-
-  {
-    id: 11,
-    title: "Event Management - Annual Conference",
-    description:
-      "Complete event management for our annual business conference. Expected 300 attendees, venue booking, catering, AV equipment, and logistics.",
-    budget: "75,000",
-    deadline: "2024-02-05",
-    status: "active",
-    bidsCount: 7,
-    awardedBid: false,
-    isCompleted: false,
-    category: "Events",
-    location: "Doha, Qatar",
-    createdAt: "2024-01-14",
-    postedDate: "Jan 14, 2024",
-  },
-
-  {
-    id: 13,
-    title: "Office Furniture Supply",
-    description:
-      "Supply and installation of office furniture for 50 employees. Includes desks, chairs, meeting tables, and storage solutions.",
-    budget: "65,000",
-    deadline: "2024-02-28",
-    status: "active",
-    bidsCount: 8,
-    awardedBid: false,
-    isCompleted: false,
-    category: "Furniture",
-    location: "Doha, Qatar",
-    createdAt: "2024-01-21",
-    postedDate: "Jan 21, 2024",
-  },
-  {
-    id: 14,
-    title: "Translation Services",
-    description:
-      "Professional translation services for corporate documents from English to Arabic and vice versa. Approximately 500 pages of technical content.",
-    budget: "12,000",
-    deadline: "2024-02-10",
-    status: "rejected",
-    bidsCount: 0,
-    awardedBid: false,
-    isCompleted: false,
-    category: "Language Services",
-    location: "Doha, Qatar",
-    createdAt: "2024-01-15",
-    postedDate: "Jan 15, 2024 (Rejected)",
-    rejectionReason: "Service category not currently supported on the platform",
-  },
-  {
-    id: 15,
-    title: "IT Infrastructure Upgrade",
-    description:
-      "Complete IT infrastructure upgrade including servers, networking equipment, and cybersecurity solutions for corporate headquarters.",
-    budget: "180,000",
-    deadline: "2024-03-20",
-    status: "active",
-    bidsCount: 6,
-    awardedBid: true,
-    isCompleted: true,
-    category: "IT Services",
-    location: "West Bay, Doha",
-    createdAt: "2024-01-12",
-    postedDate: "Jan 12, 2024",
-  },
-  {
-    id: 16,
-    title: "Corporate Training Program Development",
-    description:
-      "Comprehensive corporate training program for 200+ employees covering leadership, digital skills, and compliance. Includes curriculum development, training materials, and delivery across multiple locations.",
-    budget: "95,000",
-    deadline: "2024-03-05",
-    status: "active",
-    bidsCount: 4,
-    awardedBid: false,
-    isCompleted: false,
-    category: "Training & Development",
-    location: "Multiple Locations, Qatar",
-    createdAt: "2024-01-08",
-    postedDate: "Jan 8, 2024",
-  },
-];
+type ApiTender = {
+  _id: string;
+  title: string;
+  description: string;
+  category?: { _id?: string; name?: string } | string;
+  location?: string;
+  contactEmail?: string;
+  image?: string;
+  estimatedBudget?: number;
+  postedBy?: { _id?: string; email?: string; userType?: string };
+  status?: string;
+  deadline?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  bidsCount?: number;
+  awardedBid?: boolean;
+  isCompleted?: boolean;
+  rejectionReason?: string;
+  [k: string]: any;
+};
 
 export default function MyTendersPage() {
   const { t } = useTranslation();
 
-  const [activeTab, setActiveTab] = useState("all");
-  const [tenders, setTenders] = useState(sampleTenders);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [activeTab, setActiveTab] = useState<string>("all");
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<string>("newest");
   const [openTenderModal, setOpenTenderModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState<{
     show: boolean;
     action: string;
-    tenderId: number | null;
+    tenderId: string | null;
   }>({
     show: false,
     action: "",
@@ -254,7 +100,7 @@ export default function MyTendersPage() {
   });
   const [showReapplyModal, setShowReapplyModal] = useState<{
     show: boolean;
-    tender: (typeof sampleTenders)[0] | null;
+    tender: UiTender | null;
   }>({
     show: false,
     tender: null,
@@ -264,139 +110,155 @@ export default function MyTendersPage() {
     description: "",
     budget: "",
   });
+  const [tenders, setTenders] = useState<UiTender[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { profile } = useAuth();
 
-  // Get unique categories for filter
-  const categories = [
-    ...new Set(tenders.map((tender) => tender.category)),
-  ].sort();
-
-  const getStatusColor = (tender: (typeof sampleTenders)[0]) => {
-    if (tender.isCompleted) {
-      return "bg-purple-100 text-purple-800 border-purple-200";
-    }
-    if (tender.awardedBid) {
-      return "bg-green-100 text-green-800 border-green-200";
-    }
-    switch (tender.status) {
-      case "active":
-        return "bg-green-100 text-green-800 border-green-200";
-      // Removed 'pending' case
-      case "closed":
-        return "bg-gray-100 text-gray-800 border-gray-200";
-      case "draft":
-        return "bg-blue-100 text-blue-800 border-blue-200";
-      case "rejected":
-        return "bg-red-100 text-red-800 border-red-200";
-      default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
+  // helper: format date for display
+  const formatDate = (iso?: string) => {
+    if (!iso) return "—";
+    try {
+      const d = new Date(iso);
+      return d.toLocaleDateString(); // browser locale; change if needed
+    } catch {
+      return iso;
     }
   };
 
-  const getStatusText = (tender: (typeof sampleTenders)[0]) => {
-    if (tender.isCompleted) {
-      return "Completed";
-    }
-    if (tender.awardedBid) {
-      return "Awarded";
-    }
-    switch (tender.status) {
-      case "active":
-        return "Active";
-      // Removed 'pending' case
-      case "closed":
-        return "Closed";
-      case "draft":
-        return "Draft";
-      case "rejected":
-        return "Rejected";
-      default:
-        return "Unknown";
-    }
+  // Normalize API tender -> UI tender
+  const normalizeTender = (api: ApiTender): UiTender => {
+    const categoryName =
+      typeof api.category === "string"
+        ? api.category
+        : api.category?.name || "Uncategorized";
+
+    const categoryId =
+      typeof api.category === "string" ? undefined : api.category?._id;
+
+    const created = api.createdAt || api.updatedAt || undefined;
+    const deadline = api.deadline;
+
+    return {
+      id: api._id,
+      title: api.title || "Untitled",
+      description: api.description || "",
+      category: categoryName,
+      categoryId,
+      location: api.location,
+      contactEmail: api.contactEmail || api.postedBy?.email,
+      image: api.image,
+      budget: typeof api.estimatedBudget === "number" ? api.estimatedBudget : 0,
+      postedBy: api.postedBy,
+      status: api.status || "draft",
+      deadline,
+      createdAt: created,
+      updatedAt: api.updatedAt,
+      postedDate: formatDate(created),
+      deadlineDate: formatDate(deadline),
+      bidsCount: typeof api.bidsCount === "number" ? api.bidsCount : 0,
+      awardedBid: Boolean(api.awardedBid),
+      isCompleted: Boolean(api.isCompleted || api.status === "completed"),
+      rejectionReason: api.rejectionReason,
+    };
   };
 
-  const getStatusIcon = (tender: (typeof sampleTenders)[0]) => {
-    if (tender.isCompleted) {
-      return <CheckCircle className="h-4 w-4" />;
-    }
-    if (tender.awardedBid) {
-      return <Award className="h-4 w-4" />;
-    }
-    switch (tender.status) {
-      case "active":
-        return <CheckCircle className="h-4 w-4" />;
-      // Removed 'pending' case
-      case "closed":
-        return <AlertCircle className="h-4 w-4" />;
-      case "draft":
-        return <FileText className="h-4 w-4" />;
-      case "rejected":
-        return <XCircle className="h-4 w-4" />;
-      default:
-        return <FileText className="h-4 w-4" />;
-    }
-  };
+  useEffect(() => {
+    const fetchTenders = async () => {
+      setLoading(true);
+      try {
+        // Pass profile.user or whatever identifier your service expects
+        const data: ApiTender[] = await getUserTenders(profile?.user || "");
+        // If your service already returns normalized objects, normalize again is safe
+        const normalized = Array.isArray(data) ? data.map(normalizeTender) : [];
+        setTenders(normalized);
+      } catch (err) {
+        console.error("Failed to fetch tenders:", err);
+        setTenders([]);
+      } finally {
+        setLoading(false);
+      }
+    };
 
+    if (profile) fetchTenders();
+    // if profile might come later, keep dependency
+  }, [profile?.user]);
+
+  if (loading) return <p>Loading tenders...</p>;
+
+  // Get unique categories for filter (strings)
+  const categories = Array.from(
+    new Set(tenders.map((tender) => tender.category || "Uncategorized"))
+  ).sort();
+
+  // Filtering
   const filteredTenders = tenders.filter((tender) => {
-    // Filter by tab
+    // Tab filter
     let tabMatch = true;
     if (activeTab === "all") tabMatch = true;
     else if (activeTab === "awarded") tabMatch = tender.awardedBid;
     else if (activeTab === "completed") tabMatch = tender.isCompleted;
     else tabMatch = tender.status === activeTab;
 
-    // Filter by search query
+    // Search match
+    const q = searchQuery.trim().toLowerCase();
     const searchMatch =
-      searchQuery === "" ||
-      tender.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      tender.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      tender.category.toLowerCase().includes(searchQuery.toLowerCase());
+      q === "" ||
+      (tender.title || "").toLowerCase().includes(q) ||
+      (tender.description || "").toLowerCase().includes(q) ||
+      (tender.category || "").toLowerCase().includes(q);
 
-    // Filter by category
+    // Category filter
     const categoryMatch =
       selectedCategory === "all" || tender.category === selectedCategory;
 
     return tabMatch && searchMatch && categoryMatch;
   });
 
-  const handleDeleteTender = (id: number) => {
-    setTenders(tenders.filter((tender) => tender.id !== id));
-    setShowConfirmModal({ show: false, action: "", tenderId: null });
-  };
-
-  const handleCloseTender = (id: number) => {
-    setTenders(
-      tenders.map((tender) =>
-        tender.id === id ? { ...tender, status: "closed" } : tender
-      )
-    );
-    setShowConfirmModal({ show: false, action: "", tenderId: null });
-  };
-
-  const handleDuplicateTender = (id: number) => {
-    const tenderToDuplicate = tenders.find((tender) => tender.id === id);
-    if (tenderToDuplicate) {
-      const newTender = {
-        ...tenderToDuplicate,
-        id: Math.max(...tenders.map((t) => t.id)) + 1,
-        title: `Copy of ${tenderToDuplicate.title}`,
-        status: "draft",
-        bidsCount: 0,
-        awardedBid: false,
-        isCompleted: false, // New duplicated tender is not completed
-        createdAt: new Date().toISOString().split("T")[0],
-        postedDate: "Not posted yet",
-      };
-      setTenders([newTender, ...tenders]);
+  // Sorting
+  const sortedTenders = [...filteredTenders].sort((a, b) => {
+    switch (sortBy) {
+      case "newest":
+        return (
+          new Date(b.createdAt || 0).getTime() -
+          new Date(a.createdAt || 0).getTime()
+        );
+      case "oldest":
+        return (
+          new Date(a.createdAt || 0).getTime() -
+          new Date(b.createdAt || 0).getTime()
+        );
+      case "highest-budget":
+        return b.budget - a.budget;
+      case "lowest-budget":
+        return a.budget - b.budget;
+      case "most-bids":
+        return b.bidsCount - a.bidsCount;
+      case "least-bids":
+        return a.bidsCount - b.bidsCount;
+      case "deadline-soonest":
+        return (
+          new Date(a.deadline || 0).getTime() -
+          new Date(b.deadline || 0).getTime()
+        );
+      case "deadline-farthest":
+        return (
+          new Date(b.deadline || 0).getTime() -
+          new Date(a.deadline || 0).getTime()
+        );
+      default:
+        return 0;
     }
-  };
+  });
 
-  const handleReapplyTender = (tenderId: number) => {
-    const tenderToReapply = tenders.find((tender) => tender.id === tenderId);
+  // Actions (use string ids)
+
+  const handleReapplyTender = (tenderId: string) => {
+    const tenderToReapply = tenders.find((t) => t.id === tenderId);
     if (tenderToReapply) {
       setReapplyFormData({
         title: tenderToReapply.title,
         description: tenderToReapply.description,
-        budget: tenderToReapply.budget,
+        budget: String(tenderToReapply.budget),
       });
       setShowReapplyModal({ show: true, tender: tenderToReapply });
     }
@@ -404,119 +266,204 @@ export default function MyTendersPage() {
 
   const submitReapply = () => {
     if (showReapplyModal.tender) {
-      setTenders(
-        tenders.map((t) =>
-          t.id === showReapplyModal.tender?.id
+      setTenders((prev) =>
+        prev.map((t) =>
+          t.id === showReapplyModal.tender!.id
             ? {
                 ...t,
                 title: reapplyFormData.title,
                 description: reapplyFormData.description,
-                budget: reapplyFormData.budget,
-                status: "draft", // Changed from pending
-                postedDate: "Not posted yet", // Changed from Pending Admin Approval
-                rejectionReason: undefined, // Clear rejection reason on reapply
+                budget: Number(reapplyFormData.budget) || 0,
+                status: "draft",
+                postedDate: "Not posted yet",
+                rejectionReason: undefined,
               }
             : t
         )
       );
       setShowReapplyModal({ show: false, tender: null });
-      setReapplyFormData({ title: "", description: "", budget: "" }); // Clear form
+      setReapplyFormData({ title: "", description: "", budget: "" });
+    }
+  };
+
+  // NEW: update handler called by card/modal after successful API update
+  const handleUpdateTender = (apiTender: ApiTender) => {
+    try {
+      const updated = normalizeTender(apiTender);
+      setTenders((prev) =>
+        prev.map((t) => (t.id === updated.id ? updated : t))
+      );
+    } catch (err) {
+      console.error("Failed to normalize/replace tender after update:", err);
     }
   };
 
   return (
-    <div className="container mx-auto  py-1 px-1 md:py-3 md:px-3 ">
+    <div className="container mx-auto  py-1 px-1 md:py-8 md:px-3 ">
       {/* Search and Filter Section */}
       <div className="mb-6 space-y-2 md:space-y-4 w-full">
-        <div className="md:grid hidden grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-          <Card className="bg-gradient-to-r from-blue-500 via-blue-600/90 to-blue-600 border border-neutral-300 py-2">
-            <CardContent className="p-4 flex items-center justify-between">
+        <div className="xl:grid hidden grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+          {/* Total Tenders */}
+          <div className="bg-gradient-to-br from-blue-50 to-blue-100 text-blue-600 border-blue-200 border rounded-lg p-8  transition-all duration-500 ease-out">
+            <div className="flex flex-col space-y-4">
+              <div className="flex items-center justify-between">
+                <FileText className="h-7 w-7 text-blue-600" />
+                <div className="text-xs font-semibold px-2 py-1 rounded-full bg-white/80 text-blue-600">
+                  Total
+                </div>
+              </div>
               <div>
-                <p className="text-sm text-white pb-1">{t("total_tenders")}</p>
-                <p className="text-xl font-semibold text-white">
+                <p className="text-sm  font-medium text-slate-600 mb-1">
+                  {t("total_tenders")}
+                </p>
+                <p className="text-4xl font-medium text-blue-600">
                   {tenders.length}
                 </p>
               </div>
-              <FileText className="h-6 w-6 text-white" />
-            </CardContent>
-          </Card>
-          <Card className="bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 border border-neutral-300 py-2">
-            <CardContent className="p-4 flex items-center justify-between">
+            </div>
+          </div>
+
+          {/* Active Tenders */}
+          <div className="bg-gradient-to-br from-blue-50 to-blue-100 text-blue-600 border-blue-200 border rounded-lg p-8 transition-all duration-500 ease-out">
+            <div className="flex flex-col space-y-4">
+              <div className="flex items-center justify-between">
+                <CheckCircle className="h-7 w-7 text-blue-600" />
+                <div className="text-xs font-semibold px-2 py-1 rounded-full bg-white/80 text-blue-600">
+                  Active
+                </div>
+              </div>
               <div>
-                <p className="text-sm text-white pb-1">{t("active_tenders")}</p>
-                <p className="text-xl font-semibold text-white">
+                <p className="text-sm font-medium text-slate-600 mb-1">
+                  {t("active_tenders")}
+                </p>
+                <p className="text-4xl font-light text-blue-600">
                   {tenders.filter((t) => t.status === "active").length}
                 </p>
               </div>
-              <CheckCircle className="h-6 w-6 text-white" />
-            </CardContent>
-          </Card>
-          <Card className="bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 border border-neutral-300 py-2">
-            <CardContent className="p-4 flex items-center justify-between">
+            </div>
+          </div>
+
+          {/* Awarded Tenders */}
+          <div className="bg-gradient-to-br from-blue-50 to-blue-100 text-blue-600 border-blue-200 border rounded-lg p-8 transition-all ">
+            <div className="flex flex-col space-y-4">
+              <div className="flex items-center justify-between">
+                <Award className="h-7 w-7 text-blue-600" />
+                <div className="text-xs font-semibold px-2 py-1 rounded-full bg-white/80 text-blue-600">
+                  Awarded
+                </div>
+              </div>
               <div>
-                <p className="text-sm text-white pb-1">
+                <p className="text-sm font-medium text-slate-600 mb-1">
                   {t("awarded_tenders")}
                 </p>
-                <p className="text-xl font-semibold text-white">
+                <p className="text-4xl font-light text-blue-600">
                   {tenders.filter((t) => t.awardedBid).length}
                 </p>
               </div>
-              <Award className="h-6 w-6 text-white" />
-            </CardContent>
-          </Card>
-          <Card className="bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700  text-white border border-neutral-300 py-2">
-            <CardContent className="p-4 flex items-center justify-between">
+            </div>
+          </div>
+
+          {/* Completed Tenders */}
+          <div className="bg-gradient-to-br from-blue-50 to-blue-100 text-blue-600 border-blue-200 border rounded-lg p-8 transition-all duration-500 ease-out">
+            <div className="flex flex-col space-y-4">
+              <div className="flex items-center justify-between">
+                <CheckCircle className="h-7 w-7 text-blue-600" />
+                <div className="text-xs font-semibold px-2 py-1 rounded-full bg-white/80 text-blue-600">
+                  Done
+                </div>
+              </div>
               <div>
-                <p className="text-sm text-white pb-1">
+                <p className="text-sm font-medium text-slate-600 mb-1">
                   {t("completed_tenders")}
                 </p>
-                <p className="text-xl font-semibold text-white">
+                <p className="text-4xl font-light text-blue-600">
                   {tenders.filter((t) => t.isCompleted).length}
                 </p>
               </div>
-              <CheckCircle className="h-6 w-6 text-white" />
-            </CardContent>
-          </Card>
-          <Card className="bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700  text-white border border-neutral-300 py-2">
-            <CardContent className="p-4 flex items-center justify-between">
+            </div>
+          </div>
+
+          {/* Rejected Tenders */}
+          <div className="bg-gradient-to-br from-blue-50 to-blue-100 text-blue-600 border-blue-200 border rounded-lg p-8 transition-all duration-500 ease-out ">
+            <div className="flex flex-col space-y-4">
+              <div className="flex items-center justify-between">
+                <XCircle className="h-7 w-7 text-blue-600" />
+                <div className="text-xs font-semibold px-2 py-1 rounded-full bg-white/80 text-blue-600">
+                  Rejected
+                </div>
+              </div>
               <div>
-                <p className="text-sm text-white pb-1">
+                <p className="text-sm font-medium text-slate-600 mb-1">
                   {t("rejected_tenders")}
                 </p>
-                <p className="text-xl font-semibold text-white">
-                  {tenders.filter((t) => t.isCompleted).length}
+                <p className="text-4xl font-light text-blue-600">
+                  {tenders.filter((t) => t.status === "rejected").length}
                 </p>
               </div>
-              <CheckCircle className="h-6 w-6 text-white" />
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
-        <div className="flex flex-row gap-1 md:gap-4 w-full">
-          <div className="relative flex-1 md:w-full">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+
+        <div className="flex flex-col md:flex-row gap-4 w-full bg-white p-4 rounded-xl  border">
+          {/* Search Box */}
+          <div className="relative flex-1">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
             <Input
-              placeholder={t("search_tenders_placeholder")}
+              placeholder={t("search_tenders_by_title_description_or_category")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 h-11 border-neutral-300 w-full focus:border-blue-500 focus:ring-blue-500"
+              className="pl-12 h-12 w-full rounded-xl border border-gray-200 bg-gray-50 text-gray-800 placeholder-gray-400 focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition-all duration-200"
             />
           </div>
-          <div className="md:flex hidden w-[30%] md:w-auto overflow-hidden gap-1 md:gap-3">
+
+          {/* Filters & Sort */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full md:w-auto">
+            {/* Category Select */}
             <Select
               value={selectedCategory}
               onValueChange={setSelectedCategory}
             >
-              <SelectTrigger className="w-[200px] h-11 border-neutral-300 focus:border-blue-500 focus:ring-blue-500">
-                <Filter className="h-4 w-4 mr-2 " />
-                <SelectValue placeholder={t("all_categories")} />
+              <SelectTrigger className="w-full md:w-[200px] h-12 rounded-xl border border-gray-200 bg-gray-50 focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition-all duration-200">
+                <div className="flex items-center px-3">
+                  <Filter className="h-4 w-4 mr-2 text-gray-400" />
+                  <SelectValue placeholder={t("all_categories")} />
+                </div>
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="rounded-xl border border-gray-200 bg-white shadow-md">
                 <SelectItem value="all">{t("all_categories")}</SelectItem>
                 {categories.map((category) => (
                   <SelectItem key={category} value={category}>
                     {category}
                   </SelectItem>
                 ))}
+              </SelectContent>
+            </Select>
+
+            {/* Sort Select */}
+            <Select value={sortBy} onValueChange={setSortBy}>
+              <SelectTrigger className="w-full md:w-[200px] h-12 rounded-xl border border-gray-200 bg-gray-50 focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition-all duration-200">
+                <div className="flex items-center px-3">
+                  <Filter className="h-4 w-4 mr-2 text-gray-400" />
+                  <SelectValue placeholder={t("sort_by")} />
+                </div>
+              </SelectTrigger>
+              <SelectContent className="rounded-xl border border-gray-200 bg-white shadow-md">
+                <SelectItem value="newest">{t("newest")}</SelectItem>
+                <SelectItem value="oldest">{t("oldest")}</SelectItem>
+                <SelectItem value="highest-budget">
+                  {t("highest_budget")}
+                </SelectItem>
+                <SelectItem value="lowest-budget">
+                  {t("lowest_budget")}
+                </SelectItem>
+                <SelectItem value="most-bids">{t("most_bids")}</SelectItem>
+                <SelectItem value="least-bids">{t("least_bids")}</SelectItem>
+                <SelectItem value="deadline-soonest">
+                  {t("deadline_soonest")}
+                </SelectItem>
+                <SelectItem value="deadline-farthest">
+                  {t("deadline_farthest")}
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -529,7 +476,6 @@ export default function MyTendersPage() {
         className="w-full mb-6"
       >
         <TabsList className=" w-full grid-cols-3 sm:grid-cols-6 gap-2 md:grid hidden">
-          {/* Changed grid-cols-6 on small screens and below to grid-cols-3 for better wrapping */}
           <TabsTrigger value="all">{t("all")}</TabsTrigger>
           <TabsTrigger value="active">{t("active")}</TabsTrigger>
           <TabsTrigger value="awarded">{t("awarded")}</TabsTrigger>
@@ -537,173 +483,21 @@ export default function MyTendersPage() {
           <TabsTrigger value="rejected">{t("rejected")}</TabsTrigger>
           <TabsTrigger value="completed">{t("completed")}</TabsTrigger>
         </TabsList>
+
         <TabsContent value={activeTab} className="mt-4">
-          <div className="space-y-2 md:space-y-4">
-            {filteredTenders.length > 0 ? (
-              filteredTenders.map((tender) => (
-                <Link href={`/dashboard/tender/${tender.id}`}>
-                  {" "}
-                  <Card
-                    key={tender.id}
-                    className="border border-neutral-200/50 rounded-lg"
-                  >
-                    <CardContent className="md:p-6 p-4">
-                      <div className="flex flex-col md:flex-row items-start md:items-start justify-between mb-3 gap-2 md:gap-4 ">
-                        <div className="flex-1">
-                          <div className="flex  md:flex-row flex-row sm:flex-row items-start sm:items-center space-x-0 sm:space-x-4 mb-2">
-                            <h3 className="font-semibold text-gray-900 text-sm md:text-lg">
-                              {tender.title}
-                            </h3>
-                            <Badge
-                              className={`md:text-xs text-base border hidden md:flex items-center space-x-1 ${getStatusColor(
-                                tender
-                              )}`}
-                            >
-                              {getStatusIcon(tender)}
-                              <span>{getStatusText(tender)}</span>
-                            </Badge>
-                          </div>
-                          <p className="text-xs  text-gray-600 line-clamp-2 mb-0 md:mb-3">
-                            {tender.description}
-                          </p>
-                          <div className="md:flex hidden flex-wrap items-center gap-4 text-sm text-gray-500">
-                            <span className="flex items-center">
-                              <Calendar className="h-4 w-4 mr-1" />
-                              {t("posted")}: {tender.postedDate}
-                            </span>
-                            <span className="flex items-center">
-                              <Users className="h-4 w-4 mr-1" />
-                              {tender.bidsCount} {t("bids")}
-                            </span>
-                            <span className="flex items-center">
-                              <DollarSign className="h-4 w-4 mr-1" />
-                              {tender.budget} QAR
-                            </span>
-                            <Badge variant="outline" className="text-xs">
-                              {tender.category}
-                            </Badge>
-                          </div>
-                        </div>
-                        <div className="flex items-center space-x-2 ml-0 md:ml-4">
-                          <Badge
-                            className={`text-xs border md:hidden items-center space-x-1 ${getStatusColor(
-                              tender
-                            )}`}
-                          >
-                            <div className="hidden">
-                              {" "}
-                              {getStatusIcon(tender)}
-                            </div>
-                            <span className="text-xs">
-                              {getStatusText(tender)}
-                            </span>
-                          </Badge>
-                          {tender.status !== "rejected" && (
-                            <Link href={`/dashboard/tender/${tender.id}`}>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="text-blue-600 hover:text-blue-700 md:flex hidden hover:bg-blue-50"
-                              >
-                                <Eye className="h-4 w-4 mr-1" />
-                                {t("view")}
-                              </Button>
-                            </Link>
-                          )}
-                          <div className="relative group">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="hover:bg-gray-100"
-                            >
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                            <div className="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">
-                              <div className="py-1">
-                                {tender.status !== "closed" &&
-                                  tender.status !== "rejected" && (
-                                    <div
-                                      className=" px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center cursor-pointer"
-                                      onClick={() => setOpenTenderModal(true)}
-                                    >
-                                      <Edit className="h-4 w-4 mr-2" />
-                                      {t("edit_tender")}
-                                    </div>
-                                  )}
-
-                                {tender.status === "active" &&
-                                  !tender.awardedBid && (
-                                    <button
-                                      onClick={() =>
-                                        setShowConfirmModal({
-                                          show: true,
-                                          action: "close",
-                                          tenderId: tender.id,
-                                        })
-                                      }
-                                      className=" w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
-                                    >
-                                      <XCircle className="h-4 w-4 mr-2" />
-                                      {t("close_tender")}
-                                    </button>
-                                  )}
-
-                                {/* Reapply button moved to rejection reason modal */}
-
-                                <EditTenderModal
-                                  open={openTenderModal}
-                                  onOpenChange={setOpenTenderModal}
-                                />
-                                <button
-                                  onClick={() =>
-                                    setShowConfirmModal({
-                                      show: true,
-                                      action: "delete",
-                                      tenderId: tender.id,
-                                    })
-                                  }
-                                  className=" w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center"
-                                >
-                                  <Trash2 className="h-4 w-4 mr-2" />
-                                  {t("close_tender")}
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Rejection reason if applicable */}
-                      {tender.status === "rejected" &&
-                        tender.rejectionReason && (
-                          <div className="mt-3 p-2 bg-red-50 border border-red-200 rounded-md flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                            <div className="flex items-start">
-                              <AlertTriangle className="h-5 w-5 text-red-500 mr-2 mt-0.5" />
-                              <div>
-                                <p className="text-sm font-medium text-red-800">
-                                  {t("rejection_reason")}:
-                                </p>
-                                <p className="text-sm text-red-700">
-                                  {tender.rejectionReason}
-                                </p>
-                              </div>
-                            </div>
-                            <Button
-                              onClick={() => handleReapplyTender(tender.id)}
-                              size="sm"
-                              className="bg-red-600 hover:bg-red-700 ml-0 md:ml-4"
-                            >
-                              <RefreshCcw className="h-4 w-4 mr-1" />
-                              {t("reapply")}
-                            </Button>
-                          </div>
-                        )}
-                    </CardContent>
-                  </Card>
-                </Link>
+          <div className="space-y-2 md:space-y-2 grid grid-cols-1 md:grid-cols-2  gap-4">
+            {sortedTenders.length > 0 ? (
+              sortedTenders.map((tender) => (
+                <MyTenderCard
+                  key={tender.id}
+                  tender={tender}
+                  onReapply={handleReapplyTender}
+                  onUpdate={handleUpdateTender} // <-- pass update handler
+                  t={t}
+                />
               ))
             ) : (
-              <div className="text-center py-12 bg-white rounded-lg border border-neutral-300">
+              <div className="text-center py-12 col-span-full bg-white rounded-lg border border-neutral-300">
                 <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-gray-900 mb-2">
                   {t("no_tenders_found")}
@@ -711,96 +505,33 @@ export default function MyTendersPage() {
                 <p className="text-gray-600 mb-6">
                   {searchQuery ||
                   (selectedCategory && selectedCategory !== "all")
-                    ? t("no_tenders_match_criteria")
+                    ? t("no_tenders_match_search_criteria")
                     : activeTab === "all"
                     ? t("no_tenders_created_yet")
-                    : `${t("no_tenders_match_status")} "${activeTab}" ${t(
-                        "status"
-                      )}.`}
+                    : t("no_tenders_match_status", { status: activeTab })}
                 </p>
                 {activeTab === "all" &&
                   !searchQuery &&
                   (selectedCategory === "all" || !selectedCategory) && (
-                    <Link href="/create-tender">
+                    <div
+                      onClick={() => setOpenTenderModal(true)}
+                      className="cursor-pointer"
+                    >
                       <Button className="bg-blue-600 hover:bg-blue-700">
                         <Plus className="h-4 w-4 mr-2" />
                         {t("post_your_first_tender")}
                       </Button>
-                    </Link>
+                    </div>
                   )}
               </div>
             )}
           </div>
         </TabsContent>
       </Tabs>
-
-      {/* Confirmation Modal */}
-      {showConfirmModal.show && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-xs bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <Card className="w-full max-w-md mx-auto border border-neutral-300">
-            <CardContent className="p-6">
-              <div className="mb-5">
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  {showConfirmModal.action === "delete"
-                    ? t("confirm_delete")
-                    : showConfirmModal.action === "close"
-                    ? t("confirm_close_tender")
-                    : t("confirm_action")}
-                </h3>
-                <p className="text-gray-600">
-                  {showConfirmModal.action === "delete"
-                    ? t("confirm_delete_message")
-                    : showConfirmModal.action === "close"
-                    ? t("confirm_close_tender_message")
-                    : t("confirm_action_message")}
-                </p>
-              </div>
-              <div className="flex justify-end space-x-3 flex-wrap gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() =>
-                    setShowConfirmModal({
-                      show: false,
-                      action: "",
-                      tenderId: null,
-                    })
-                  }
-                >
-                  {t("cancel")}
-                </Button>
-                <Button
-                  size="sm"
-                  className={
-                    showConfirmModal.action === "delete"
-                      ? "bg-red-600 hover:bg-red-700"
-                      : "bg-blue-600 hover:bg-blue-700"
-                  }
-                  onClick={() => {
-                    if (
-                      showConfirmModal.action === "delete" &&
-                      showConfirmModal.tenderId
-                    ) {
-                      handleDeleteTender(showConfirmModal.tenderId);
-                    } else if (
-                      showConfirmModal.action === "close" &&
-                      showConfirmModal.tenderId
-                    ) {
-                      handleCloseTender(showConfirmModal.tenderId);
-                    }
-                  }}
-                >
-                  {showConfirmModal.action === "delete"
-                    ? t("delete")
-                    : showConfirmModal.action === "close"
-                    ? t("close_tender")
-                    : t("confirm")}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+      <CreateTenderModal
+        open={openTenderModal}
+        onOpenChange={setOpenTenderModal}
+      />
 
       {/* Reapply Tender Modal */}
       <Dialog
@@ -813,9 +544,10 @@ export default function MyTendersPage() {
               {t("reapply_for_tender")}: {showReapplyModal.tender?.title}
             </DialogTitle>
             <DialogDescription>
-              {t("reapply_tender_description")}
+              {t("edit_details_and_reapply")}
             </DialogDescription>
           </DialogHeader>
+
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
               <label htmlFor="title" className="text-right">
@@ -833,6 +565,7 @@ export default function MyTendersPage() {
                 className="col-span-3"
               />
             </div>
+
             <div className="grid grid-cols-4 items-center gap-4">
               <label htmlFor="description" className="text-right">
                 {t("description")}
@@ -849,6 +582,7 @@ export default function MyTendersPage() {
                 className="col-span-3 min-h-[100px]"
               />
             </div>
+
             <div className="grid grid-cols-4 items-center gap-4">
               <label htmlFor="budget" className="text-right">
                 {t("budget_qar")}
@@ -867,6 +601,7 @@ export default function MyTendersPage() {
               />
             </div>
           </div>
+
           <DialogFooter>
             <Button
               variant="outline"

@@ -1,12 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-
 import {
   Building2,
   ArrowLeft,
@@ -28,13 +27,14 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useTranslation } from "..../../../lib/hooks/useTranslation";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { ProviderBadge } from "@/components/provider-badge"; // Assuming this component exists
+import useTranslation from "@/lib/hooks/useTranslation";
+import { getTender } from "@/app/services/tenderService";
 
 // Sample data - this would come from API based on tender ID
 const getTenderData = (id: string) => {
@@ -438,33 +438,6 @@ const getQAForTender = (tenderId: string) => {
   return qaData[tenderId as keyof typeof qaData] || [];
 };
 
-const chatMessages = [
-  {
-    id: 1,
-    sender: "provider",
-    message:
-      "Thank you for awarding us this project. When can we schedule the initial site visit?",
-    timestamp: "2:30 PM",
-    senderName: "Doha Elite Construction",
-  },
-  {
-    id: 2,
-    sender: "poster",
-    message:
-      "Great! We can schedule it for tomorrow morning at 9 AM. Please bring your site engineer.",
-    timestamp: "2:45 PM",
-    senderName: "Ahmed Al-Mahmoud",
-  },
-  {
-    id: 3,
-    sender: "provider",
-    message:
-      "Perfect. Our site engineer will be there. Should we bring the initial material samples?",
-    timestamp: "3:00 PM",
-    senderName: "Doha Elite Construction",
-  },
-];
-
 export default function TenderDetailPage() {
   const { t } = useTranslation();
 
@@ -483,30 +456,6 @@ export default function TenderDetailPage() {
   const [onTimeDelivery, setOnTimeDelivery] = useState(false);
   const [bids, setBids] = useState(initialBids);
   const [isSaved, setIsSaved] = useState(false); // Added for save functionality
-
-  const getBadgeColor = (badge: string) => {
-    switch (badge) {
-      case "platinum":
-        return "bg-black text-white border-black";
-      case "gold":
-        return "bg-gray-800 text-white border-gray-800";
-      case "bronze":
-        return "bg-gray-600 text-white border-gray-600";
-      default:
-        return "bg-gray-200 text-gray-800 border-gray-200";
-    }
-  };
-
-  const getBidStatusColor = (status: string) => {
-    switch (status) {
-      case "awarded":
-        return "bg-black text-white border-black";
-      case "rejected":
-        return "bg-gray-600 text-white border-gray-600";
-      default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
-    }
-  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -565,15 +514,28 @@ export default function TenderDetailPage() {
     );
   };
 
-  const handleSubmitRating = () => {
-    console.log("Rating submitted:", { rating, onTimeDelivery });
-    setShowRatingModal(false);
-  };
-
   const awardedBid = bids.find((bid) => bid.status === "awarded");
   const hasAwardedBid = !!awardedBid;
   const isPendingApproval = tenderData.status === "pending_approval";
+  const { id } = useParams<{ id: string }>();
+  const [tender, setTender] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    const fetchTender = async () => {
+      try {
+        const data = await getTender(id);
+        setTender(data);
+        console.log("Tender data loaded:", data);
+      } catch (err) {
+        console.error("Error loading tender:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchTender();
+  }, []);
   return (
     <div className="container mx-auto px-0 py-8">
       <div className="">
@@ -601,30 +563,28 @@ export default function TenderDetailPage() {
           <div className="flex items-start justify-between mb-4">
             <div>
               <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                {tenderData.title}
+                {tender.title}
               </h1>
               <div className="flex items-center space-x-4 text-sm text-gray-600">
                 <span className="flex items-center">
                   <Calendar className="h-4 w-4 mr-1" />
-                  {t("posted")}: {tenderData.postedDate}
+                  {t("posted")}: {tender.updatedAt}
                 </span>
                 <span className="flex items-center">
                   <MapPin className="h-4 w-4 mr-1" />
-                  {tenderData.location}
+                  {tender.location}
                 </span>
                 <span className="flex items-center">
                   <DollarSign className="h-4 w-4 mr-1" />
-                  {tenderData.budget} QAR
+                  {tender.estimatedBudget} QAR
                 </span>
               </div>
             </div>
-            <Badge className={`border ${getStatusColor(tenderData.status)}`}>
-              {getStatusText(tenderData.status)}
+            <Badge className={`border ${getStatusColor(tender.status)}`}>
+              {getStatusText(tender.status)}
             </Badge>
           </div>
-          <p className="text-gray-700 leading-relaxed">
-            {tenderData.description}
-          </p>
+          <p className="text-gray-700 leading-relaxed">{tender.description}</p>
         </div>
 
         {/* Tabs - Only show if not pending approval */}
@@ -650,7 +610,7 @@ export default function TenderDetailPage() {
                       : "border-transparent text-gray-500 hover:text-gray-700"
                   }`}
                 >
-                  {t("q_a")} ({qaData.length})
+                  {t("q_and_a")} ({qaData.length})
                 </button>
               </nav>
             </div>
@@ -737,7 +697,7 @@ export default function TenderDetailPage() {
                               {bid.status === "pending" && hasAwardedBid && (
                                 <div className="text-sm text-gray-500 italic">
                                   {t(
-                                    "bid_cannot_be_awarded_another_bid_already_selected"
+                                    "bid_cannot_be_awarded_another_bid_selected"
                                   )}
                                 </div>
                               )}
@@ -789,9 +749,7 @@ export default function TenderDetailPage() {
                       {t("no_bids_yet")}
                     </h3>
                     <p className="text-gray-600">
-                      {t(
-                        "providers_havent_submitted_any_bids_for_this_tender_yet"
-                      )}
+                      {t("providers_have_not_submitted_any_bids_yet")}
                     </p>
                   </div>
                 )}
@@ -861,9 +819,7 @@ export default function TenderDetailPage() {
                       {t("no_questions_yet")}
                     </h3>
                     <p className="text-gray-600">
-                      {t(
-                        "providers_havent_asked_any_questions_about_this_tender_yet"
-                      )}
+                      {t("providers_have_not_asked_any_questions_yet")}
                     </p>
                   </div>
                 )}
@@ -884,7 +840,7 @@ export default function TenderDetailPage() {
                   </h3>
                   <p className="text-gray-700 max-w-md mx-auto mb-4">
                     {t(
-                      "bids_and_qa_sections_are_hidden_until_your_tender_is_active_by_an_administrator_this_helps_ensure_quality_and_compliance_with_platform_guidelines"
+                      "bids_and_qa_sections_are_hidden_until_tender_is_active"
                     )}
                   </p>
                   <Badge className="bg-gray-100 text-gray-800 border-gray-200">

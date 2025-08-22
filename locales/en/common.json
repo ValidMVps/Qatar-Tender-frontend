@@ -1130,5 +1130,10 @@
   "tender_created_successfully": "Tender Created Successfully!",
   "redirecting_to_your_tenders": "Redirecting to your tenders dashboard...",
   "tender_information_saved": "Tender information saved",
-  "notifications_sent_to_relevant_contractors": "Notifications sent to relevant contractors"
+  "notifications_sent_to_relevant_contractors": "Notifications sent to relevant contractors",
+  "providers_have_not_submitted_any_bids_yet": "Providers have not submitted any bids yet",
+  "providers_have_not_asked_any_questions_yet": "Providers have not asked any questions yet",
+  "overview_of_posting_and_bidding_activity": "Overview of Posting and Bidding Activity",
+  "no_tenders_created_yet": "No tenders created yet",
+  "reopen_tender": "Reopen Tender"
 }

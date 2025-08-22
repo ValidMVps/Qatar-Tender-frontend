@@ -1,6 +1,6 @@
 "use client";
 import type React from "react";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,16 +23,22 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
-  CameraIcon,
-  MailIcon,
-  CheckCircleIcon,
-  SaveIcon,
-  XIcon,
-  UploadIcon,
-  GlobeIcon,
-  PhoneIcon,
+  Camera,
+  Mail,
+  CheckCircle,
+  Save,
+  X,
+  Upload,
+  Globe,
+  Phone,
+  Loader2,
+  AlertCircle,
 } from "lucide-react";
+import { uploadToCloudinary } from "../../../utils/uploadToCloudinary";
+import { profileApi } from "@/app/services/profileApi";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Component() {
   const { t } = useTranslation();
@@ -41,34 +47,131 @@ export default function Component() {
   const [profileCompletion, setProfileCompletion] = useState(0);
   const [isProfileCompleted, setIsProfileCompleted] = useState(false);
   const [showCompletionModal, setShowCompletionModal] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [uploadingFile, setUploadingFile] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
+  const [verificationStatus, setVerificationStatus] = useState(null);
+
   const [profileData, setProfileData] = useState({
-    companyName: "Qatar Construction Co.",
-    contactPersonName: "Jane Doe",
-    personalEmail: "jane.doe@example.com",
-    companyEmail: "omar545@hotmail.com",
+    companyName: "",
+    contactPersonName: "",
+    personalEmail: "",
+    companyEmail: "",
     companyPhoneCountryCode: "QA",
-    companyPhoneNumber: "97418995505",
-    commercialRegistrationNumber: "123-456-789",
-    companyDescription:
-      "Leading provider of innovative solutions in the tech industry.",
+    companyPhoneNumber: "",
+    commercialRegistrationNumber: "",
+    companyDescription: "",
     companyWebsite: "",
+    phone: "",
+    address: "",
   });
+
+  const [documentData, setDocumentData] = useState({
+    commercialRegistrationDoc: null,
+    commercialRegistrationNumber: "",
+  });
+
+  const { user, isLoading, profile } = useAuth();
+
+  useEffect(() => {
+    loadProfile();
+    loadVerificationStatus();
+  }, []);
 
   useEffect(() => {
     updateProfileCompletion();
   }, [profileData]);
 
-  const handleEditClick = () => setIsEditing(true);
+  const loadProfile = async () => {
+    try {
+      setLoading(true);
+      const profile = await profileApi.getProfile();
 
-  const handleSaveClick = () => {
-    console.log("Saving profile data:", profileData);
-    setIsEditing(false);
-    updateProfileCompletion();
+      // Map API response to component state
+      setProfileData({
+        companyName: profile.companyName || "",
+        contactPersonName: profile.contactPersonName || "",
+        personalEmail: profile.personalEmail || "",
+        companyEmail: profile.companyEmail || "",
+        companyPhoneCountryCode: "QA", // You might want to extract this from phone
+        companyPhoneNumber: profile.phone || "",
+        commercialRegistrationNumber:
+          profile.commercialRegistrationNumber || "",
+        companyDescription: profile.companyDesc || "",
+        companyWebsite: profile.companyWebsite || "",
+        phone: profile.phone || "",
+        address: profile.address || "",
+      });
+
+      setDocumentData({
+        commercialRegistrationDoc: profile.commercialRegistrationDoc || null,
+        commercialRegistrationNumber:
+          profile.commercialRegistrationNumber || "",
+      });
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleCancelClick = () => setIsEditing(false);
+  const loadVerificationStatus = async () => {
+    try {
+      const status = user.isDocumentVerified;
+      console.log(status, user);
+      setVerificationStatus(status);
+      setIsProfileCompleted(status === "verified" || status === "pending");
+    } catch (err) {
+      console.error("Failed to load verification status:", err);
+    }
+  };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleEditClick = () => setIsEditing(true);
+
+  const handleSaveClick = async () => {
+    try {
+      setSaving(true);
+      setError(null);
+
+      // Prepare data for API
+      const updateData = {
+        companyName: profileData.companyName,
+        contactPersonName: profileData.contactPersonName,
+        personalEmail: profileData.personalEmail,
+        companyEmail: profileData.companyEmail,
+        phone: profileData.companyPhoneNumber,
+        companyDesc: profileData.companyDescription,
+        address: profileData.address,
+      };
+
+      const result = await profileApi.updateProfile(updateData);
+
+      setSuccess("Profile updated successfully!");
+      setIsEditing(false);
+
+      // If verification is required, update status
+      if (result.requiresReVerification) {
+        await loadVerificationStatus();
+        setIsProfileCompleted(false);
+      }
+
+      // Clear success message after 3 seconds
+      setTimeout(() => setSuccess(null), 3000);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleCancelClick = () => {
+    setIsEditing(false);
+    loadProfile(); // Reset to original data
+  };
+
+  const handleInputChange = (e) => {
     const { id, value } = e.target;
     setProfileData((prevData) => ({
       ...prevData,
@@ -76,42 +179,145 @@ export default function Component() {
     }));
   };
 
-  const handleSelectChange = (value: string) => {
+  const handleSelectChange = (value) => {
     setProfileData((prevData) => ({
       ...prevData,
       companyPhoneCountryCode: value,
     }));
   };
 
+  const handleFileUpload = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type and size
+    const allowedTypes = ["image/jpeg", "image/png", "application/pdf"];
+    const maxSize = 10 * 1024 * 1024; // 10MB
+
+    if (!allowedTypes.includes(file.type)) {
+      setError("Please upload a PDF, JPG, or PNG file");
+      return;
+    }
+
+    if (file.size > maxSize) {
+      setError("File size must be less than 10MB");
+      return;
+    }
+
+    try {
+      setUploadingFile(true);
+      setError(null);
+
+      const uploadedUrl = await uploadToCloudinary(file);
+
+      setDocumentData((prev) => ({
+        ...prev,
+        commercialRegistrationDoc: uploadedUrl,
+      }));
+
+      setSuccess("Document uploaded successfully!");
+      setTimeout(() => setSuccess(null), 3000);
+    } catch (err) {
+      setError("Failed to upload document: " + err.message);
+    } finally {
+      setUploadingFile(false);
+    }
+  };
+
   const updateProfileCompletion = () => {
     let completedFields = 0;
-    if (profileData.companyName) completedFields++;
-    if (profileData.contactPersonName) completedFields++;
-    if (profileData.personalEmail) completedFields++;
-    if (profileData.companyEmail) completedFields++;
-    if (profileData.companyPhoneNumber) completedFields++;
-    if (profileData.commercialRegistrationNumber) completedFields++;
-    if (profileData.companyDescription) completedFields++;
-    if (profileData.companyWebsite) completedFields++;
+    const requiredFields = [
+      "companyName",
+      "contactPersonName",
+      "personalEmail",
+      "companyEmail",
+      "companyPhoneNumber",
+      "companyDescription",
+      "address",
+    ];
 
-    setProfileCompletion(Math.min(100, (completedFields / 8) * 100));
+    requiredFields.forEach((field) => {
+      if (profileData[field]?.trim()) completedFields++;
+    });
+
+    setProfileCompletion(
+      Math.min(100, (completedFields / requiredFields.length) * 100)
+    );
   };
 
   const handleCompleteProfileClick = () => setShowCompletionModal(true);
 
-  const handleConfirmCompletion = () => {
-    setIsProfileCompleted(true);
-    setShowCompletionModal(false);
-    setIsEditing(false);
+  const handleConfirmCompletion = async () => {
+    try {
+      setSaving(true);
+      setError(null);
+
+      const documentsPayload = {
+        commercialRegistrationNumber: documentData.commercialRegistrationNumber,
+        commercialRegistrationDoc: documentData.commercialRegistrationDoc,
+      };
+
+      await profileApi.submitDocuments(documentsPayload);
+
+      setIsProfileCompleted(true);
+      setShowCompletionModal(false);
+      setIsEditing(false);
+      setSuccess("Documents submitted for verification successfully!");
+
+      // Reload verification status
+      await loadVerificationStatus();
+
+      setTimeout(() => setSuccess(null), 3000);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleCloseModal = () => setShowCompletionModal(false);
 
   const areInputsDisabled = !isEditing || isProfileCompleted;
+  const canCompleteProfile =
+    profileCompletion === 100 &&
+    documentData.commercialRegistrationNumber &&
+    documentData.commercialRegistrationDoc &&
+    !isProfileCompleted;
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen bg-white container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex-1 flex items-center justify-center">
+          <div className="flex items-center gap-2">
+            <Loader2 className="w-6 h-6 animate-spin text-[#5A4DFF]" />
+            <span className="text-gray-600">Loading profile...</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen bg-white container mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex-1 flex flex-col">
+        {error && (
+          <Alert className="mb-4 border-red-200 bg-red-50">
+            <AlertCircle className="w-4 h-4 text-red-600" />
+            <AlertDescription className="text-red-800">
+              {error}
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {success && (
+          <Alert className="mb-4 border-green-200 bg-green-50">
+            <CheckCircle className="w-4 h-4 text-green-600" />
+            <AlertDescription className="text-green-800">
+              {success}
+            </AlertDescription>
+          </Alert>
+        )}
+
         <main className="flex-1 p-0 sm:p-6 overflow-auto">
           <div className="pb-6 mb-6 border-b border-gray-200">
             <div className="flex flex-col sm:flex-row items-center justify-between flex-wrap gap-4">
@@ -122,38 +328,42 @@ export default function Component() {
                       src="/placeholder.svg?height=112&width=112"
                       alt={t("company_logo")}
                     />
-                    <AvatarFallback>QC</AvatarFallback>
+                    <AvatarFallback>
+                      {profileData.companyName?.charAt(0) || "C"}
+                    </AvatarFallback>
                   </Avatar>
                   <Button
                     variant="outline"
                     size="icon"
                     className="absolute bottom-0 right-0 rounded-full bg-white border border-gray-200 shadow-sm w-8 h-8 md:w-9 md:h-9"
                   >
-                    <CameraIcon className="w-4 h-4 md:w-5 md:h-5 text-gray-600" />
+                    <Camera className="w-4 h-4 md:w-5 md:h-5 text-gray-600" />
                   </Button>
                 </div>
                 <div>
                   <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
-                    {profileData.companyName}
+                    {profileData.companyName || "Company Name"}
                   </h2>
                   <p className="text-base sm:text-lg text-gray-600">
-                    {profileData.companyDescription}
+                    {profileData.companyDescription || "Company description"}
                   </p>
                   <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-6 text-sm sm:text-base text-gray-500 mt-3">
                     <div className="flex items-center gap-2">
-                      <MailIcon className="w-4 h-4 sm:w-5 sm:h-5" />
-                      <span>{profileData.companyEmail}</span>
+                      <Mail className="w-4 h-4 sm:w-5 sm:h-5" />
+                      <span>
+                        {profileData.companyEmail || "company@email.com"}
+                      </span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <PhoneIcon className="w-4 h-4 sm:w-5 sm:h-5" />
+                      <Phone className="w-4 h-4 sm:w-5 sm:h-5" />
                       <span>
                         {profileData.companyPhoneCountryCode}{" "}
-                        {profileData.companyPhoneNumber}
+                        {profileData.companyPhoneNumber || "Phone number"}
                       </span>
                     </div>
                     {profileData.companyWebsite && (
                       <div className="flex items-center gap-2">
-                        <GlobeIcon className="w-4 h-4 sm:w-5 sm:h-5" />
+                        <Globe className="w-4 h-4 sm:w-5 sm:h-5" />
                         <a
                           href={profileData.companyWebsite}
                           target="_blank"
@@ -168,10 +378,20 @@ export default function Component() {
                 </div>
               </div>
               <div className="flex items-center gap-4 mt-4 sm:mt-0">
-                {isProfileCompleted ? (
+                {verificationStatus === "verified" ? (
+                  <div className="flex items-center gap-2 text-green-600 font-medium">
+                    <CheckCircle className="w-5 h-5" />
+                    <span>Verified</span>
+                  </div>
+                ) : verificationStatus === "pending" ? (
                   <div className="flex items-center gap-2 text-blue-600 font-medium">
-                    <CheckCircleIcon className="w-5 h-5" />
-                    <span>{t("verification_pending")}</span>
+                    <Loader2 className="w-5 h-5" />
+                    <span>Verification Pending</span>
+                  </div>
+                ) : verificationStatus === "rejected" ? (
+                  <div className="flex items-center gap-2 text-red-600 font-medium">
+                    <AlertCircle className="w-5 h-5" />
+                    <span>Verification Rejected</span>
                   </div>
                 ) : !isEditing ? (
                   <Button
@@ -184,17 +404,23 @@ export default function Component() {
                   <>
                     <Button
                       onClick={handleSaveClick}
+                      disabled={saving}
                       className="bg-green-500 hover:bg-green-600 text-white rounded-md px-4 py-2 sm:px-6 sm:py-2 flex items-center gap-2 text-sm sm:text-base"
                     >
-                      <SaveIcon className="w-4 h-4" />
-                      {t("save_changes")}
+                      {saving ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Save className="w-4 h-4" />
+                      )}
+                      {saving ? "Saving..." : t("save_changes")}
                     </Button>
                     <Button
                       onClick={handleCancelClick}
+                      disabled={saving}
                       variant="outline"
                       className="rounded-md px-4 py-2 sm:px-6 sm:py-2 flex items-center gap-2 bg-transparent text-sm sm:text-base"
                     >
-                      <XIcon className="w-4 h-4" />
+                      <X className="w-4 h-4" />
                       {t("cancel")}
                     </Button>
                   </>
@@ -207,7 +433,7 @@ export default function Component() {
                   {t("profile_completion")}
                 </Label>
                 <span className="text-sm font-medium text-gray-700">
-                  {profileCompletion}%
+                  {Math.round(profileCompletion)}%
                 </span>
               </div>
               <Progress
@@ -217,7 +443,7 @@ export default function Component() {
               <p className="text-xs sm:text-sm text-gray-500 mt-2">
                 {t("complete_your_profile_to_unlock_all_features")}
               </p>
-              {profileCompletion === 100 && !isProfileCompleted && (
+              {canCompleteProfile && (
                 <Button
                   onClick={handleCompleteProfileClick}
                   className="mt-4 bg-blue-600 hover:bg-blue-700 text-white rounded-md px-4 py-2 sm:px-6 sm:py-2 text-sm sm:text-base"
@@ -227,6 +453,7 @@ export default function Component() {
               )}
             </div>
           </div>
+
           <Tabs defaultValue="profile-details" className="w-full mt-6">
             <TabsList className="grid w-full grid-cols-2 bg-gray-100 rounded-lg p-1">
               <TabsTrigger
@@ -249,7 +476,7 @@ export default function Component() {
                     htmlFor="companyName"
                     className="text-gray-700 text-sm sm:text-base"
                   >
-                    {t("company_name")}
+                    {t("company_name")} *
                   </Label>
                   <Input
                     id="companyName"
@@ -264,7 +491,7 @@ export default function Component() {
                     htmlFor="contactPersonName"
                     className="text-gray-700 text-sm sm:text-base"
                   >
-                    {t("contact_person_name")}
+                    {t("contact_person_name")} *
                   </Label>
                   <Input
                     id="contactPersonName"
@@ -279,7 +506,7 @@ export default function Component() {
                     htmlFor="personalEmail"
                     className="text-gray-700 text-sm sm:text-base"
                   >
-                    {t("personal_email")}
+                    {t("personal_email")} *
                   </Label>
                   <Input
                     id="personalEmail"
@@ -295,7 +522,7 @@ export default function Component() {
                     htmlFor="companyEmail"
                     className="text-gray-700 text-sm sm:text-base"
                   >
-                    {t("company_email")}
+                    {t("company_email")} *
                   </Label>
                   <Input
                     id="companyEmail"
@@ -311,7 +538,7 @@ export default function Component() {
                     htmlFor="companyPhoneNumber"
                     className="text-gray-700 text-sm sm:text-base"
                   >
-                    {t("company_phone")}
+                    {t("company_phone")} *
                   </Label>
                   <div className="flex gap-2 mt-1">
                     <Select
@@ -339,10 +566,25 @@ export default function Component() {
                 </div>
                 <div>
                   <Label
+                    htmlFor="address"
+                    className="text-gray-700 text-sm sm:text-base"
+                  >
+                    Address *
+                  </Label>
+                  <Input
+                    id="address"
+                    value={profileData.address}
+                    onChange={handleInputChange}
+                    disabled={areInputsDisabled}
+                    className="mt-1"
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <Label
                     htmlFor="companyDescription"
                     className="text-gray-700 text-sm sm:text-base"
                   >
-                    {t("company_description")}
+                    {t("company_description")} *
                   </Label>
                   <Input
                     id="companyDescription"
@@ -367,61 +609,134 @@ export default function Component() {
                     htmlFor="commercialRegistrationNumber"
                     className="text-gray-700 text-sm sm:text-base"
                   >
-                    {t("commercial_registration_number")}
+                    {t("commercial_registration_number")} *
                   </Label>
                   <Input
                     id="commercialRegistrationNumber"
-                    value={profileData.commercialRegistrationNumber}
-                    onChange={handleInputChange}
+                    value={documentData.commercialRegistrationNumber}
+                    onChange={(e) =>
+                      setDocumentData((prev) => ({
+                        ...prev,
+                        commercialRegistrationNumber: e.target.value,
+                      }))
+                    }
                     disabled={areInputsDisabled}
                     className="mt-1"
                   />
                 </div>
                 <div>
                   <Label className="text-gray-700 text-sm sm:text-base">
-                    {t("upload_cr_document_pdf_jpg_png")}
+                    {t("upload_cr_document_pdf_jpg_png")} *
                   </Label>
-                  <div className="mt-1 border-2 border-dashed border-gray-300 rounded-lg p-4 sm:p-6 text-center flex flex-col items-center justify-center space-y-3">
-                    <UploadIcon className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" />
-                    <p className="text-xs sm:text-sm text-gray-600">
-                      {t("drag_and_drop_your_file_here_or_click_to_browse")}
-                    </p>
-                    <Button
-                      variant="outline"
-                      className="px-4 py-2 sm:px-6 sm:py-2 bg-transparent text-sm sm:text-base"
-                      disabled={areInputsDisabled}
-                    >
-                      {t("choose_file")}
-                    </Button>
-                    <p className="text-xs text-gray-500">
-                      {t("pdf_jpg_png_up_to_10mb")}
-                    </p>
-                  </div>
+                  {documentData.commercialRegistrationDoc ? (
+                    <div className="mt-1 p-4 border-2 border-green-300 rounded-lg bg-green-50">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <CheckCircle className="w-5 h-5 text-green-600" />
+                          <span className="text-green-800 text-sm">
+                            Document uploaded successfully
+                          </span>
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() =>
+                            window.open(
+                              documentData.commercialRegistrationDoc,
+                              "_blank"
+                            )
+                          }
+                        >
+                          View
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="mt-1 border-2 border-dashed border-gray-300 rounded-lg p-4 sm:p-6 text-center flex flex-col items-center justify-center space-y-3">
+                      {uploadingFile ? (
+                        <>
+                          <Loader2 className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400 animate-spin" />
+                          <p className="text-xs sm:text-sm text-gray-600">
+                            Uploading document...
+                          </p>
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" />
+                          <p className="text-xs sm:text-sm text-gray-600">
+                            {t(
+                              "drag_and_drop_your_file_here_or_click_to_browse"
+                            )}
+                          </p>
+                          <Button
+                            variant="outline"
+                            className="px-4 py-2 sm:px-6 sm:py-2 bg-transparent text-sm sm:text-base relative"
+                            disabled={areInputsDisabled || uploadingFile}
+                          >
+                            {t("choose_file")}
+                            <input
+                              type="file"
+                              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                              accept=".pdf,.jpg,.jpeg,.png"
+                              onChange={handleFileUpload}
+                              disabled={areInputsDisabled || uploadingFile}
+                            />
+                          </Button>
+                          <p className="text-xs text-gray-500">
+                            {t("pdf_jpg_png_up_to_10mb")}
+                          </p>
+                        </>
+                      )}
+                    </div>
+                  )}
                 </div>
+
+                {verificationStatus === "rejected" && (
+                  <Alert className="border-red-200 bg-red-50">
+                    <AlertCircle className="w-4 h-4 text-red-600" />
+                    <AlertDescription className="text-red-800">
+                      <strong>Verification Rejected:</strong>{" "}
+                      {verificationStatus}
+                    </AlertDescription>
+                  </Alert>
+                )}
               </div>
             </TabsContent>
           </Tabs>
         </main>
       </div>
+
       <Dialog open={showCompletionModal} onOpenChange={setShowCompletionModal}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>{t("confirm_profile_completion")}</DialogTitle>
             <DialogDescription>
-              {t(
-                "are_you_sure_you_want_to_complete_your_profile_once_confirmed_your_profile_will_be_submitted_for_verification_and_you_will_no_longer_be_able_to_edit_it"
-              )}
+              Are you sure you want to submit your profile for verification?
+              Once submitted, your documents will be reviewed by our team and
+              you cannot edit them until the review is complete.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={handleCloseModal}>
+            <Button
+              variant="outline"
+              onClick={handleCloseModal}
+              disabled={saving}
+            >
               {t("cancel")}
             </Button>
             <Button
               onClick={handleConfirmCompletion}
+              disabled={saving}
               className="bg-blue-600 hover:bg-blue-700 text-white"
             >
-              {t("confirm")}
+              {saving ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                  Submitting...
+                </>
+              ) : (
+                t("confirm")
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>

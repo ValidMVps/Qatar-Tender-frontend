@@ -1130,5 +1130,10 @@
   "tender_created_successfully": "تم إنشاء المناقصة بنجاح!",
   "redirecting_to_your_tenders": "جاري تحويلك إلى لوحة تحكم المناقصات...",
   "tender_information_saved": "تم حفظ معلومات المناقصة",
-  "notifications_sent_to_relevant_contractors": "تم إرسال إشعارات إلى المقاولين المعنيين"
+  "notifications_sent_to_relevant_contractors": "تم إرسال إشعارات إلى المقاولين المعنيين",
+  "providers_have_not_submitted_any_bids_yet": "لم يقدم المزودون أي عروض بعد",
+  "providers_have_not_asked_any_questions_yet": "لم يسأل المزودون أي أسئلة بعد",
+  "overview_of_posting_and_bidding_activity": "نظرة عامة على نشاط النشر والمزايدة",
+  "no_tenders_created_yet": "لم يتم إنشاء أي مناقصات بعد",
+  "reopen_tender": "إعادة فتح المناقصة"
 }
