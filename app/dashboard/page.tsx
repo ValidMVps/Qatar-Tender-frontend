@@ -87,49 +87,51 @@ export default function DashboardPage() {
     >
       {/* Welcome Box */}
       <main className="flex-1 py-1 px-1 md:py-9 md:px-3 space-y-7">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between py-8 px-7 rounded-lg bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 shadow-sm">
-          <div className="mb-4 md:mb-0">
-            <h1 className="md:text-3xl text-xl font-medium pb-2 text-white">
-              {t("welcome_back")} {profile?.fullName}
-            </h1>
-            <p className="text-md text-blue-100">
-              {t("overview_of_your_posting_and_bidding_activity_today")}
-            </p>
-          </div>
-          <div className="flex-shrink-0">
-            <Button
-              className="text-blue-700 flex items-center"
-              onClick={() => setOpenTenderModal(true)}
-              variant={"secondary"}
-            >
-              <Plus className="md:mr-2 mr-0 h-4 w-4" /> {t("post_new_tender")}
-            </Button>
-          </div>
-        </div>
-
-        {/* Stats Cards */}
-        <div className="md:grid hidden gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 xl:grid-cols-4 mb-8">
-          {statsData.map((stat, index) => {
-            const Icon = stat.icon;
-            return (
-              <Card
-                key={index}
-                className="border-neutral-200 rounded-md transition-shadow duration-200"
+        <div className="flex flex-col py-9 px-9 rounded-lg   bg-gradient-to-br from-blue-50 to-blue-100 text-blue-600 border-blue-200 border ">
+          {/* Header */}
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6">
+            <div className="mb-4 md:mb-0">
+              <h1 className="md:text-3xl text-xl font-medium pb-2 text-gray-800">
+                {t("welcome_back")} {profile?.fullName}
+              </h1>
+              <p className="text-md text-gray-700">
+                {t("overview_of_your_posting_and_bidding_activity_today")}
+              </p>
+            </div>
+            <div className="flex-shrink-0">
+              <Button
+                className="flex items-center"
+                onClick={() => setOpenTenderModal(true)}
               >
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-500">
-                    {t(stat.title)}
-                  </CardTitle>
-                  <Icon className="h-5 w-5 text-gray-400" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-gray-900">
-                    {stat.value}
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
+                <Plus className="md:mr-2 mr-0 h-4 w-4" /> {t("post_new_tender")}
+              </Button>
+            </div>
+          </div>
+
+          {/* Stats Cards inside welcome box */}
+          <div className="grid gap-4 mt-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 xl:grid-cols-4">
+            {statsData.map((stat, index) => {
+              const Icon = stat.icon;
+              return (
+                <Card
+                  key={index}
+                  className="transition-shadow duration-200 rounded-lg shadow-0 border-0 bg-white/70"
+                >
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium text-gray-500">
+                      {t(stat.title)}
+                    </CardTitle>
+                    <Icon className="h-5 w-5 text-blue-700" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-blue-500">
+                      {stat.value}
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
         </div>
 
         {/* Overview Chart */}

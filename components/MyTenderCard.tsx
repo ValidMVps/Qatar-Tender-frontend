@@ -60,7 +60,7 @@ export default function MyTenderCard({
   };
 
   return (
-    <div className="bg-white/70 backdrop-blur-xl rounded-md border border-neutral-300 overflow-hidden shadow-sm">
+    <div className="bg-white/70 backdrop-blur-xl rounded-md border border-neutral-300 overflow-hidden shadow-0">
       <div className="p-6">
         {/* Header */}
         <div className="flex items-start justify-between mb-4">
@@ -68,7 +68,7 @@ export default function MyTenderCard({
             <Link
               href={`/dashboard/tender/${tender.id}`}
               onClick={(e) => e.stopPropagation()}
-              className="text-lg font-semibold text-gray-900 mb-2 block hover:underline overflow-hidden text-ellipsis whitespace-nowrap"
+              className="text-lg xl:text-2xl font-semibold text-gray-900 mb-2 block hover:underline overflow-hidden text-ellipsis whitespace-nowrap"
             >
               {tender.title}
             </Link>
@@ -100,7 +100,7 @@ export default function MyTenderCard({
 
         {/* Description */}
         <p
-          className="text-gray-600 text-sm mb-4 overflow-hidden"
+          className="text-gray-600 text-md mb-4 overflow-hidden"
           style={{
             display: "-webkit-box",
             WebkitLineClamp: 2,

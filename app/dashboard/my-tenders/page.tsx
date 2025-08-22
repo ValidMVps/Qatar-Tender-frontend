@@ -226,22 +226,7 @@ export default function MyTendersPage() {
     }
   };
 
-  const getStatusIcon = (tender: UiTender) => {
-    if (tender.isCompleted) return <CheckCircle className="h-4 w-4" />;
-    if (tender.awardedBid) return <Award className="h-4 w-4" />;
-    switch (tender.status) {
-      case "active":
-        return <CheckCircle className="h-4 w-4" />;
-      case "closed":
-        return <AlertCircle className="h-4 w-4" />;
-      case "draft":
-        return <FileText className="h-4 w-4" />;
-      case "rejected":
-        return <XCircle className="h-4 w-4" />;
-      default:
-        return <FileText className="h-4 w-4" />;
-    }
-  };
+
 
   // Filtering
   const filteredTenders = tenders.filter((tender) => {
@@ -332,24 +317,7 @@ export default function MyTendersPage() {
     }
   };
 
-  const handleDuplicateTender = (id: string) => {
-    const tenderToDuplicate = tenders.find((t) => t.id === id);
-    if (tenderToDuplicate) {
-      const newTender: UiTender = {
-        ...tenderToDuplicate,
-        id: String(Date.now()),
-        title: `Copy of ${tenderToDuplicate.title}`,
-        status: "draft",
-        bidsCount: 0,
-        awardedBid: false,
-        isCompleted: false,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        postedDate: "Not posted yet",
-      };
-      setTenders((prev) => [newTender, ...prev]);
-    }
-  };
+ 
 
   const handleReapplyTender = (tenderId: string) => {
     const tenderToReapply = tenders.find((t) => t.id === tenderId);
@@ -403,7 +371,7 @@ export default function MyTendersPage() {
       <div className="mb-6 space-y-2 md:space-y-4 w-full">
         <div className="xl:grid hidden grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 mb-6">
           {/* Total Tenders */}
-          <div className="bg-gradient-to-br from-blue-50 to-blue-100 text-blue-600 border-blue-200 border rounded-lg p-8 hover:scale-[1.02] transition-all duration-500 ease-out hover:shadow-lg">
+          <div className="bg-gradient-to-br from-blue-50 to-blue-100 text-blue-600 border-blue-200 border rounded-lg p-8  transition-all duration-500 ease-out">
             <div className="flex flex-col space-y-4">
               <div className="flex items-center justify-between">
                 <FileText className="h-7 w-7 text-blue-600" />
@@ -423,7 +391,7 @@ export default function MyTendersPage() {
           </div>
 
           {/* Active Tenders */}
-          <div className="bg-gradient-to-br from-blue-50 to-blue-100 text-blue-600 border-blue-200 border rounded-lg p-8 hover:scale-[1.02] transition-all duration-500 ease-out hover:shadow-lg">
+          <div className="bg-gradient-to-br from-blue-50 to-blue-100 text-blue-600 border-blue-200 border rounded-lg p-8 transition-all duration-500 ease-out">
             <div className="flex flex-col space-y-4">
               <div className="flex items-center justify-between">
                 <CheckCircle className="h-7 w-7 text-blue-600" />
@@ -443,7 +411,7 @@ export default function MyTendersPage() {
           </div>
 
           {/* Awarded Tenders */}
-          <div className="bg-gradient-to-br from-blue-50 to-blue-100 text-blue-600 border-blue-200 border rounded-lg p-8 hover:scale-[1.02] transition-all duration-500 ease-out  hover:shadow-lg">
+          <div className="bg-gradient-to-br from-blue-50 to-blue-100 text-blue-600 border-blue-200 border rounded-lg p-8 transition-all ">
             <div className="flex flex-col space-y-4">
               <div className="flex items-center justify-between">
                 <Award className="h-7 w-7 text-blue-600" />
@@ -463,7 +431,7 @@ export default function MyTendersPage() {
           </div>
 
           {/* Completed Tenders */}
-          <div className="bg-gradient-to-br from-blue-50 to-blue-100 text-blue-600 border-blue-200 border rounded-lg p-8 hover:scale-[1.02] transition-all duration-500 ease-out  hover:shadow-lg">
+          <div className="bg-gradient-to-br from-blue-50 to-blue-100 text-blue-600 border-blue-200 border rounded-lg p-8 transition-all duration-500 ease-out">
             <div className="flex flex-col space-y-4">
               <div className="flex items-center justify-between">
                 <CheckCircle className="h-7 w-7 text-blue-600" />
@@ -483,7 +451,7 @@ export default function MyTendersPage() {
           </div>
 
           {/* Rejected Tenders */}
-          <div className="bg-gradient-to-br from-blue-50 to-blue-100 text-blue-600 border-blue-200 border rounded-lg p-8 hover:scale-[1.02] transition-all duration-500 ease-out hover:shadow-lg">
+          <div className="bg-gradient-to-br from-blue-50 to-blue-100 text-blue-600 border-blue-200 border rounded-lg p-8 transition-all duration-500 ease-out ">
             <div className="flex flex-col space-y-4">
               <div className="flex items-center justify-between">
                 <XCircle className="h-7 w-7 text-blue-600" />
