@@ -77,3 +77,29 @@ export const createTender = async (payload: any) => {
   });
   return response.data;
 };
+
+type TenderFilters = {
+  status?: string;
+  category?: string;
+  search?: string;
+};
+
+export const getTenders = async (filters: TenderFilters = {}) => {
+  try {
+    const params = new URLSearchParams();
+
+    // Add filters to params
+    if (filters.status) params.append("status", filters.status);
+    if (filters.category) params.append("category", filters.category);
+    if (filters.search) params.append("search", filters.search);
+
+    const response = await api.get(`/api/tenders?${params.toString()}`);
+    return response.data;
+  } catch (error) {
+    if (typeof error === "object" && error !== null && "response" in error) {
+      // @ts-ignore
+      throw new Error(error.response?.data?.message || "Failed to fetch tenders");
+    }
+    throw new Error("Failed to fetch tenders");
+  }
+};
