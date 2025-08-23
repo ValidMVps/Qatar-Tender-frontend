@@ -33,8 +33,11 @@ export const createBid = async (payload: CreateBidPayload) => {
 
 // Get bids for a specific tender
 export const getTenderBids = async (tenderId: string) => {
+    console.log("od:", tenderId);
+
     try {
         const res = await api.get(`/api/bids/tender/${tenderId}`);
+        console.log("Bids for tender:", res.data);
         return res.data;
     } catch (error: any) {
         console.error("Error fetching tender bids:", error.response?.data || error.message);

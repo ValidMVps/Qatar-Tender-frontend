@@ -70,7 +70,11 @@ interface Tender {
 
 interface Bid {
   _id: string;
-  tender: string;
+  tender: {
+    _id: string;
+    title?: string;
+    // other fields if needed
+  };
   bidder: {
     _id: string;
     name: string;
@@ -81,7 +85,6 @@ interface Bid {
   status: "pending" | "accepted" | "rejected";
   createdAt: string;
 }
-
 interface QuestionAnswer {
   id: number;
   question: string;
@@ -149,34 +152,45 @@ export default function TenderDetailsPage({ params }: PageProps) {
   const [expiryDate, setExpiryDate] = useState("");
   const [cvv, setCvv] = useState("");
   const [cardHolder, setCardHolder] = useState("");
-
+  const [hasUserBid, setHasUserBid] = useState(false);
   // Load tender details and check if user has already bid
+
   useEffect(() => {
     const loadTenderDetails = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        // Load tender details
+        // load tender
         const tenderData = await getTender(id);
-        // Add mock rating and completed projects for demo
         if (tenderData.postedBy) {
           tenderData.postedBy.rating = 4.7;
           tenderData.postedBy.completedProjects = 23;
         }
         setTender(tenderData);
 
-        // Check if user has already bid on this tender
+        // load user bids and check if one matches this tender id
         try {
-          const userBids = await getUserBids();
-          const existingBid = userBids.find(
-            (bid: Bid) =>
-              bid.tender._id === id || bid.tender._id === tenderData._id
-          );
-          setUserBid(existingBid || null);
-          console.log(tenderData);
+          const userBids: Bid[] = (await getUserBids()) || [];
+
+          // normalize comparison
+          const existingBid =
+            userBids.find((bid: Bid) => {
+              const bidTenderId =
+                typeof bid.tender === "string"
+                  ? bid.tender
+                  : String(bid.tender?._id);
+              return String(bidTenderId) === String(id);
+            }) || null;
+
+          setUserBid(existingBid);
+          setHasUserBid(!!existingBid);
+
+          console.log("userBids:", userBids);
+          console.log("existingBid:", existingBid);
         } catch (bidsError) {
           console.error("Error loading user bids:", bidsError);
+          // optional: setHasUserBid(false)
         }
       } catch (err: any) {
         console.error("Error loading tender:", err);
@@ -190,9 +204,7 @@ export default function TenderDetailsPage({ params }: PageProps) {
       }
     };
 
-    if (id) {
-      loadTenderDetails();
-    }
+    if (id) loadTenderDetails();
   }, [id]);
 
   const handleNextStep = () => {
@@ -750,52 +762,56 @@ export default function TenderDetailsPage({ params }: PageProps) {
                   </h1>
 
                   {/* Client Information Card - Enhanced with rating */}
-                  {(userBid || tender.postedBy) && (
-                    <div className="bg-blue-50/50 rounded-xl p-4 mb-6">
-                      <div className="flex items-center gap-4 mb-3">
-                        <div className="h-12 w-12 bg-blue-500 rounded-full flex items-center justify-center">
-                          <User className="h-6 w-6 text-white" />
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <h3 className="font-semibold text-gray-900">
-                              {tender.postedBy?.name ||
+
+                  <div className="bg-blue-50/50 rounded-xl p-4 mb-6">
+                    <div className="flex items-center gap-4 mb-3">
+                      <div className="h-12 w-12 bg-blue-500 rounded-full flex items-center justify-center">
+                        <User className="h-6 w-6 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h3 className="font-semibold text-gray-900">
+                            {hasUserBid
+                              ? tender.postedBy?.name ||
                                 tender.postedBy?.email ||
-                                "Anonymous Client"}
-                            </h3>
-                            {tender.postedBy?.isVerified && (
-                              <CheckCircle className="h-4 w-4 text-blue-500" />
-                            )}
-                          </div>
-                          <div className="flex items-center gap-4">
-                            <p className="text-sm text-gray-600">
-                              {getUserTypeLabel(tender.postedBy?.userType)}
-                            </p>
-                            {tender.postedBy?.rating && (
-                              <div className="flex items-center gap-1">
-                                {renderStars(tender.postedBy.rating)}
-                                <span className="text-sm font-medium text-gray-700 ml-1">
-                                  {tender.postedBy.rating}
-                                </span>
-                              </div>
-                            )}
-                            {tender.postedBy?.completedProjects && (
-                              <span className="text-sm text-gray-600">
-                                {tender.postedBy.completedProjects} projects
-                                completed
+                                "Anonymous Client"
+                              : "Anonymous Client"}
+                          </h3>
+
+                          {tender.postedBy?.isVerified && (
+                            <CheckCircle className="h-4 w-4 text-blue-500" />
+                          )}
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <p className="text-sm text-gray-600">
+                            {getUserTypeLabel(tender.postedBy?.userType)}
+                          </p>
+                          {tender.postedBy?.rating && (
+                            <div className="flex items-center gap-1">
+                              {renderStars(tender.postedBy.rating)}
+                              <span className="text-sm font-medium text-gray-700 ml-1">
+                                {tender.postedBy.rating}
                               </span>
-                            )}
-                          </div>
+                            </div>
+                          )}
+                          {tender.postedBy?.completedProjects && (
+                            <span className="text-sm text-gray-600">
+                              {tender.postedBy.completedProjects} projects
+                              completed
+                            </span>
+                          )}
                         </div>
                       </div>
-                      <div className="flex items-center gap-4 text-sm text-gray-600">
+                    </div>
+                    <div className="flex items-center gap-4 text-sm text-gray-600">
+                      {hasUserBid && (
                         <div className="flex items-center gap-1">
                           <Mail className="h-4 w-4" />
                           <span>{tender.contactEmail}</span>
                         </div>
-                      </div>
+                      )}
                     </div>
-                  )}
+                  </div>
 
                   {/* Key Information Grid */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -896,7 +912,7 @@ export default function TenderDetailsPage({ params }: PageProps) {
                   )}
 
                   {/* User's Bid Status - Only show if user has bid */}
-            
+
                   {/* Q&A Section */}
                   <QnaSection tenderid={tender._id} />
                 </div>

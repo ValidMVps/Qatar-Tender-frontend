@@ -24,6 +24,8 @@ import {
   User,
   Briefcase,
   Trophy,
+  AlertCircle,
+  Loader2,
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -32,441 +34,177 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { ProviderBadge } from "@/components/provider-badge"; // Assuming this component exists
+import { ProviderBadge } from "@/components/provider-badge";
 import useTranslation from "@/lib/hooks/useTranslation";
 import { getTender } from "@/app/services/tenderService";
+import { getTenderBids, updateBid } from "@/app/services/BidService";
+import {
+  getQuestionsForTender,
+  answerQuestion,
+  Question,
+} from "@/app/services/QnaService";
 
-// Sample data - this would come from API based on tender ID
-const getTenderData = (id: string) => {
-  const tenders = {
-    "1": {
-      id: 1,
-      title: "Office Building Construction Project",
-      description:
-        "We are looking for a qualified contractor to handle this important construction project in West Bay. The project involves complete construction of a 5-story office building with modern amenities.",
-      budget: "150,000",
-      deadline: "2024-02-15",
-      status: "active",
-      category: "Construction",
-      location: "West Bay, Doha",
-      postedDate: "Jan 10, 2024",
-      requirements: ["Verified Provider", "Sample Work Provided"],
-      company: {
-        name: "TechCorp Solutions",
-        logo: "/placeholder-logo.png",
-        location: "Doha, Qatar",
-        verified: true,
-        rating: 4.8,
-        reviewsCount: 127,
-        projectsCompleted: 45,
-      },
-      skills: ["Construction", "Project Management", "Architecture"],
-      viewsCount: 320,
-      attachments: [
-        { name: "Building Plans.pdf", size: "5.2 MB" },
-        { name: "Material Specifications.docx", size: "1.1 MB" },
-      ],
-    },
-    "2": {
-      id: 2,
-      title: "Website Development and Design",
-      description:
-        "Modern responsive website needed for our consulting firm with Arabic and English support. Must include CMS, SEO optimization, and mobile-first design approach.",
-      budget: "25,000",
-      deadline: "2024-02-20",
-      status: "pending_approval",
-      category: "IT Services",
-      location: "Doha, Qatar",
-      postedDate: "Pending Admin Approval",
-      requirements: ["Portfolio Required", "Arabic Language Support"],
-      company: {
-        name: "Digital Innovators",
-        logo: "/placeholder-logo.png",
-        location: "Doha, Qatar",
-        verified: true,
-        rating: 4.5,
-        reviewsCount: 80,
-        projectsCompleted: 30,
-      },
-      skills: ["React.js", "Node.js", "UI/UX Design", "SEO"],
-      viewsCount: 180,
-      attachments: [],
-    },
-    "7": {
-      id: 7,
-      title: "Security System Upgrade",
-      description:
-        "Upgrade existing security system with modern CCTV cameras, access control, and monitoring software for our corporate headquarters.",
-      budget: "65,000",
-      deadline: "2024-02-25",
-      status: "pending_approval",
-      category: "Security",
-      location: "West Bay, Doha",
-      postedDate: "Pending Admin Approval",
-      requirements: ["Licensed Security Provider", "24/7 Support"],
-      company: {
-        name: "Secure Solutions",
-        logo: "/placeholder-logo.png",
-        location: "Doha, Qatar",
-        verified: true,
-        rating: 4.7,
-        reviewsCount: 60,
-        projectsCompleted: 25,
-      },
-      skills: ["CCTV", "Access Control", "Network Security"],
-      viewsCount: 250,
-      attachments: [],
-    },
-    "16": {
-      id: 16,
-      title: "Corporate Training Program Development",
-      description:
-        "Comprehensive corporate training program for 200+ employees covering leadership, digital skills, and compliance. Includes curriculum development, training materials, and delivery across multiple locations.",
-      budget: "95,000",
-      deadline: "2024-03-05",
-      status: "active",
-      category: "Training & Development",
-      location: "Multiple Locations, Qatar",
-      postedDate: "Jan 8, 2024",
-      requirements: ["Training Certification", "Multi-location Capability"],
-      company: {
-        name: "Global Learning",
-        logo: "/placeholder-logo.png",
-        location: "Doha, Qatar",
-        verified: true,
-        rating: 4.9,
-        reviewsCount: 150,
-        projectsCompleted: 50,
-      },
-      skills: [
-        "Curriculum Design",
-        "Corporate Training",
-        "Leadership Development",
-      ],
-      viewsCount: 400,
-      attachments: [{ name: "Training Outline.pdf", size: "1.5 MB" }],
-    },
+interface Tender {
+  _id: string;
+  title: string;
+  description: string;
+  estimatedBudget: number;
+  deadline: string;
+  status: "active" | "pending_approval" | "closed" | "draft";
+  category: string;
+  location: string;
+  createdAt: string;
+  updatedAt: string;
+  owner: {
+    _id: string;
+    name: string;
+    email: string;
   };
-  return tenders[id as keyof typeof tenders] || tenders["1"];
-};
+  requirements?: string[];
+  skills?: string[];
+  attachments?: Array<{
+    name: string;
+    size: string;
+    url?: string;
+  }>;
+}
 
-const getBidsForTender = (tenderId: string) => {
-  const bidsData = {
-    "1": [
-      {
-        id: 1,
-        providerName: "Qatar Construction Co.",
-        providerRating: 4.8,
-        providerBadge: "gold",
-        isVerified: true,
-        bidAmount: "145,000",
-        bidSummary:
-          "We have 15+ years of experience in commercial construction. Our team can complete this project within the specified timeline with high-quality materials.",
-        submittedDate: "Jan 12, 2024",
-        status: "pending",
-        completedProjects: 28,
-        onTimeDelivery: 95,
-        bidderProfileId: "1", // Link to bidder profile
-        platformRank: 5,
-      },
-      {
-        id: 2,
-        providerName: "Al-Rayyan Builders",
-        providerRating: 4.6,
-        providerBadge: "bronze",
-        isVerified: false,
-        bidAmount: "138,000",
-        bidSummary:
-          "Specialized in office building construction with modern techniques. We guarantee quality work and timely delivery.",
-        submittedDate: "Jan 13, 2024",
-        status: "pending",
-        completedProjects: 15,
-        onTimeDelivery: 88,
-        bidderProfileId: "2", // Link to bidder profile
-        platformRank: 12,
-      },
-      {
-        id: 3,
-        providerName: "Doha Elite Construction",
-        providerRating: 4.9,
-        providerBadge: "platinum",
-        isVerified: true,
-        bidAmount: "152,000",
-        bidSummary:
-          "Premium construction services with 20+ years of experience. We use only the finest materials and latest construction techniques.",
-        submittedDate: "Jan 11, 2024",
-        status: "awarded",
-        completedProjects: 45,
-        onTimeDelivery: 98,
-        bidderProfileId: "3", // Link to bidder profile
-        platformRank: 1,
-      },
-    ],
-    "2": [
-      {
-        id: 4,
-        providerName: "Qatar Digital Solutions",
-        providerRating: 4.7,
-        providerBadge: "gold",
-        isVerified: true,
-        bidAmount: "22,000",
-        bidSummary:
-          "Full-stack web development with Arabic/English support. We specialize in responsive design and modern CMS solutions.",
-        submittedDate: "Jan 14, 2024",
-        status: "pending",
-        completedProjects: 32,
-        onTimeDelivery: 92,
-        bidderProfileId: "1", // Reusing profile for demo
-        platformRank: 5,
-      },
-      {
-        id: 5,
-        providerName: "Doha Web Studio",
-        providerRating: 4.4,
-        providerBadge: "bronze",
-        isVerified: false,
-        bidAmount: "18,500",
-        bidSummary:
-          "Creative web design and development services. We focus on user experience and mobile-first approach.",
-        submittedDate: "Jan 15, 2024",
-        status: "pending",
-        completedProjects: 12,
-        onTimeDelivery: 85,
-        bidderProfileId: "2", // Reusing profile for demo
-        platformRank: 12,
-      },
-    ],
-    "7": [
-      {
-        id: 7,
-        providerName: "SecureGuard Qatar",
-        providerRating: 4.9,
-        providerBadge: "platinum",
-        isVerified: true,
-        bidAmount: "62,000",
-        bidSummary:
-          "Complete security system upgrade with latest CCTV technology, access control, and 24/7 monitoring services.",
-        submittedDate: "Jan 17, 2024",
-        status: "pending",
-        completedProjects: 35,
-        onTimeDelivery: 98,
-        bidderProfileId: "3", // Reusing profile for demo
-        platformRank: 1,
-      },
-      {
-        id: 8,
-        providerName: "Al-Ameen Security",
-        providerRating: 4.5,
-        providerBadge: "gold",
-        isVerified: true,
-        bidAmount: "58,500",
-        bidSummary:
-          "Licensed security provider with expertise in corporate security systems. Includes installation, training, and maintenance.",
-        submittedDate: "Jan 18, 2024",
-        status: "pending",
-        completedProjects: 22,
-        onTimeDelivery: 90,
-        bidderProfileId: "1", // Reusing profile for demo
-        platformRank: 5,
-      },
-    ],
-    "16": [
-      {
-        id: 16,
-        providerName: "Qatar Learning Solutions",
-        providerRating: 4.9,
-        providerBadge: "platinum",
-        isVerified: true,
-        bidAmount: "89,000",
-        bidSummary:
-          "Comprehensive training solutions with 10+ years experience. We specialize in corporate training programs with proven methodologies and certified trainers.",
-        submittedDate: "Jan 9, 2024",
-        status: "pending",
-        completedProjects: 42,
-        onTimeDelivery: 97,
-        bidderProfileId: "3", // Reusing profile for demo
-        platformRank: 1,
-      },
-      {
-        id: 17,
-        providerName: "Gulf Training Institute",
-        providerRating: 4.7,
-        providerBadge: "gold",
-        isVerified: true,
-        bidAmount: "92,500",
-        bidSummary:
-          "Professional training institute with expertise in leadership and digital skills training. We offer customized curriculum and multi-location delivery.",
-        submittedDate: "Jan 10, 2024",
-        status: "pending",
-        completedProjects: 38,
-        onTimeDelivery: 94,
-        bidderProfileId: "1", // Reusing profile for demo
-        platformRank: 5,
-      },
-      {
-        id: 18,
-        providerName: "Doha Corporate Academy",
-        providerRating: 4.8,
-        providerBadge: "gold",
-        isVerified: true,
-        bidAmount: "87,500",
-        bidSummary:
-          "Specialized in corporate training with focus on leadership development and compliance training. We have trained over 5000+ professionals across Qatar.",
-        submittedDate: "Jan 11, 2024",
-        status: "pending",
-        completedProjects: 35,
-        onTimeDelivery: 96,
-        bidderProfileId: "2", // Reusing profile for demo
-        platformRank: 12,
-      },
-      {
-        id: 19,
-        providerName: "Excellence Training Center",
-        providerRating: 4.6,
-        providerBadge: "bronze",
-        isVerified: false,
-        bidAmount: "85,000",
-        bidSummary:
-          "Training center with expertise in digital skills and professional development. We offer flexible scheduling and modern training facilities.",
-        submittedDate: "Jan 12, 2024",
-        status: "pending",
-        completedProjects: 28,
-        onTimeDelivery: 89,
-        bidderProfileId: "3", // Reusing profile for demo
-        platformRank: 1,
-      },
-    ],
+interface Bid {
+  _id: string;
+  tender: string;
+  bidder: {
+    _id: string;
+    name: string;
+    email: string;
+    rating?: number;
+    completedProjects?: number;
+    onTimeDelivery?: number;
+    verified?: boolean;
   };
-  return bidsData[tenderId as keyof typeof bidsData] || [];
-};
-
-const getQAForTender = (tenderId: string) => {
-  const qaData = {
-    "1": [
-      {
-        id: 1,
-        question: "What type of foundation is required for this project?",
-        answer:
-          "The project requires a reinforced concrete foundation suitable for a 5-story structure. Detailed specifications will be provided to the selected contractor.",
-        providerName: "Qatar Construction Co.",
-        questionDate: "Jan 11, 2024",
-        answerDate: "Jan 11, 2024",
-      },
-      {
-        id: 2,
-        question:
-          "Are there any specific building materials that must be used?",
-        answer: "",
-        providerName: "Al-Rayyan Builders",
-        questionDate: "Jan 12, 2024",
-        answerDate: null,
-      },
-    ],
-    "2": [
-      {
-        id: 3,
-        question:
-          "Do you require a custom CMS or would WordPress be acceptable?",
-        answer: "",
-        providerName: "Qatar Digital Solutions",
-        questionDate: "Jan 14, 2024",
-        answerDate: null,
-      },
-    ],
-    "7": [
-      {
-        id: 4,
-        question:
-          "What is the total square footage of the area requiring security coverage?",
-        answer: "",
-        providerName: "SecureGuard Qatar",
-        questionDate: "Jan 17, 2024",
-        answerDate: null,
-      },
-    ],
-    "16": [
-      {
-        id: 5,
-        question:
-          "What is the preferred training methodology - classroom, online, or hybrid?",
-        answer:
-          "We prefer a hybrid approach combining classroom sessions for leadership training and online modules for digital skills. This allows for better engagement and flexibility.",
-        providerName: "Qatar Learning Solutions",
-        questionDate: "Jan 9, 2024",
-        answerDate: "Jan 10, 2024",
-      },
-      {
-        id: 6,
-        question:
-          "Are there specific compliance standards we need to address in the training?",
-        answer:
-          "Yes, the training must cover Qatar Labor Law compliance, workplace safety regulations, and our internal code of conduct. We'll provide detailed compliance requirements to the selected provider.",
-        providerName: "Gulf Training Institute",
-        questionDate: "Jan 11, 2024",
-        answerDate: "Jan 12, 2024",
-      },
-      {
-        id: 7,
-        question: "What is the expected duration for each training module?",
-        answer:
-          "Each module should be 2-3 hours long with breaks. Leadership modules can be full-day sessions (6-8 hours) while digital skills modules should be shorter (1-2 hours) for better retention.",
-        providerName: "Doha Corporate Academy",
-        questionDate: "Jan 13, 2024",
-        answerDate: "Jan 14, 2024",
-      },
-      {
-        id: 8,
-        question: "Do you require post-training assessment and certification?",
-        answer:
-          "Yes, we require comprehensive assessments for all modules and official certificates upon completion. The certificates should be recognized and include our company branding.",
-        providerName: "Excellence Training Center",
-        questionDate: "Jan 14, 2024",
-        answerDate: "Jan 15, 2024",
-      },
-      {
-        id: 9,
-        question:
-          "What languages should the training materials be available in?",
-        answer:
-          "Training materials should be available in both English and Arabic. All trainers must be bilingual to accommodate our diverse workforce effectively.",
-        providerName: "Qatar Learning Solutions",
-        questionDate: "Jan 15, 2024",
-        answerDate: "Jan 16, 2024",
-      },
-    ],
-  };
-  return qaData[tenderId as keyof typeof qaData] || [];
-};
+  amount: number;
+  description: string;
+  status: "pending" | "accepted" | "rejected";
+  createdAt: string;
+  updatedAt: string;
+}
 
 export default function TenderDetailPage() {
   const { t } = useTranslation();
-
   const params = useParams();
   const tenderId = params.id as string;
-  const tenderData = getTenderData(tenderId);
-  const initialBids = getBidsForTender(tenderId);
-  const qaData = getQAForTender(tenderId);
 
+  // State management
+  const [tender, setTender] = useState<Tender | null>(null);
+  const [bids, setBids] = useState<Bid[]>([]);
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("bids");
-  const [newQuestion, setNewQuestion] = useState("");
-  const [newAnswer, setNewAnswer] = useState("");
-  const [newMessage, setNewMessage] = useState("");
-  const [showRatingModal, setShowRatingModal] = useState(false);
-  const [rating, setRating] = useState(0);
-  const [onTimeDelivery, setOnTimeDelivery] = useState(false);
-  const [bids, setBids] = useState(initialBids);
-  const [isSaved, setIsSaved] = useState(false); // Added for save functionality
+  const [answerText, setAnswerText] = useState<{ [key: string]: string }>({});
+  const [submittingAnswer, setSubmittingAnswer] = useState<{
+    [key: string]: boolean;
+  }>({});
+  const [updatingBidStatus, setUpdatingBidStatus] = useState<{
+    [key: string]: boolean;
+  }>({});
 
+  // Fetch tender data
+  useEffect(() => {
+    const fetchTenderData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Fetch tender details
+        const tenderData = await getTender(tenderId);
+        setTender(tenderData);
+        console.log("Fetched tender data:", tenderData);
+        const bidsdata = await getTenderBids(tenderId);
+        const questionsData = await getQuestionsForTender(tenderId);
+        console.log("Bids data:", bidsdata, tenderId);
+        console.log("Questions data:", questionsData);
+        setQuestions(questionsData);
+      } catch (err: any) {
+        console.error("Error fetching tender data:", err);
+        setError(err.response?.data?.message || "Failed to load tender data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (tenderId) {
+      fetchTenderData();
+    }
+  }, [tenderId]);
+
+  // Handle bid status updates (award/reject)
+  const handleBidStatusUpdate = async (
+    bidId: string,
+    status: "accepted" | "rejected"
+  ) => {
+    try {
+      setUpdatingBidStatus((prev) => ({ ...prev, [bidId]: true }));
+
+      // Update bid status via API
+      await updateBid(bidId, { status } as any);
+
+      // Update local state
+      setBids((prevBids) =>
+        prevBids.map((bid) => {
+          if (bid._id === bidId) {
+            return { ...bid, status };
+          }
+          // If awarding this bid, reset other awarded bids to pending
+          if (status === "accepted" && bid.status === "accepted") {
+            return { ...bid, status: "pending" };
+          }
+          return bid;
+        })
+      );
+    } catch (err: any) {
+      console.error("Error updating bid status:", err);
+      setError(err.response?.data?.message || "Failed to update bid status");
+    } finally {
+      setUpdatingBidStatus((prev) => ({ ...prev, [bidId]: false }));
+    }
+  };
+
+  // Handle question answers
+  const handleAnswerQuestion = async (questionId: string) => {
+    const answer = answerText[questionId];
+    if (!answer.trim()) return;
+
+    try {
+      setSubmittingAnswer((prev) => ({ ...prev, [questionId]: true }));
+
+      const updatedQuestion = await answerQuestion(questionId, answer);
+
+      // Update local state
+      setQuestions((prevQuestions) =>
+        prevQuestions.map((q) => (q._id === questionId ? updatedQuestion : q))
+      );
+
+      // Clear answer text
+      setAnswerText((prev) => ({ ...prev, [questionId]: "" }));
+    } catch (err: any) {
+      console.error("Error answering question:", err);
+      setError(err.response?.data?.message || "Failed to submit answer");
+    } finally {
+      setSubmittingAnswer((prev) => ({ ...prev, [questionId]: false }));
+    }
+  };
+
+  // Utility functions
   const getStatusColor = (status: string) => {
     switch (status) {
       case "active":
-        return "bg-black text-white border-black";
+        return "bg-green-600 text-white border-green-600";
       case "pending_approval":
-        return "bg-gray-600 text-white border-gray-600";
+        return "bg-yellow-600 text-white border-yellow-600";
       case "closed":
-        return "bg-gray-100 text-gray-800 border-gray-200";
+        return "bg-gray-600 text-white border-gray-600";
       case "draft":
-        return "bg-gray-300 text-gray-800 border-gray-300";
+        return "bg-gray-400 text-white border-gray-400";
       default:
         return "bg-gray-100 text-gray-800 border-gray-200";
     }
@@ -475,7 +213,7 @@ export default function TenderDetailPage() {
   const getStatusText = (status: string) => {
     switch (status) {
       case "active":
-        return "active";
+        return "Active";
       case "pending_approval":
         return "Pending Approval";
       case "closed":
@@ -487,68 +225,93 @@ export default function TenderDetailPage() {
     }
   };
 
-  const maskSensitiveInfo = (text: string) => {
-    text = text.replace(/https?:\/\/[^\s]+/g, "[LINK MASKED]");
-    return text;
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
   };
 
-  const handleAwardBid = (bidId: number) => {
-    setBids((prevBids) =>
-      prevBids.map((bid) => ({
-        ...bid,
-        status:
-          bid.id === bidId
-            ? "awarded"
-            : bid.status === "awarded"
-            ? "pending"
-            : bid.status,
-      }))
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat("en-QA", {
+      style: "currency",
+      currency: "QAR",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount);
+  };
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <Loader2 className="h-8 w-8 animate-spin text-gray-600 mx-auto mb-4" />
+            <p className="text-gray-600">Loading tender details...</p>
+          </div>
+        </div>
+      </div>
     );
-  };
+  }
 
-  const handleRejectBid = (bidId: number) => {
-    setBids((prevBids) =>
-      prevBids.map((bid) =>
-        bid.id === bidId ? { ...bid, status: "rejected" } : bid
-      )
+  // Error state
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              Error Loading Tender
+            </h3>
+            <p className="text-gray-600 mb-4">{error}</p>
+            <Button onClick={() => window.location.reload()} variant="outline">
+              Try Again
+            </Button>
+          </div>
+        </div>
+      </div>
     );
-  };
+  }
 
-  const awardedBid = bids.find((bid) => bid.status === "awarded");
+  // No tender found
+  if (!tender) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              Tender Not Found
+            </h3>
+            <p className="text-gray-600">
+              The tender you're looking for doesn't exist or has been removed.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const awardedBid = bids.find((bid) => bid.status === "accepted");
   const hasAwardedBid = !!awardedBid;
-  const isPendingApproval = tenderData.status === "pending_approval";
-  const { id } = useParams<{ id: string }>();
-  const [tender, setTender] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const isPendingApproval = tender.status === "pending_approval";
 
-  useEffect(() => {
-    const fetchTender = async () => {
-      try {
-        const data = await getTender(id);
-        setTender(data);
-        console.log("Tender data loaded:", data);
-      } catch (err) {
-        console.error("Error loading tender:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    fetchTender();
-  }, []);
   return (
     <div className="container mx-auto px-0 py-8">
       <div className="">
         {/* Pending Approval Notice */}
         {isPendingApproval && (
-          <div className="mb-6 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+          <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
             <div className="flex items-center">
-              <Clock className="h-5 w-5 text-gray-600 mr-2" />
+              <Clock className="h-5 w-5 text-yellow-600 mr-2" />
               <div>
-                <h3 className="text-sm font-medium text-gray-800">
+                <h3 className="text-sm font-medium text-yellow-800">
                   {t("tender_pending_approval")}
                 </h3>
-                <p className="text-sm text-gray-700 mt-1">
+                <p className="text-sm text-yellow-700 mt-1">
                   {t(
                     "this_tender_is_currently_under_admin_review_bids_and_qa_will_be_available_once_the_tender_is_active"
                   )}
@@ -561,14 +324,14 @@ export default function TenderDetailPage() {
         {/* Tender Header */}
         <div className="mb-8">
           <div className="flex items-start justify-between mb-4">
-            <div>
+            <div className="flex-1">
               <h1 className="text-3xl font-bold text-gray-900 mb-2">
                 {tender.title}
               </h1>
-              <div className="flex items-center space-x-4 text-sm text-gray-600">
+              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
                 <span className="flex items-center">
                   <Calendar className="h-4 w-4 mr-1" />
-                  {t("posted")}: {tender.updatedAt}
+                  Posted: {formatDate(tender.createdAt)}
                 </span>
                 <span className="flex items-center">
                   <MapPin className="h-4 w-4 mr-1" />
@@ -576,7 +339,11 @@ export default function TenderDetailPage() {
                 </span>
                 <span className="flex items-center">
                   <DollarSign className="h-4 w-4 mr-1" />
-                  {tender.estimatedBudget} QAR
+                  {formatCurrency(tender.estimatedBudget)}
+                </span>
+                <span className="flex items-center">
+                  <Clock className="h-4 w-4 mr-1" />
+                  Deadline: {formatDate(tender.deadline)}
                 </span>
               </div>
             </div>
@@ -584,7 +351,38 @@ export default function TenderDetailPage() {
               {getStatusText(tender.status)}
             </Badge>
           </div>
-          <p className="text-gray-700 leading-relaxed">{tender.description}</p>
+          <p className="text-gray-700 leading-relaxed mb-4">
+            {tender.description}
+          </p>
+
+          {/* Skills and Requirements */}
+          {tender.skills && tender.skills.length > 0 && (
+            <div className="mb-4">
+              <h4 className="text-sm font-medium text-gray-900 mb-2">
+                Required Skills:
+              </h4>
+              <div className="flex flex-wrap gap-2">
+                {tender.skills.map((skill, index) => (
+                  <Badge key={index} variant="outline" className="text-xs">
+                    {skill}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {tender.requirements && tender.requirements.length > 0 && (
+            <div className="mb-4">
+              <h4 className="text-sm font-medium text-gray-900 mb-2">
+                Requirements:
+              </h4>
+              <ul className="list-disc list-inside text-sm text-gray-600">
+                {tender.requirements.map((req, index) => (
+                  <li key={index}>{req}</li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
 
         {/* Tabs - Only show if not pending approval */}
@@ -610,202 +408,118 @@ export default function TenderDetailPage() {
                       : "border-transparent text-gray-500 hover:text-gray-700"
                   }`}
                 >
-                  {t("q_and_a")} ({qaData.length})
+                  {t("q_and_a")} ({questions.length})
                 </button>
               </nav>
             </div>
 
-            {/* Tab Content */}
+            {/* Bids Tab */}
             {activeTab === "bids" && (
               <div className="space-y-6">
                 {bids.length > 0 ? (
                   bids.map((bid) => (
-                    <Popover key={bid.id}>
-                      <PopoverTrigger asChild>
-                        <Card className="border border-gray-200  cursor-pointer ">
-                          <CardContent className="p-6">
-                            <div className="flex items-start justify-between mb-4">
-                              <div className="flex items-start space-x-4">
-                                <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
-                                  <Building2 className="h-6 w-6 text-gray-600" />
-                                </div>
-                                <div>
-                                  <div className="flex items-center space-x-3 mb-2">
-                                    <h3 className="font-semibold text-gray-900">
-                                      {bid.providerName}
-                                    </h3>
-
-                                    {bid.status === "awarded" && (
-                                      <Badge className="bg-black text-white border-black">
-                                        {t("awarded")}
-                                      </Badge>
-                                    )}
-                                    {bid.status === "rejected" && (
-                                      <Badge className="bg-gray-600 text-white border-gray-600">
-                                        {t("rejected")}
-                                      </Badge>
-                                    )}
-                                  </div>
-                                  <div className="flex items-center space-x-4 text-sm text-gray-600">
-                                    <span className="flex items-center">
-                                      <Star className="h-4 w-4 mr-1 text-gray-400 fill-current" />
-                                      {bid.providerRating}
-                                    </span>
-                                    <span>
-                                      {bid.completedProjects} {t("projects")}
-                                    </span>
-                                    <span>
-                                      {bid.onTimeDelivery}% {t("on_time")}
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="text-right">
-                                <div className="text-2xl font-bold text-gray-900">
-                                  {bid.bidAmount} QAR
-                                </div>
-                                <div className="text-sm text-gray-500">
-                                  {t("submitted")}: {bid.submittedDate}
-                                </div>
-                              </div>
-                            </div>
-                            <p className="text-gray-700 mb-4">
-                              {maskSensitiveInfo(bid.bidSummary)}
-                            </p>
-                            <div className="flex items-center space-x-3">
-                              {bid.status === "pending" && !hasAwardedBid && (
-                                <>
-                                  <Button
-                                    onClick={() => handleAwardBid(bid.id)}
-                                    size="sm"
-                                    className="bg-black hover:bg-gray-800"
-                                  >
-                                    <Award className="h-4 w-4 mr-1" />
-                                    {t("award_bid")}
-                                  </Button>
-                                  <Button
-                                    onClick={() => handleRejectBid(bid.id)}
-                                    variant="outline"
-                                    size="sm"
-                                    className="bg-transparent text-gray-600 border-gray-200 hover:bg-gray-50"
-                                  >
-                                    <X className="h-4 w-4 mr-1" />
-                                    {t("reject")}
-                                  </Button>
-                                </>
-                              )}
-                              {bid.status === "pending" && hasAwardedBid && (
-                                <div className="text-sm text-gray-500 italic">
-                                  {t(
-                                    "bid_cannot_be_awarded_another_bid_selected"
-                                  )}
-                                </div>
-                              )}
-                            </div>
-                          </CardContent>
-                        </Card>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-80 p-4">
-                        <div className="flex items-center space-x-3 mb-3">
-                          <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center shrink-0">
-                            <User className="h-5 w-5 text-gray-600" />
-                          </div>
-                          <div>
-                            <h4 className="font-semibold text-gray-900">
-                              {bid.providerName}
-                            </h4>
-                            <div className="flex items-center space-x-2 text-sm text-gray-600">
-                              <span className="flex items-center">
-                                <Star className="h-3 w-3 mr-1 text-gray-400 fill-current" />
-                                {bid.providerRating}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="space-y-1 text-sm text-gray-700 mb-4">
-                          <p className="flex items-center gap-2">
-                            <Briefcase className="h-4 w-4 text-gray-500" />
-                            {bid.completedProjects} {t("projects_completed")}
-                          </p>
-                        </div>
-                        <Link
-                          href={`/dashboard/my-tenders/bidder-profile/${bid.bidderProfileId}`}
-                          passHref
-                        >
-                          <Button
-                            size="sm"
-                            className="w-full cursor-pointer bg-black hover:bg-gray-800"
-                          >
-                            {t("view_full_profile")}
-                          </Button>
-                        </Link>
-                      </PopoverContent>
-                    </Popover>
-                  ))
-                ) : (
-                  <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
-                    <Building2 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">
-                      {t("no_bids_yet")}
-                    </h3>
-                    <p className="text-gray-600">
-                      {t("providers_have_not_submitted_any_bids_yet")}
-                    </p>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {activeTab === "qa" && (
-              <div className="space-y-6">
-                {qaData.length > 0 ? (
-                  qaData.map((qa) => (
-                    <Card key={qa.id} className="border border-gray-200">
+                    <Card key={bid._id} className="border border-gray-200">
                       <CardContent className="p-6">
-                        <div className="space-y-4">
-                          <div>
-                            <div className="flex items-center space-x-3 mb-2">
-                              <MessageSquare className="h-5 w-5 text-gray-600" />
-                              <span className="font-medium text-gray-900">
-                                {qa.providerName}
-                              </span>
-                              <span className="text-sm text-gray-500">
-                                {qa.questionDate}
-                              </span>
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex items-start space-x-4">
+                            <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+                              <User className="h-6 w-6 text-gray-600" />
                             </div>
-                            <p className="text-gray-700 pl-8">
-                              {maskSensitiveInfo(qa.question)}
-                            </p>
-                          </div>
-                          {qa.answer ? (
-                            <div className="pl-8 border-l-2 border-gray-200">
+                            <div>
                               <div className="flex items-center space-x-3 mb-2">
-                                <span className="font-medium text-gray-700">
-                                  {t("your_answer")}
-                                </span>
-                                <span className="text-sm text-gray-500">
-                                  {qa.answerDate}
-                                </span>
+                                <h3 className="font-semibold text-gray-900">
+                                  {bid.bidder.name}
+                                </h3>
+                                {bid.bidder.verified && (
+                                  <Badge className="bg-blue-100 text-blue-800 border-blue-200">
+                                    <Shield className="h-3 w-3 mr-1" />
+                                    Verified
+                                  </Badge>
+                                )}
+                                {bid.status === "accepted" && (
+                                  <Badge className="bg-green-600 text-white border-green-600">
+                                    <CheckCircle className="h-3 w-3 mr-1" />
+                                    Awarded
+                                  </Badge>
+                                )}
+                                {bid.status === "rejected" && (
+                                  <Badge className="bg-red-600 text-white border-red-600">
+                                    <X className="h-3 w-3 mr-1" />
+                                    Rejected
+                                  </Badge>
+                                )}
                               </div>
-                              <p className="text-gray-700">
-                                {maskSensitiveInfo(qa.answer)}
-                              </p>
+                              <div className="flex items-center space-x-4 text-sm text-gray-600">
+                                {bid.bidder.rating && (
+                                  <span className="flex items-center">
+                                    <Star className="h-4 w-4 mr-1 text-yellow-400 fill-current" />
+                                    {bid.bidder.rating.toFixed(1)}
+                                  </span>
+                                )}
+                                {bid.bidder.completedProjects && (
+                                  <span>
+                                    {bid.bidder.completedProjects} projects
+                                  </span>
+                                )}
+                                {bid.bidder.onTimeDelivery && (
+                                  <span>
+                                    {bid.bidder.onTimeDelivery}% on time
+                                  </span>
+                                )}
+                              </div>
                             </div>
-                          ) : (
-                            <div className="pl-8">
-                              <Textarea
-                                placeholder={t("type_your_answer")}
-                                value={newAnswer}
-                                onChange={(e) => setNewAnswer(e.target.value)}
-                                className="mb-3"
-                              />
+                          </div>
+                          <div className="text-right">
+                            <div className="text-2xl font-bold text-gray-900">
+                              {formatCurrency(bid.amount)}
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              Submitted: {formatDate(bid.createdAt)}
+                            </div>
+                          </div>
+                        </div>
+                        <p className="text-gray-700 mb-4">{bid.description}</p>
+
+                        {/* Action buttons */}
+                        <div className="flex items-center space-x-3">
+                          {bid.status === "pending" && !hasAwardedBid && (
+                            <>
                               <Button
+                                onClick={() =>
+                                  handleBidStatusUpdate(bid._id, "accepted")
+                                }
+                                disabled={updatingBidStatus[bid._id]}
                                 size="sm"
-                                className="bg-black hover:bg-gray-800"
+                                className="bg-green-600 hover:bg-green-700 text-white"
                               >
-                                <Send className="h-4 w-4 mr-1" />
-                                {t("reply")}
+                                {updatingBidStatus[bid._id] ? (
+                                  <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                                ) : (
+                                  <Award className="h-4 w-4 mr-1" />
+                                )}
+                                Award Bid
                               </Button>
+                              <Button
+                                onClick={() =>
+                                  handleBidStatusUpdate(bid._id, "rejected")
+                                }
+                                disabled={updatingBidStatus[bid._id]}
+                                variant="outline"
+                                size="sm"
+                                className="border-red-200 text-red-600 hover:bg-red-50"
+                              >
+                                {updatingBidStatus[bid._id] ? (
+                                  <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                                ) : (
+                                  <X className="h-4 w-4 mr-1" />
+                                )}
+                                Reject
+                              </Button>
+                            </>
+                          )}
+                          {bid.status === "pending" && hasAwardedBid && (
+                            <div className="text-sm text-gray-500 italic">
+                              Cannot award - another bid has been selected
                             </div>
                           )}
                         </div>
@@ -814,15 +528,94 @@ export default function TenderDetailPage() {
                   ))
                 ) : (
                   <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
-                    <MessageSquare className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <Building2 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                     <h3 className="text-lg font-medium text-gray-900 mb-2">
-                      {t("no_questions_yet")}
+                      No bids yet
                     </h3>
                     <p className="text-gray-600">
-                      {t("providers_have_not_asked_any_questions_yet")}
+                      Providers haven't submitted any bids for this tender yet.
                     </p>
                   </div>
                 )}
+              </div>
+            )}
+
+            {/* Q&A Tab */}
+            {activeTab === "qa" && (
+              <div className="space-y-6">
+                {questions.map((question) => {
+                  console.log("question:", question, questions);
+                  return (
+                    <Card key={question._id} className="border border-gray-200">
+                      <CardContent className="p-6">
+                        <div className="space-y-4">
+                          {/* Question */}
+                          <div>
+                            <div className="flex items-center space-x-3 mb-2">
+                              <MessageSquare className="h-5 w-5 text-blue-600" />
+                              <span className="font-medium text-gray-900">
+                                {question.askedBy.name}
+                              </span>
+                              <span className="text-sm text-gray-500">
+                                {formatDate(question.createdAt)}
+                              </span>
+                            </div>
+                            <p className="text-gray-700 pl-8">
+                              {question.question}
+                            </p>
+                          </div>
+
+                          {/* Answer or Answer Input */}
+                          {question.answer ? (
+                            <div className="pl-8 border-l-2 border-gray-200">
+                              <div className="flex items-center space-x-3 mb-2">
+                                <span className="font-medium text-green-600">
+                                  Your Answer
+                                </span>
+                                <span className="text-sm text-gray-500">
+                                  {formatDate(question.updatedAt)}
+                                </span>
+                              </div>
+                              <p className="text-gray-700">{question.answer}</p>
+                            </div>
+                          ) : (
+                            <div className="pl-8">
+                              <Textarea
+                                placeholder="Type your answer..."
+                                value={answerText[question._id] || ""}
+                                onChange={(e) =>
+                                  setAnswerText((prev) => ({
+                                    ...prev,
+                                    [question._id]: e.target.value,
+                                  }))
+                                }
+                                className="mb-3"
+                              />
+                              <Button
+                                onClick={() =>
+                                  handleAnswerQuestion(question._id)
+                                }
+                                disabled={
+                                  !answerText[question._id]?.trim() ||
+                                  submittingAnswer[question._id]
+                                }
+                                size="sm"
+                                className="bg-blue-600 hover:bg-blue-700"
+                              >
+                                {submittingAnswer[question._id] ? (
+                                  <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                                ) : (
+                                  <Send className="h-4 w-4 mr-1" />
+                                )}
+                                Submit Answer
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
               </div>
             )}
           </>
@@ -836,16 +629,15 @@ export default function TenderDetailPage() {
                     <LockIcon className="h-8 w-8 text-gray-600" />
                   </div>
                   <h3 className="text-xl font-medium text-gray-800 mb-2">
-                    {t("content_locked")}
+                    Content Locked
                   </h3>
                   <p className="text-gray-700 max-w-md mx-auto mb-4">
-                    {t(
-                      "bids_and_qa_sections_are_hidden_until_tender_is_active"
-                    )}
+                    Bids and Q&A sections are hidden until this tender is
+                    approved and becomes active.
                   </p>
-                  <Badge className="bg-gray-100 text-gray-800 border-gray-200">
+                  <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200">
                     <Clock className="h-3 w-3 mr-1" />
-                    {t("pending_admin_approval")}
+                    Pending Admin Approval
                   </Badge>
                 </div>
               </CardContent>

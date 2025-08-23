@@ -22,6 +22,7 @@ import {
 import { UiTender } from "@/types/ui";
 import { updateTenderStatus } from "@/app/services/tenderService";
 import ReopenTenderModal from "./ReopenTenderModal";
+import { useAuth } from "@/context/AuthContext";
 
 interface TenderCardProps {
   tender: UiTender;
@@ -69,7 +70,7 @@ export default function MyTenderCard({
   };
 
   // ✅ Reopen tender
-
+  const { profile } = useAuth();
   return (
     <>
       <div className="bg-white/70 backdrop-blur-xl rounded-md border border-neutral-300 overflow-hidden shadow-0">
@@ -78,7 +79,11 @@ export default function MyTenderCard({
           <div className="flex items-start justify-between mb-4">
             <div className="flex-1">
               <Link
-                href={`/business-dashboard/tender/${tender.id}`}
+                href={
+                  profile?.userType == "business"
+                    ? `/business-dashboard/tender/${tender.id} `
+                    : `/dashboard/tender/${tender.id} `
+                }
                 onClick={(e) => e.stopPropagation()}
                 className="text-lg xl:text-2xl font-semibold text-gray-900 mb-2 block hover:underline overflow-hidden text-ellipsis whitespace-nowrap"
               >
@@ -175,7 +180,13 @@ export default function MyTenderCard({
                 </button>
               ) : null}
             </div>
-            <Link href={`/business-dashboard/tender/${tender.id}`}>
+            <Link
+              href={
+                profile?.userType == "business"
+                  ? `/business-dashboard/tender/${tender.id} `
+                  : `/dashboard/tender/${tender.id} `
+              }
+            >
               <button className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors text-sm font-medium">
                 <span>View Details</span>
                 <ChevronRightIcon className="h-4 w-4" />

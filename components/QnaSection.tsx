@@ -1,10 +1,14 @@
 "use client";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@radix-ui/react-tabs";
 import React, { useEffect, useState } from "react";
 import { Label } from "./ui/components/ui/label";
 import { Textarea } from "./ui/components/ui/textarea";
 import { Button } from "./ui/components/ui/button";
-import { askQuestion, getQuestionsForTender, Question } from "@/app/services/QnaService";
+import {
+  askQuestion,
+  getQuestionsForTender,
+  Question,
+} from "@/app/services/QnaService";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 
 interface QnaSectionProps {
   tenderid: string;
@@ -19,6 +23,7 @@ function QnaSection({ tenderid }: QnaSectionProps) {
     try {
       const data = await getQuestionsForTender(tenderid);
       setQuestions(data);
+      console.log("Fetched questions:", data);
     } catch (err) {
       console.error("Failed to fetch questions:", err);
     }
@@ -33,9 +38,10 @@ function QnaSection({ tenderid }: QnaSectionProps) {
     if (!newQuestion.trim()) return;
     setLoading(true);
     try {
-      await askQuestion(tenderid, newQuestion.trim());
+      const answer = await askQuestion(tenderid, newQuestion.trim());
       setNewQuestion("");
       fetchQuestions(); // Refresh list
+      console.log("Question submitted successfully", answer);
     } catch (err) {
       console.error("Failed to submit question:", err);
     } finally {
@@ -43,7 +49,8 @@ function QnaSection({ tenderid }: QnaSectionProps) {
     }
   };
 
-  const answeredQuestions = questions.filter((q) => q.answer);
+  const answeredQuestions =
+    questions?.filter && questions.filter((q) => q.answer);
 
   return (
     <div className="mb-8">
@@ -51,26 +58,20 @@ function QnaSection({ tenderid }: QnaSectionProps) {
         Questions & Answers
       </h2>
       <Tabs defaultValue="qa" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 bg-gray-100/80 rounded-xl p-1">
-          <TabsTrigger
-            value="qa"
-            className="rounded-lg data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm transition-all duration-200"
-          >
-            Q&A ({answeredQuestions.length})
+        <TabsList className="w-full">
+          <TabsTrigger className="w-full" value="qa">
+            Q&A ({questions.length})
           </TabsTrigger>
-          <TabsTrigger
-            value="ask"
-            className="rounded-lg data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm transition-all duration-200"
-          >
+          <TabsTrigger className="w-full" value="ask">
             Ask a Question
           </TabsTrigger>
         </TabsList>
 
         {/* Q&A Tab */}
         <TabsContent value="qa" className="mt-6">
-          {answeredQuestions.length > 0 ? (
+          {questions.length > 0 ? (
             <div className="space-y-4">
-              {answeredQuestions.map((qa) => (
+              {questions.map((qa) => (
                 <div
                   key={qa._id}
                   className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-gray-100/80"
@@ -83,20 +84,22 @@ function QnaSection({ tenderid }: QnaSectionProps) {
                       {new Date(qa.createdAt).toLocaleString()}
                     </p>
                   </div>
-                  {qa.answer && (
+                  {qa.answer ? (
                     <div className="pl-4 border-l-4 border-blue-200">
                       <p className="text-gray-700 leading-relaxed">
                         <span className="font-medium text-blue-600">A:</span>{" "}
                         {qa.answer}
                       </p>
                     </div>
+                  ) : (
+                    <p className="text-gray-400 italic">No answer yet</p>
                   )}
                 </div>
               ))}
             </div>
           ) : (
             <div className="text-center py-12 bg-gray-50/50 rounded-xl">
-              <p className="text-gray-500">No questions answered yet</p>
+              <p className="text-gray-500">No questions asked yet</p>
             </div>
           )}
         </TabsContent>

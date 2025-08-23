@@ -1,11 +1,15 @@
 import { api } from "@/lib/apiClient";
-
+export interface UserProfile {
+  _id: string;
+  usertype: string;
+  email: string;
+}
 export interface Question {
   _id: string;
   tender: string;
   question: string;
   answer?: string;
-  askedBy: string;
+  askedBy: UserProfile;
   createdAt: string;
   updatedAt: string;
 }
@@ -23,11 +27,11 @@ export const askQuestion = async (
   question: string
 ): Promise<Question> => {
   try {
-    const response = await api.post<ApiResponse<Question>>("/questions", {
+    const response = await api.post("/api/questions", {
       tender,
       question,
     });
-    return response.data.data;
+    return response.data;
   } catch (error: any) {
     throw error.response?.data || error.message;
   }
@@ -42,7 +46,7 @@ export const answerQuestion = async (
 ): Promise<Question> => {
   try {
     const response = await api.put<ApiResponse<Question>>(
-      `/questions/${questionId}/answer`,
+      `/api/questions/${questionId}/answer`,
       { answer }
     );
     return response.data.data;
@@ -59,9 +63,9 @@ export const getQuestionsForTender = async (
 ): Promise<Question[]> => {
   try {
     const response = await api.get<ApiResponse<Question[]>>(
-      `/questions/tender/${tenderId}`
+      `/api/questions/tender/${tenderId}`
     );
-    return response.data.data;
+    return response.data;
   } catch (error: any) {
     throw error.response?.data || error.message;
   }
@@ -73,7 +77,7 @@ export const getQuestionsForTender = async (
 export const getMyQuestions = async (): Promise<Question[]> => {
   try {
     const response = await api.get<ApiResponse<Question[]>>(
-      "/questions/my-questions"
+      "/api/questions/my-questions"
     );
     return response.data.data;
   } catch (error: any) {
@@ -89,7 +93,7 @@ export const getQuestionById = async (
 ): Promise<Question> => {
   try {
     const response = await api.get<ApiResponse<Question>>(
-      `/questions/${questionId}`
+      `/api/questions/${questionId}`
     );
     return response.data.data;
   } catch (error: any) {
@@ -105,7 +109,7 @@ export const deleteQuestion = async (
 ): Promise<{ message: string }> => {
   try {
     const response = await api.delete<ApiResponse<{ message: string }>>(
-      `/questions/${questionId}`
+      `/api/questions/${questionId}`
     );
     return response.data.data;
   } catch (error: any) {
@@ -122,7 +126,7 @@ export const updateQuestion = async (
 ): Promise<Question> => {
   try {
     const response = await api.put<ApiResponse<Question>>(
-      `/questions/${questionId}`,
+      `/api/questions/${questionId}`,
       { question }
     );
     return response.data.data;
