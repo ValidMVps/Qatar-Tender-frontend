@@ -1135,5 +1135,19 @@
   "providers_have_not_asked_any_questions_yet": "Providers have not asked any questions yet",
   "overview_of_posting_and_bidding_activity": "Overview of Posting and Bidding Activity",
   "no_tenders_created_yet": "No tenders created yet",
-  "reopen_tender": "Reopen Tender"
+  "reopen_tender": "Reopen Tender",
+  "sort_by_budget_high_to_low": "Budget: High to Low",
+  "sort_by_budget_low_to_high": "Budget: Low to High",
+  "select_location": "Select location",
+  "any": "Any",
+  "due_in_7_days": "Due in 7 days",
+  "due_in_30_days": "Due in 30 days",
+  "over_30_days": "Over 30 days",
+  "today": "Today",
+  "500_to_1k": "500 - 1k",
+  "1k_to_5k": "1k - 5k",
+  "5k_plus": "5k+",
+  "adjust_filters_or_try_different_search": "Adjust filters or try a different search",
+  "questions_and_answers": "Questions and Answers",
+  "complete_your_profile_to_unlock_all_features": "Complete your profile to unlock all features"
 }

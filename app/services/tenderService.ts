@@ -78,28 +78,23 @@ export const createTender = async (payload: any) => {
   return response.data;
 };
 
-type TenderFilters = {
+
+type TendersParams = {
   status?: string;
   category?: string;
   search?: string;
 };
 
-export const getTenders = async (filters: TenderFilters = {}) => {
+export const getTenders = async (params?: TendersParams) => {
   try {
-    const params = new URLSearchParams();
-
-    // Add filters to params
-    if (filters.status) params.append("status", filters.status);
-    if (filters.category) params.append("category", filters.category);
-    if (filters.search) params.append("search", filters.search);
-
-    const response = await api.get(`/api/tenders?${params.toString()}`);
-    return response.data;
-  } catch (error) {
-    if (typeof error === "object" && error !== null && "response" in error) {
-      // @ts-ignore
-      throw new Error(error.response?.data?.message || "Failed to fetch tenders");
-    }
-    throw new Error("Failed to fetch tenders");
+    const res = await api.get("/api/tenders", { params });
+    return res.data;
+  } catch (error: any) {
+    console.error("Error fetching tenders:", error.response?.data || error.message);
+    throw error;
   }
+};
+
+export const getActiveTenders = async () => {
+  return getTenders({ status: "active" });
 };
