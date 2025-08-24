@@ -31,7 +31,7 @@ import {
   getMyReceivedReviews,
   getReviewsForUser,
 } from "../../services/ReviewService";
-import type { Review as ApiReview } from "@/services/reviewService";
+import type { Review as ApiReview } from "../../services/ReviewService";
 
 // TypeScript Interfaces
 interface Review {

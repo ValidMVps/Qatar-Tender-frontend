@@ -61,6 +61,24 @@ interface BidderProfile {
   projectHistory: Project[];
 }
 
+interface ProfileData {
+  _id?: string;
+  companyName?: string;
+  contactPersonName?: string;
+  companyEmail?: string;
+  personalEmail?: string;
+  phone?: string;
+  address?: string;
+  companyDesc?: string;
+  rating?: number;
+  ratingCount?: number;
+  completedTenders?: number;
+  badge?: string;
+  isVerified?: boolean;
+  platformRank?: number;
+  projectHistory?: Project[];
+}
+
 export default function BidderProfilePage() {
   const { t } = useTranslation();
   const params = useParams();
@@ -76,11 +94,13 @@ export default function BidderProfilePage() {
     const fetchBidderProfile = async () => {
       try {
         setLoading(true);
-        const profileData = await profileApi.getProfileById(bidderId);
+        const profileData: ProfileData = await profileApi.getProfileById(
+          bidderId
+        );
 
         // ✅ Transform API response to match expected structure
         const transformedData: BidderProfile = {
-          id: profileData._id,
+          id: profileData._id || "",
           name:
             profileData.companyName ||
             profileData.contactPersonName ||

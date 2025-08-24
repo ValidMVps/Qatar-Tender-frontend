@@ -4,6 +4,7 @@ import { api } from "@/lib/apiClient";
 
 // Define TypeScript interfaces for better type safety
 interface ProfileData {
+  personalEmail: string;
   userType: string;
   fullName?: string;
   phone?: string;

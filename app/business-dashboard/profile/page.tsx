@@ -49,7 +49,6 @@ interface ProfileData {
   companyPhoneNumber: string;
   commercialRegistrationNumber: string;
   companyDescription: string;
-  companyWebsite: string;
   phone: string;
   address: string;
 }
@@ -84,7 +83,6 @@ export default function Component() {
     companyPhoneNumber: "",
     commercialRegistrationNumber: "",
     companyDescription: "",
-    companyWebsite: "",
     phone: "",
     address: "",
   });
@@ -121,7 +119,6 @@ export default function Component() {
         commercialRegistrationNumber:
           profile.commercialRegistrationNumber || "",
         companyDescription: profile.companyDesc || "",
-        companyWebsite: profile.companyWebsite || "",
         phone: profile.phone || "",
         address: profile.address || "",
       });
@@ -385,19 +382,7 @@ export default function Component() {
                         {profileData.companyPhoneNumber || "Phone number"}
                       </span>
                     </div>
-                    {profileData.companyWebsite && (
-                      <div className="flex items-center gap-2">
-                        <Globe className="w-4 h-4 sm:w-5 sm:h-5" />
-                        <a
-                          href={profileData.companyWebsite}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="hover:underline"
-                        >
-                          {profileData.companyWebsite}
-                        </a>
-                      </div>
-                    )}
+              
                   </div>
                 </div>
               </div>
