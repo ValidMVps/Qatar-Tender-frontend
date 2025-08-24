@@ -2,7 +2,7 @@
 "use client";
 
 import type React from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -22,11 +22,15 @@ import {
   User,
   CheckCircle,
   Star,
+  Eye,
 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { useTranslation } from "../lib/hooks/useTranslation";
 import { updateTenderStatus } from "@/app/services/tenderService";
-import { createReview } from "@/app/services/ReviewService";
+import { createReview, getReviewForTender } from "@/app/services/ReviewService";
+import { getTenderBids } from "@/app/services/BidService"; // Import bid service
+import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
 
 interface ProjectDetailsSidebarProps
   extends React.ComponentPropsWithoutRef<"div"> {
@@ -34,10 +38,12 @@ interface ProjectDetailsSidebarProps
     id: string;
     title: string;
     description: string;
-    budget: string;
     status: string;
     startDate: string;
-    awardedTo?: string;
+    awardedTo?: {
+      _id: string;
+      email: string;
+    };
     postedBy: string;
   } | null;
   getStatusColor: (status: string) => string;
@@ -54,16 +60,55 @@ export function ProjectDetailsSidebar({
   ...props
 }: ProjectDetailsSidebarProps) {
   const [isCompleteDialogOpen, setIsCompleteDialogOpen] = useState(false);
+  const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false);
   const [completeStep, setCompleteStep] = useState(1); // 1: confirm, 2: review
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [hasReview, setHasReview] = useState(false);
+  const [selectedBidAmount, setSelectedBidAmount] = useState<string | null>(
+    null
+  );
+  const [bidLoading, setBidLoading] = useState(false);
   const { t } = useTranslation();
+  const { profile, user } = useAuth();
 
   const isTenderOwner = selectedProject?.postedBy === currentUserId;
   const isCompleted = selectedProject?.status === "completed";
   const isAwarded = selectedProject?.status === "awarded";
+
+  // Fetch the selected bid amount when project changes
+  useEffect(() => {
+    const fetchSelectedBidAmount = async () => {
+      if (!selectedProject || !selectedProject.awardedTo) return;
+
+      setBidLoading(true);
+      try {
+        const bids = await getTenderBids(selectedProject.id);
+        // Find the bid from the awarded user
+        console.log(
+          "All Bids:",
+          selectedProject.awardedTo._id,
+          selectedProject.awardedTo
+        );
+        const awardedBid = bids.find((bid: any) => bid.status === "accepted");
+        console.log("Awarded Bid:", awardedBid);
+        if (awardedBid) {
+          setSelectedBidAmount(awardedBid.amount + "QAR");
+        } else {
+          setSelectedBidAmount("Not specified");
+        }
+      } catch (err) {
+        console.error("Failed to fetch bid amount", err);
+        setSelectedBidAmount("Not specified");
+      } finally {
+        setBidLoading(false);
+      }
+    };
+
+    fetchSelectedBidAmount();
+  }, [selectedProject]);
 
   const handleMarkAsComplete = async () => {
     if (!selectedProject) return;
@@ -73,8 +118,8 @@ export function ProjectDetailsSidebar({
 
     try {
       await updateTenderStatus(selectedProject.id, "completed");
-      onMarkComplete();
-      setCompleteStep(2); // Move to review step
+      onMarkComplete(); // This should trigger a refresh of the selectedProject
+      setCompleteStep(2); // Move to review step in dialog
     } catch (err) {
       setError("Failed to mark project as complete");
       console.error(err);
@@ -89,11 +134,12 @@ export function ProjectDetailsSidebar({
     try {
       await createReview({
         tender: selectedProject.id,
-        reviewedUser: selectedProject.awardedTo,
+        reviewedUser: selectedProject.awardedTo._id,
         rating,
         comment,
       });
       setIsCompleteDialogOpen(false);
+      setIsReviewDialogOpen(false);
       setCompleteStep(1); // Reset for next time
       setRating(0);
       setComment("");
@@ -103,9 +149,32 @@ export function ProjectDetailsSidebar({
     }
   };
 
-  const handleCloseDialog = () => {
+  const fetchReviewStatus = async () => {
+    if (!selectedProject) return;
+
+    try {
+      const review = await getReviewForTender(selectedProject.id);
+      // If review is not null, it means review was given
+      setHasReview(!!review);
+    } catch (err) {
+      console.error("Failed to check review status", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchReviewStatus();
+  }, [selectedProject]);
+
+  const handleCloseCompleteDialog = () => {
     setIsCompleteDialogOpen(false);
     setCompleteStep(1); // Reset to first step
+    setRating(0);
+    setComment("");
+    setError(null);
+  };
+
+  const handleCloseReviewDialog = () => {
+    setIsReviewDialogOpen(false);
     setRating(0);
     setComment("");
     setError(null);
@@ -154,10 +223,14 @@ export function ProjectDetailsSidebar({
                 <div>
                   <label className="text-sm font-medium text-gray-600 flex items-center gap-1">
                     <DollarSign className="w-4 h-4" />
-                    {t("budget")}
+                    {/* Changed heading to "selected amount" */}
+                    {t("selected_amount")}
                   </label>
                   <p className="text-sm font-semibold mt-1 text-gray-800">
-                    {selectedProject.budget}
+                    {/* Display the fetched bid amount */}
+                    {bidLoading
+                      ? "Loading..."
+                      : selectedBidAmount || "Not specified"}
                   </p>
                 </div>
                 <div>
@@ -190,7 +263,7 @@ export function ProjectDetailsSidebar({
                     {t("awarded_to")}
                   </label>
                   <p className="text-sm mt-1 text-gray-800">
-                    {selectedProject.awardedTo}
+                    {selectedProject.awardedTo.email}
                   </p>
                 </div>
               )}
@@ -204,6 +277,23 @@ export function ProjectDetailsSidebar({
           )}
 
           <div className="space-y-3">
+            {/* Always visible View Details button */}
+            <Link
+              href={
+                profile?.userType !== "business"
+                  ? `/dashboard/tender/${selectedProject.id}`
+                  : `/business-dashboard/tender/${selectedProject.id}`
+              }
+            >
+              <Button
+                className="w-full justify-start rounded-lg bg-blue-600 text-white hover:bg-blue-700"
+                variant="default"
+              >
+                <Eye className="w-4 h-4 mr-2" />
+                {t("view_tender_details")}
+              </Button>
+            </Link>
+
             {isTenderOwner && isAwarded && (
               <Button
                 className="w-full justify-start rounded-lg bg-black text-white hover:bg-gray-800"
@@ -215,11 +305,11 @@ export function ProjectDetailsSidebar({
               </Button>
             )}
 
-            {isTenderOwner && isCompleted && (
+            {isTenderOwner && isCompleted && !hasReview && (
               <Button
                 className="w-full justify-start rounded-lg bg-green-600 text-white hover:bg-green-700"
                 variant="default"
-                onClick={() => setIsCompleteDialogOpen(true)}
+                onClick={() => setIsReviewDialogOpen(true)}
               >
                 <Star className="w-4 h-4 mr-2" />
                 {t("leave_review")}
@@ -229,7 +319,11 @@ export function ProjectDetailsSidebar({
         </div>
       </ScrollArea>
 
-      <Dialog open={isCompleteDialogOpen} onOpenChange={handleCloseDialog}>
+      {/* Mark as Complete Dialog (Multi-step) */}
+      <Dialog
+        open={isCompleteDialogOpen}
+        onOpenChange={handleCloseCompleteDialog}
+      >
         <DialogContent className="sm:max-w-[425px]">
           {completeStep === 1 && (
             <>
@@ -242,7 +336,7 @@ export function ProjectDetailsSidebar({
               <DialogFooter>
                 <Button
                   variant="outline"
-                  onClick={handleCloseDialog}
+                  onClick={handleCloseCompleteDialog}
                   disabled={loading}
                 >
                   {t("cancel")}
@@ -295,7 +389,7 @@ export function ProjectDetailsSidebar({
               <DialogFooter>
                 <Button
                   variant="outline"
-                  onClick={handleCloseDialog}
+                  onClick={handleCloseCompleteDialog}
                   disabled={loading}
                 >
                   {t("skip")}
@@ -311,6 +405,57 @@ export function ProjectDetailsSidebar({
               </DialogFooter>
             </>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Review Dialog (Separate dialog for completed projects) */}
+      <Dialog open={isReviewDialogOpen} onOpenChange={handleCloseReviewDialog}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>{t("rate_project_completion")}</DialogTitle>
+            <DialogDescription>{t("please_rate_worker")}</DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="flex items-center gap-2">
+              <label className="text-right w-16">{t("rating")}</label>
+              <div className="flex gap-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <Star
+                    key={star}
+                    className={`h-6 w-6 cursor-pointer ${
+                      rating >= star
+                        ? "fill-yellow-400 text-yellow-400"
+                        : "text-muted-foreground"
+                    }`}
+                    onClick={() => setRating(star)}
+                  />
+                ))}
+              </div>
+            </div>
+            <div className="grid gap-2">
+              <label htmlFor="comment">{t("review")}</label>
+              <Textarea
+                id="comment"
+                placeholder={t("write_your_feedback")}
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                className="min-h-[100px]"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={handleCloseReviewDialog}>
+              {t("cancel")}
+            </Button>
+            <Button
+              type="submit"
+              onClick={handleReviewSubmit}
+              disabled={rating === 0}
+              className="bg-black text-white hover:bg-gray-800"
+            >
+              {t("submit_review")}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

@@ -186,8 +186,6 @@ export default function TenderDetailsPage({ params }: PageProps) {
           setUserBid(existingBid);
           setHasUserBid(!!existingBid);
 
-          console.log("userBids:", userBids);
-          console.log("existingBid:", existingBid);
         } catch (bidsError) {
           console.error("Error loading user bids:", bidsError);
           // optional: setHasUserBid(false)

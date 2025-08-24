@@ -280,7 +280,7 @@ export default function Component() {
                       budget: selectedTender.budget,
                       status: selectedTender.status,
                       startDate: selectedTender.startDate,
-                      awardedTo: getAwardedToName(selectedTender.awardedTo),
+                      awardedTo: selectedTender.awardedTo,
                     }
                   : null
               }
