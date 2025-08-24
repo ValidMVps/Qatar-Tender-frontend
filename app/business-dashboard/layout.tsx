@@ -31,92 +31,81 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [isClient, setIsClient] = useState(false);
   const pathname = usePathname();
   const { t } = useTranslation();
 
   useEffect(() => {
-    setIsClient(true);
     document.body.style.overflow = sidebarOpen ? "hidden" : "";
   }, [sidebarOpen]);
 
-  // Define sidebar groups with fallback values for SSR
   const sidebarGroups = [
     {
-      title: isClient ? t("overview") : "Overview",
+      title: t("overview"),
       links: [
+        { name: t("dashboard"), href: "/business-dashboard", icon: Home },
         {
-          name: isClient ? t("dashboard") : "Dashboard",
-          href: "/business-dashboard",
-          icon: Home,
-        },
-        {
-          name: isClient ? t("analytics") : "Analytics",
+          name: t("analytics"),
           href: "/business-dashboard/analytics",
           icon: BarChart,
         },
       ],
     },
     {
-      title: isClient ? t("project_posting") : "Project Posting",
+      title: t("project_posting"),
       links: [
         {
-          name: isClient ? t("my_posted_tenders") : "My Posted Tenders",
+          name: t("my_posted_tenders"),
           href: "/business-dashboard/my-tenders",
           icon: FileText,
         },
         {
-          name: isClient ? t("active_projects") : "Active Projects",
+          name: t("active_projects"),
           href: "/business-dashboard/projects",
           icon: Briefcase,
         },
       ],
     },
     {
-      title: isClient ? t("bidding") : "Bidding",
+      title: t("bidding"),
       links: [
         {
-          name: isClient ? t("browse_tenders") : "Browse Tenders",
+          name: t("browse_tenders"),
           href: "/business-dashboard/browse-tenders",
           icon: Search,
         },
         {
-          name: isClient ? t("my_bids") : "My Bids",
+          name: t("my_bids"),
           href: "/business-dashboard/bids",
           icon: PenSquare,
         },
         {
-          name: isClient ? t("saved_jobs") : "Saved Jobs",
+          name: t("saved_jobs"),
           href: "/business-dashboard/saved-jobs",
           icon: Save,
         },
       ],
     },
     {
-      title: isClient ? t("company_profile") : "Company Profile",
+      title: t("company_profile"),
       links: [
         {
-          name: isClient ? t("company_profile") : "Company Profile",
+          name: t("company_profile"),
           href: "/business-dashboard/profile",
           icon: Building2,
         },
         {
-          name: isClient ? t("ratings_and_reviews") : "Ratings and Reviews",
+          name: t("ratings_and_reviews"),
           href: "/business-dashboard/ratings",
           icon: Star,
         },
       ],
     },
     {
-      title: isClient ? t("system") : "System",
+      title: t("system"),
       links: [
+      
         {
-          name: isClient ? t("settings") : "Settings",
-          href: "/business-dashboard/settings",
-          icon: Settings,
-        },
-        {
-          name: isClient ? t("help_and_support") : "Help and Support",
+          name: t("help_and_support"),
           href: "/business-dashboard/help",
           icon: HelpCircle,
         },
@@ -176,7 +165,7 @@ export default function DashboardLayout({
                     <Building2 className="h-5 w-5 text-white" />
                   </div>
                   <span className="ml-2 text-lg font-semibold text-gray-900">
-                    {isClient ? t("tenderhub_qatar") : "TenderHub Qatar"}
+                    {t("tenderhub_qatar")}
                   </span>
                 </div>
                 <button onClick={() => setSidebarOpen(false)}>
@@ -196,7 +185,7 @@ export default function DashboardLayout({
                 <Building2 className="h-5 w-5 text-white" />
               </div>
               <span className="text-2xl font-semibold text-gray-900">
-                {isClient ? t("tenderhub") : "TenderHub"}
+                {t("tenderhub")}
               </span>
             </div>
           </div>
