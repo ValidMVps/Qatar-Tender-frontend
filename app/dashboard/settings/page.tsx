@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,6 +20,9 @@ import { useTranslation } from "../../../lib/hooks/useTranslation";
 import { LanguageToggle } from "@/components/LanguageToggle";
 
 export default function SettingsPage() {
+  // Add client-side check
+  const [isClient, setIsClient] = useState(false);
+  
   // Company Profile States
   const [companyName, setCompanyName] = useState("Acme Solutions Inc.");
   const [industry, setIndustry] = useState("Construction");
@@ -28,7 +31,9 @@ export default function SettingsPage() {
   const [companyLogo, setCompanyLogo] = useState(
     "/placeholder.svg?height=100&width=100&text=Company+Logo"
   );
+  
   const { t } = useTranslation();
+  
   // Notification Settings
   const [newBidNotification, setNewBidNotification] = useState(true);
   const [tenderStatusNotification, setTenderStatusNotification] =
@@ -44,6 +49,11 @@ export default function SettingsPage() {
   const [appLanguage, setAppLanguage] = useState("en");
   const [font, setFont] = useState("Inter");
   const [theme, setTheme] = useState<"light" | "dark">("light");
+
+  // Set client flag after hydration
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const handleSaveAll = (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,6 +84,25 @@ export default function SettingsPage() {
       setCompanyLogo(URL.createObjectURL(file));
     }
   };
+
+  // Show loading state during SSR/hydration
+  if (!isClient) {
+    return (
+      <div className="min-h-screen py-8">
+        <div className="container mx-auto px-4 space-y-8">
+          <div className="animate-pulse">
+            <div className="h-8 bg-gray-200 rounded w-1/3 mb-6"></div>
+            <div className="space-y-4">
+              <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+              <div className="h-10 bg-gray-200 rounded"></div>
+              <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+              <div className="h-10 bg-gray-200 rounded"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen py-8">

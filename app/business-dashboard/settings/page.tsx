@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,10 +16,14 @@ import {
 } from "@/components/ui/select";
 import Image from "next/image";
 import { Moon, Sun, Upload } from "lucide-react";
-
-import { useTranslation } from "@/lib/hooks/useTranslation";
+import { useTranslation } from "../../../lib/hooks/useTranslation";
+import { LanguageToggle } from "@/components/LanguageToggle";
 
 export default function SettingsPage() {
+  // Add client-side check
+  const [isClient, setIsClient] = useState(false);
+
+  // Company Profile States
   const [companyName, setCompanyName] = useState("Acme Solutions Inc.");
   const [industry, setIndustry] = useState("Construction");
   const [contactPerson, setContactPerson] = useState("Jane Doe");
@@ -28,18 +32,28 @@ export default function SettingsPage() {
     "/placeholder.svg?height=100&width=100&text=Company+Logo"
   );
 
+  const { t } = useTranslation();
+
+  // Notification Settings
   const [newBidNotification, setNewBidNotification] = useState(true);
   const [tenderStatusNotification, setTenderStatusNotification] =
     useState(true);
   const [messageNotification, setMessageNotification] = useState(true);
 
+  // Security Settings
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  // Appearance & Language Settings
   const [appLanguage, setAppLanguage] = useState("en");
   const [font, setFont] = useState("Inter");
   const [theme, setTheme] = useState<"light" | "dark">("light");
+
+  // Set client flag after hydration
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const handleSaveAll = (e: React.FormEvent) => {
     e.preventDefault();
@@ -71,7 +85,24 @@ export default function SettingsPage() {
     }
   };
 
-  const { t } = useTranslation();
+  // Show loading state during SSR/hydration
+  if (!isClient) {
+    return (
+      <div className="min-h-screen py-8">
+        <div className="container mx-auto px-4 space-y-8">
+          <div className="animate-pulse">
+            <div className="h-8 bg-gray-200 rounded w-1/3 mb-6"></div>
+            <div className="space-y-4">
+              <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+              <div className="h-10 bg-gray-200 rounded"></div>
+              <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+              <div className="h-10 bg-gray-200 rounded"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen py-8">
@@ -87,7 +118,7 @@ export default function SettingsPage() {
             <CardContent className="space-y-4 px-0">
               <div className="flex items-center justify-between">
                 <Label htmlFor="newBidNotification">
-                  {t("bid_status_updates")}
+                  {t("new_bid_received")}
                 </Label>
                 <Switch
                   id="newBidNotification"
@@ -106,19 +137,11 @@ export default function SettingsPage() {
                 />
               </div>
               <div className="flex items-center justify-between">
-                <Label htmlFor="newBids">{t("new_bids_on_your_tender")}</Label>
-                <Switch
-                  id="newBids"
-                  checked={newBidNotification}
-                  onCheckedChange={setNewBidNotification}
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <Label htmlFor="profileVerification">
+                <Label htmlFor="profileVerificationUpdates">
                   {t("profile_verification_updates")}
                 </Label>
                 <Switch
-                  id="profileVerification"
+                  id="profileVerificationUpdates"
                   checked={tenderStatusNotification}
                   onCheckedChange={setTenderStatusNotification}
                 />
@@ -177,7 +200,7 @@ export default function SettingsPage() {
             </CardContent>
           </Card>
 
-          {/* Appearance & Language */}
+          {/* Appearance & Language Settings */}
           <Card className="border-0 px-0">
             <CardHeader className="border-0 px-0">
               <CardTitle className="text-2xl font-semibold text-gray-800">
@@ -189,12 +212,13 @@ export default function SettingsPage() {
                 <Label htmlFor="appLanguage" className="mb-4">
                   {t("application_language")}
                 </Label>
+                <LanguageToggle />
               </div>
 
               <div className="space-y-3 md:col-span-3">
                 <Label className="text-base font-medium">{t("theme")}</Label>
                 <p className="text-sm text-muted-foreground">
-                  {t("select_the_theme_for_the_dashboard")}
+                  {t("select_theme_for_dashboard")}
                 </p>
                 <div className="flex items-center gap-3">
                   <Sun className="w-5 h-5 text-gray-500" />
