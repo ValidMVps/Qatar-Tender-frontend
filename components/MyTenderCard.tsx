@@ -1,4 +1,3 @@
-// components/TenderCard.tsx
 "use client";
 
 import { Badge } from "@/components/ui/badge";
@@ -69,55 +68,51 @@ export default function MyTenderCard({
     }
   };
 
-  // ✅ Reopen tender
   const { profile } = useAuth();
+
   return (
     <>
-      <div className="bg-white/70 backdrop-blur-xl rounded-md border border-neutral-300 overflow-hidden shadow-0">
+      <div className="bg-white/80 backdrop-blur-lg rounded-lg border border-gray-200 shadow-0 overflow-hidden transition-all hover:shadow-0">
         <div className="p-6">
           {/* Header */}
-          <div className="flex items-start justify-between mb-4">
+          <div className="flex items-start justify-between mb-5">
             <div className="flex-1">
               <Link
                 href={
                   profile?.userType == "business"
-                    ? `/business-dashboard/tender/${tender.id} `
-                    : `/dashboard/tender/${tender.id} `
+                    ? `/business-dashboard/tender/${tender.id}`
+                    : `/dashboard/tender/${tender.id}`
                 }
                 onClick={(e) => e.stopPropagation()}
-                className="text-lg xl:text-2xl font-semibold text-gray-900 mb-2 block hover:underline overflow-hidden text-ellipsis whitespace-nowrap"
+                className="text-xl font-medium text-gray-900 line-clamp-1 hover:text-blue-600 transition-colors"
               >
                 {tender.title}
               </Link>
 
-              <div className="flex items-center gap-3 text-sm text-gray-500 mb-3">
-                <div className="flex items-center gap-1">
-                  <Badge variant="outline">{tender.category}</Badge>
-                </div>
+              <div className="flex flex-wrap items-center gap-2 mt-2">
+                <Badge variant="secondary" className="rounded-full px-3 py-1 text-xs font-medium">
+                  {tender.category}
+                </Badge>
                 {tender.location && (
-                  <div className="flex items-center gap-1">
-                    <MapPin className="h-4 w-4" />
+                  <div className="flex items-center gap-1 text-sm text-gray-500">
+                    <MapPin className="h-4 w-4 text-gray-400" />
                     <span>{tender.location}</span>
                   </div>
                 )}
               </div>
             </div>
 
-            <div className="flex items-center gap-2 ml-4">
-              <Badge
-                className={`px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5 ${getStatusColor(
-                  tender
-                )}`}
-              >
-                {getStatusIcon(tender)}
-                <span>{getStatusText(tender)}</span>
-              </Badge>
-            </div>
+            <Badge
+              className={`rounded-full px-3 py-1.5 text-xs font-medium flex items-center gap-1.5 bg-blue-50 text-blue-700 shadow-0`}
+            >
+              {getStatusIcon(tender)}
+              <span>{getStatusText(tender)}</span>
+            </Badge>
           </div>
 
           {/* Description */}
           <p
-            className="text-gray-600 text-md mb-4 overflow-hidden"
+            className="text-gray-700 text-base leading-relaxed mb-6 line-clamp-2"
             style={{
               display: "-webkit-box",
               WebkitLineClamp: 2,
@@ -128,21 +123,21 @@ export default function MyTenderCard({
           </p>
 
           {/* Stats Grid */}
-          <div className="grid grid-cols-3 gap-4 py-6">
-            <div className="text-center">
-              <p className="text-2xl font-medium text-blue-600">
+          <div className="grid grid-cols-3 gap-4 py-5 border-t border-b border-gray-100">
+            <div className="text-center py-2">
+              <p className="text-lg font-semibold text-gray-900">
                 {tender.budget.toLocaleString()}
               </p>
               <p className="text-xs text-gray-500 font-medium">QAR Budget</p>
             </div>
-            <div className="text-center">
-              <p className="text-2xl font-medium text-blue-600">
+            <div className="text-center py-2">
+              <p className="text-lg font-semibold text-gray-900">
                 {tender.bidsCount}
               </p>
               <p className="text-xs text-gray-500 font-medium">Bids Received</p>
             </div>
-            <div className="text-center">
-              <p className="text-2xl font-medium text-blue-600">
+            <div className="text-center py-2">
+              <p className="text-lg font-semibold text-gray-900">
                 {tender.deadlineDate}
               </p>
               <p className="text-xs text-gray-500 font-medium">Deadline</p>
@@ -150,50 +145,50 @@ export default function MyTenderCard({
           </div>
 
           {/* Actions */}
-          <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+          <div className="flex items-center justify-between pt-5">
             <div className="flex items-center gap-2">
-              <button className="p-2 rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors">
+              <button className="p-2.5 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 active:bg-gray-300 transition-all">
                 <Eye className="h-4 w-4" />
               </button>
               <button
-                className="p-2 rounded-xl bg-gray-50 text-gray-600 hover:bg-gray-100 transition-colors"
+                className="p-2.5 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 active:bg-gray-300 transition-all"
                 onClick={(e) => stopAnd(e, () => setOpenTenderModal(true))}
               >
                 <Edit className="h-4 w-4" />
               </button>
 
               {tender.status === "active" ? (
-                // Close button
                 <button
-                  className="p-2 rounded-xl bg-gray-50 text-gray-600 hover:bg-gray-100 transition-colors"
+                  className="p-2.5 rounded-full bg-red-50 text-red-600 hover:bg-red-100 active:bg-red-200 transition-all"
                   onClick={(e) => stopAnd(e, () => setConfirmClose(true))}
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
               ) : tender.status === "closed" ? (
-                // Reopen button
                 <button
-                  className="p-2 rounded-xl bg-green-50 text-green-600 hover:bg-green-100 transition-colors"
+                  className="p-2.5 rounded-full bg-green-50 text-green-600 hover:bg-green-100 active:bg-green-200 transition-all"
                   onClick={(e) => stopAnd(e, () => setIsReopening(true))}
                 >
                   <RefreshCcw className="h-4 w-4" />
                 </button>
               ) : null}
             </div>
+
             <Link
               href={
                 profile?.userType == "business"
-                  ? `/business-dashboard/tender/${tender.id} `
-                  : `/dashboard/tender/${tender.id} `
+                  ? `/business-dashboard/tender/${tender.id}`
+                  : `/dashboard/tender/${tender.id}`
               }
             >
-              <button className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors text-sm font-medium">
+              <button className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-blue-50 text-blue-700 hover:bg-blue-100 active:bg-blue-200 transition-all text-sm font-medium">
                 <span>View Details</span>
                 <ChevronRightIcon className="h-4 w-4" />
               </button>
             </Link>
           </div>
         </div>
+
         {/* Edit Modal */}
         <EditTenderModal
           open={openTenderModal}
@@ -203,7 +198,9 @@ export default function MyTenderCard({
             onUpdate?.(updated);
             setOpenTenderModal(false);
           }}
-        />{" "}
+        />
+
+        {/* Reopen Modal */}
         <ReopenTenderModal
           open={isReopening}
           onOpenChange={setIsReopening}
@@ -213,33 +210,38 @@ export default function MyTenderCard({
             setIsReopening(false);
           }}
         />
-        {/* Confirm Close Dialog */}
+
+        {/* Confirm Close Dialog (Apple-style Sheet) */}
         {confirmClose && (
-          <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-            <div className="bg-white rounded-xl p-6 w-full max-w-md shadow-lg">
-              <h2 className="text-lg font-semibold mb-3">Close Tender</h2>
-              <p className="text-sm text-gray-600 mb-4">
-                Are you sure you want to mark this tender as <b>Closed</b>?
-              </p>
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn">
+            <div className="bg-white rounded-2xl shadow-0 w-full max-w-sm overflow-hidden border border-gray-200">
+              <div className="p-6 text-center">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Close Tender</h3>
+                <p className="text-sm text-gray-600 mb-4">
+                  Are you sure you want to mark this tender as <b>Closed</b>?
+                </p>
 
-              {closeError && (
-                <div className="text-sm text-red-600 mb-3">{closeError}</div>
-              )}
+                {closeError && (
+                  <p className="text-sm text-red-600 mb-4">{closeError}</p>
+                )}
+              </div>
 
-              <div className="flex justify-end gap-3">
+              <div className="flex border-t border-gray-200">
                 <Button
-                  variant="outline"
+                  variant="ghost"
+                  className="flex-1 py-3 text-gray-700 font-medium"
                   onClick={() => setConfirmClose(false)}
                   disabled={isClosing}
                 >
                   Cancel
                 </Button>
                 <Button
-                  className="bg-red-600 text-white hover:bg-red-700"
+                  variant="destructive"
+                  className="flex-1 py-3 font-medium rounded-none"
                   onClick={handleCloseTender}
                   disabled={isClosing}
                 >
-                  {isClosing ? "Closing..." : "Close Tender"}
+                  {isClosing ? "Closing..." : "Close"}
                 </Button>
               </div>
             </div>

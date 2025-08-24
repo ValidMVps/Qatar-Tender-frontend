@@ -190,43 +190,6 @@ export default function MyTendersPage() {
     new Set(tenders.map((tender) => tender.category || "Uncategorized"))
   ).sort();
 
-  // status helpers
-  const getStatusColor = (tender: UiTender) => {
-    if (tender.isCompleted)
-      return "bg-purple-100 text-purple-800 border-purple-200";
-    if (tender.awardedBid)
-      return "bg-green-100 text-green-800 border-green-200";
-    switch (tender.status) {
-      case "active":
-        return "bg-green-100 text-green-800 border-green-200";
-      case "closed":
-        return "bg-gray-100 text-gray-800 border-gray-200";
-      case "draft":
-        return "bg-blue-100 text-blue-800 border-blue-200";
-      case "rejected":
-        return "bg-red-100 text-red-800 border-red-200";
-      default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
-    }
-  };
-
-  const getStatusText = (tender: UiTender) => {
-    if (tender.isCompleted) return "Completed";
-    if (tender.awardedBid) return "Awarded";
-    switch (tender.status) {
-      case "active":
-        return "Active";
-      case "closed":
-        return "Closed";
-      case "draft":
-        return "Draft";
-      case "rejected":
-        return "Rejected";
-      default:
-        return "Unknown";
-    }
-  };
-
   // Filtering
   const filteredTenders = tenders.filter((tender) => {
     // Tab filter
@@ -288,33 +251,6 @@ export default function MyTendersPage() {
   });
 
   // Actions (use string ids)
-  const handleDeleteTender = (id: string) => {
-    setShowConfirmModal({ show: true, action: "delete", tenderId: id });
-  };
-
-  const handleCloseTender = (id: string) => {
-    setShowConfirmModal({ show: true, action: "close", tenderId: id });
-  };
-
-  const handleConfirmDelete = () => {
-    if (showConfirmModal.tenderId) {
-      setTenders((prev) =>
-        prev.filter((t) => t.id !== showConfirmModal.tenderId)
-      );
-      setShowConfirmModal({ show: false, action: "", tenderId: null });
-    }
-  };
-
-  const handleConfirmClose = () => {
-    if (showConfirmModal.tenderId) {
-      setTenders((prev) =>
-        prev.map((t) =>
-          t.id === showConfirmModal.tenderId ? { ...t, status: "closed" } : t
-        )
-      );
-      setShowConfirmModal({ show: false, action: "", tenderId: null });
-    }
-  };
 
   const handleReapplyTender = (tenderId: string) => {
     const tenderToReapply = tenders.find((t) => t.id === tenderId);
@@ -533,6 +469,7 @@ export default function MyTendersPage() {
           </div>
         </div>
       </div>
+
       <Tabs
         value={activeTab}
         onValueChange={setActiveTab}
@@ -576,22 +513,26 @@ export default function MyTendersPage() {
                 {activeTab === "all" &&
                   !searchQuery &&
                   (selectedCategory === "all" || !selectedCategory) && (
-                    <Link href="/create-tender">
+                    <div
+                      onClick={() => setOpenTenderModal(true)}
+                      className="cursor-pointer"
+                    >
                       <Button className="bg-blue-600 hover:bg-blue-700">
                         <Plus className="h-4 w-4 mr-2" />
                         {t("post_your_first_tender")}
                       </Button>
-                    </Link>
+                    </div>
                   )}
               </div>
             )}
           </div>
         </TabsContent>
-      </Tabs>{" "}
+      </Tabs>
       <CreateTenderModal
         open={openTenderModal}
         onOpenChange={setOpenTenderModal}
       />
+
       {/* Reapply Tender Modal */}
       <Dialog
         open={showReapplyModal.show}

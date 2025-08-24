@@ -495,7 +495,7 @@ const CreateTenderModal = ({
 
         onOpenChange(false);
         router.push(
-          user?.userType == "business"
+          user?.userType !== "business"
             ? "/dashboard/my-tenders"
             : "/business-dashboard/my-tenders"
         );
