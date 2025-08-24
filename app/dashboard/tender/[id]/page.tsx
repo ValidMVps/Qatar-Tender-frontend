@@ -29,27 +29,29 @@ import {
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import useTranslation from "@/lib/hooks/useTranslation";
+
+// Services
 import { getTender } from "@/app/services/tenderService";
-import {
-  getTenderBids,
-  updateBid,
-  updateBidStatus,
-} from "@/app/services/BidService"; // Updated import
+import { getTenderBids } from "@/app/services/BidService";
 import {
   getQuestionsForTender,
   answerQuestion,
   Question,
 } from "@/app/services/QnaService";
-import { getStatusColor, getStatusText } from "@/utils/tenderStatus";
+import { awardTender } from "@/app/services/tenderService"; // New import
 
-// Interfaces (updated with full data from your example)
+// Utils
+import { getStatusColor, getStatusText } from "@/utils/tenderStatus";
+import { useAuth } from "@/context/AuthContext";
+
+// Interfaces
 interface Tender {
   _id: string;
   title: string;
   description: string;
   estimatedBudget: number;
   deadline: string;
-  status: "active" | "pending_approval" | "closed" | "draft";
+  status: "active" | "pending_approval" | "closed" | "draft" | "awarded";
   category: { _id: string; name: string; description: string };
   location: string;
   contactEmail: string;
@@ -83,7 +85,7 @@ interface Bid {
   paymentAmount: number;
   paymentId: string;
   paymentStatus: "paid" | "pending";
-  status: "submitted" | "accepted" | "rejected" | "under_review"; // Updated status types
+  status: "submitted" | "accepted" | "rejected" | "under_review";
   createdAt: string;
   updatedAt: string;
   v: number;
@@ -119,7 +121,7 @@ export default function TenderDetailPage() {
       setBids(bidsData);
       setQuestions(questionsData);
     } catch (err: any) {
-      console.error("Error fetching tender ", err);
+      console.error("Error fetching tender data:", err);
       setError(err.response?.data?.message || "Failed to load tender data");
     } finally {
       setLoading(false);
@@ -130,28 +132,39 @@ export default function TenderDetailPage() {
     if (tenderId) fetchTenderData();
   }, [tenderId]);
 
+  // ✅ Handle awarding the tender
   const handleBidStatusUpdate = async (
     bidId: string,
     status: "accepted" | "rejected"
   ) => {
+    if (status !== "accepted") return; // Only accept flow uses award
+
     try {
       setUpdatingBidStatus((prev) => ({ ...prev, [bidId]: true }));
-      // Use the correct endpoint for status updates
-      await updateBidStatus(bidId, status);
 
-      // Update local state to reflect the new status
+      // Call backend to award the tender
+      await awardTender(tenderId, bidId);
+
+      // Update bids locally
       setBids((prevBids) =>
-        prevBids.map((bid) => {
-          if (bid._id === bidId) return { ...bid, status };
-          // If we're accepting a new bid, change any previously accepted bid to submitted
-          if (status === "accepted" && bid.status === "accepted")
-            return { ...bid, status: "submitted" };
-          return bid;
-        })
+        prevBids.map((bid) =>
+          bid._id === bidId
+            ? { ...bid, status: "accepted" }
+            : { ...bid, status: "rejected" }
+        )
       );
+
+      // Update tender status
+      setTender((prev) => (prev ? { ...prev, status: "awarded" } : null));
+
+      // Optional: show success feedback
+      alert("Tender awarded successfully!");
     } catch (err: any) {
-      console.error("Error updating bid status:", err);
-      setError(err.response?.data?.message || "Failed to update bid status");
+      console.error("Error awarding tender:", err);
+      const errorMessage =
+        err.response?.data?.message ||
+        "Failed to award tender. Please try again.";
+      setError(errorMessage);
     } finally {
       setUpdatingBidStatus((prev) => ({ ...prev, [bidId]: false }));
     }
@@ -163,7 +176,7 @@ export default function TenderDetailPage() {
     try {
       setSubmittingAnswer((prev) => ({ ...prev, [questionId]: true }));
       await answerQuestion(questionId, answer);
-      fetchTenderData();
+      fetchTenderData(); // Refetch to update answer state
       setAnswerText((prev) => ({ ...prev, [questionId]: "" }));
     } catch (err: any) {
       console.error("Error answering question:", err);
@@ -248,7 +261,7 @@ export default function TenderDetailPage() {
   const awardedBid = bids.find((bid) => bid.status === "accepted");
   const hasAwardedBid = !!awardedBid;
   const isPendingApproval = tender.status === "pending_approval";
-
+  const { profile } = useAuth();
   return (
     <div className="min-h-screen">
       {/* Navigation Bar */}
@@ -256,7 +269,11 @@ export default function TenderDetailPage() {
         <div className="mx-auto px-4 sm:px-6 lg:px-14">
           <div className="flex items-center justify-between h-16">
             <Link
-              href="/dashboard/my-tenders"
+              href={
+                profile?.userType !== "business"
+                  ? "/dashboard/my-tenders"
+                  : "/business-dashboard/my-tenders"
+              }
               className="flex items-center text-blue-500 hover:text-blue-600 font-medium transition-colors"
             >
               <ArrowLeft className="h-5 w-5 mr-2" />
@@ -297,11 +314,21 @@ export default function TenderDetailPage() {
                   {tender.title}
                 </h1>
                 <Badge
-                  className={`px-3 py-1 rounded-full text-xs font-medium border `}
+                  className={`px-3 py-1 rounded-full text-xs font-medium border ${
+                    tender.status === "active"
+                      ? "bg-green-50 text-green-700 border-green-200"
+                      : tender.status === "awarded"
+                      ? "bg-blue-50 text-blue-700 border-blue-200"
+                      : tender.status === "closed"
+                      ? "bg-gray-50 text-gray-700 border-gray-200"
+                      : "bg-yellow-50 text-yellow-700 border-yellow-200"
+                  }`}
                 >
-                  {tender.status}
+                  {tender.status.charAt(0).toUpperCase() +
+                    tender.status.slice(1)}
                 </Badge>
               </div>
+
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 <div className="flex items-center text-gray-600">
                   <div className="w-8 h-8 bg-blue-50 rounded-full flex items-center justify-center mr-3">
@@ -335,9 +362,11 @@ export default function TenderDetailPage() {
                   </div>
                 </div>
               </div>
+
               <p className="text-gray-700 leading-relaxed mb-6 text-lg">
                 {tender.description}
               </p>
+
               <div className="flex flex-wrap gap-6 text-sm">
                 <div className="flex items-center text-gray-600">
                   <Trophy className="h-4 w-4 mr-2 text-purple-500" />
@@ -390,11 +419,28 @@ export default function TenderDetailPage() {
             {/* Bids Content */}
             {activeTab === "bids" && (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
+                {/* Awarded Bid Banner */}
+                {hasAwardedBid && (
+                  <div className="col-span-2 bg-green-50 border border-green-200 rounded-md p-4 mb-4">
+                    <div className="flex items-center">
+                      <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
+                      <p className="text-green-800 font-medium">
+                        Tender awarded to{" "}
+                        <span className="font-semibold">
+                          {awardedBid.bidder.profile?.fullName ||
+                            awardedBid.bidder.profile?.companyName ||
+                            awardedBid.bidder.email.split("@")[0]}
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+                )}
+
                 {bids.length > 0 ? (
                   bids.map((bid) => (
                     <div
                       key={bid._id}
-                      className="bg-white rounded-md shadow-0 border border-gray-100 overflow-hidden hover:shadow-0 transition-shadow"
+                      className="bg-white rounded-md shadow-0 border border-gray-100 overflow-hidden hover:shadow-md transition-shadow"
                     >
                       <div className="p-6">
                         <div className="flex items-start justify-between mb-4">
@@ -420,7 +466,6 @@ export default function TenderDetailPage() {
                             </div>
 
                             <div className="flex items-center justify-start gap-6">
-                              {" "}
                               {bid.bidder.profile?.phone && (
                                 <div className="flex items-center text-sm text-gray-500">
                                   <Phone className="h-4 w-4 mr-2" />
@@ -444,39 +489,42 @@ export default function TenderDetailPage() {
                             </div>
                           </div>
                         </div>
+
                         <div className="bg-gray-50 rounded-md p-4 mb-4">
                           <p className="text-gray-700 leading-relaxed">
                             {bid.description}
                           </p>
                         </div>
-                        {/* Payment Information */}
-                        {/* Action Buttons */}
+
                         <div className="flex items-center justify-between pt-4 border-t border-gray-100">
                           <Link
-                            href={`/dashboard/my-tenders/bidder-profile/${bid.bidder._id}`}
+                            href={
+                              profile?.userType !== "business"
+                                ? `/dashboard/my-tenders/bidder-profile/${bid.bidder._id}`
+                                : `/business-dashboard/my-tenders/bidder-profile/${bid.bidder._id}`
+                            }
                             className="flex items-center text-blue-500 hover:text-blue-600 font-medium text-sm transition-colors"
                           >
                             View Profile
                             <ExternalLink className="h-4 w-4 ml-1" />
                           </Link>
+
                           <div className="flex gap-2">
                             {bid.status === "submitted" && !hasAwardedBid && (
-                              <>
-                                <Button
-                                  onClick={() =>
-                                    handleBidStatusUpdate(bid._id, "accepted")
-                                  }
-                                  disabled={updatingBidStatus[bid._id]}
-                                  className="bg-blue-500 hover:bg-blue-600 text-white rounded-full px-4 py-2 h-auto text-sm font-medium"
-                                >
-                                  {updatingBidStatus[bid._id] ? (
-                                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                                  ) : (
-                                    <Award className="h-4 w-4 mr-2" />
-                                  )}
-                                  Accept Bid
-                                </Button>
-                              </>
+                              <Button
+                                onClick={() =>
+                                  handleBidStatusUpdate(bid._id, "accepted")
+                                }
+                                disabled={updatingBidStatus[bid._id]}
+                                className="bg-blue-500 hover:bg-blue-600 text-white rounded-full px-4 py-2 h-auto text-sm font-medium"
+                              >
+                                {updatingBidStatus[bid._id] ? (
+                                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                                ) : (
+                                  <Award className="h-4 w-4 mr-2" />
+                                )}
+                                Accept Bid
+                              </Button>
                             )}
                             {hasAwardedBid && bid.status !== "accepted" && (
                               <span className="text-sm text-gray-500 italic">
@@ -532,6 +580,7 @@ export default function TenderDetailPage() {
                             </p>
                           </div>
                         </div>
+
                         {question.answer ? (
                           <div className="ml-14 bg-green-50 rounded-md p-4 border-l-4 border-green-400">
                             <div className="flex items-center gap-2 mb-2">

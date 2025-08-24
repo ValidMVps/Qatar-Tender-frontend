@@ -236,6 +236,9 @@ export default function TenderDetailsPage({ params }: PageProps) {
 
     setTimeout(async () => {
       try {
+        if (!tender?._id) {
+          throw new Error("Tender ID is missing.");
+        }
         const bidData = {
           tender: tender._id,
           amount: Number(bidAmount),

@@ -13,6 +13,7 @@ export interface User {
   isVerified: boolean;
   adminType?: string;
   permissions?: string[];
+  isDocumentVerified?: string;
   profile?: any;
 }
 

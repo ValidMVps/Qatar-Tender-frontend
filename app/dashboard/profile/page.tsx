@@ -40,6 +40,31 @@ import { uploadToCloudinary } from "../../../utils/uploadToCloudinary";
 import { profileApi } from "@/app/services/profileApi";
 import { useAuth } from "@/context/AuthContext";
 
+interface ProfileData {
+  fullName: string;
+  personalEmail: string;
+  phone: string;
+  address: string;
+  companyName: string;
+  companyEmail: string;
+  contactPersonName: string;
+  companyDesc: string;
+}
+
+interface DocumentData {
+  nationalId: string;
+  nationalIdFront: string | null;
+  nationalIdBack: string | null;
+  commercialRegistrationNumber: string;
+  commercialRegistrationDoc: string | null;
+}
+
+interface User {
+  userType: string;
+  email?: string;
+  verificationStatus?: string;
+}
+
 export default function Component() {
   const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
@@ -49,13 +74,15 @@ export default function Component() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploadingFile, setUploadingFile] = useState(false);
-  const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(null);
-  const [verificationStatus, setVerificationStatus] = useState(null);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [verificationStatus, setVerificationStatus] = useState<string | null>(
+    null
+  );
 
-  const [profileData, setProfileData] = useState({
+  const [profileData, setProfileData] = useState<ProfileData>({
     fullName: "",
-    personalEmail: "", // Use personalEmail to align with schema for business users
+    personalEmail: "",
     phone: "",
     address: "",
     companyName: "",
@@ -64,7 +91,7 @@ export default function Component() {
     companyDesc: "",
   });
 
-  const [documentData, setDocumentData] = useState({
+  const [documentData, setDocumentData] = useState<DocumentData>({
     nationalId: "",
     nationalIdFront: null,
     nationalIdBack: null,
@@ -94,30 +121,40 @@ export default function Component() {
           fullName: profile.fullName || "",
           phone: profile.phone || "",
           address: profile.address || "",
-          personalEmail: user.email || "", // Assuming email comes from auth user
+          personalEmail: user?.email || "",
+          companyName: "",
+          companyEmail: "",
+          contactPersonName: "",
+          companyDesc: "",
         });
         setDocumentData({
           nationalId: profile.nationalId || "",
           nationalIdFront: profile.nationalIdFront || null,
           nationalIdBack: profile.nationalIdBack || null,
+          commercialRegistrationNumber: "",
+          commercialRegistrationDoc: null,
         });
       } else if (profile.userType === "business") {
         setProfileData({
-          fullName: profile.contactPersonName || "", // Use contactPersonName for display
+          fullName: profile.contactPersonName || "",
           companyName: profile.companyName || "",
           phone: profile.phone || "",
           address: profile.address || "",
           personalEmail: profile.personalEmail || "",
           companyEmail: profile.companyEmail || "",
+          contactPersonName: profile.contactPersonName || "",
           companyDesc: profile.companyDesc || "",
         });
         setDocumentData({
+          nationalId: "",
+          nationalIdFront: null,
+          nationalIdBack: null,
           commercialRegistrationNumber:
             profile.commercialRegistrationNumber || "",
           commercialRegistrationDoc: profile.commercialRegistrationDoc || null,
         });
       }
-    } catch (err) {
+    } catch (err: any) {
       setError(err.message);
     } finally {
       setLoading(false);
@@ -127,10 +164,10 @@ export default function Component() {
   const loadVerificationStatus = async () => {
     try {
       // Assuming a verification status field exists on the user object
-      const status = user.verificationStatus;
-      setVerificationStatus(status);
+      const status = user?.isDocumentVerified;
+      setVerificationStatus(status || null);
       setIsProfileCompleted(status === "verified" || status === "pending");
-    } catch (err) {
+    } catch (err: any) {
       console.error("Failed to load verification status:", err);
     }
   };
@@ -141,8 +178,8 @@ export default function Component() {
     try {
       setSaving(true);
       setError(null);
-      let updateData;
-      if (user.userType === "individual") {
+      let updateData: any;
+      if (user?.userType === "individual") {
         updateData = {
           fullName: profileData.fullName,
           phone: profileData.phone,
@@ -167,7 +204,7 @@ export default function Component() {
         setIsProfileCompleted(false);
       }
       setTimeout(() => setSuccess(null), 3000);
-    } catch (err) {
+    } catch (err: any) {
       setError(err.message);
     } finally {
       setSaving(false);
@@ -179,12 +216,15 @@ export default function Component() {
     loadProfile();
   };
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
     setProfileData((prevData) => ({ ...prevData, [id]: value }));
   };
 
-  const handleFileUpload = async (event, docType) => {
+  const handleFileUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+    docType: keyof DocumentData
+  ) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -207,7 +247,7 @@ export default function Component() {
       setDocumentData((prev) => ({ ...prev, [docType]: uploadedUrl }));
       setSuccess("Document uploaded successfully!");
       setTimeout(() => setSuccess(null), 3000);
-    } catch (err) {
+    } catch (err: any) {
       setError("Failed to upload document: " + err.message);
     } finally {
       setUploadingFile(false);
@@ -226,7 +266,7 @@ export default function Component() {
       if (documentData.nationalIdFront) completedFields++;
       if (documentData.nationalIdBack) completedFields++;
       requiredFields.forEach((field) => {
-        if (profileData[field]?.trim()) completedFields++;
+        if (profileData[field as keyof ProfileData]?.trim()) completedFields++;
       });
     } else if (user?.userType === "business") {
       const requiredFields = [
@@ -241,7 +281,7 @@ export default function Component() {
       if (documentData.commercialRegistrationNumber?.trim()) completedFields++;
       if (documentData.commercialRegistrationDoc) completedFields++;
       requiredFields.forEach((field) => {
-        if (profileData[field]?.trim()) completedFields++;
+        if (profileData[field as keyof ProfileData]?.trim()) completedFields++;
       });
     }
 
@@ -254,8 +294,8 @@ export default function Component() {
     try {
       setSaving(true);
       setError(null);
-      let documentsPayload;
-      if (user.userType === "individual") {
+      let documentsPayload: any;
+      if (user?.userType === "individual") {
         documentsPayload = {
           nationalId: documentData.nationalId,
           nationalIdFront: documentData.nationalIdFront,
@@ -275,7 +315,7 @@ export default function Component() {
       setSuccess("Documents submitted for verification successfully!");
       await loadVerificationStatus();
       setTimeout(() => setSuccess(null), 3000);
-    } catch (err) {
+    } catch (err: any) {
       setError(err.message);
     } finally {
       setSaving(false);
@@ -301,7 +341,11 @@ export default function Component() {
     );
   }
 
-  const renderFileUpload = (docType, label, disabled) => (
+  const renderFileUpload = (
+    docType: keyof DocumentData,
+    label: string,
+    disabled: boolean
+  ) => (
     <div className="mt-1 border-2 border-dashed border-gray-300 rounded-lg p-4 sm:p-6 text-center flex flex-col items-center justify-center space-y-3">
       {documentData[docType] ? (
         <div className="flex items-center justify-between w-full">
@@ -312,7 +356,7 @@ export default function Component() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => window.open(documentData[docType], "_blank")}
+            onClick={() => window.open(documentData[docType]!, "_blank")}
           >
             View
           </Button>

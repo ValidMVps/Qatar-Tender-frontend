@@ -1,8 +1,6 @@
 "use client";
-
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -22,84 +20,88 @@ import {
   Clock,
   LockIcon,
   User,
-  Briefcase,
+  Phone,
+  ExternalLink,
+  Loader2,
   Trophy,
   AlertCircle,
-  Loader2,
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { ProviderBadge } from "@/components/provider-badge";
 import useTranslation from "@/lib/hooks/useTranslation";
+
+// Services
 import { getTender } from "@/app/services/tenderService";
-import { getTenderBids, updateBid } from "@/app/services/BidService";
+import { getTenderBids } from "@/app/services/BidService";
 import {
   getQuestionsForTender,
   answerQuestion,
   Question,
 } from "@/app/services/QnaService";
+import { awardTender } from "@/app/services/tenderService"; // New import
 
+// Utils
+import { getStatusColor, getStatusText } from "@/utils/tenderStatus";
+import { useAuth } from "@/context/AuthContext";
+
+// Interfaces
 interface Tender {
   _id: string;
   title: string;
   description: string;
   estimatedBudget: number;
   deadline: string;
-  status: "active" | "pending_approval" | "closed" | "draft";
-  category: string;
+  status: "active" | "pending_approval" | "closed" | "draft" | "awarded";
+  category: { _id: string; name: string; description: string };
   location: string;
+  contactEmail: string;
+  image: string;
+  postedBy: { _id: string; email: string; userType: "individual" | "business" };
   createdAt: string;
   updatedAt: string;
-  owner: {
-    _id: string;
-    name: string;
-    email: string;
-  };
-  requirements?: string[];
-  skills?: string[];
-  attachments?: Array<{
-    name: string;
-    size: string;
-    url?: string;
-  }>;
+  v: number;
 }
 
 interface Bid {
   _id: string;
-  tender: string;
+  amount: number;
   bidder: {
     _id: string;
-    name: string;
     email: string;
-    rating?: number;
-    completedProjects?: number;
-    onTimeDelivery?: number;
-    verified?: boolean;
+    userType: string;
+    isVerified: boolean;
+    profile: {
+      fullName?: string;
+      companyName?: string;
+      rating?: number;
+      ratingCount?: number;
+      completedTenders?: number;
+      onTimeDelivery?: number;
+      phone?: string;
+      address?: string;
+    };
   };
-  amount: number;
   description: string;
-  status: "pending" | "accepted" | "rejected";
+  paymentAmount: number;
+  paymentId: string;
+  paymentStatus: "paid" | "pending";
+  status: "submitted" | "accepted" | "rejected" | "under_review";
   createdAt: string;
   updatedAt: string;
+  v: number;
+  tender: string;
 }
 
 export default function TenderDetailPage() {
   const { t } = useTranslation();
   const params = useParams();
   const tenderId = params.id as string;
-
-  // State management
   const [tender, setTender] = useState<Tender | null>(null);
   const [bids, setBids] = useState<Bid[]>([]);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState("bids");
+  const [activeTab, setActiveTab] = useState<"bids" | "qa">("bids");
   const [answerText, setAnswerText] = useState<{ [key: string]: string }>({});
   const [submittingAnswer, setSubmittingAnswer] = useState<{
     [key: string]: boolean;
@@ -108,120 +110,79 @@ export default function TenderDetailPage() {
     [key: string]: boolean;
   }>({});
 
-  // Fetch tender data
-  useEffect(() => {
-    const fetchTenderData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        // Fetch tender details
-        const tenderData = await getTender(tenderId);
-        setTender(tenderData);
-        console.log("Fetched tender data:", tenderData);
-        const bidsdata = await getTenderBids(tenderId);
-        const questionsData = await getQuestionsForTender(tenderId);
-        console.log("Bids data:", bidsdata, tenderId);
-        console.log("Questions data:", questionsData);
-        setQuestions(questionsData);
-      } catch (err: any) {
-        console.error("Error fetching tender data:", err);
-        setError(err.response?.data?.message || "Failed to load tender data");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (tenderId) {
-      fetchTenderData();
+  const fetchTenderData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const tenderData = await getTender(tenderId);
+      const bidsData = await getTenderBids(tenderId);
+      const questionsData = await getQuestionsForTender(tenderId);
+      setTender(tenderData);
+      setBids(bidsData);
+      setQuestions(questionsData);
+    } catch (err: any) {
+      console.error("Error fetching tender data:", err);
+      setError(err.response?.data?.message || "Failed to load tender data");
+    } finally {
+      setLoading(false);
     }
+  };
+
+  useEffect(() => {
+    if (tenderId) fetchTenderData();
   }, [tenderId]);
 
-  // Handle bid status updates (award/reject)
+  // ✅ Handle awarding the tender
   const handleBidStatusUpdate = async (
     bidId: string,
     status: "accepted" | "rejected"
   ) => {
+    if (status !== "accepted") return; // Only accept flow uses award
+
     try {
       setUpdatingBidStatus((prev) => ({ ...prev, [bidId]: true }));
 
-      // Update bid status via API
-      await updateBid(bidId, { status } as any);
+      // Call backend to award the tender
+      await awardTender(tenderId, bidId);
 
-      // Update local state
+      // Update bids locally
       setBids((prevBids) =>
-        prevBids.map((bid) => {
-          if (bid._id === bidId) {
-            return { ...bid, status };
-          }
-          // If awarding this bid, reset other awarded bids to pending
-          if (status === "accepted" && bid.status === "accepted") {
-            return { ...bid, status: "pending" };
-          }
-          return bid;
-        })
+        prevBids.map((bid) =>
+          bid._id === bidId
+            ? { ...bid, status: "accepted" }
+            : { ...bid, status: "rejected" }
+        )
       );
+
+      // Update tender status
+      setTender((prev) => (prev ? { ...prev, status: "awarded" } : null));
+
+      // Optional: show success feedback
+      alert("Tender awarded successfully!");
     } catch (err: any) {
-      console.error("Error updating bid status:", err);
-      setError(err.response?.data?.message || "Failed to update bid status");
+      console.error("Error awarding tender:", err);
+      const errorMessage =
+        err.response?.data?.message ||
+        "Failed to award tender. Please try again.";
+      setError(errorMessage);
     } finally {
       setUpdatingBidStatus((prev) => ({ ...prev, [bidId]: false }));
     }
   };
 
-  // Handle question answers
   const handleAnswerQuestion = async (questionId: string) => {
     const answer = answerText[questionId];
-    if (!answer.trim()) return;
-
+    if (!answer?.trim()) return;
     try {
       setSubmittingAnswer((prev) => ({ ...prev, [questionId]: true }));
-
-      const updatedQuestion = await answerQuestion(questionId, answer);
-
-      // Update local state
-      setQuestions((prevQuestions) =>
-        prevQuestions.map((q) => (q._id === questionId ? updatedQuestion : q))
-      );
-
-      // Clear answer text
+      await answerQuestion(questionId, answer);
+      fetchTenderData(); // Refetch to update answer state
       setAnswerText((prev) => ({ ...prev, [questionId]: "" }));
     } catch (err: any) {
       console.error("Error answering question:", err);
       setError(err.response?.data?.message || "Failed to submit answer");
     } finally {
       setSubmittingAnswer((prev) => ({ ...prev, [questionId]: false }));
-    }
-  };
-
-  // Utility functions
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "active":
-        return "bg-green-600 text-white border-green-600";
-      case "pending_approval":
-        return "bg-yellow-600 text-white border-yellow-600";
-      case "closed":
-        return "bg-gray-600 text-white border-gray-600";
-      case "draft":
-        return "bg-gray-400 text-white border-gray-400";
-      default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
-    }
-  };
-
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case "active":
-        return "Active";
-      case "pending_approval":
-        return "Pending Approval";
-      case "closed":
-        return "Closed";
-      case "draft":
-        return "Draft";
-      default:
-        return "Unknown";
     }
   };
 
@@ -242,32 +203,33 @@ export default function TenderDetailPage() {
     }).format(amount);
   };
 
-  // Loading state
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-center">
-            <Loader2 className="h-8 w-8 animate-spin text-gray-600 mx-auto mb-4" />
-            <p className="text-gray-600">Loading tender details...</p>
-          </div>
+      <div className="min-h-screen bg-gray-50">
+        <div className="flex flex-col items-center justify-center min-h-screen space-y-4">
+          <div className="w-8 h-8 border-2 border-gray-300 border-t-blue-500 rounded-full animate-spin"></div>
+          <p className="text-gray-600 font-medium">Loading tender details...</p>
         </div>
       </div>
     );
   }
 
-  // Error state
   if (error) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-center">
-            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              Error Loading Tender
+      <div className="min-h-screen bg-gray-50">
+        <div className="flex flex-col items-center justify-center min-h-screen px-4">
+          <div className="bg-white rounded-md shadow-0 border border-gray-100 p-8 text-center max-w-md w-full">
+            <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+              <AlertCircle className="h-8 w-8 text-red-500" />
+            </div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              Something went wrong
             </h3>
-            <p className="text-gray-600 mb-4">{error}</p>
-            <Button onClick={() => window.location.reload()} variant="outline">
+            <p className="text-gray-600 mb-6 leading-relaxed">{error}</p>
+            <Button
+              onClick={() => window.location.reload()}
+              className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-full font-medium transition-all"
+            >
               Try Again
             </Button>
           </div>
@@ -276,18 +238,19 @@ export default function TenderDetailPage() {
     );
   }
 
-  // No tender found
   if (!tender) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-center">
-            <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+      <div className="min-h-screen bg-gray-50">
+        <div className="flex flex-col items-center justify-center min-h-screen px-4">
+          <div className="bg-white rounded-md shadow-0 border border-gray-100 p-8 text-center max-w-md w-full">
+            <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+              <AlertCircle className="h-8 w-8 text-gray-400" />
+            </div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
               Tender Not Found
             </h3>
-            <p className="text-gray-600">
-              The tender you're looking for doesn't exist or has been removed.
+            <p className="text-gray-600 leading-relaxed">
+              The requested tender does not exist or has been removed.
             </p>
           </div>
         </div>
@@ -298,350 +261,405 @@ export default function TenderDetailPage() {
   const awardedBid = bids.find((bid) => bid.status === "accepted");
   const hasAwardedBid = !!awardedBid;
   const isPendingApproval = tender.status === "pending_approval";
-
+  const { profile } = useAuth();
   return (
-    <div className="container mx-auto px-0 py-8">
-      <div className="">
-        {/* Pending Approval Notice */}
+    <div className="min-h-screen">
+      {/* Navigation Bar */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="mx-auto px-4 sm:px-6 lg:px-14">
+          <div className="flex items-center justify-between h-16">
+            <Link
+              href={
+                profile?.userType !== "business"
+                  ? "/dashboard/my-tenders"
+                  : "/business-dashboard/my-tenders"
+              }
+              className="flex items-center text-blue-500 hover:text-blue-600 font-medium transition-colors"
+            >
+              <ArrowLeft className="h-5 w-5 mr-2" />
+              Tenders
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="mx-auto px-4 sm:px-6 lg:px-14 py-8">
+        {/* Pending Approval Alert */}
         {isPendingApproval && (
-          <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-            <div className="flex items-center">
-              <Clock className="h-5 w-5 text-yellow-600 mr-2" />
-              <div>
-                <h3 className="text-sm font-medium text-yellow-800">
-                  {t("tender_pending_approval")}
-                </h3>
-                <p className="text-sm text-yellow-700 mt-1">
-                  {t(
-                    "this_tender_is_currently_under_admin_review_bids_and_qa_will_be_available_once_the_tender_is_active"
-                  )}
+          <div className="mb-6 bg-amber-50 border border-amber-200 rounded-md p-6">
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center">
+                  <Clock className="h-5 w-5 text-amber-600" />
+                </div>
+              </div>
+              <div className="ml-4">
+                <h3 className="text-amber-900 font-semibold">Under Review</h3>
+                <p className="text-amber-800 mt-1 leading-relaxed">
+                  This tender is currently being reviewed. Bids and Q&A will be
+                  available once approved.
                 </p>
               </div>
             </div>
           </div>
         )}
 
-        {/* Tender Header */}
-        <div className="mb-8">
-          <div className="flex items-start justify-between mb-4">
+        {/* Hero Card */}
+        <div className="bg-white rounded-md shadow-0 border border-gray-100 p-8 mb-8">
+          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between">
             <div className="flex-1">
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                {tender.title}
-              </h1>
-              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
-                <span className="flex items-center">
-                  <Calendar className="h-4 w-4 mr-1" />
-                  Posted: {formatDate(tender.createdAt)}
-                </span>
-                <span className="flex items-center">
-                  <MapPin className="h-4 w-4 mr-1" />
-                  {tender.location}
-                </span>
-                <span className="flex items-center">
-                  <DollarSign className="h-4 w-4 mr-1" />
-                  {formatCurrency(tender.estimatedBudget)}
-                </span>
-                <span className="flex items-center">
-                  <Clock className="h-4 w-4 mr-1" />
-                  Deadline: {formatDate(tender.deadline)}
-                </span>
-              </div>
-            </div>
-            <Badge className={`border ${getStatusColor(tender.status)}`}>
-              {getStatusText(tender.status)}
-            </Badge>
-          </div>
-          <p className="text-gray-700 leading-relaxed mb-4">
-            {tender.description}
-          </p>
-
-          {/* Skills and Requirements */}
-          {tender.skills && tender.skills.length > 0 && (
-            <div className="mb-4">
-              <h4 className="text-sm font-medium text-gray-900 mb-2">
-                Required Skills:
-              </h4>
-              <div className="flex flex-wrap gap-2">
-                {tender.skills.map((skill, index) => (
-                  <Badge key={index} variant="outline" className="text-xs">
-                    {skill}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {tender.requirements && tender.requirements.length > 0 && (
-            <div className="mb-4">
-              <h4 className="text-sm font-medium text-gray-900 mb-2">
-                Requirements:
-              </h4>
-              <ul className="list-disc list-inside text-sm text-gray-600">
-                {tender.requirements.map((req, index) => (
-                  <li key={index}>{req}</li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
-
-        {/* Tabs - Only show if not pending approval */}
-        {!isPendingApproval ? (
-          <>
-            <div className="border-b border-gray-200 mb-6">
-              <nav className="flex space-x-8">
-                <button
-                  onClick={() => setActiveTab("bids")}
-                  className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                    activeTab === "bids"
-                      ? "border-black text-black"
-                      : "border-transparent text-gray-500 hover:text-gray-700"
+              <div className="flex items-center gap-3 mb-4">
+                <h1 className="text-3xl font-bold text-gray-900 leading-tight">
+                  {tender.title}
+                </h1>
+                <Badge
+                  className={`px-3 py-1 rounded-full text-xs font-medium border ${
+                    tender.status === "active"
+                      ? "bg-green-50 text-green-700 border-green-200"
+                      : tender.status === "awarded"
+                      ? "bg-blue-50 text-blue-700 border-blue-200"
+                      : tender.status === "closed"
+                      ? "bg-gray-50 text-gray-700 border-gray-200"
+                      : "bg-yellow-50 text-yellow-700 border-yellow-200"
                   }`}
                 >
-                  {t("bids")} ({bids.length})
+                  {tender.status.charAt(0).toUpperCase() +
+                    tender.status.slice(1)}
+                </Badge>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div className="flex items-center text-gray-600">
+                  <div className="w-8 h-8 bg-blue-50 rounded-full flex items-center justify-center mr-3">
+                    <Calendar className="h-4 w-4 text-blue-500" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Posted</p>
+                    <p className="font-medium">
+                      {formatDate(tender.createdAt)}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center text-gray-600">
+                  <div className="w-8 h-8 bg-green-50 rounded-full flex items-center justify-center mr-3">
+                    <MapPin className="h-4 w-4 text-green-500" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Location</p>
+                    <p className="font-medium">{tender.location}</p>
+                  </div>
+                </div>
+                <div className="flex items-center text-gray-600">
+                  <div className="w-8 h-8 bg-emerald-50 rounded-full flex items-center justify-center mr-3">
+                    <DollarSign className="h-4 w-4 text-emerald-500" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Budget</p>
+                    <p className="font-semibold text-emerald-600">
+                      {formatCurrency(tender.estimatedBudget)}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <p className="text-gray-700 leading-relaxed mb-6 text-lg">
+                {tender.description}
+              </p>
+
+              <div className="flex flex-wrap gap-6 text-sm">
+                <div className="flex items-center text-gray-600">
+                  <Trophy className="h-4 w-4 mr-2 text-purple-500" />
+                  <span className="text-gray-500 mr-1">Category:</span>
+                  <span className="font-medium text-gray-900">
+                    {tender.category.name}
+                  </span>
+                </div>
+                <div className="flex items-center text-gray-600">
+                  <User className="h-4 w-4 mr-2 text-gray-400" />
+                  <span className="text-gray-500 mr-1">Contact:</span>
+                  <span className="font-medium text-gray-900">
+                    {tender.contactEmail}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Content Tabs */}
+        {!isPendingApproval ? (
+          <>
+            {/* Tab Navigation */}
+            <div className="bg-white rounded-md shadow-0 border border-gray-100 mb-6">
+              <div className="flex border-b border-gray-100">
+                <button
+                  onClick={() => setActiveTab("bids")}
+                  className={`flex-1 py-4 px-6 font-semibold text-center transition-all relative ${
+                    activeTab === "bids"
+                      ? "text-blue-600 bg-blue-50"
+                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                  }`}
+                >
+                  Bids ({bids.length})
                 </button>
                 <button
                   onClick={() => setActiveTab("qa")}
-                  className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                  className={`flex-1 py-4 px-6 font-semibold text-center transition-all relative ${
                     activeTab === "qa"
-                      ? "border-black text-black"
-                      : "border-transparent text-gray-500 hover:text-gray-700"
+                      ? "text-blue-600 bg-blue-50"
+                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                   }`}
                 >
-                  {t("q_and_a")} ({questions.length})
+                  Questions & Answers ({questions.length})
                 </button>
-              </nav>
+              </div>
             </div>
 
-            {/* Bids Tab */}
+            {/* Bids Content */}
             {activeTab === "bids" && (
-              <div className="space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
+                {/* Awarded Bid Banner */}
+                {hasAwardedBid && (
+                  <div className="col-span-2 bg-green-50 border border-green-200 rounded-md p-4 mb-4">
+                    <div className="flex items-center">
+                      <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
+                      <p className="text-green-800 font-medium">
+                        Tender awarded to{" "}
+                        <span className="font-semibold">
+                          {awardedBid.bidder.profile?.fullName ||
+                            awardedBid.bidder.profile?.companyName ||
+                            awardedBid.bidder.email.split("@")[0]}
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+                )}
+
                 {bids.length > 0 ? (
                   bids.map((bid) => (
-                    <Card key={bid._id} className="border border-gray-200">
-                      <CardContent className="p-6">
+                    <div
+                      key={bid._id}
+                      className="bg-white rounded-md shadow-0 border border-gray-100 overflow-hidden hover:shadow-md transition-shadow"
+                    >
+                      <div className="p-6">
                         <div className="flex items-start justify-between mb-4">
-                          <div className="flex items-start space-x-4">
-                            <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
-                              <User className="h-6 w-6 text-gray-600" />
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-6">
+                              <h3 className="font-semibold text-gray-900 text-lg">
+                                {bid.bidder.profile?.fullName ||
+                                  bid.bidder.profile?.companyName ||
+                                  bid.bidder.email.split("@")[0]}
+                              </h3>
+                              {bid.bidder.isVerified && (
+                                <div className="flex items-center bg-blue-50 text-blue-700 px-2 py-1 rounded-full text-xs font-medium">
+                                  <Shield className="h-3 w-3 mr-1" />
+                                  Verified
+                                </div>
+                              )}
+                              {bid.status === "accepted" && (
+                                <div className="flex items-center bg-green-50 text-green-700 px-2 py-1 rounded-full text-xs font-medium">
+                                  <CheckCircle className="h-3 w-3 mr-1" />
+                                  Awarded
+                                </div>
+                              )}
                             </div>
-                            <div>
-                              <div className="flex items-center space-x-3 mb-2">
-                                <h3 className="font-semibold text-gray-900">
-                                  {bid.bidder.name}
-                                </h3>
-                                {bid.bidder.verified && (
-                                  <Badge className="bg-blue-100 text-blue-800 border-blue-200">
-                                    <Shield className="h-3 w-3 mr-1" />
-                                    Verified
-                                  </Badge>
-                                )}
-                                {bid.status === "accepted" && (
-                                  <Badge className="bg-green-600 text-white border-green-600">
-                                    <CheckCircle className="h-3 w-3 mr-1" />
-                                    Awarded
-                                  </Badge>
-                                )}
-                                {bid.status === "rejected" && (
-                                  <Badge className="bg-red-600 text-white border-red-600">
-                                    <X className="h-3 w-3 mr-1" />
-                                    Rejected
-                                  </Badge>
-                                )}
-                              </div>
-                              <div className="flex items-center space-x-4 text-sm text-gray-600">
-                                {bid.bidder.rating && (
-                                  <span className="flex items-center">
-                                    <Star className="h-4 w-4 mr-1 text-yellow-400 fill-current" />
-                                    {bid.bidder.rating.toFixed(1)}
-                                  </span>
-                                )}
-                                {bid.bidder.completedProjects && (
-                                  <span>
-                                    {bid.bidder.completedProjects} projects
-                                  </span>
-                                )}
-                                {bid.bidder.onTimeDelivery && (
-                                  <span>
-                                    {bid.bidder.onTimeDelivery}% on time
-                                  </span>
-                                )}
-                              </div>
+
+                            <div className="flex items-center justify-start gap-6">
+                              {bid.bidder.profile?.phone && (
+                                <div className="flex items-center text-sm text-gray-500">
+                                  <Phone className="h-4 w-4 mr-2" />
+                                  {bid.bidder.profile.phone}
+                                </div>
+                              )}
+                              {bid.bidder.profile?.address && (
+                                <div className="flex items-center text-sm text-gray-500">
+                                  <MapPin className="h-4 w-4 mr-2" />
+                                  {bid.bidder.profile.address}
+                                </div>
+                              )}
                             </div>
                           </div>
-                          <div className="text-right">
-                            <div className="text-2xl font-bold text-gray-900">
+                          <div className="text-right ml-4">
+                            <div className="text-2xl font-bold text-gray-900 mb-1">
                               {formatCurrency(bid.amount)}
                             </div>
                             <div className="text-sm text-gray-500">
-                              Submitted: {formatDate(bid.createdAt)}
+                              {formatDate(bid.createdAt)}
                             </div>
                           </div>
                         </div>
-                        <p className="text-gray-700 mb-4">{bid.description}</p>
 
-                        {/* Action buttons */}
-                        <div className="flex items-center space-x-3">
-                          {bid.status === "pending" && !hasAwardedBid && (
-                            <>
+                        <div className="bg-gray-50 rounded-md p-4 mb-4">
+                          <p className="text-gray-700 leading-relaxed">
+                            {bid.description}
+                          </p>
+                        </div>
+
+                        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                          <Link
+                            href={
+                              profile?.userType !== "business"
+                                ? `/dashboard/my-tenders/bidder-profile/${bid.bidder._id}`
+                                : `/business-dashboard/my-tenders/bidder-profile/${bid.bidder._id}`
+                            }
+                            className="flex items-center text-blue-500 hover:text-blue-600 font-medium text-sm transition-colors"
+                          >
+                            View Profile
+                            <ExternalLink className="h-4 w-4 ml-1" />
+                          </Link>
+
+                          <div className="flex gap-2">
+                            {bid.status === "submitted" && !hasAwardedBid && (
                               <Button
                                 onClick={() =>
                                   handleBidStatusUpdate(bid._id, "accepted")
                                 }
                                 disabled={updatingBidStatus[bid._id]}
-                                size="sm"
-                                className="bg-green-600 hover:bg-green-700 text-white"
+                                className="bg-blue-500 hover:bg-blue-600 text-white rounded-full px-4 py-2 h-auto text-sm font-medium"
                               >
                                 {updatingBidStatus[bid._id] ? (
-                                  <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
                                 ) : (
-                                  <Award className="h-4 w-4 mr-1" />
+                                  <Award className="h-4 w-4 mr-2" />
                                 )}
-                                Award Bid
+                                Accept Bid
                               </Button>
-                              <Button
-                                onClick={() =>
-                                  handleBidStatusUpdate(bid._id, "rejected")
-                                }
-                                disabled={updatingBidStatus[bid._id]}
-                                variant="outline"
-                                size="sm"
-                                className="border-red-200 text-red-600 hover:bg-red-50"
-                              >
-                                {updatingBidStatus[bid._id] ? (
-                                  <Loader2 className="h-4 w-4 mr-1 animate-spin" />
-                                ) : (
-                                  <X className="h-4 w-4 mr-1" />
-                                )}
-                                Reject
-                              </Button>
-                            </>
-                          )}
-                          {bid.status === "pending" && hasAwardedBid && (
-                            <div className="text-sm text-gray-500 italic">
-                              Cannot award - another bid has been selected
-                            </div>
-                          )}
+                            )}
+                            {hasAwardedBid && bid.status !== "accepted" && (
+                              <span className="text-sm text-gray-500 italic">
+                                Another bid was accepted
+                              </span>
+                            )}
+                          </div>
                         </div>
-                      </CardContent>
-                    </Card>
+                      </div>
+                    </div>
                   ))
                 ) : (
-                  <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
-                    <Building2 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">
-                      No bids yet
+                  <div className="col-span-2 bg-white rounded-md shadow-0 border border-gray-100 p-12 text-center">
+                    <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Building2 className="h-8 w-8 text-gray-300" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                      No Bids Received
                     </h3>
                     <p className="text-gray-600">
-                      Providers haven't submitted any bids for this tender yet.
+                      No providers have submitted bids for this tender yet.
                     </p>
                   </div>
                 )}
               </div>
             )}
 
-            {/* Q&A Tab */}
+            {/* Q&A Content */}
             {activeTab === "qa" && (
               <div className="space-y-6">
-                {questions.map((question) => {
-                  console.log("question:", question, questions);
-                  return (
-                    <Card key={question._id} className="border border-gray-200">
-                      <CardContent className="p-6">
-                        <div className="space-y-4">
-                          {/* Question */}
-                          <div>
-                            <div className="flex items-center space-x-3 mb-2">
-                              <MessageSquare className="h-5 w-5 text-blue-600" />
-                              <span className="font-medium text-gray-900">
-                                {question.askedBy.name}
+                {questions.length > 0 ? (
+                  questions.map((question) => (
+                    <div
+                      key={question._id}
+                      className="bg-white rounded-md shadow-0 border border-gray-100 overflow-hidden"
+                    >
+                      <div className="p-6">
+                        <div className="flex items-start mb-6">
+                          <div className="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
+                            <MessageSquare className="h-5 w-5 text-blue-500" />
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-2">
+                              <span className="font-semibold text-gray-900">
+                                Anonymous
                               </span>
-                              <span className="text-sm text-gray-500">
+                              <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
                                 {formatDate(question.createdAt)}
                               </span>
                             </div>
-                            <p className="text-gray-700 pl-8">
+                            <p className="text-gray-700 leading-relaxed text-lg">
                               {question.question}
                             </p>
                           </div>
-
-                          {/* Answer or Answer Input */}
-                          {question.answer ? (
-                            <div className="pl-8 border-l-2 border-gray-200">
-                              <div className="flex items-center space-x-3 mb-2">
-                                <span className="font-medium text-green-600">
-                                  Your Answer
-                                </span>
-                                <span className="text-sm text-gray-500">
-                                  {formatDate(question.updatedAt)}
-                                </span>
-                              </div>
-                              <p className="text-gray-700">{question.answer}</p>
-                            </div>
-                          ) : (
-                            <div className="pl-8">
-                              <Textarea
-                                placeholder="Type your answer..."
-                                value={answerText[question._id] || ""}
-                                onChange={(e) =>
-                                  setAnswerText((prev) => ({
-                                    ...prev,
-                                    [question._id]: e.target.value,
-                                  }))
-                                }
-                                className="mb-3"
-                              />
-                              <Button
-                                onClick={() =>
-                                  handleAnswerQuestion(question._id)
-                                }
-                                disabled={
-                                  !answerText[question._id]?.trim() ||
-                                  submittingAnswer[question._id]
-                                }
-                                size="sm"
-                                className="bg-blue-600 hover:bg-blue-700"
-                              >
-                                {submittingAnswer[question._id] ? (
-                                  <Loader2 className="h-4 w-4 mr-1 animate-spin" />
-                                ) : (
-                                  <Send className="h-4 w-4 mr-1" />
-                                )}
-                                Submit Answer
-                              </Button>
-                            </div>
-                          )}
                         </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
+
+                        {question.answer ? (
+                          <div className="ml-14 bg-green-50 rounded-md p-4 border-l-4 border-green-400">
+                            <div className="flex items-center gap-2 mb-2">
+                              <span className="font-semibold text-green-800">
+                                Your Response
+                              </span>
+                              <span className="text-sm text-green-600">
+                                {formatDate(question.updatedAt)}
+                              </span>
+                            </div>
+                            <p className="text-green-900 leading-relaxed">
+                              {question.answer}
+                            </p>
+                          </div>
+                        ) : (
+                          <div className="ml-14">
+                            <Textarea
+                              placeholder="Write your response..."
+                              value={answerText[question._id] || ""}
+                              onChange={(e) =>
+                                setAnswerText((prev) => ({
+                                  ...prev,
+                                  [question._id]: e.target.value,
+                                }))
+                              }
+                              className="rounded-md border-gray-200 focus:border-blue-500 focus:ring-blue-500 mb-4 min-h-[100px] resize-none"
+                            />
+                            <Button
+                              onClick={() => handleAnswerQuestion(question._id)}
+                              disabled={
+                                !answerText[question._id]?.trim() ||
+                                submittingAnswer[question._id]
+                              }
+                              className="bg-blue-500 hover:bg-blue-600 text-white rounded-full px-6 py-2 h-auto font-medium"
+                            >
+                              {submittingAnswer[question._id] ? (
+                                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                              ) : (
+                                <Send className="h-4 w-4 mr-2" />
+                              )}
+                              Send Response
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="bg-white rounded-md shadow-0 border border-gray-100 p-12 text-center">
+                    <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <MessageSquare className="h-8 w-8 text-gray-300" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                      No Questions Yet
+                    </h3>
+                    <p className="text-gray-600">
+                      No questions have been asked about this tender.
+                    </p>
+                  </div>
+                )}
               </div>
             )}
           </>
         ) : (
-          // Content for pending approval tenders
-          <div className="space-y-6">
-            <Card className="border border-gray-200 bg-gray-50">
-              <CardContent className="p-8 text-center">
-                <div className="flex flex-col items-center justify-center">
-                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                    <LockIcon className="h-8 w-8 text-gray-600" />
-                  </div>
-                  <h3 className="text-xl font-medium text-gray-800 mb-2">
-                    Content Locked
-                  </h3>
-                  <p className="text-gray-700 max-w-md mx-auto mb-4">
-                    Bids and Q&A sections are hidden until this tender is
-                    approved and becomes active.
-                  </p>
-                  <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200">
-                    <Clock className="h-3 w-3 mr-1" />
-                    Pending Admin Approval
-                  </Badge>
-                </div>
-              </CardContent>
-            </Card>
+          <div className="bg-white rounded-md shadow-0 border border-gray-100 p-12 text-center">
+            <div className="w-16 h-16 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-6">
+              <LockIcon className="h-8 w-8 text-amber-500" />
+            </div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              Content Under Review
+            </h3>
+            <p className="text-gray-600 mb-6 leading-relaxed max-w-md mx-auto">
+              Bids and questions are hidden while this tender undergoes our
+              approval process.
+            </p>
+            <div className="inline-flex items-center bg-amber-50 text-amber-800 px-4 py-2 rounded-full text-sm font-medium">
+              <Clock className="h-4 w-4 mr-2" />
+              Pending Approval
+            </div>
           </div>
         )}
       </div>

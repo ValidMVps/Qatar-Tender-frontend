@@ -27,7 +27,7 @@ export const askQuestion = async (
   question: string
 ): Promise<Question> => {
   try {
-    const response = await api.post("/api/questions", {
+    const response = await api.post<Question>("/api/questions", {
       tender,
       question,
     });
@@ -65,7 +65,7 @@ export const getQuestionsForTender = async (
     const response = await api.get<ApiResponse<Question[]>>(
       `/api/questions/tender/${tenderId}`
     );
-    return response.data;
+    return response.data.data;
   } catch (error: any) {
     throw error.response?.data || error.message;
   }

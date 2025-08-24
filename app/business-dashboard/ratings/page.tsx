@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
@@ -26,8 +26,13 @@ import {
   Save,
   X,
 } from "lucide-react";
-
 import { useTranslation } from "../../../lib/hooks/useTranslation";
+import {
+  getMyReceivedReviews,
+  getReviewsForUser,
+} from "../../services/ReviewService";
+import type { Review as ApiReview } from "@/services/reviewService";
+
 // TypeScript Interfaces
 interface Review {
   id: string;
@@ -58,140 +63,30 @@ interface AnalyticsSummary {
   mostFrequentTag: string;
 }
 
-interface UserRole {
-  type: "project_owner" | "contractor";
-  name: string;
-  company: string;
-}
+// Transform API review to UI review
+const transformApiReviewToReview = (apiReview: ApiReview): Review => ({
+  id: apiReview._id,
+  contractorName: apiReview.reviewer.email, // Using email as name for now
+  contractorAvatar: undefined, // API doesn't provide avatar
+  rating: apiReview.rating,
+  comment: apiReview.comment || "",
+  projectName: apiReview.tender.title,
+  date: apiReview.createdAt,
+  tags: [], // API doesn't provide tags
+});
 
-// Mock Data - Reviews Received
-const mockReviews: Review[] = [
-  {
-    id: "1",
-    contractorName: "Ahmed Al-Mansouri",
-    contractorAvatar:
-      "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2",
-    rating: 5,
-    comment:
-      "Exceptional project owner. Clear communication, prompt payments, and realistic deadlines. Would definitely work with them again on future projects.",
-    projectName: "Qatar National Museum Renovation",
-    date: "2024-01-15",
-    tags: ["Responsive", "Professional", "Paid Quickly"],
-  },
-  {
-    id: "2",
-    contractorName: "Fatima Al-Thani",
-    contractorAvatar:
-      "https://images.pexels.com/photos/3763188/pexels-photo-3763188.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2",
-    rating: 4,
-    comment:
-      "Great collaboration on the infrastructure project. Minor delays in feedback but overall a smooth working relationship.",
-    projectName: "Doha Metro Station Upgrades",
-    date: "2024-01-10",
-    tags: ["Professional", "Detail-oriented"],
-  },
-  {
-    id: "3",
-    contractorName: "Mohammad Al-Kuwari",
-    contractorAvatar:
-      "https://images.pexels.com/photos/1040880/pexels-photo-1040880.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2",
-    rating: 5,
-    comment:
-      "Outstanding project management and clear specifications. Payment was processed ahead of schedule. Highly recommend.",
-    projectName: "Lusail City Commercial Complex",
-    date: "2024-01-05",
-    tags: ["On-time", "Paid Quickly", "Clear Requirements"],
-  },
-  {
-    id: "4",
-    contractorName: "Sarah Al-Dosari",
-    contractorAvatar:
-      "https://images.pexels.com/photos/3785079/pexels-photo-3785079.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2",
-    rating: 4,
-    comment:
-      "Professional and organized project owner. Good communication throughout the project lifecycle.",
-    projectName: "Education City Library Extension",
-    date: "2023-12-28",
-    tags: ["Responsive", "Organized"],
-  },
-  {
-    id: "5",
-    contractorName: "Khalid Al-Attiyah",
-    contractorAvatar:
-      "https://images.pexels.com/photos/2182970/pexels-photo-2182970.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2",
-    rating: 3,
-    comment:
-      "Decent working relationship. Some communication gaps during the project but issues were resolved satisfactorily.",
-    projectName: "West Bay Office Tower",
-    date: "2023-12-20",
-    tags: ["Fair", "Resolves Issues"],
-  },
-  {
-    id: "6",
-    contractorName: "Noor Al-Sulaiti",
-    contractorAvatar:
-      "https://images.pexels.com/photos/3586798/pexels-photo-3586798.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2",
-    rating: 5,
-    comment:
-      "Excellent project owner with clear vision and excellent project coordination. Fast payment processing and great support.",
-    projectName: "Hamad International Airport Terminal",
-    date: "2023-12-15",
-    tags: ["Visionary", "Supportive", "Paid Quickly"],
-  },
-];
-
-const mockReviewsGiven: ReviewGiven[] = [
-  {
-    id: "g1",
-    projectOwnerName: "Omar Al-Rashid",
-    projectOwnerAvatar:
-      "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2",
-    rating: 5,
-    comment:
-      "Excellent contractor with outstanding technical skills. Delivered the project ahead of schedule with exceptional quality. Highly professional and communicative throughout.",
-    projectName: "Smart City Infrastructure",
-    date: "2024-01-20",
-    tags: ["Skilled", "On-time", "Quality Work"],
-  },
-  {
-    id: "g2",
-    projectOwnerName: "Layla Al-Zahra",
-    projectOwnerAvatar:
-      "https://images.pexels.com/photos/3763188/pexels-photo-3763188.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2",
-    rating: 4,
-    comment:
-      "Good contractor with solid technical abilities. Minor communication delays but delivered quality work within budget.",
-    projectName: "Residential Complex Development",
-    date: "2024-01-12",
-    tags: ["Reliable", "Budget-friendly"],
-  },
-  {
-    id: "g3",
-    projectOwnerName: "Hassan Al-Mahmoud",
-    projectOwnerAvatar:
-      "https://images.pexels.com/photos/1040880/pexels-photo-1040880.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2",
-    rating: 5,
-    comment:
-      "Outstanding contractor! Innovative solutions, excellent project management, and superior craftsmanship. Would definitely hire again.",
-    projectName: "Cultural Center Renovation",
-    date: "2024-01-08",
-    tags: ["Innovative", "Professional", "High Quality"],
-  },
-];
-
-const mockAnalytics: AnalyticsSummary = {
-  averageRating: 4.3,
-  totalReviews: 6,
-  fiveStarPercentage: 50,
-  mostFrequentTag: "Professional",
-};
-
-const mockAnalyticsGiven: AnalyticsSummary = {
-  averageRating: 4.7,
-  totalReviews: 3,
-  fiveStarPercentage: 67,
-  mostFrequentTag: "Professional",
-};
+const transformApiReviewToReviewGiven = (
+  apiReview: ApiReview
+): ReviewGiven => ({
+  id: apiReview._id,
+  projectOwnerName: apiReview.reviewedUser, // This should be the project owner name
+  projectOwnerAvatar: undefined, // API doesn't provide avatar
+  rating: apiReview.rating,
+  comment: apiReview.comment || "",
+  projectName: apiReview.tender.title,
+  date: apiReview.createdAt,
+  tags: [], // API doesn't provide tags
+});
 
 // Star Rating Component
 const StarRating: React.FC<{ rating: number; size?: "sm" | "md" | "lg" }> = ({
@@ -451,12 +346,43 @@ const ReviewsRatingsPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [ratingFilter, setRatingFilter] = useState<string>("all");
   const [activeTab, setActiveTab] = useState("received");
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [reviewsGiven, setReviewsGiven] = useState<ReviewGiven[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const [reviewsGiven, setReviewsGiven] =
-    useState<ReviewGiven[]>(mockReviewsGiven);
+  // Fetch reviews when component mounts or tab changes
+  useEffect(() => {
+    const fetchReviews = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        if (activeTab === "received") {
+          const apiReviews = await getMyReceivedReviews();
+          const transformedReviews = apiReviews.map(transformApiReviewToReview);
+          setReviews(transformedReviews);
+        } else {
+          // For "given" tab, you would need to implement a function to get reviews given by current user
+          // This would require a new endpoint in your backend
+          const apiReviews = await getMyReceivedReviews(); // Placeholder - replace with actual function
+          const transformedReviews = apiReviews.map(
+            transformApiReviewToReviewGiven
+          );
+          setReviewsGiven(transformedReviews);
+        }
+      } catch (err) {
+        setError("Failed to fetch reviews");
+        console.error("Error fetching reviews:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchReviews();
+  }, [activeTab]);
 
   const filteredReviews = useMemo(() => {
-    return mockReviews.filter((review) => {
+    return reviews.filter((review) => {
       const matchesSearch =
         review.contractorName
           .toLowerCase()
@@ -470,7 +396,7 @@ const ReviewsRatingsPage: React.FC = () => {
 
       return matchesSearch && matchesRating;
     });
-  }, [searchTerm, ratingFilter]);
+  }, [reviews, searchTerm, ratingFilter]);
 
   const filteredReviewsGiven = useMemo(() => {
     return reviewsGiven.filter((review) => {
@@ -487,7 +413,7 @@ const ReviewsRatingsPage: React.FC = () => {
 
       return matchesSearch && matchesRating;
     });
-  }, [searchTerm, ratingFilter, reviewsGiven]);
+  }, [reviewsGiven, searchTerm, ratingFilter]);
 
   const handleReviewUpdate = (updatedReview: ReviewGiven) => {
     setReviewsGiven((prev) =>
@@ -495,6 +421,14 @@ const ReviewsRatingsPage: React.FC = () => {
         review.id === updatedReview.id ? updatedReview : review
       )
     );
+  };
+
+  // Mock analytics data - in a real app, this would come from the API
+  const mockAnalytics: AnalyticsSummary = {
+    averageRating: 4.3,
+    totalReviews: reviews.length,
+    fiveStarPercentage: 50,
+    mostFrequentTag: "Professional",
   };
 
   const EmptyState = ({ type }: { type: "received" | "given" }) => (
@@ -514,7 +448,17 @@ const ReviewsRatingsPage: React.FC = () => {
       </p>
     </div>
   );
+
   const { t } = useTranslation();
+
+  if (loading) {
+    return <div className="container mx-auto py-8">Loading reviews...</div>;
+  }
+
+  if (error) {
+    return <div className="container mx-auto py-8 text-red-500">{error}</div>;
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 container mx-auto px-0 py-8 ">
       <div className="mx-auto space-y-8">

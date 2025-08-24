@@ -59,7 +59,7 @@ export const updateTender = async (
 export const updateTenderStatus = async (id: string, status: string) => {
   try {
     const res = await api.put(`/api/tenders/${id}/status`, { status });
-    return res.data; // updated tender object
+    return res.data.tender; // updated tender object
   } catch (error: any) {
     console.error(
       "Error updating tender status:",
@@ -91,6 +91,18 @@ export const getTenders = async (params?: TendersParams) => {
     return res.data;
   } catch (error: any) {
     console.error("Error fetching tenders:", error.response?.data || error.message);
+    throw error;
+  }
+};
+export const awardTender = async (id: string, bidId: string) => {
+  try {
+    const res = await api.put(`/api/tenders/${id}/award`, { bidId });
+    return res.data; // { message: "Tender awarded successfully", tender }
+  } catch (error: any) {
+    console.error(
+      "Error awarding tender:",
+      error.response?.data || error.message
+    );
     throw error;
   }
 };

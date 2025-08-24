@@ -1,5 +1,6 @@
-// utils/uploadToCloudinary.js
-export const uploadToCloudinary = async (file) => {
+// utils/uploadToCloudinary.ts
+
+export const uploadToCloudinary = async (file: File): Promise<string> => {
   try {
     console.log("🔄 Starting Cloudinary upload...");
     console.log("📁 File details:", {
@@ -33,7 +34,7 @@ export const uploadToCloudinary = async (file) => {
     // Log FormData contents (for debugging)
     console.log("📦 FormData entries:");
     for (let [key, value] of formData.entries()) {
-      console.log(`  ${key}:`, value instanceof File ? `File(${value.name})` : value);
+      console.log(`  ${key}:`, value instanceof File ? `File(${(value as File).name})` : value);
     }
 
     const uploadUrl = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
@@ -53,7 +54,7 @@ export const uploadToCloudinary = async (file) => {
       throw new Error(`Cloudinary upload failed: ${response.status} ${response.statusText} - ${errorText}`);
     }
 
-    const data = await response.json();
+    const data: any = await response.json();
     console.log("✅ Cloudinary success response:", {
       secure_url: data.secure_url,
       public_id: data.public_id,
@@ -70,9 +71,9 @@ export const uploadToCloudinary = async (file) => {
     }
 
     console.log("🎉 Upload successful! URL:", data.secure_url);
-    return data.secure_url;
+    return data.secure_url as string;
 
-  } catch (error) {
+  } catch (error: any) {
     console.error("💥 Cloudinary upload error:", error);
     console.error("Error stack:", error.stack);
 

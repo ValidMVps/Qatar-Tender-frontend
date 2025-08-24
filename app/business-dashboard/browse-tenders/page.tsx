@@ -115,7 +115,7 @@ export default function ServiceProvidingDashboardPage() {
   };
 
   const resolveBidsCount = (tender: any) => {
-    if (typeof tender.bidsCount === "number") return tender.bidsCount;
+    if (typeof tender.bidCount === "number") return tender.bidCount;
     if (typeof tender.bids === "number") return tender.bids;
     if (typeof tender.bids === "string") {
       const match = tender.bids.match(/\d+/);
@@ -624,7 +624,9 @@ export default function ServiceProvidingDashboardPage() {
         </div>
 
         <div className="container mx-auto px-0 py-4">
-          <div className={!showFilters ? "flex  px-0 gap-2" : "flex  px-0 gap-6"}>
+          <div
+            className={!showFilters ? "flex  px-0 gap-2" : "flex  px-0 gap-6"}
+          >
             {/* Filters Sidebar */}
             <div
               className={`transition-all duration-500 ${

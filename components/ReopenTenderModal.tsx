@@ -37,7 +37,11 @@ import {
 } from "lucide-react";
 
 import { useTranslation } from "../lib/hooks/useTranslation";
-import { getTender, updateTender } from "@/app/services/tenderService";
+import {
+  getTender,
+  updateTender,
+  updateTenderStatus,
+} from "@/app/services/tenderService";
 import { uploadToCloudinary } from "@/utils/uploadToCloudinary";
 import { detectContactInfo, VALIDATION_RULES } from "@/utils/validationcehck";
 import { getCategories } from "@/app/services/categoryService";
@@ -468,7 +472,7 @@ const ReopenTenderModal = ({
 
       // Call your service (should send JSON)
       const updated = await updateTender(tenderId, payload);
-
+      const moreupdated = await updateTenderStatus(tenderId, "active");
       setShowSuccess(true);
 
       setTimeout(() => {

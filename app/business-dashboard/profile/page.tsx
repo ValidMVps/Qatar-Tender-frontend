@@ -40,6 +40,25 @@ import { uploadToCloudinary } from "../../../utils/uploadToCloudinary";
 import { profileApi } from "@/app/services/profileApi";
 import { useAuth } from "@/context/AuthContext";
 
+interface ProfileData {
+  companyName: string;
+  contactPersonName: string;
+  personalEmail: string;
+  companyEmail: string;
+  companyPhoneCountryCode: string;
+  companyPhoneNumber: string;
+  commercialRegistrationNumber: string;
+  companyDescription: string;
+  companyWebsite: string;
+  phone: string;
+  address: string;
+}
+
+interface DocumentData {
+  commercialRegistrationDoc: string | null;
+  commercialRegistrationNumber: string;
+}
+
 export default function Component() {
   const { t } = useTranslation();
 
@@ -50,11 +69,13 @@ export default function Component() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploadingFile, setUploadingFile] = useState(false);
-  const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(null);
-  const [verificationStatus, setVerificationStatus] = useState(null);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [verificationStatus, setVerificationStatus] = useState<string | null>(
+    null
+  );
 
-  const [profileData, setProfileData] = useState({
+  const [profileData, setProfileData] = useState<ProfileData>({
     companyName: "",
     contactPersonName: "",
     personalEmail: "",
@@ -68,7 +89,7 @@ export default function Component() {
     address: "",
   });
 
-  const [documentData, setDocumentData] = useState({
+  const [documentData, setDocumentData] = useState<DocumentData>({
     commercialRegistrationDoc: null,
     commercialRegistrationNumber: "",
   });
@@ -110,7 +131,7 @@ export default function Component() {
         commercialRegistrationNumber:
           profile.commercialRegistrationNumber || "",
       });
-    } catch (err) {
+    } catch (err: any) {
       setError(err.message);
     } finally {
       setLoading(false);
@@ -119,11 +140,11 @@ export default function Component() {
 
   const loadVerificationStatus = async () => {
     try {
-      const status = user.isDocumentVerified;
+      const status = user?.isDocumentVerified;
       console.log(status, user);
-      setVerificationStatus(status);
+      setVerificationStatus(status || null);
       setIsProfileCompleted(status === "verified" || status === "pending");
-    } catch (err) {
+    } catch (err: any) {
       console.error("Failed to load verification status:", err);
     }
   };
@@ -159,7 +180,7 @@ export default function Component() {
 
       // Clear success message after 3 seconds
       setTimeout(() => setSuccess(null), 3000);
-    } catch (err) {
+    } catch (err: any) {
       setError(err.message);
     } finally {
       setSaving(false);
@@ -171,7 +192,7 @@ export default function Component() {
     loadProfile(); // Reset to original data
   };
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
     setProfileData((prevData) => ({
       ...prevData,
@@ -179,14 +200,16 @@ export default function Component() {
     }));
   };
 
-  const handleSelectChange = (value) => {
+  const handleSelectChange = (value: string) => {
     setProfileData((prevData) => ({
       ...prevData,
       companyPhoneCountryCode: value,
     }));
   };
 
-  const handleFileUpload = async (event) => {
+  const handleFileUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -217,7 +240,7 @@ export default function Component() {
 
       setSuccess("Document uploaded successfully!");
       setTimeout(() => setSuccess(null), 3000);
-    } catch (err) {
+    } catch (err: any) {
       setError("Failed to upload document: " + err.message);
     } finally {
       setUploadingFile(false);
@@ -237,7 +260,7 @@ export default function Component() {
     ];
 
     requiredFields.forEach((field) => {
-      if (profileData[field]?.trim()) completedFields++;
+      if (profileData[field as keyof ProfileData]?.trim()) completedFields++;
     });
 
     setProfileCompletion(
@@ -254,7 +277,8 @@ export default function Component() {
 
       const documentsPayload = {
         commercialRegistrationNumber: documentData.commercialRegistrationNumber,
-        commercialRegistrationDoc: documentData.commercialRegistrationDoc,
+        commercialRegistrationDoc:
+          documentData.commercialRegistrationDoc ?? undefined,
       };
 
       await profileApi.submitDocuments(documentsPayload);
@@ -268,7 +292,7 @@ export default function Component() {
       await loadVerificationStatus();
 
       setTimeout(() => setSuccess(null), 3000);
-    } catch (err) {
+    } catch (err: any) {
       setError(err.message);
     } finally {
       setSaving(false);
@@ -642,7 +666,7 @@ export default function Component() {
                           size="sm"
                           onClick={() =>
                             window.open(
-                              documentData.commercialRegistrationDoc,
+                              documentData.commercialRegistrationDoc!,
                               "_blank"
                             )
                           }

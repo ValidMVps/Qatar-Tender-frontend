@@ -6,6 +6,7 @@ import {
   AlertCircle,
   FileText,
   XCircle,
+  Check,
 } from "lucide-react";
 import { UiTender } from "@/types/ui";
 
@@ -15,6 +16,8 @@ export const getStatusColor = (t: UiTender) => {
   switch (t.status) {
     case "active":
       return "bg-green-100 text-green-800 border-green-200";
+    case "awarded":
+      return "bg-blue-400 text-blue-800 border-blue-200";
     case "closed":
       return "bg-gray-100 text-gray-800 border-gray-200";
     case "draft":
@@ -38,6 +41,8 @@ export const getStatusText = (t: UiTender) => {
       return "Draft";
     case "rejected":
       return "Rejected";
+    case "awarded":
+      return "Awarded";
     default:
       return "Unknown";
   }
@@ -55,6 +60,8 @@ export const getStatusIcon = (t: UiTender): React.ReactNode => {
       return <FileText className="h-4 w-4" />;
     case "rejected":
       return <XCircle className="h-4 w-4" />;
+    case "awarded":
+      return <Check className="h-4 w-4" />;
     default:
       return <FileText className="h-4 w-4" />;
   }

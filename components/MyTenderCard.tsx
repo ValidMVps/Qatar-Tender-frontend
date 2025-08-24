@@ -28,13 +28,14 @@ interface TenderCardProps {
   onReapply: (id: string) => void;
   onUpdate?: (apiTender: any) => void;
   t: (key: string, params?: any) => string;
+  fetchTenders: () => Promise<void>;
 }
 
 export default function MyTenderCard({
   tender,
-  onReapply,
   onUpdate,
   t,
+  fetchTenders,
 }: TenderCardProps) {
   const [openTenderModal, setOpenTenderModal] = useState(false);
 
@@ -60,6 +61,7 @@ export default function MyTenderCard({
       const updated = await updateTenderStatus(tender.id, "closed");
       onUpdate?.(updated);
       setConfirmClose(false);
+      fetchTenders();
     } catch (err) {
       console.error("Failed to close tender:", err);
       setCloseError("Failed to close tender. Try again.");
@@ -69,7 +71,7 @@ export default function MyTenderCard({
   };
 
   const { profile } = useAuth();
-
+  console.log(tender);
   return (
     <>
       <div className="bg-white/80 backdrop-blur-lg rounded-lg border border-gray-200 shadow-0 overflow-hidden transition-all hover:shadow-0">
@@ -90,7 +92,10 @@ export default function MyTenderCard({
               </Link>
 
               <div className="flex flex-wrap items-center gap-2 mt-2">
-                <Badge variant="secondary" className="rounded-full px-3 py-1 text-xs font-medium">
+                <Badge
+                  variant="secondary"
+                  className="rounded-full px-3 py-1 text-xs font-medium"
+                >
                   {tender.category}
                 </Badge>
                 {tender.location && (
@@ -132,7 +137,7 @@ export default function MyTenderCard({
             </div>
             <div className="text-center py-2">
               <p className="text-lg font-semibold text-gray-900">
-                {tender.bidsCount}
+                {tender.bidCount}
               </p>
               <p className="text-xs text-gray-500 font-medium">Bids Received</p>
             </div>
@@ -197,6 +202,7 @@ export default function MyTenderCard({
           onUpdated={(updated) => {
             onUpdate?.(updated);
             setOpenTenderModal(false);
+            fetchTenders();
           }}
         />
 
@@ -208,6 +214,7 @@ export default function MyTenderCard({
           onUpdated={(updated) => {
             onUpdate?.(updated);
             setIsReopening(false);
+            fetchTenders();
           }}
         />
 
@@ -216,7 +223,9 @@ export default function MyTenderCard({
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn">
             <div className="bg-white rounded-2xl shadow-0 w-full max-w-sm overflow-hidden border border-gray-200">
               <div className="p-6 text-center">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Close Tender</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  Close Tender
+                </h3>
                 <p className="text-sm text-gray-600 mb-4">
                   Are you sure you want to mark this tender as <b>Closed</b>?
                 </p>

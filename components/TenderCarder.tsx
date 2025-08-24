@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useTranslation } from '../lib/hooks/useTranslation';
+import { useTranslation } from "../lib/hooks/useTranslation";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -39,9 +39,8 @@ interface TenderCardProps {
 }
 
 export function TenderCarder({ tender }: TenderCardProps) {
+  const { t } = useTranslation();
   const getStatusVariant = (status: Tender["status"]) => {
-      const { t } = useTranslation();
-
     switch (status) {
       case "Active":
         return "default"; // Default is usually blue/primary
@@ -69,8 +68,8 @@ export function TenderCarder({ tender }: TenderCardProps) {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem>{t('edit')}</DropdownMenuItem>
-              <DropdownMenuItem>{t('delete')}</DropdownMenuItem>
+              <DropdownMenuItem>{t("edit")}</DropdownMenuItem>
+              <DropdownMenuItem>{t("delete")}</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -99,7 +98,7 @@ export function TenderCarder({ tender }: TenderCardProps) {
           {tender.status}
         </Badge>
         <Button variant="outline" size="sm">
-          <Eye className="mr-2 h-4 w-4" /> {t('view')}
+          <Eye className="mr-2 h-4 w-4" /> {t("view")}
         </Button>
       </CardFooter>
     </Card>

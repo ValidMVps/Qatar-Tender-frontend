@@ -16,7 +16,7 @@ export type UiTender = {
   updatedAt?: string;
   postedDate: string;
   deadlineDate: string;
-  bidsCount: number;
+  bidCount: number;
   awardedBid: boolean;
   isCompleted: boolean;
   rejectionReason?: string;
