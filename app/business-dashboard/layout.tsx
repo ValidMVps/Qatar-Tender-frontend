@@ -31,85 +31,92 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isClient, setIsClient] = useState(false);
   const pathname = usePathname();
   const { t } = useTranslation();
 
   useEffect(() => {
+    setIsClient(true);
     document.body.style.overflow = sidebarOpen ? "hidden" : "";
   }, [sidebarOpen]);
 
+  // Define sidebar groups with fallback values for SSR
   const sidebarGroups = [
     {
-      title: t("overview"),
+      title: isClient ? t("overview") : "Overview",
       links: [
-        { name: t("dashboard"), href: "/business-dashboard", icon: Home },
         {
-          name: t("analytics"),
+          name: isClient ? t("dashboard") : "Dashboard",
+          href: "/business-dashboard",
+          icon: Home,
+        },
+        {
+          name: isClient ? t("analytics") : "Analytics",
           href: "/business-dashboard/analytics",
           icon: BarChart,
         },
       ],
     },
     {
-      title: t("project_posting"),
+      title: isClient ? t("project_posting") : "Project Posting",
       links: [
         {
-          name: t("my_posted_tenders"),
+          name: isClient ? t("my_posted_tenders") : "My Posted Tenders",
           href: "/business-dashboard/my-tenders",
           icon: FileText,
         },
         {
-          name: t("active_projects"),
+          name: isClient ? t("active_projects") : "Active Projects",
           href: "/business-dashboard/projects",
           icon: Briefcase,
         },
       ],
     },
     {
-      title: t("bidding"),
+      title: isClient ? t("bidding") : "Bidding",
       links: [
         {
-          name: t("browse_tenders"),
+          name: isClient ? t("browse_tenders") : "Browse Tenders",
           href: "/business-dashboard/browse-tenders",
           icon: Search,
         },
         {
-          name: t("my_bids"),
+          name: isClient ? t("my_bids") : "My Bids",
           href: "/business-dashboard/bids",
           icon: PenSquare,
         },
         {
-          name: t("saved_jobs"),
+          name: isClient ? t("saved_jobs") : "Saved Jobs",
           href: "/business-dashboard/saved-jobs",
           icon: Save,
         },
       ],
     },
     {
-      title: t("company_profile"),
+      title: isClient ? t("company_profile") : "Company Profile",
       links: [
         {
-          name: t("company_profile"),
+          name: isClient ? t("company_profile") : "Company Profile",
           href: "/business-dashboard/profile",
           icon: Building2,
         },
         {
-          name: t("ratings_and_reviews"),
+          name: isClient ? t("ratings_and_reviews") : "Ratings and Reviews",
           href: "/business-dashboard/ratings",
           icon: Star,
         },
       ],
     },
     {
-      title: t("system"),
+      title: isClient ? t("system") : "System",
       links: [
         {
-          name: t("settings"),
+          name: isClient ? t("settings") : "Settings",
           href: "/business-dashboard/settings",
           icon: Settings,
         },
         {
-          name: t("help_and_support"),
+          name: isClient ? t("help_and_support") : "Help and Support",
           href: "/business-dashboard/help",
           icon: HelpCircle,
         },
@@ -169,7 +176,7 @@ export default function DashboardLayout({
                     <Building2 className="h-5 w-5 text-white" />
                   </div>
                   <span className="ml-2 text-lg font-semibold text-gray-900">
-                    {t("tenderhub_qatar")}
+                    {isClient ? t("tenderhub_qatar") : "TenderHub Qatar"}
                   </span>
                 </div>
                 <button onClick={() => setSidebarOpen(false)}>
@@ -189,7 +196,7 @@ export default function DashboardLayout({
                 <Building2 className="h-5 w-5 text-white" />
               </div>
               <span className="text-2xl font-semibold text-gray-900">
-                {t("tenderhub")}
+                {isClient ? t("tenderhub") : "TenderHub"}
               </span>
             </div>
           </div>

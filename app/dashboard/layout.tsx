@@ -20,32 +20,59 @@ import { motion } from "framer-motion";
 import { useTranslation } from "../../lib/hooks/useTranslation";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { ProtectedRoute } from "@/components/auth-guard";
+
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const { t } = useTranslation();
-
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isClient, setIsClient] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
+    setIsClient(true);
     document.body.style.overflow = sidebarOpen ? "hidden" : "";
   }, [sidebarOpen]);
 
+  // Define sidebar links with fallback values for SSR
   const sidebarLinks = [
-    { name: t("dashboard"), href: "/dashboard", icon: Home },
-    { name: t("my_tenders"), href: "/dashboard/my-tenders", icon: FileText },
     {
-      name: t("active_projects"),
+      name: isClient ? t("dashboard") : "Dashboard",
+      href: "/dashboard",
+      icon: Home,
+    },
+    {
+      name: isClient ? t("my_tenders") : "My Tenders",
+      href: "/dashboard/my-tenders",
+      icon: FileText,
+    },
+    {
+      name: isClient ? t("active_projects") : "Active Projects",
       href: "/dashboard/projects",
       icon: Briefcase,
     },
-    { name: t("ratings_reviews"), href: "/dashboard/ratings", icon: Star },
-    { name: t("settings"), href: "/dashboard/settings", icon: Settings },
-    { name: t("help_support"), href: "/dashboard/help", icon: HelpCircle },
-    { name: t("analytics"), href: "/dashboard/analytics", icon: BarChart },
+    {
+      name: isClient ? t("ratings_reviews") : "Ratings & Reviews",
+      href: "/dashboard/ratings",
+      icon: Star,
+    },
+    {
+      name: isClient ? t("settings") : "Settings",
+      href: "/dashboard/settings",
+      icon: Settings,
+    },
+    {
+      name: isClient ? t("help_support") : "Help & Support",
+      href: "/dashboard/help",
+      icon: HelpCircle,
+    },
+    {
+      name: isClient ? t("analytics") : "Analytics",
+      href: "/dashboard/analytics",
+      icon: BarChart,
+    },
   ];
 
   return (
@@ -127,7 +154,7 @@ export default function DashboardLayout({
                   sidebarOpen ? "opacity-0 w-0 overflow-hidden" : "opacity-100"
                 }`}
               >
-                {t("tenderhub")}
+                {isClient ? t("tenderhub") : "TenderHub"}
               </span>
             </div>
           </div>
