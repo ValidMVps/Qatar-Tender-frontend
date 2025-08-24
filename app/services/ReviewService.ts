@@ -35,12 +35,12 @@ export const createReview = async (reviewData: CreateReviewData): Promise<Review
 
 // Get reviews for a specific user
 export const getReviewsForUser = async (userId: string): Promise<Review[]> => {
-    const response = await api.get<Review[]>(`/reviews/user/${userId}`);
+    const response = await api.get<Review[]>(`/api/reviews/user/${userId}`);
     return response.data;
 };
 
 // Get reviews received by the current user
 export const getMyReceivedReviews = async (): Promise<Review[]> => {
-    const response = await api.get<Review[]>("/reviews/my-reviews");
+    const response = await api.get<Review[]>("/api/reviews/my-reviews");
     return response.data;
 };

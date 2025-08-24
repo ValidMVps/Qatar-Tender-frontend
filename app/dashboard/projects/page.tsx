@@ -5,7 +5,6 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Inbox, Search } from "lucide-react";
 import Link from "next/link";
-import { ReviewDialog } from "@/components/review-dialog";
 import { ProjectDetailsSidebar } from "@/components/project-details-sidebar";
 import ChatSection from "@/components/ChatSection";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
@@ -330,12 +329,6 @@ export default function Component() {
           />
         </SheetContent>
       </Sheet>
-
-      <ReviewDialog
-        isOpen={isReviewDialogOpen}
-        onOpenChange={setIsReviewDialogOpen}
-        onSubmit={handleReviewSubmit}
-      />
     </div>
   );
 }

@@ -27,7 +27,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import useTranslation from "@/lib/hooks/useTranslation";
 
 // Services
@@ -38,7 +38,7 @@ import {
   answerQuestion,
   Question,
 } from "@/app/services/QnaService";
-import { awardTender } from "@/app/services/tenderService"; // New import
+import { awardTender } from "@/app/services/tenderService";
 
 // Utils
 import { getStatusColor, getStatusText } from "@/utils/tenderStatus";
@@ -51,7 +51,13 @@ interface Tender {
   description: string;
   estimatedBudget: number;
   deadline: string;
-  status: "active" | "pending_approval" | "closed" | "draft" | "awarded";
+  status:
+    | "active"
+    | "pending_approval"
+    | "closed"
+    | "draft"
+    | "awarded"
+    | "completed";
   category: { _id: string; name: string; description: string };
   location: string;
   contactEmail: string;
@@ -93,15 +99,17 @@ interface Bid {
 }
 
 export default function TenderDetailPage() {
+  const { profile } = useAuth();
   const { t } = useTranslation();
   const params = useParams();
+  const router = useRouter();
   const tenderId = params.id as string;
   const [tender, setTender] = useState<Tender | null>(null);
   const [bids, setBids] = useState<Bid[]>([]);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<"bids" | "qa">("bids");
+  const [activeTab, setActiveTab] = useState<"bids" | "qa" | "reviews">("bids");
   const [answerText, setAnswerText] = useState<{ [key: string]: string }>({});
   const [submittingAnswer, setSubmittingAnswer] = useState<{
     [key: string]: boolean;
@@ -132,20 +140,17 @@ export default function TenderDetailPage() {
     if (tenderId) fetchTenderData();
   }, [tenderId]);
 
-  // ✅ Handle awarding the tender
   const handleBidStatusUpdate = async (
     bidId: string,
     status: "accepted" | "rejected"
   ) => {
-    if (status !== "accepted") return; // Only accept flow uses award
+    if (status !== "accepted") return;
 
     try {
       setUpdatingBidStatus((prev) => ({ ...prev, [bidId]: true }));
 
-      // Call backend to award the tender
       await awardTender(tenderId, bidId);
 
-      // Update bids locally
       setBids((prevBids) =>
         prevBids.map((bid) =>
           bid._id === bidId
@@ -154,10 +159,8 @@ export default function TenderDetailPage() {
         )
       );
 
-      // Update tender status
       setTender((prev) => (prev ? { ...prev, status: "awarded" } : null));
 
-      // Optional: show success feedback
       alert("Tender awarded successfully!");
     } catch (err: any) {
       console.error("Error awarding tender:", err);
@@ -176,7 +179,7 @@ export default function TenderDetailPage() {
     try {
       setSubmittingAnswer((prev) => ({ ...prev, [questionId]: true }));
       await answerQuestion(questionId, answer);
-      fetchTenderData(); // Refetch to update answer state
+      fetchTenderData();
       setAnswerText((prev) => ({ ...prev, [questionId]: "" }));
     } catch (err: any) {
       console.error("Error answering question:", err);
@@ -261,7 +264,9 @@ export default function TenderDetailPage() {
   const awardedBid = bids.find((bid) => bid.status === "accepted");
   const hasAwardedBid = !!awardedBid;
   const isPendingApproval = tender.status === "pending_approval";
-  const { profile } = useAuth();
+  const isAwarded = tender.status === "awarded";
+  const isCompleted = tender.status === "completed";
+
   return (
     <div className="min-h-screen">
       {/* Navigation Bar */}
@@ -319,6 +324,8 @@ export default function TenderDetailPage() {
                       ? "bg-green-50 text-green-700 border-green-200"
                       : tender.status === "awarded"
                       ? "bg-blue-50 text-blue-700 border-blue-200"
+                      : tender.status === "completed"
+                      ? "bg-purple-50 text-purple-700 border-purple-200"
                       : tender.status === "closed"
                       ? "bg-gray-50 text-gray-700 border-gray-200"
                       : "bg-yellow-50 text-yellow-700 border-yellow-200"
@@ -384,6 +391,19 @@ export default function TenderDetailPage() {
                 </div>
               </div>
             </div>
+
+            {/* Chat Button - Only show when awarded */}
+            {isAwarded && awardedBid && (
+              <div className="mt-6 lg:mt-0 lg:ml-8">
+                <Button
+                  onClick={() => router.push(`/chat/${awardedBid.bidder._id}`)}
+                  className="bg-blue-500 hover:bg-blue-600 text-white rounded-full px-6 py-3 h-auto font-medium flex items-center"
+                >
+                  <MessageSquare className="h-5 w-5 mr-2" />
+                  Chat with Bidder
+                </Button>
+              </div>
+            )}
           </div>
         </div>
 
@@ -413,6 +433,18 @@ export default function TenderDetailPage() {
                 >
                   Questions & Answers ({questions.length})
                 </button>
+                {hasAwardedBid && (
+                  <button
+                    onClick={() => setActiveTab("reviews")}
+                    className={`flex-1 py-4 px-6 font-semibold text-center transition-all relative ${
+                      activeTab === "reviews"
+                        ? "text-blue-600 bg-blue-50"
+                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                    }`}
+                  >
+                    Reviews
+                  </button>
+                )}
               </div>
             </div>
 
@@ -639,6 +671,79 @@ export default function TenderDetailPage() {
                     <p className="text-gray-600">
                       No questions have been asked about this tender.
                     </p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Reviews Tab */}
+            {activeTab === "reviews" && hasAwardedBid && (
+              <div className="bg-white rounded-md shadow-0 border border-gray-100 p-6">
+                <h2 className="text-xl font-bold text-gray-900 mb-6">
+                  Reviews
+                </h2>
+
+                {/* Review Section - Only show when completed */}
+                {isCompleted ? (
+                  <div className="space-y-6">
+                    <div className="border border-gray-200 rounded-md p-6">
+                      <h3 className="font-semibold text-gray-900 mb-4">
+                        Your Review
+                      </h3>
+                      <div className="flex items-center mb-4">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <Star
+                            key={star}
+                            className="h-6 w-6 text-yellow-400 fill-current"
+                          />
+                        ))}
+                      </div>
+                      <p className="text-gray-700">
+                        Great work! The project was completed on time and
+                        exceeded expectations.
+                      </p>
+                    </div>
+
+                    <div className="border border-gray-200 rounded-md p-6">
+                      <h3 className="font-semibold text-gray-900 mb-4">
+                        Bidder's Review
+                      </h3>
+                      <div className="flex items-center mb-4">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <Star
+                            key={star}
+                            className="h-6 w-6 text-yellow-400 fill-current"
+                          />
+                        ))}
+                      </div>
+                      <p className="text-gray-700">
+                        Professional client, clear requirements, and prompt
+                        payments.
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Star className="h-8 w-8 text-blue-500" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                      Reviews Not Available Yet
+                    </h3>
+                    <p className="text-gray-600 mb-6">
+                      Reviews will be available once the project is completed.
+                    </p>
+                    {isAwarded && (
+                      <Button
+                        onClick={() =>
+                          router.push(`/chat/${awardedBid.bidder._id}`)
+                        }
+                        className="bg-blue-500 hover:bg-blue-600 text-white rounded-full px-6 py-2 h-auto font-medium"
+                      >
+                        <MessageSquare className="h-4 w-4 mr-2" />
+                        Chat with Bidder
+                      </Button>
+                    )}
                   </div>
                 )}
               </div>

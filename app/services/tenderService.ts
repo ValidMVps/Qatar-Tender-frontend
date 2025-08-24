@@ -59,7 +59,7 @@ export const updateTender = async (
 export const updateTenderStatus = async (id: string, status: string) => {
   try {
     const res = await api.put(`/api/tenders/${id}/status`, { status });
-    return res.data.tender; // updated tender object
+    return res.data; // updated tender object
   } catch (error: any) {
     console.error(
       "Error updating tender status:",

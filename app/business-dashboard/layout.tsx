@@ -103,7 +103,11 @@ export default function DashboardLayout({
     {
       title: t("system"),
       links: [
-      
+        {
+          name: t("settings"),
+          href: "/business-dashboard/settings",
+          icon: Settings,
+        },
         {
           name: t("help_and_support"),
           href: "/business-dashboard/help",
