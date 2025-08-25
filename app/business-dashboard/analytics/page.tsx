@@ -1,33 +1,19 @@
 "use client";
 import * as React from "react";
 import {
-  AlertTriangle,
-  BarChart3,
-  Bell,
-  BookOpen,
-  LineChartIcon as ChartLine,
-  ChevronRight,
-  CircleHelp,
-  Clock,
-  FilePlus,
-  Gauge,
-  Inbox,
-  Layers,
-  LineChartIcon,
-  ListOrdered,
-  Settings,
-  Star,
-  User,
-  ArrowUp,
-  ArrowDown,
-  ArrowUpRight,
-  ArrowDownLeft,
-  Hourglass,
-  CheckSquare,
-  XSquare,
-  FileText,
-  TrendingUp,
-} from "lucide-react";
+  Area,
+  AreaChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  XAxis,
+  YAxis,
+} from "recharts";
+import {
+  type ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
 import {
   Select,
   SelectContent,
@@ -35,912 +21,498 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarHeader,
-  SidebarInset,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarProvider,
-  SidebarRail,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
-import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Line,
-  LineChart,
-  ResponsiveContainer,
-  XAxis,
-  YAxis,
-} from "recharts";
-import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
-import ProjectsOverviewChart from "@/components/ProjectOverviewChart";
-import { Tabs } from "@radix-ui/react-tabs";
-import { TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import Banalytics from "@/components/Banalytics";
+import { getUserTenders } from "@/app/services/tenderService";
+import { getUserBids } from "@/app/services/BidService";
+import { Loader2, TrendingUp, Calendar, Award } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
-import { useTranslation } from "../../../lib/hooks/useTranslation";
-type TenderStatus = "Pending" | "Active" | "Closed";
+const chartConfig = {
+  tenders: { label: "Tenders" },
+  tendersPosted: { label: "Tenders Posted", color: "#007AFF" },
+  bidsReceived: { label: "Bids Received", color: "#34C759" },
+  myBids: { label: "My Bids", color: "#AF52DE" },
+} satisfies ChartConfig;
 
-type Tender = {
-  id: string;
-  title: string;
-  category: string;
-  status: TenderStatus;
+interface ChartDataPoint {
+  date: string;
+  tendersPosted: number;
   bidsReceived: number;
-  views: number;
-  postedAt: string; // ISO date
-  deadline: string; // ISO date
-  bidDiffPct?: number; // For visualization; e.g., spread between min and max bids (%)
-  value: number;
-};
+  myBids: number;
+}
 
-const dummyTenders: Tender[] = [
-  {
-    id: "TND-001",
-    title: "Apartment Renovation - Kitchen & Bath",
-    category: "Construction",
-    status: "Active",
-    bidsReceived: 12,
-    views: 420,
-    postedAt: "2025-07-20",
-    deadline: "2025-08-15",
-    bidDiffPct: 24,
-    value: 150000, // Added value
-  },
-  {
-    id: "TND-002",
-    title: "Home Solar Panel Installation",
-    category: "Energy",
-    status: "Active",
-    bidsReceived: 0,
-    views: 185,
-    postedAt: "2025-07-29",
-    deadline: "2025-08-10",
-    bidDiffPct: 0,
-    value: 25000, // Added value
-  },
-  {
-    id: "TND-003",
-    title: "Custom Wardrobes & Cabinetry",
-    category: "Carpentry",
-    status: "Active",
-    bidsReceived: 7,
-    views: 260,
-    postedAt: "2025-07-18",
-    deadline: "2025-08-05",
-    bidDiffPct: 31,
-    value: 18000, // Added value
-  },
-  {
-    id: "TND-004",
-    title: "Landscape Design & Irrigation",
-    category: "Landscaping",
-    status: "Active",
-    bidsReceived: 9,
-    views: 510,
-    postedAt: "2025-06-30",
-    deadline: "2025-07-30",
-    bidDiffPct: 18,
-    value: 35000, // Added value
-  },
-  {
-    id: "TND-005",
-    title: "AC Servicing & Duct Cleaning",
-    category: "HVAC",
-    status: "Active",
-    bidsReceived: 2,
-    views: 143,
-    postedAt: "2025-07-25",
-    deadline: "2025-08-06",
-    bidDiffPct: 12,
-    value: 5000, // Added value
-  },
-  {
-    id: "TND-006",
-    title: "Painting: 3BHK Apartment",
-    category: "Painting",
-    status: "Active",
-    bidsReceived: 5,
-    views: 201,
-    postedAt: "2025-07-15",
-    deadline: "2025-08-03",
-    bidDiffPct: 22,
-    value: 8000, // Added value
-  },
-];
+interface BidSuccessData {
+  date: string;
+  bidsPlaced: number;
+  bidsWon: number;
+}
 
-function formatDate(d: string) {
-  return new Date(d).toLocaleDateString("en-QA", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
+export default function page() {
+  const [timeRange, setTimeRange] = React.useState("7d");
+  const [chartData, setChartData] = React.useState<ChartDataPoint[]>([]);
+  const [bidSuccessData, setBidSuccessData] = React.useState<BidSuccessData[]>(
+    []
+  );
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
+  const [stats, setStats] = React.useState({
+    totalTenders: 0,
+    totalBids: 0,
+    activeTenders: 0,
+    completedTenders: 0,
+    pendingBids: 0,
+    acceptedBids: 0,
   });
-}
+  const { user } = useAuth();
 
-function StatusBadge({ status }: { status: TenderStatus }) {
-  const { t } = useTranslation();
-  if (status === "Active")
-    return (
-      <Badge className="bg-blue-600 hover:bg-blue-600 text-white">
-        {t("active")}
-      </Badge>
-    );
-  if (status === "Pending")
-    return <Badge variant="secondary">{t("pending")}</Badge>;
-  return <Badge variant="outline">{t("closed")}</Badge>;
-}
+  const processDataForChart = (tenders: any[], bids: any[]) => {
+    const dataMap = new Map<string, ChartDataPoint>();
+    const days = timeRange === "30d" ? 30 : timeRange === "7d" ? 7 : 90;
+    const endDate = new Date();
+    const startDate = new Date(endDate);
+    startDate.setDate(startDate.getDate() - days);
 
-function StatCard({
-  title,
-  value,
-  icon,
-  subtle,
-}: {
-  title: string;
-  value: string;
-  icon: React.ReactNode;
-  subtle?: string;
-}) {
-  return (
-    <>
-      <Card className="h-full border-1 md:block hidden shadow-none bg-blue-500 text-white border-neutral-200 rounded-md">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-          <CardTitle className="text-sm font-medium">{title}</CardTitle>
-          <div className="text-white ">{icon}</div>
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-semibold">{value}</div>
-          {subtle ? <p className="text-xs text-white mt-1">{subtle}</p> : null}
-        </CardContent>
-      </Card>
-      <Card className="w-full border-0 border-b-1  md:hidden flex justify-between items-center shadow-none bg-white text-black border-neutral-200 rounded-none ">
-        <CardTitle className="text-sm font-medium">
-          {title}
-          {subtle ? (
-            <p className="text-xs text-black/70 font-normal mt-0">{subtle}</p>
-          ) : null}
-        </CardTitle>
-        <CardContent className="flex items-center justify-center x py-3">
-          <div className="text-lg font-semibold">{value}</div>
-        </CardContent>
-      </Card>
-    </>
-  );
-}
-
-type SortColumn = "postedAt" | "deadline" | "bidsReceived" | null;
-type SortDirection = "asc" | "desc";
-
-export default function Component() {
-  const { t } = useTranslation();
-
-  const [query, setQuery] = React.useState("");
-  const [sortColumn, setSortColumn] = React.useState<SortColumn>(null);
-  const [sortDirection, setSortDirection] =
-    React.useState<SortDirection>("asc");
-  const [filterStatus, setFilterStatus] = React.useState<TenderStatus | "All">(
-    "All"
-  );
-  const [activeTab, setActiveTab] = React.useState<"bids" | "tender">("bids");
-
-  const handleSort = (column: SortColumn) => {
-    if (sortColumn === column) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-    } else {
-      setSortColumn(column);
-      setSortDirection("asc"); // Default to ascending when changing column
-    }
-  };
-  const analyticsData = {
-    totalTendersPosted: 25,
-    pendingApprovalTenders: 3,
-    activeLiveTenders: 8,
-    closedCompletedTenders: 14,
-    avgBidsPerTender: 4.8,
-    completedProjects: 15,
-    onTimeCompletionRate: 92,
-    totalAwardedValue: "950,000 QAR",
-    totalSpendOnPlatform: "800,000 QAR",
-    averageRatingGivenByFreelancers: 4.7,
-    idVerificationStatus: "Verified",
-    recentActivity: [
-      {
-        type: "tender",
-        message: "New tender 'Office Renovation' posted",
-        time: "2 hours ago",
-      },
-      {
-        type: "bid",
-        message: "New bid on 'Website Development'",
-        time: "5 hours ago",
-      },
-      {
-        type: "project",
-        message: "'HVAC Installation' project completed",
-        time: "1 day ago",
-      },
-      {
-        type: "tender",
-        message: "Tender 'Legal Advisory' closed",
-        time: "3 days ago",
-      },
-    ],
-    jobPostingHistory: [
-      { month: "Jan", tenders: 5 },
-      { month: "Feb", tenders: 7 },
-      { month: "Mar", tenders: 6 },
-      { month: "Apr", tenders: 9 },
-      { month: "May", tenders: 8 },
-      { month: "Jun", tenders: 10 },
-      { month: "Jul", tenders: 12 },
-    ],
-    reviewsFromBidders: [
-      {
-        id: 1,
-        bidderName: "Freelancer A",
-        bidderAvatar: "/placeholder-user.jpg",
-        rating: 5,
-        comment:
-          "Excellent communication and clear project requirements. A pleasure to work with!",
-        date: "2024-07-10",
-      },
-      {
-        id: 2,
-        bidderName: "Freelancer B",
-        bidderAvatar: "/placeholder-user.jpg",
-        rating: 4,
-        comment:
-          "Good project, but payment was slightly delayed. Overall positive experience.",
-        date: "2024-07-05",
-      },
-      {
-        id: 3,
-        bidderName: "Freelancer C",
-        bidderAvatar: "/placeholder-user.jpg",
-        rating: 5,
-        comment: "Very professional and responsive. Highly recommend!",
-        date: "2024-06-28",
-      },
-      {
-        id: 4,
-        bidderName: "Freelancer D",
-        bidderAvatar: "/placeholder-user.jpg",
-        rating: 3,
-        comment:
-          "Project scope changed mid-way, which caused some issues. Managed to complete it.",
-        date: "2024-06-20",
-      },
-    ],
-    spendHistory: [
-      { month: "Jan", spend: 10000 },
-      { month: "Feb", spend: 15000 },
-      { month: "Mar", spend: 12000 },
-      { month: "Apr", spend: 18000 },
-      { month: "May", spend: 20000 },
-      { month: "Jun", spend: 25000 },
-      { month: "Jul", spend: 30000 },
-    ],
-    projectExpenditure: [
-      {
-        id: 1,
-        name: "Office Renovation Phase 1",
-        amount: "150,000 QAR",
-        status: "Completed",
-      },
-      {
-        id: 2,
-        name: "Website Redesign Project",
-        amount: "50,000 QAR",
-        status: "Completed",
-      },
-      {
-        id: 3,
-        name: "Marketing Campaign Q3",
-        amount: "30,000 QAR",
-        status: "Active",
-      },
-      {
-        id: 4,
-        name: "HVAC System Upgrade",
-        amount: "200,000 QAR",
-        status: "Completed",
-      },
-      {
-        id: 5,
-        name: "Mobile App Development",
-        amount: "120,000 QAR",
-        status: "Active",
-      },
-      {
-        id: 6,
-        name: "Legal Advisory Services",
-        amount: "15,000 QAR",
-        status: "Completed",
-      },
-      {
-        id: 7,
-        name: "Data Migration Project",
-        amount: "45,000 QAR",
-        status: "Completed",
-      },
-    ],
-    userBadge: {
-      currentBadge: "Bronze",
-      currentRating: 4.7,
-      completedProjects: 15,
-      progressToNextBadge: 60, // Percentage to next badge
-      badgeRequirements: {
-        Bronze: { minRating: 0, minProjects: 0 },
-        Silver: { minRating: 3.5, minProjects: 5 },
-        Gold: { minRating: 4.0, minProjects: 10 },
-        Platinum: { minRating: 4.5, minProjects: 20 },
-      },
-    },
-  };
-  // Derived metrics
-  const {
-    totalTenders,
-    totalBids,
-    pendingApprovals,
-    avgBidsPerTender,
-    categoryCounts,
-    bidDiffSeries,
-    recentTenders,
-    reminders,
-    rating,
-    totalTenderValue,
-    avgTenderValue,
-  } = React.useMemo(() => {
-    const totalTenders = dummyTenders.length;
-    const totalBids = dummyTenders.reduce((sum, t) => sum + t.bidsReceived, 0);
-    const pendingApprovals = dummyTenders.filter(
-      (t) => t.status === "Pending"
-    ).length;
-    const avgBidsPerTender = totalTenders ? totalBids / totalTenders : 0;
-
-    const categoryCountsMap = new Map<string, number>();
-    for (const t of dummyTenders) {
-      categoryCountsMap.set(
-        t.category,
-        (categoryCountsMap.get(t.category) ?? 0) + 1
-      );
-    }
-    const categoryCounts = Array.from(categoryCountsMap.entries()).map(
-      ([category, count]) => ({
-        category,
-        tenders: count,
-      })
-    );
-
-    const bidDiffSeries = dummyTenders.map((t) => ({
-      name: t.title.length > 24 ? t.title.slice(0, 22) + "…" : t.title,
-      diff: t.bidDiffPct ?? 0,
-    }));
-
-    const byPostedDesc = [...dummyTenders].sort(
-      (a, b) => new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime()
-    );
-    const recentTenders = byPostedDesc.slice(0, 5);
-
-    const now = new Date();
-    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-    const threeDaysAhead = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
-
-    const noBidsIn7Days = dummyTenders.filter(
-      (t) =>
-        new Date(t.postedAt) <= sevenDaysAgo &&
-        t.bidsReceived === 0 &&
-        t.status !== "Closed"
-    );
-    const expiringSoon = dummyTenders.filter(
-      (t) => new Date(t.deadline) <= threeDaysAhead && t.status !== "Closed"
-    );
-
-    // Dummy rating data (optional feature)
-    const rating = {
-      average: 4.6,
-      totalReviews: 128,
-      summary: "Great communication and clear requirements from vendors.",
-    };
-
-    const totalTenderValue = dummyTenders.reduce((sum, t) => sum + t.value, 0);
-    const avgTenderValue = totalTenders ? totalTenderValue / totalTenders : 0;
-
-    return {
-      totalTenders,
-      totalBids,
-      pendingApprovals,
-      avgBidsPerTender,
-      categoryCounts,
-      bidDiffSeries,
-      recentTenders,
-      reminders: {
-        noBidsIn7Days,
-        expiringSoon,
-      },
-      rating,
-      totalTenderValue, // Added
-      avgTenderValue, // Added
-    };
-  }, []);
-
-  const nav = [
-    { title: "Dashboard", icon: BarChart3, url: "#", active: true },
-    { title: "My Tenders", icon: ListOrdered, url: "#" },
-    { title: "Approvals", icon: Layers, url: "#" },
-    { title: "Support", icon: CircleHelp, url: "#" },
-    { title: "Settings", icon: Settings, url: "#" },
-  ];
-
-  // Amount spent chart state and data
-  const [selectedAmountTimeRange, setSelectedAmountTimeRange] = React.useState<
-    "1day" | "1week" | "1month" | "1year"
-  >("1month");
-
-  // Dummy data for amount spent chart
-  const amountSpentData = React.useMemo(() => {
-    // Generate dummy data based on selectedAmountTimeRange
-    if (selectedAmountTimeRange === "1day") {
-      // 24 hours
-      return Array.from({ length: 24 }, (_, i) => ({
-        date: `${i}:00`,
-        amountSpent: Math.floor(Math.random() * 2000) + 1000,
-      }));
-    }
-    if (selectedAmountTimeRange === "1week") {
-      // 7 days
-      return Array.from({ length: 7 }, (_, i) => ({
-        date: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][i],
-        amountSpent: Math.floor(Math.random() * 10000) + 5000,
-      }));
-    }
-    if (selectedAmountTimeRange === "1month") {
-      // 30 days
-      return Array.from({ length: 30 }, (_, i) => ({
-        date: `Day ${i + 1}`,
-        amountSpent: Math.floor(Math.random() * 12000) + 4000,
-      }));
-    }
-    // 12 months
-    return Array.from({ length: 12 }, (_, i) => ({
-      date: [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec",
-      ][i],
-      amountSpent: Math.floor(Math.random() * 100000) + 50000,
-    }));
-  }, [selectedAmountTimeRange]);
-
-  const filteredTenders = React.useMemo(() => {
-    const q = query.trim().toLowerCase();
-    let currentTenders = recentTenders;
-
-    // Apply filtering by search query
-    if (q) {
-      currentTenders = currentTenders.filter(
-        (t) =>
-          t.title.toLowerCase().includes(q) ||
-          t.category.toLowerCase().includes(q) ||
-          t.status.toLowerCase().includes(q)
-      );
-    }
-
-    // Apply filtering by status
-    if (filterStatus !== "All") {
-      currentTenders = currentTenders.filter((t) => t.status === filterStatus);
-    }
-
-    // Apply sorting
-    if (sortColumn) {
-      currentTenders = [...currentTenders].sort((a, b) => {
-        let valA: any;
-        let valB: any;
-
-        if (sortColumn === "postedAt" || sortColumn === "deadline") {
-          valA = new Date(a[sortColumn]).getTime();
-          valB = new Date(b[sortColumn]).getTime();
-        } else if (sortColumn === "bidsReceived") {
-          valA = a[sortColumn];
-          valB = b[sortColumn];
-        }
-
-        if (valA < valB) {
-          return sortDirection === "asc" ? -1 : 1;
-        }
-        if (valA > valB) {
-          return sortDirection === "asc" ? 1 : -1;
-        }
-        return 0;
+    for (
+      let d = new Date(startDate);
+      d <= endDate;
+      d.setDate(d.getDate() + 1)
+    ) {
+      const dateStr = d.toISOString().split("T")[0];
+      dataMap.set(dateStr, {
+        date: dateStr,
+        tendersPosted: 0,
+        bidsReceived: 0,
+        myBids: 0,
       });
     }
 
-    return currentTenders;
-  }, [query, recentTenders, sortColumn, sortDirection, filterStatus]);
+    tenders.forEach((tender: any) => {
+      const tenderDate = new Date(tender.createdAt).toISOString().split("T")[0];
+      if (dataMap.has(tenderDate)) {
+        const existing = dataMap.get(tenderDate)!;
+        existing.tendersPosted += 1;
+        if (tender.bidCount) existing.bidsReceived += tender.bidCount;
+      }
+    });
+
+    bids.forEach((bid: any) => {
+      const bidDate = new Date(bid.createdAt).toISOString().split("T")[0];
+      if (dataMap.has(bidDate)) dataMap.get(bidDate)!.myBids += 1;
+    });
+
+    return Array.from(dataMap.values()).sort(
+      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+    );
+  };
+
+  const processBidSuccessData = (bids: any[]) => {
+    const dataMap = new Map<string, BidSuccessData>();
+    const days = timeRange === "30d" ? 30 : timeRange === "7d" ? 7 : 90;
+    const endDate = new Date();
+    const startDate = new Date(endDate);
+    startDate.setDate(startDate.getDate() - days);
+
+    for (
+      let d = new Date(startDate);
+      d <= endDate;
+      d.setDate(d.getDate() + 1)
+    ) {
+      const dateStr = d.toISOString().split("T")[0];
+      dataMap.set(dateStr, { date: dateStr, bidsPlaced: 0, bidsWon: 0 });
+    }
+
+    bids.forEach((bid: any) => {
+      if (!bid.createdAt) return;
+      const bidDate = new Date(bid.createdAt).toISOString().split("T")[0];
+      if (dataMap.has(bidDate)) {
+        const existing = dataMap.get(bidDate)!;
+        existing.bidsPlaced += 1;
+        if (bid.status === "accepted") existing.bidsWon += 1;
+      }
+    });
+
+    return Array.from(dataMap.values()).sort(
+      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+    );
+  };
+
+  const calculateStats = (tenders: any[], bids: any[]) => {
+    const activeTenders = tenders.filter((t) => t.status === "active").length;
+    const completedTenders = tenders.filter(
+      (t) => t.status === "completed"
+    ).length;
+    const pendingBids = bids.filter(
+      (b) => b.status === "pending" || b.status === "submitted"
+    ).length;
+    const acceptedBids = bids.filter((b) => b.status === "accepted").length;
+
+    return {
+      totalTenders: tenders.length,
+      totalBids: bids.length,
+      activeTenders,
+      completedTenders,
+      pendingBids,
+      acceptedBids,
+    };
+  };
+
+  React.useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const userId = user._id;
+        if (!userId) throw new Error("User not found. Please log in again.");
+
+        const [tendersResponse, bidsResponse] = await Promise.all([
+          getUserTenders(userId),
+          getUserBids(),
+        ]);
+        const tenders = tendersResponse || [];
+        const bids = bidsResponse || [];
+
+        setChartData(processDataForChart(tenders, bids));
+        setBidSuccessData(processBidSuccessData(bids));
+        setStats(calculateStats(tenders, bids));
+      } catch (err) {
+        console.error("Failed to fetch data:", err);
+        setError(err instanceof Error ? err.message : "Failed to load data");
+        setChartData([]);
+        setBidSuccessData([]);
+        setStats({
+          totalTenders: 0,
+          totalBids: 0,
+          activeTenders: 0,
+          completedTenders: 0,
+          pendingBids: 0,
+          acceptedBids: 0,
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [timeRange]);
+
+  const filteredData = React.useMemo(() => {
+    if (!chartData.length) return [];
+    const days = timeRange === "30d" ? 30 : timeRange === "7d" ? 7 : 90;
+    return chartData.slice(-days);
+  }, [chartData, timeRange]);
+
+  if (loading) {
+    return (
+      <div className="w-full h-full flex items-center justify-center h-[400px]">
+        <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+        <span className="ml-2 text-sm text-gray-500">
+          Loading dashboard data...
+        </span>
+      </div>
+    );
+  }
 
   return (
-    <SidebarProvider>
-      <Tabs
-        value={activeTab}
-        className="w-full px-0 container mx-auto"
-        onValueChange={(value) => setActiveTab(value as "bids" | "tender")}
-      >
-        <TabsContent value="tender" className="px-0">
-          <SidebarInset className="bg-transparent py-1 px-2 md:py-3 md:px-3">
-            {/* Page body */}
-            <div className="flex flex-1 flex-col gap-6 w-full">
-              {/* Snapshot cards */}
-              <section>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  <Card className="border border-gray-200 shadow-sm">
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-sm font-medium text-gray-600 flex items-center justify-between">
-                        <span className="flex items-center">
-                          <FileText className="h-4 w-4 mr-2" />
-                          {t("total_tenders_posted")}
-                        </span>
-                        <TrendingUp className="h-4 w-4 text-green-500" />
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="pt-0">
-                      <div className="text-2xl font-bold text-gray-900">
-                        {analyticsData.totalTendersPosted}
-                      </div>
-                      <p className="text-xs text-gray-500 mt-1">
-                        {t("plus_5_this_month")}
-                      </p>
-                    </CardContent>
-                  </Card>
+    <div className="w-full h-full flex flex-col space-y-6 py-6">
+      {/* Header */}
+      <div className="flex items-center justify-between border-b pb-4">
+        <div className="grid flex-1 gap-1">
+          <h3 className="text-xl font-semibold text-gray-900">
+            Activity Overview
+          </h3>
+          <p className="text-sm text-gray-500">
+            {error
+              ? "Error loading data - please check your connection"
+              : "Your tender and bidding activity"}
+          </p>
+        </div>
+        <Select value={timeRange} onValueChange={setTimeRange}>
+          <SelectTrigger className="w-[160px] rounded-full bg-gray-100 border-0">
+            <SelectValue placeholder="Last 3 months" />
+          </SelectTrigger>
+          <SelectContent className="rounded-xl">
+            <SelectItem value="30d">Last 30 days</SelectItem>
+            <SelectItem value="7d">Last 7 days</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
 
-                  <Card className="border border-gray-200 shadow-sm">
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-sm font-medium text-gray-600 flex items-center">
-                        <Hourglass className="h-4 w-4 mr-2" />
-                        {t("pending_approval")}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="pt-0">
-                      <div className="text-2xl font-bold text-gray-900">
-                        {analyticsData.pendingApprovalTenders}
-                      </div>
-                      <p className="text-xs text-gray-500 mt-1">
-                        {t("tenders_awaiting_review")}
-                      </p>
-                    </CardContent>
-                  </Card>
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-800 text-sm">
+          {error}
+        </div>
+      )}
 
-                  <Card className="border border-gray-200 shadow-sm">
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-sm font-medium text-gray-600 flex items-center">
-                        <CheckSquare className="h-4 w-4 mr-2" />
-                        {t("active_live_tenders")}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="pt-0">
-                      <div className="text-2xl font-bold text-gray-900">
-                        {analyticsData.activeLiveTenders}
-                      </div>
-                      <p className="text-xs text-gray-500 mt-1">
-                        {t("currently_open_for_bids")}
-                      </p>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="border border-gray-200 shadow-sm">
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-sm font-medium text-gray-600 flex items-center">
-                        <XSquare className="h-4 w-4 mr-2" />
-                        {t("closed_completed")}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="pt-0">
-                      <div className="text-2xl font-bold text-gray-900">
-                        {analyticsData.closedCompletedTenders}
-                      </div>
-                      <p className="text-xs text-gray-500 mt-1">
-                        {t("tenders_finished_or_closed")}
-                      </p>
-                    </CardContent>
-                  </Card>
-                </div>
-              </section>
-
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="bids" className="text-xs">
-                  {t("bids_analytics")}
-                </TabsTrigger>
-                <TabsTrigger value="tender" className="text-xs">
-                  {t("tender_analytics")}
-                </TabsTrigger>
-              </TabsList>
-
-              {/* Charts and lists */}
-              <section className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6">
-                <ProjectsOverviewChart />
-
-                <div className="md:col-span-5 col-span-1 flex flex-col gap-4 md:gap-4">
-                  {/* User Rating */}
-                  <Card className="w-full p-6">
-                    <CardContent className="p-0 space-y-6">
-                      <div>
-                        <p className="text-sm text-muted-foreground">
-                          {t("total_projects_posted")}
-                        </p>
-                        <h2 className="text-4xl font-bold mt-1">128</h2>
-                      </div>
-                      <div>
-                        <div className="flex -space-x-2 overflow-hidden">
-                          {/* Avatar list unchanged */}
-                        </div>
-                      </div>
-                      <div className="space-y-4">
-                        <h3 className="text-base font-semibold">
-                          {t("highlights")}
-                        </h3>
-                        <div className="space-y-4">
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm">
-                              {t("avg_bids_per_project")}
-                            </span>
-                            <div className="flex items-center gap-1 text-green-500">
-                              <ArrowUpRight className="w-4 h-4" />
-                              <span className="font-medium">6.1</span>
-                            </div>
-                          </div>
-                          <Separator />
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm">
-                              {t("projects_with_no_bids")}
-                            </span>
-                            <div className="flex items-center gap-1 text-red-500">
-                              <ArrowDownLeft className="w-4 h-4" />
-                              <span className="font-medium">12</span>
-                            </div>
-                          </div>
-                          <Separator />
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm">
-                              {t("total_bids_received")}
-                            </span>
-                            <div className="flex items-center gap-1 text-green-500">
-                              <ArrowUpRight className="w-4 h-4" />
-                              <span className="font-medium">342</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="border-1 col-span-full lg:col-span-3 h-fit shadow-none border-neutral-200 rounded-md">
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-base flex items-center gap-2">
-                        <AlertTriangle className="h-4 w-4 text-amber-600" />
-                        {t("tenders_with_no_bids_in_7_days")}
-                      </CardTitle>
-                      <CardDescription>
-                        {t("consider_updating_details")}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      {reminders.noBidsIn7Days.length === 0 ? (
-                        <p className="text-sm text-muted-foreground">
-                          {t("no_items_to_show")}
-                        </p>
-                      ) : (
-                        <ul className="space-y-3">
-                          {reminders.noBidsIn7Days.map((i) => (
-                            <li
-                              key={i.id}
-                              className="flex items-center justify-between"
-                            >
-                              <div className="min-w-0">
-                                <p className="truncate font-medium">
-                                  {i.title}
-                                </p>
-                                <p className="text-xs text-muted-foreground">
-                                  {t("posted")} {formatDate(i.postedAt)} •{" "}
-                                  {i.category}
-                                </p>
-                              </div>
-                              <Badge variant="outline" className="shrink-0">
-                                {i.bidsReceived} {t("bids")}
-                              </Badge>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </CardContent>
-                  </Card>
-                </div>
-              </section>
-
-              <div className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <Card className="border border-gray-200 shadow-sm">
-                    <CardHeader>
-                      <CardTitle className="text-lg font-semibold flex items-center">
-                        <Star className="h-5 w-5 mr-2 text-yellow-500" />
-                        {t("average_rating_given_by_freelancers")}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="pt-0">
-                      <div className="text-4xl font-bold text-gray-900 flex items-center">
-                        {analyticsData.averageRatingGivenByFreelancers}
-                        <span className="text-xl text-gray-500 ml-2">
-                          / 5.0
-                        </span>
-                      </div>
-                      <p className="text-sm text-gray-500 mt-2">
-                        {t("based_on")}{" "}
-                        {analyticsData.reviewsFromBidders.length} {t("reviews")}
-                      </p>
-
-                      {/* Badge tiers */}
-                      <div className="mt-6 space-y-3">
-                        <div className="flex justify-between items-center p-3 border border-emerald-600 rounded-lg bg-emerald-50">
-                          <div>
-                            <p className="text-base font-semibold text-emerald-700">
-                              {t("bronze")}
-                            </p>
-                            <p className="text-sm text-emerald-600">
-                              {t("2_plus_projects_4_5_plus_rating")}
-                            </p>
-                          </div>
-                          <span className="px-3 py-1 text-sm font-bold border border-emerald-600 text-emerald-700 rounded-full">
-                            {t("bronze")}
-                          </span>
-                        </div>
-                        <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg">
-                          <div>
-                            <p className="text-base font-semibold text-gray-800">
-                              {t("gold")}
-                            </p>
-                            <p className="text-sm text-gray-600">
-                              {t("10_plus_projects_4_8_plus_rating")}
-                            </p>
-                          </div>
-                          <span className="px-3 py-1 text-sm font-bold border border-gray-300 text-gray-700 rounded-full">
-                            {t("gold")}
-                          </span>
-                        </div>
-                        <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg">
-                          <div>
-                            <p className="text-base font-semibold text-gray-800">
-                              {t("platinum")}
-                            </p>
-                            <p className="text-sm text-gray-600">
-                              {t("25_plus_projects_4_9_plus_rating")}
-                            </p>
-                          </div>
-                          <span className="px-3 py-1 text-sm font-bold border border-gray-300 text-gray-700 rounded-full">
-                            {t("platinum")}
-                          </span>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="border border-gray-200 shadow-sm">
-                    <CardHeader>
-                      <CardTitle className="text-lg font-semibold">
-                        {t("reviews_from_bidders")}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="pt-0 space-y-4">
-                      {analyticsData.reviewsFromBidders.map((review) => (
-                        <div
-                          key={review.id}
-                          className="flex items-start space-x-4 border-b pb-4 last:border-b-0"
-                        >
-                          <Avatar className="h-10 w-10">
-                            <AvatarImage
-                              src={
-                                review.bidderAvatar ||
-                                "/placeholder.svg?height=40&width=40&query=user avatar"
-                              }
-                              alt={review.bidderName}
-                            />
-                            <AvatarFallback>
-                              {review.bidderName.charAt(0)}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="flex-1">
-                            <div className="flex justify-between items-center">
-                              <h4 className="font-semibold text-gray-900">
-                                {review.bidderName}
-                              </h4>
-                              <div className="flex items-center text-sm text-yellow-500">
-                                {Array.from({ length: review.rating }).map(
-                                  (_, i) => (
-                                    <Star
-                                      key={i}
-                                      className="h-4 w-4 fill-current"
-                                    />
-                                  )
-                                )}
-                                {Array.from({ length: 5 - review.rating }).map(
-                                  (_, i) => (
-                                    <Star
-                                      key={i}
-                                      className="h-4 w-4 text-gray-300"
-                                    />
-                                  )
-                                )}
-                              </div>
-                            </div>
-                            <p className="text-sm text-gray-700 mt-1">
-                              {review.comment}
-                            </p>
-                            <p className="text-xs text-gray-500 mt-1">
-                              {review.date}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
-                    </CardContent>
-                  </Card>
-                </div>
-              </div>
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Tenders Posted */}
+        <div className="bg-blue-50 p-4 rounded-2xl border border-blue-100">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+              <Calendar className="h-5 w-5 text-blue-600" />
             </div>
-          </SidebarInset>
-        </TabsContent>
+            <div>
+              <p className="text-sm text-gray-500">Tenders Posted</p>
+              <p className="text-xl font-semibold text-gray-900">
+                {filteredData.reduce(
+                  (sum, item) => sum + item.tendersPosted,
+                  0
+                )}
+              </p>
+            </div>
+          </div>
+        </div>
 
-        <Banalytics
-          tab={
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="bids" className="text-xs">
-                {t("bids_analytics")}
-              </TabsTrigger>
-              <TabsTrigger value="tender" className="text-xs">
-                {t("tender_analytics")}
-              </TabsTrigger>
-            </TabsList>
-          }
-        />
-      </Tabs>
-    </SidebarProvider>
+        {/* Bids Placed */}
+        <div className="bg-purple-50 p-4 rounded-2xl border border-purple-100">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
+              <TrendingUp className="h-5 w-5 text-purple-600" />
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Bids Placed</p>
+              <p className="text-xl font-semibold text-gray-900">
+                {bidSuccessData.reduce((sum, item) => sum + item.bidsPlaced, 0)}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Bids Won */}
+        <div className="bg-green-50 p-4 rounded-2xl border border-green-100">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+              <Award className="h-5 w-5 text-green-600" />
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Bids Won</p>
+              <p className="text-xl font-semibold text-gray-900">
+                {bidSuccessData.reduce((sum, item) => sum + item.bidsWon, 0)}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Win Rate */}
+        <div className="bg-amber-50 p-4 rounded-2xl border border-amber-100">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center">
+              <Award className="h-5 w-5 text-amber-600" />
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Win Rate</p>
+              <p className="text-xl font-semibold text-gray-900">
+                {bidSuccessData.reduce((sum, item) => sum + item.bidsPlaced, 0)
+                  ? Math.round(
+                      (bidSuccessData.reduce(
+                        (sum, item) => sum + item.bidsWon,
+                        0
+                      ) /
+                        bidSuccessData.reduce(
+                          (sum, item) => sum + item.bidsPlaced,
+                          0
+                        )) *
+                        100
+                    )
+                  : 0}
+                %
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Charts Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Timeline Chart */}
+        <div className="bg-white p-5 rounded-2xl h-[300px] lg:h-[400px]">
+          <h4 className="text-md font-semibold mb-4 text-gray-900">
+            Activity Timeline
+          </h4>
+          <ChartContainer config={chartConfig} className="w-full h-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart
+                data={filteredData}
+                margin={{ top: 10, right: 0, left: 0, bottom: 0 }}
+              >
+                <defs>
+                  <linearGradient
+                    id="fillTendersPosted"
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
+                    <stop offset="5%" stopColor="#007AFF" stopOpacity={0.2} />
+                    <stop offset="95%" stopColor="#007AFF" stopOpacity={0} />
+                  </linearGradient>
+                  <linearGradient id="fillMyBids" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#AF52DE" stopOpacity={0.2} />
+                    <stop offset="95%" stopColor="#AF52DE" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid vertical={false} stroke="#f0f0f0" />
+                <XAxis
+                  dataKey="date"
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={8}
+                  minTickGap={32}
+                  tickFormatter={(value) =>
+                    new Date(value).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                    })
+                  }
+                  className="text-xs text-gray-500"
+                />
+                <YAxis
+                  tickLine={false}
+                  axisLine={false}
+                  tickFormatter={(value) => `${value}`}
+                  className="text-xs text-gray-500"
+                  width={30}
+                />
+                <ChartTooltip
+                  cursor={false}
+                  content={
+                    <ChartTooltipContent
+                      labelFormatter={(value) =>
+                        new Date(value).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })
+                      }
+                      indicator="dot"
+                      className="bg-white shadow-lg rounded-xl border border-gray-200"
+                    />
+                  }
+                />
+                <Area
+                  dataKey="tendersPosted"
+                  type="monotone"
+                  fill="url(#fillTendersPosted)"
+                  stroke="#007AFF"
+                  strokeWidth={2}
+                  stackId="a"
+                />
+                <Area
+                  dataKey="myBids"
+                  type="monotone"
+                  fill="url(#fillMyBids)"
+                  stroke="#AF52DE"
+                  strokeWidth={2}
+                  stackId="b"
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </ChartContainer>
+        </div>
+
+        {/* Bid Success Chart */}
+        <div className="bg-white p-5 rounded-2xl h-[300px] lg:h-[400px]">
+          <h4 className="text-md font-semibold mb-4 text-gray-900">
+            Bid Success Rate
+          </h4>
+          {bidSuccessData.some(
+            (item) => item.bidsPlaced > 0 || item.bidsWon > 0
+          ) ? (
+            <ChartContainer config={chartConfig} className="w-full h-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart
+                  data={bidSuccessData}
+                  margin={{ top: 10, right: 0, left: 0, bottom: 0 }}
+                >
+                  <defs>
+                    <linearGradient
+                      id="fillBidsPlaced"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+                      <stop offset="5%" stopColor="#FF9500" stopOpacity={0.2} />
+                      <stop offset="95%" stopColor="#FF9500" stopOpacity={0} />
+                    </linearGradient>
+                    <linearGradient
+                      id="fillBidsWon"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+                      <stop offset="5%" stopColor="#34C759" stopOpacity={0.2} />
+                      <stop offset="95%" stopColor="#34C759" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid vertical={false} stroke="#f0f0f0" />
+                  <XAxis
+                    dataKey="date"
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={8}
+                    minTickGap={32}
+                    tickFormatter={(value) =>
+                      new Date(value).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                      })
+                    }
+                    className="text-xs text-gray-500"
+                  />
+                  <YAxis
+                    tickLine={false}
+                    axisLine={false}
+                    tickFormatter={(value) => `${value}`}
+                    className="text-xs text-gray-500"
+                    width={30}
+                  />
+                  <ChartTooltip
+                    cursor={false}
+                    content={
+                      <ChartTooltipContent
+                        labelFormatter={(value) =>
+                          new Date(value).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          })
+                        }
+                        indicator="dot"
+                        formatter={(value, name) => [
+                          value,
+                          name === "bidsPlaced" ? "Bids Placed" : "Bids Won",
+                        ]}
+                        className="bg-white shadow-lg rounded-xl border border-gray-200"
+                      />
+                    }
+                  />
+                  <Area
+                    dataKey="bidsPlaced"
+                    type="monotone"
+                    fill="url(#fillBidsPlaced)"
+                    stroke="#FF9500"
+                    strokeWidth={2}
+                    stackId="a"
+                  />
+                  <Area
+                    dataKey="bidsWon"
+                    type="monotone"
+                    fill="url(#fillBidsWon)"
+                    stroke="#34C759"
+                    strokeWidth={2}
+                    stackId="b"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </ChartContainer>
+          ) : (
+            <div className="h-full flex items-center justify-center text-gray-400">
+              <p>No bidding activity yet</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }

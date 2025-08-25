@@ -185,7 +185,6 @@ export default function TenderDetailsPage({ params }: PageProps) {
 
           setUserBid(existingBid);
           setHasUserBid(!!existingBid);
-
         } catch (bidsError) {
           console.error("Error loading user bids:", bidsError);
           // optional: setHasUserBid(false)
@@ -815,8 +814,9 @@ export default function TenderDetailsPage({ params }: PageProps) {
                   </div>
 
                   {/* Key Information Grid */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                    <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 border border-green-100">
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                    {/* Budget */}
+                    <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-5 border border-green-100">
                       <div className="flex items-center gap-2 mb-2">
                         <DollarSign className="h-5 w-5 text-green-600" />
                         <span className="text-sm font-medium text-green-700">
@@ -828,7 +828,8 @@ export default function TenderDetailsPage({ params }: PageProps) {
                       </p>
                     </div>
 
-                    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-100">
+                    {/* Deadline */}
+                    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-5 border border-blue-100">
                       <div className="flex items-center gap-2 mb-2">
                         <Calendar className="h-5 w-5 text-blue-600" />
                         <span className="text-sm font-medium text-blue-700">
@@ -840,7 +841,8 @@ export default function TenderDetailsPage({ params }: PageProps) {
                       </p>
                     </div>
 
-                    <div className="bg-gradient-to-br from-purple-50 to-violet-50 rounded-xl p-4 border border-purple-100">
+                    {/* Location */}
+                    <div className="bg-gradient-to-br from-purple-50 to-violet-50 rounded-xl p-5 border border-purple-100">
                       <div className="flex items-center gap-2 mb-2">
                         <MapPin className="h-5 w-5 text-purple-600" />
                         <span className="text-sm font-medium text-purple-700">
@@ -849,6 +851,19 @@ export default function TenderDetailsPage({ params }: PageProps) {
                       </div>
                       <p className="text-lg font-semibold text-purple-700">
                         {tender.location}
+                      </p>
+                    </div>
+
+                    {/* Bids Placed */}
+                    <div className="bg-gradient-to-br from-yellow-50 to-amber-50 rounded-xl p-5 border border-yellow-100">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Star className="h-5 w-5 text-yellow-600" />
+                        <span className="text-sm font-medium text-yellow-700">
+                          Bids Placed
+                        </span>
+                      </div>
+                      <p className="text-lg font-semibold text-yellow-700">
+                        {tender.bidCount}
                       </p>
                     </div>
                   </div>
@@ -961,9 +976,7 @@ export default function TenderDetailsPage({ params }: PageProps) {
                     // Show My Bids button if user has already bid
                     <div className="space-y-3">
                       <Button
-                        onClick={() =>
-                          router.push("/business-dashboard/my-bids")
-                        }
+                        onClick={() => router.push("/business-dashboard/bids")}
                         className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-xl py-3 font-medium transition-all duration-300 shadow-lg shadow-blue-500/25"
                       >
                         View My Bids

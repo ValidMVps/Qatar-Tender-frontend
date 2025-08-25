@@ -78,7 +78,6 @@ export const createTender = async (payload: any) => {
   return response.data;
 };
 
-
 type TendersParams = {
   status?: string;
   category?: string;
@@ -90,7 +89,10 @@ export const getTenders = async (params?: TendersParams) => {
     const res = await api.get("/api/tenders", { params });
     return res.data;
   } catch (error: any) {
-    console.error("Error fetching tenders:", error.response?.data || error.message);
+    console.error(
+      "Error fetching tenders:",
+      error.response?.data || error.message
+    );
     throw error;
   }
 };

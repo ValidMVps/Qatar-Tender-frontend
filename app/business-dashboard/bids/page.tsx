@@ -205,7 +205,7 @@ export default function MyBidsPage() {
       case "submitted":
         return "bg-amber-50 text-amber-700 border-amber-200 py-2";
       case "rejected":
-        return "bg-red-50 text-red-700 border-red-200 py-2";
+        return "bg-gray-50 text-gray-700 border-gray-200 py-2";
       case "completed":
         return "bg-blue-50 text-blue-700 border-blue-200 py-2 ";
       default:
@@ -220,7 +220,7 @@ export default function MyBidsPage() {
       case "submitted":
         return "Submitted";
       case "rejected":
-        return "Rejected";
+        return "Closed";
       case "completed":
         return "Completed";
       default:
@@ -492,7 +492,7 @@ export default function MyBidsPage() {
             {[
               { key: "all", label: t("all") || "All" },
               { key: "accepted", label: t("accepted") || "Accepted" },
-              { key: "rejected", label: t("rejected") || "Rejected" },
+              { key: "rejected", label: t("closed") || "Closed" },
               { key: "submitted", label: t("submitted") || "Submitted" },
               { key: "completed", label: t("completed") || "Completed" },
             ].map((tab) => (
@@ -834,17 +834,14 @@ export default function MyBidsPage() {
 
                 {selectedBidForDetails.status === "rejected" && (
                   <div className="p-6 bg-red-50 border border-red-100 rounded-2xl">
-                    <div className="flex items-start">
-                      <div className="p-2 bg-red-100 rounded-xl mr-4 shrink-0">
+                    <div className="flex items-center">
+                      <div className=" bg-red-100 rounded-xl mr-4 shrink-0">
                         <Info className="h-5 w-5 text-red-600" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-red-800 mb-2">
-                          {t("rejection_reason") || "Rejection Reason"}
+                        <h3 className="font-semibold text-red-800 ">
+                          {t("another_bid_was_accepted")}
                         </h3>
-                        <p className="text-red-700 leading-relaxed">
-                          {selectedBidForDetails.description}
-                        </p>
                       </div>
                     </div>
                   </div>

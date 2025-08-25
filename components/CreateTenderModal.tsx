@@ -111,7 +111,7 @@ const CreateTenderModal = ({
     deadline: "",
     location: "",
     contactEmail: "",
-    image: "https://pbs.twimg.com/media/Gy7Ag4iboAEZ7Sx?format=jpg&name=small",
+    image: "",
   });
   useEffect(() => {
     const fetchCategories = async () => {

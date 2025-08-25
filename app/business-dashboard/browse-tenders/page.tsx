@@ -36,10 +36,12 @@ import Link from "next/link";
 
 import { useTranslation } from "../../../lib/hooks/useTranslation";
 import { getActiveTenders } from "@/app/services/tenderService";
+import { useAuth } from "@/context/AuthContext";
 
 export default function ServiceProvidingDashboardPage() {
   const { t } = useTranslation();
-
+  const { user } = useAuth();
+  const currentUserId = user?._id;
   // UI state
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -163,14 +165,26 @@ export default function ServiceProvidingDashboardPage() {
   // client-side filtering
   const filteredTenders = useMemo(() => {
     const now = new Date();
+
     return tenders.filter((tender) => {
+      // ✅ Filter out tenders created by the current user
+      const tenderUserId =
+        tender.postedBy?._id ||
+        tender.postedBy?.id ||
+        tender.userId ||
+        tender.postedBy;
+
+      if (currentUserId && tenderUserId === currentUserId) {
+        return false; // Skip this tender
+      }
+
+      // Keep going with the rest of your filters...
       const title = (tender.title || "").toString().toLowerCase();
       const desc = (tender.description || "").toString().toLowerCase();
       const categoryName = resolveCategoryName(tender).toLowerCase();
       const location = (tender.location || "").toString().toLowerCase();
       const search = searchTerm.trim().toLowerCase();
 
-      // search
       const matchesSearch =
         !search ||
         title.includes(search) ||
@@ -178,16 +192,13 @@ export default function ServiceProvidingDashboardPage() {
         categoryName.includes(search) ||
         location.includes(search);
 
-      // category filter
       const matchesCategory =
         selectedCategories.length === 0 ||
         selectedCategories.includes(resolveCategoryName(tender));
 
-      // location filter
       const matchesLocation =
         selectedLocation === "all" || tender.location === selectedLocation;
 
-      // budget filter
       const tenderBudget = resolveBudget(tender);
       const matchesBudget =
         selectedFixedPriceRange.length === 0 ||
@@ -197,7 +208,6 @@ export default function ServiceProvidingDashboardPage() {
           return tenderBudget >= range.min && tenderBudget <= range.max;
         });
 
-      // bids filter
       const bidsNum = resolveBidsCount(tender);
       const matchesBids =
         selectedBidCounts.length === 0 ||
@@ -207,7 +217,6 @@ export default function ServiceProvidingDashboardPage() {
           return bidsNum >= range.min && bidsNum <= range.max;
         });
 
-      // deadline filter
       const deadline = parseDeadline(tender);
       let matchesDeadline = true;
       if (selectedDeadlineFilter !== "any") {
@@ -247,6 +256,7 @@ export default function ServiceProvidingDashboardPage() {
     selectedDeadlineFilter,
     fixedPriceRanges,
     bidCounts,
+    currentUserId, // ✅ Add this as a dependency
   ]);
 
   // sorting

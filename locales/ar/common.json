@@ -1149,5 +1149,16 @@
   "5k_plus": "أكثر من 5000",
   "adjust_filters_or_try_different_search": "قم بتعديل الفلاتر أو جرب بحثًا مختلفًا",
   "questions_and_answers": "الأسئلة والأجوبة",
-  "complete_your_profile_to_unlock_all_features": "أكمل ملفك الشخصي لفتح جميع الميزات"
+  "monthly_trend_of_tenders_posted_vs_bids_received": "الاتجاه الشهري للمناقصات المنشورة مقابل العروض المستلمة",
+  "recent_bids_placed": "العروض المقدمة مؤخرًا",
+  "another_bid_was_accepted": "تم قبول عرض آخر",
+  "complete_your_profile_to_unlock_all_features": "أكمل ملفك الشخصي لفتح جميع الميزات",
+  "note_do_not_include_contact_information_in_your_question_or_answer": "لا تتضمن عناوين البريد الإلكتروني أو أرقام الهواتف أو روابط المواقع الإلكترونية. يجب أن تظل الاتصالات على المنصة.",
+  "question_contains_contact_information_email": "لا يمكن أن تحتوي الأسئلة على عناوين بريد إلكتروني.",
+  "question_contains_contact_information_phone": "لا يمكن أن تحتوي الأسئلة على أرقام هواتف.",
+  "question_contains_contact_information_url": "لا يمكن أن تحتوي الأسئلة على روابط لمواقع الويب.",
+  "answer_contains_contact_information_email": "لا يمكن أن تحتوي الإجابات على عناوين بريد إلكتروني.",
+  "answer_contains_contact_information_phone": "لا يمكن أن تحتوي الإجابات على أرقام هواتف.",
+  "answer_contains_contact_information_url": "لا يمكن أن تحتوي الإجابات على روابط لمواقع الويب.",
+  "note_do_not_include_contact_information_in_your_answer": "لا تتضمن عناوين البريد الإلكتروني أو أرقام الهواتف أو روابط المواقع الإلكترونية. يجب أن تظل الاتصالات على المنصة."
 }

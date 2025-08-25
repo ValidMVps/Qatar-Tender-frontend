@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -43,6 +44,7 @@ import { awardTender } from "@/app/services/tenderService";
 // Utils
 import { getStatusColor, getStatusText } from "@/utils/tenderStatus";
 import { useAuth } from "@/context/AuthContext";
+import { detectContactInfo } from "@/utils/validationcehck"; // Reuse same validation
 
 // Interfaces
 interface Tender {
@@ -104,6 +106,7 @@ export default function TenderDetailPage() {
   const params = useParams();
   const router = useRouter();
   const tenderId = params.id as string;
+
   const [tender, setTender] = useState<Tender | null>(null);
   const [bids, setBids] = useState<Bid[]>([]);
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -111,12 +114,37 @@ export default function TenderDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"bids" | "qa" | "reviews">("bids");
   const [answerText, setAnswerText] = useState<{ [key: string]: string }>({});
+  const [answerErrors, setAnswerErrors] = useState<{ [key: string]: string }>(
+    {}
+  );
   const [submittingAnswer, setSubmittingAnswer] = useState<{
     [key: string]: boolean;
   }>({});
   const [updatingBidStatus, setUpdatingBidStatus] = useState<{
     [key: string]: boolean;
   }>({});
+
+  // Validation function for answer content
+  const validateAnswer = (
+    text: string
+  ): { valid: boolean; message?: string } => {
+    if (!text.trim()) {
+      return { valid: false, message: t("answer_cannot_be_empty") };
+    }
+
+    const detections = detectContactInfo(text);
+    const highSeverity = detections.filter((d) => d.severity === "high");
+
+    if (highSeverity.length > 0) {
+      const type = highSeverity[0].type; // 'email', 'phone', 'url'
+      return {
+        valid: false,
+        message: t(`answer_contains_contact_information_${type}`),
+      };
+    }
+
+    return { valid: true };
+  };
 
   const fetchTenderData = async () => {
     try {
@@ -175,12 +203,19 @@ export default function TenderDetailPage() {
 
   const handleAnswerQuestion = async (questionId: string) => {
     const answer = answerText[questionId];
-    if (!answer?.trim()) return;
+    const validation = validateAnswer(answer);
+
+    if (!validation.valid) {
+      alert(validation.message); // You can replace with toast later
+      return;
+    }
+
     try {
       setSubmittingAnswer((prev) => ({ ...prev, [questionId]: true }));
       await answerQuestion(questionId, answer);
       fetchTenderData();
       setAnswerText((prev) => ({ ...prev, [questionId]: "" }));
+      setAnswerErrors((prev) => ({ ...prev, [questionId]: "" }));
     } catch (err: any) {
       console.error("Error answering question:", err);
       setError(err.response?.data?.message || "Failed to submit answer");
@@ -396,7 +431,13 @@ export default function TenderDetailPage() {
             {isAwarded && (
               <div className="mt-6 lg:mt-0 lg:ml-8">
                 <Button
-                  onClick={() => router.push(`/chat/${awardedBid.bidder._id}`)}
+                  onClick={() =>
+                    router.push(
+                      profile?.userType === "business"
+                        ? `/business-dashboard/projects`
+                        : "/dashboard/projects"
+                    )
+                  }
                   className="bg-blue-500 hover:bg-blue-600 text-white rounded-full px-6 py-3 h-auto font-medium flex items-center"
                 >
                   <MessageSquare className="h-5 w-5 mr-2" />
@@ -629,22 +670,48 @@ export default function TenderDetailPage() {
                           </div>
                         ) : (
                           <div className="ml-14">
+                            <p className="text-xs text-gray-500 mb-2 flex items-center gap-1">
+                              <AlertCircle className="h-3 w-3" />
+                              {t(
+                                "note_do_not_include_contact_information_in_your_answer"
+                              )}
+                            </p>
                             <Textarea
                               placeholder="Write your response..."
                               value={answerText[question._id] || ""}
-                              onChange={(e) =>
+                              onChange={(e) => {
+                                const value = e.target.value;
                                 setAnswerText((prev) => ({
                                   ...prev,
-                                  [question._id]: e.target.value,
-                                }))
-                              }
-                              className="rounded-md border-gray-200 focus:border-blue-500 focus:ring-blue-500 mb-4 min-h-[100px] resize-none"
+                                  [question._id]: value,
+                                }));
+
+                                const validation = validateAnswer(value);
+                                setAnswerErrors((prev) => ({
+                                  ...prev,
+                                  [question._id]: validation.valid
+                                    ? ""
+                                    : validation.message,
+                                }));
+                              }}
+                              className={`rounded-md border-gray-200 focus:border-blue-500 focus:ring-blue-500 mb-2 min-h-[100px] resize-none ${
+                                answerErrors[question._id]
+                                  ? "border-red-300 focus:border-red-500"
+                                  : ""
+                              }`}
                             />
+                            {answerErrors[question._id] && (
+                              <p className="text-red-500 text-sm mb-4 flex items-center gap-1">
+                                <AlertCircle className="h-4 w-4" />
+                                {answerErrors[question._id]}
+                              </p>
+                            )}
                             <Button
                               onClick={() => handleAnswerQuestion(question._id)}
                               disabled={
                                 !answerText[question._id]?.trim() ||
-                                submittingAnswer[question._id]
+                                submittingAnswer[question._id] ||
+                                !!answerErrors[question._id]
                               }
                               className="bg-blue-500 hover:bg-blue-600 text-white rounded-full px-6 py-2 h-auto font-medium"
                             >
@@ -683,7 +750,6 @@ export default function TenderDetailPage() {
                   Reviews
                 </h2>
 
-                {/* Review Section - Only show when completed */}
                 {isCompleted ? (
                   <div className="space-y-6">
                     <div className="border border-gray-200 rounded-md p-6">

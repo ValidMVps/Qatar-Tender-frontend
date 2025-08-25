@@ -36,11 +36,11 @@ import {
 } from "../../services/ReviewService";
 import type { Review as ApiReview } from "../../services/ReviewService";
 import { toast } from "@/components/ui/use-toast";
+import { useAuth } from "@/context/AuthContext";
 
 // TypeScript Interfaces
 interface Review {
   id: string;
-  contractorName: string;
   contractorEmail: string;
   contractorId: string;
   rating: number;
@@ -75,8 +75,7 @@ interface AnalyticsSummary {
 // For received reviews: reviewer is the person who gave you the review
 const transformApiReviewToReview = (apiReview: ApiReview): Review => ({
   id: apiReview._id,
-  contractorName: apiReview.reviewer.email || "Unknown Reviewer",
-  contractorEmail: apiReview.reviewer.email || "Unknown",
+  contractorEmail: apiReview.reviewer.email || "Unknown Reviewer", // <- use reviewer email
   contractorId: apiReview.reviewer._id || "",
   rating: apiReview.rating,
   comment: apiReview.comment || "",
@@ -85,7 +84,6 @@ const transformApiReviewToReview = (apiReview: ApiReview): Review => ({
   tags: [],
   tenderId: apiReview.tender._id,
 });
-
 // Transform API review to UI review (reviews you gave)
 // For given reviews: reviewedUser is the person you reviewed
 const transformApiReviewToReviewGiven = (apiReview: ApiReview): ReviewGiven => {
@@ -154,7 +152,6 @@ const EditableStarRating: React.FC<{
     md: "w-4 h-4",
     lg: "w-5 h-5",
   };
-
   return (
     <div className="flex items-center gap-0.5">
       {[1, 2, 3, 4, 5].map((star) => (
@@ -204,18 +201,15 @@ const AnalyticsCard: React.FC<{
 const ReviewCard: React.FC<{ review: Review }> = ({ review }) => {
   const { t } = useTranslation();
   const router = useRouter();
-
   return (
     <Card className="bg-white border-0 shadow-sm hover:shadow-md transition-all duration-200 rounded-2xl overflow-hidden">
       <CardHeader className="bg-gradient-to-br from-gray-50 to-gray-100/50 pb-4">
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <h3 className="font-semibold text-gray-900 text-lg mb-1">
-              {review.contractorName}
-            </h3>
-            <p className="text-sm text-gray-500 mb-2">
               {review.contractorEmail}
-            </p>
+            </h3>
+
             <div className="flex items-center gap-2">
               <StarRating rating={review.rating} size="sm" />
               <span className="text-sm font-medium text-gray-700">
@@ -274,10 +268,11 @@ const EditableReviewCard: React.FC<{
 }> = ({ review, onUpdate }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedReview, setEditedReview] = useState(review);
+  const { profile, user } = useAuth();
   const [isUpdating, setIsUpdating] = useState(false);
   const { t } = useTranslation();
   const router = useRouter();
-
+  console.log("Rendering EditableReviewCard for review ID:", review);
   const handleSave = async () => {
     setIsUpdating(true);
     try {
@@ -314,7 +309,6 @@ const EditableReviewCard: React.FC<{
       setIsUpdating(false);
     }
   };
-
   const handleCancel = () => {
     setEditedReview(review);
     setIsEditing(false);
@@ -326,11 +320,8 @@ const EditableReviewCard: React.FC<{
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <h3 className="font-semibold text-gray-900 text-lg mb-1">
-              {review.projectOwnerName}
+              {user?.email}
             </h3>
-            <p className="text-sm text-gray-500 mb-2">
-              {review.projectOwnerEmail}
-            </p>
             <div className="flex items-center gap-2">
               {isEditing ? (
                 <EditableStarRating
@@ -458,7 +449,53 @@ const ReviewsRatingsPage: React.FC = () => {
   const [reviewsGiven, setReviewsGiven] = useState<ReviewGiven[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { profile } = useAuth();
+  const analytics = useMemo<AnalyticsSummary>(() => {
+    const total = reviews.length;
+    // averageRating: prefer profile.rating (backend truth) else compute from reviews
+    const avgFromProfile = Number(profile?.rating ?? 0);
+    const averageRating =
+      total === 0
+        ? Number(avgFromProfile.toFixed(1))
+        : Number(
+            (reviews.reduce((s, r) => s + r.rating, 0) / total).toFixed(1)
+          );
 
+    // totalReviews: prefer profile count else reviews length
+    const totalReviews = Number(profile?.ratingCount ?? total);
+
+    // fiveStarPercentage: exact from reviews if available, else approximate from profile
+    const fiveStarPercentage =
+      total === 0
+        ? Math.round((Number(profile?.rating ?? 0) / 5) * 100)
+        : Math.round(
+            (reviews.filter((r) => r.rating === 5).length / total) * 100
+          );
+
+    // topProject: find tenderId with highest count in reviews
+    let topProject = "N/A";
+    if (total > 0) {
+      const counts: Record<string, { name: string; count: number }> = {};
+      reviews.forEach((r) => {
+        const id = r.tenderId || r.id || "unknown";
+        const name = r.projectName || "Untitled Project";
+        if (!counts[id]) counts[id] = { name, count: 0 };
+        counts[id].count += 1;
+      });
+      const top = Object.values(counts).sort((a, b) => b.count - a.count)[0];
+      topProject = top ? `${top.name}` : "N/A";
+    }
+
+    return {
+      averageRating,
+      totalReviews,
+      fiveStarPercentage,
+      topProject,
+    };
+  }, [profile, reviews]);
+  useEffect(() => {
+    console.log(profile);
+  }, [profile]);
   useEffect(() => {
     const fetchReviews = async () => {
       setLoading(true);
@@ -489,7 +526,7 @@ const ReviewsRatingsPage: React.FC = () => {
   const filteredReviews = useMemo(() => {
     return reviews.filter((review) => {
       const matchesSearch =
-        review.contractorName
+        review.contractorEmail
           .toLowerCase()
           .includes(searchTerm.toLowerCase()) ||
         review.projectName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -580,13 +617,13 @@ const ReviewsRatingsPage: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <AnalyticsCard
             title={t("average_rating") || "Average Rating"}
-            value={mockAnalytics.averageRating.toFixed(1)}
+            value={analytics?.averageRating}
             icon={<TrendingUp className="w-4 h-4" />}
             description={t("out_of_5_stars") || "out of 5 stars"}
           />
           <AnalyticsCard
             title={t("total_reviews") || "Total Reviews"}
-            value={mockAnalytics.totalReviews}
+            value={analytics?.totalReviews}
             icon={<MessageSquare className="w-4 h-4" />}
             description={
               t("from_completed_projects") || "from completed projects"
@@ -594,17 +631,15 @@ const ReviewsRatingsPage: React.FC = () => {
           />
           <AnalyticsCard
             title={t("5_star_reviews") || "5-Star Reviews"}
-            value={`${mockAnalytics.fiveStarPercentage}%`}
+            value={`${analytics.fiveStarPercentage}%`}
             icon={<Award className="w-4 h-4" />}
             description={t("excellent_ratings") || "excellent ratings"}
           />
           <AnalyticsCard
-            title={t("top_quality") || "Top Quality"}
-            value={mockAnalytics.mostFrequentTag}
+            title={t("top_project") || "Top Project"}
+            value={analytics.topProject}
             icon={<Clock className="w-4 h-4" />}
-            description={
-              t("most_mentioned_attribute") || "most mentioned attribute"
-            }
+            description={t("most_reviewed_project") || "most reviewed project"}
           />
         </div>
 

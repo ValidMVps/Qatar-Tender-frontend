@@ -162,7 +162,7 @@ export default function MyTenderCard({
                 <Edit className="h-4 w-4" />
               </button>
 
-              {tender.status === "active" ? (
+              {tender.status === "active" && tender.bidCount === 0 ? (
                 <button
                   className="p-2.5 rounded-full bg-red-50 text-red-600 hover:bg-red-100 active:bg-red-200 transition-all"
                   onClick={(e) => stopAnd(e, () => setConfirmClose(true))}

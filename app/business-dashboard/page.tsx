@@ -120,6 +120,7 @@ export default function DashboardPage() {
         setLoading(false);
       }
     };
+    console.log("User ID:", profile);
 
     fetchDashboardData();
   }, [user?._id]);
@@ -128,17 +129,15 @@ export default function DashboardPage() {
     switch (status) {
       case "active":
       case "accepted":
-      case "submitted":
         return <Badge className="bg-blue-500 text-white">{t(status)}</Badge>;
-      case "closed":
+      case "submitted":
+        return <Badge className="bg-indigo-500 text-white">{t(status)}</Badge>;
       case "rejected":
         return <Badge className="bg-gray-500 text-white">{t(status)}</Badge>;
-      case "awarded":
       case "completed":
         return (
-          <Badge className="bg-green-500 text-white">{t("awarded")}</Badge>
+          <Badge className="bg-green-600 text-white">{t("completed")}</Badge>
         );
-      case "pending":
       case "under_review":
         return <Badge variant="outline">{t(status)}</Badge>;
       default:
@@ -149,17 +148,13 @@ export default function DashboardPage() {
   const ctaButton = (
     <div className="flex gap-5">
       <Button
-        className="text-blue-700 shadow-none flex items-center"
+        className="bg-blue-600 shadow-none flex items-center"
         onClick={() => setOpenTenderModal(true)}
-        variant="secondary"
       >
         <Plus className="md:mr-2 mr-0 h-4 w-4" /> {t("post_new_tender")}
       </Button>
       <Link href={"/business-dashboard/browse-tenders"}>
-        <Button
-          className="text-blue-800 shadow-md flex items-center"
-          variant="secondary"
-        >
+        <Button className="bg-blue-600 shadow-md flex items-center">
           <Search className="md:mr-2 mr-0 h-4 w-4" /> {t("browse_tenders")}
         </Button>
       </Link>
@@ -176,188 +171,201 @@ export default function DashboardPage() {
       >
         <main className="flex-1 py-1 px-1 md:py-5 md:px-3 space-y-7">
           {/* Welcome Header */}
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between py-8 px-7 rounded-lg bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 shadow-sm">
-            <div className="mb-4 md:mb-0">
-              <h1 className="md:text-3xl text-xl font-medium pb-2 text-white">
-                {t("welcome_back")} {profile?.fullName || "User"}!
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between py-10 px-8 rounded-lg bg-white backdrop-blur-xl shadow-xs border border-gray-200 relative overflow-hidden">
+            {/* Subtle background pattern */}
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.03),transparent_50%)]"></div>
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(147,197,253,0.02),transparent_50%)]"></div>
+
+            <div className="mb-6 md:mb-0 relative z-10">
+              <h1 className="md:text-3xl text-xl font-semibold pb-3 text-gray-900 tracking-tight leading-tight">
+                {t("welcome_back")}{" "}
+                <span className="text-blue-700">{profile?.companyName}</span>
               </h1>
-              <p className="text-md text-blue-100">
+              <p className="text-base text-gray-700 font-medium leading-relaxed">
                 {t("overview_of_posting_and_bidding_activity")}
               </p>
             </div>
-            <div className="flex-shrink-0">{ctaButton}</div>
+            <div className="flex-shrink-0 relative z-10">{ctaButton}</div>
           </div>
 
           {/* Dual Column Overview: Recent Tenders & Recent Bids */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             {/* Recent Tenders Posted */}
-            {/* <Card className="shadow-xs rounded-md border-neutral-200">
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle className="text-lg font-semibold">
+            <Card className="shadow-sm rounded-xl border-gray-100 bg-white/80 backdrop-blur-xl">
+              <CardHeader className="flex flex-row items-center justify-between px-6 pt-6 pb-4">
+                <CardTitle className="text-xl font-semibold text-gray-900 tracking-tight">
                   {t("recent_tenders_posted")}
                 </CardTitle>
-                <Button variant="outline" size="sm" asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  asChild
+                  className="bg-blue-50 border-blue-200 text-blue-600 hover:bg-blue-100 hover:border-blue-300 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200"
+                >
                   <Link href="/business-dashboard/my-tenders">
                     {t("view_all")}
                   </Link>
                 </Button>
               </CardHeader>
-              <CardContent>
+              <CardContent className="px-6 pb-6">
                 {loading ? (
-                  <p className="text-sm text-gray-500">{t("loading")}...</p>
+                  <p className="text-sm text-gray-500 py-8 text-center">
+                    {t("loading")}...
+                  </p>
                 ) : recentTenders.length === 0 ? (
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-gray-500 py-8 text-center">
                     {t("no_tenders_posted")}
                   </p>
                 ) : (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>{t("tender_title")}</TableHead>
-                        <TableHead>{t("category")}</TableHead>
-                        <TableHead>{t("status")}</TableHead>
-                        <TableHead className="text-right">
-                          {t("deadline")}
-                        </TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {recentTenders.map((tender) => (
-                        <TableRow key={tender._id}>
-                          <TableCell className="font-medium">
-                            {tender.title}
-                          </TableCell>
-                          <TableCell>{tender.category}</TableCell>
-                          <TableCell>
-                            {getBidStatusBadge(tender.status)}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            {new Date(tender.deadline).toLocaleDateString()}
-                          </TableCell>
+                  <div className="overflow-hidden rounded-lg border border-gray-100">
+                    <Table>
+                      <TableHeader className="bg-gray-50/80">
+                        <TableRow className="border-gray-100 hover:bg-gray-50/50">
+                          <TableHead className="text-gray-700 font-semibold text-sm px-6 py-4">
+                            {t("tender_title")}
+                          </TableHead>
+                          <TableHead className="text-gray-700 font-semibold text-sm px-6 py-4">
+                            {t("category")}
+                          </TableHead>
+                          <TableHead className="text-gray-700 font-semibold text-sm px-6 py-4">
+                            {t("status")}
+                          </TableHead>
+                          <TableHead className="text-right text-gray-700 font-semibold text-sm px-6 py-4">
+                            {t("deadline")}
+                          </TableHead>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+                      </TableHeader>
+                      <TableBody className="bg-white">
+                        {recentTenders.map((tender) => (
+                          <TableRow
+                            key={tender._id}
+                            className="border-gray-100 hover:bg-gray-50/30 transition-colors duration-150 cursor-pointer"
+                          >
+                            <TableCell className="font-medium text-gray-900 px-6 py-4">
+                              <Link
+                                href={`/business-dashboard/tender/${tender._id}`}
+                                className="text-blue-600 hover:text-blue-800 hover:underline transition-colors duration-150"
+                              >
+                                {tender.title}
+                              </Link>
+                            </TableCell>
+                            <TableCell className="text-gray-700 px-6 py-4">
+                              {tender.category.name}
+                            </TableCell>
+                            <TableCell className="px-6 py-4">
+                              {getBidStatusBadge(tender.status)}
+                            </TableCell>
+                            <TableCell className="text-right text-gray-700 px-6 py-4">
+                              {new Date(tender.deadline).toLocaleDateString()}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
                 )}
               </CardContent>
-            </Card> */}
+            </Card>
 
             {/* Recent Bids Placed */}
-            <Card className="shadow-xs rounded-md border-neutral-200">
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle className="text-lg font-semibold">
+            <Card className="shadow-sm rounded-xl border-gray-100 bg-white/80 backdrop-blur-xl">
+              <CardHeader className="flex flex-row items-center justify-between px-6 pt-6 pb-4">
+                <CardTitle className="text-xl font-semibold text-gray-900 tracking-tight">
                   {t("recent_bids_placed")}
                 </CardTitle>
-                <Button variant="outline" size="sm" asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  asChild
+                  className="bg-blue-50 border-blue-200 text-blue-600 hover:bg-blue-100 hover:border-blue-300 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200"
+                >
                   <Link href="/business-dashboard/bids">
                     {t("view_all_bids")}
                   </Link>
                 </Button>
               </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>{t("tender_title")}</TableHead>
-                      <TableHead>{t("amount")}</TableHead>
-                      <TableHead>{t("status")}</TableHead>
-                      <TableHead className="text-right">
-                        {t("submission_date")}
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {loading ? (
-                      <TableRow>
-                        <TableCell
-                          colSpan={4}
-                          className="text-center text-sm text-gray-500"
-                        >
-                          {t("loading")}...
-                        </TableCell>
+              <CardContent className="px-6 pb-6">
+                <div className="overflow-hidden rounded-lg border border-gray-100">
+                  <Table>
+                    <TableHeader className="bg-gray-50/80">
+                      <TableRow className="border-gray-100 hover:bg-gray-50/50">
+                        <TableHead className="text-gray-700 font-semibold text-sm px-6 py-4">
+                          {t("tender_title")}
+                        </TableHead>
+                        <TableHead className="text-gray-700 font-semibold text-sm px-6 py-4">
+                          {t("amount")}
+                        </TableHead>
+                        <TableHead className="text-gray-700 font-semibold text-sm px-6 py-4">
+                          {t("status")}
+                        </TableHead>
+                        <TableHead className="text-right text-gray-700 font-semibold text-sm px-6 py-4">
+                          {t("submission_date")}
+                        </TableHead>
                       </TableRow>
-                    ) : recentBids.length === 0 ? (
-                      <TableRow>
-                        <TableCell
-                          colSpan={4}
-                          className="text-center text-sm text-gray-500"
-                        >
-                          {t("no_bids_placed")}
-                        </TableCell>
-                      </TableRow>
-                    ) : (
-                      recentBids.map((bid) => (
-                        <TableRow key={bid._id}>
-                          <TableCell className="font-medium">
-                            {bid.tenderTitle}
-                          </TableCell>
-                          <TableCell>
-                            {new Intl.NumberFormat().format(bid.amount)}{" "}
-                            {t("currency")}
-                          </TableCell>
-                          <TableCell>{getBidStatusBadge(bid.status)}</TableCell>
-                          <TableCell className="text-right">
-                            {new Date(bid.createdAt).toLocaleDateString()}
+                    </TableHeader>
+                    <TableBody className="bg-white">
+                      {loading ? (
+                        <TableRow className="border-gray-100">
+                          <TableCell
+                            colSpan={4}
+                            className="text-center text-sm text-gray-500 py-12 px-6"
+                          >
+                            {t("loading")}...
                           </TableCell>
                         </TableRow>
-                      ))
-                    )}
-                  </TableBody>
-                </Table>
+                      ) : recentBids.length === 0 ? (
+                        <TableRow className="border-gray-100">
+                          <TableCell
+                            colSpan={4}
+                            className="text-center text-sm text-gray-500 py-12 px-6"
+                          >
+                            {t("no_bids_placed")}
+                          </TableCell>
+                        </TableRow>
+                      ) : (
+                        recentBids.map(
+                          (bid) => (
+                            console.log(bid),
+                            (
+                              <TableRow
+                                key={bid._id}
+                                className="border-gray-100 hover:bg-gray-50/30 transition-colors duration-150 cursor-pointer"
+                              >
+                                <TableCell className="font-medium text-gray-900 px-6 py-4">
+                                  <Link
+                                    href={`/business-dashboard/tender-details/${bid.tender._id}`}
+                                    className="text-blue-600 hover:text-blue-800 hover:underline transition-colors duration-150"
+                                  >
+                                    {bid.tender.title}
+                                  </Link>
+                                </TableCell>
+                                <TableCell className="text-gray-700 px-6 py-4">
+                                  {new Intl.NumberFormat().format(bid.amount)}{" "}
+                                  {t("QAR")}
+                                </TableCell>
+                                <TableCell className="px-6 py-4">
+                                  {getBidStatusBadge(bid.status)}
+                                </TableCell>
+                                <TableCell className="text-right text-gray-700 px-6 py-4">
+                                  {new Date(bid.createdAt).toLocaleDateString()}
+                                </TableCell>
+                              </TableRow>
+                            )
+                          )
+                        )
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
               </CardContent>
             </Card>
           </div>
 
           {/* Charts Section */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <div className="grid grid-cols-1 gap-6 mb-8">
             <Card className="shadow-xs rounded-md border-neutral-200">
-              <CardHeader>
-                <CardTitle className="text-lg font-semibold">
-                  {t("posting_performance")}
-                </CardTitle>
-                <p className="text-sm text-gray-500">
-                  {t("monthly_trend_of_tenders_posted_vs_bids_received")}
-                </p>
-              </CardHeader>
               <CardContent>
                 <OverviewChart />
-              </CardContent>
-            </Card>
-
-            <Card className="shadow-xs rounded-md border-neutral-200">
-              <CardHeader>
-                <CardTitle className="text-lg font-semibold">
-                  {t("bidding_success_rate")}
-                </CardTitle>
-                <p className="text-sm text-gray-500">
-                  {t("bids_placed_vs_bids_won")}
-                </p>
-              </CardHeader>
-              <CardContent>
-                <ChartContainer config={{}} className="aspect-video h-[300px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={biddingSuccessData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="month" />
-                      <YAxis />
-                      <ChartTooltip
-                        cursor={false}
-                        content={<ChartTooltipContent indicator="dot" />}
-                      />
-                      <ChartLegend content={<ChartLegendContent />} />
-                      <Bar
-                        dataKey="bidsPlaced"
-                        fill="#8884d8"
-                        name={t("bids_placed")}
-                      />
-                      <Bar
-                        dataKey="bidsWon"
-                        fill="#82ca9d"
-                        name={t("bids_won")}
-                      />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </ChartContainer>
               </CardContent>
             </Card>
           </div>

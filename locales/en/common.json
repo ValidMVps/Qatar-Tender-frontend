@@ -1149,5 +1149,16 @@
   "5k_plus": "5k+",
   "adjust_filters_or_try_different_search": "Adjust filters or try a different search",
   "questions_and_answers": "Questions and Answers",
-  "complete_your_profile_to_unlock_all_features": "Complete your profile to unlock all features"
+  "complete_your_profile_to_unlock_all_features": "Complete your profile to unlock all features",
+  "recent_bids_placed": "Recent Bids Placed",
+  "monthly_trend_of_tenders_posted_vs_bids_received": "Monthly Trend of Tenders Posted vs Bids Received",
+  "another_bid_was_accepted": "Another bid was accepted",
+  "note_do_not_include_contact_information_in_your_question_or_answer": "Do not include email, phone, or website links. Communication should stay on platform.",
+  "question_contains_contact_information_email": "Questions cannot contain email addresses.",
+  "question_contains_contact_information_phone": "Questions cannot contain phone numbers.",
+  "question_contains_contact_information_url": "Questions cannot contain website links.",
+  "answer_contains_contact_information_email": "Answers cannot contain email addresses.",
+  "answer_contains_contact_information_phone": "Answers cannot contain phone numbers.",
+  "answer_contains_contact_information_url": "Answers cannot contain website links.",
+  "note_do_not_include_contact_information_in_your_answer": "Do not include email, phone, or website links. Communication should stay on platform."
 }
