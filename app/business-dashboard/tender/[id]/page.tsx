@@ -91,7 +91,7 @@ interface Bid {
   paymentAmount: number;
   paymentId: string;
   paymentStatus: "paid" | "pending";
-  status: "submitted" | "accepted" | "rejected" | "under_review";
+  status: "submitted" | "accepted" | "rejected" | "under_review" | "completed";
   createdAt: string;
   updatedAt: string;
   v: number;
@@ -393,7 +393,7 @@ export default function TenderDetailPage() {
             </div>
 
             {/* Chat Button - Only show when awarded */}
-            {isAwarded && awardedBid && (
+            {isAwarded && (
               <div className="mt-6 lg:mt-0 lg:ml-8">
                 <Button
                   onClick={() => router.push(`/chat/${awardedBid.bidder._id}`)}

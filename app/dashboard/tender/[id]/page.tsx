@@ -91,7 +91,7 @@ interface Bid {
   paymentAmount: number;
   paymentId: string;
   paymentStatus: "paid" | "pending";
-  status: "submitted" | "accepted" | "rejected" | "under_review";
+  status: "submitted" | "accepted" | "rejected" | "under_review" | "completed";
   createdAt: string;
   updatedAt: string;
   v: number;

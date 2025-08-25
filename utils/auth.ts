@@ -65,6 +65,7 @@ class AuthService {
       console.error("Logout error:", error);
     } finally {
       clearTokens();
+      console.log("logout");
       if (typeof window !== "undefined") {
         window.location.href = "/login";
       }

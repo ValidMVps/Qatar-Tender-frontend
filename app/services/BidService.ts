@@ -15,7 +15,13 @@ export interface Bid {
   paymentStatus: "pending" | "completed" | "failed";
   paymentAmount: number;
   paymentId?: string;
-  status: "pending" | "accepted" | "rejected" | "under_review" | "submitted";
+  status:
+    | "pending"
+    | "accepted"
+    | "rejected"
+    | "under_review"
+    | "submitted"
+    | "completed";
   createdAt: string;
   updatedAt: string;
 }
@@ -78,7 +84,7 @@ export const updateBid = async (
 // NEW: Update bid status (specifically for accepting/rejecting bids)
 export const updateBidStatus = async (
   bidId: string,
-  status: "accepted" | "rejected" | "under_review" | "submitted"
+  status: "accepted" | "rejected" | "under_review" | "submitted" | "completed"
 ) => {
   try {
     const res = await api.put(`/api/bids/${bidId}/status`, { status });

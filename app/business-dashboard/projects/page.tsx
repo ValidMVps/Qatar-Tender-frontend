@@ -128,9 +128,7 @@ export default function Component() {
     }
   };
 
-  const handleReviewSubmit = (rating: number, review: string) => {
-    console.log("Review Submitted:", { rating, review });
-  };
+
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -418,9 +416,6 @@ export default function Component() {
                 <TabsList className="w-full">
                   <TabsTrigger value="owned" className="flex-1">
                     {t("owned_projects")}
-                  </TabsTrigger>
-                  <TabsTrigger value="awarded" className="flex-1">
-                    {t("awarded_to_me")}
                   </TabsTrigger>
                 </TabsList>
               </div>

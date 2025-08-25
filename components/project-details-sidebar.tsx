@@ -28,7 +28,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useTranslation } from "../lib/hooks/useTranslation";
 import { updateTenderStatus } from "@/app/services/tenderService";
 import { createReview, getReviewForTender } from "@/app/services/ReviewService";
-import { getTenderBids } from "@/app/services/BidService"; // Import bid service
+import { getTenderBids, updateBidStatus } from "@/app/services/BidService"; // Import bid service
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 
@@ -65,6 +65,7 @@ export function ProjectDetailsSidebar({
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [loading, setLoading] = useState(false);
+  const [bid, setbid] = useState();
   const [error, setError] = useState<string | null>(null);
   const [hasReview, setHasReview] = useState(false);
   const [selectedBidAmount, setSelectedBidAmount] = useState<string | null>(
@@ -94,6 +95,7 @@ export function ProjectDetailsSidebar({
         );
         const awardedBid = bids.find((bid: any) => bid.status === "accepted");
         console.log("Awarded Bid:", awardedBid);
+        setbid(awardedBid);
         if (awardedBid) {
           setSelectedBidAmount(awardedBid.amount + "QAR");
         } else {
@@ -117,6 +119,7 @@ export function ProjectDetailsSidebar({
     setError(null);
 
     try {
+      await updateBidStatus(bid?._id, "completed");
       await updateTenderStatus(selectedProject.id, "completed");
       onMarkComplete(); // This should trigger a refresh of the selectedProject
       setCompleteStep(2); // Move to review step in dialog

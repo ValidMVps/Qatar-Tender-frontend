@@ -1,7 +1,5 @@
 "use client";
-
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   Table,
@@ -14,13 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -55,371 +47,434 @@ import {
   Trophy,
   MoreHorizontal,
   Pencil,
-  Trash2,
   Search,
-  Filter,
   TrendingUp,
   CheckCircle,
   AlertCircle,
+  MessageCircle,
+  X,
 } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
-
 import { useTranslation } from "../../../lib/hooks/useTranslation";
-interface Bid {
-  id: string;
-  tenderId: string;
-  tenderTitle: string;
-  bidAmount: number;
-  submittedAt: string;
-  status: "pending" | "awarded" | "rejected" | "Withdrawn" | "closed";
-  rejectionReason?: string;
-  bidDescription: string;
-  budget: number;
-  deadline: string;
-  category: string;
-  location: string;
-  clientName: string;
+
+// Services (adjust paths if your project structure differs)
+import {
+  getUserBids,
+  updateBid as apiUpdateBid,
+  updateBidStatus as apiUpdateBidStatus,
+} from "@/app/services/BidService";
+import { getTender } from "@/app/services/tenderService";
+
+// Types (keep in sync with backend)
+interface ApiBid {
+  _id: string;
+  tender: string | { _id: string; title?: string };
+  bidder?: string;
+  amount: number;
   description: string;
+  paymentStatus?: "pending" | "completed" | "failed";
+  paymentAmount?: number;
+  paymentId?: string;
+  // limited to the statuses your backend uses
+  status: "submitted" | "rejected" | "accepted" | "completed" | "under_review";
+  createdAt: string;
+  updatedAt?: string;
 }
 
-const sampleBids: Bid[] = [
-  {
-    id: "bid-1",
-    tenderId: "tender-101",
-    tenderTitle: "Website Redesign Project",
-    bidAmount: 5000,
-    submittedAt: "2024-07-20",
-    status: "awarded",
-    bidDescription:
-      "Comprehensive redesign focusing on modern UI/UX and performance optimization.",
-    budget: 7500,
-    deadline: "2024-08-30",
-    category: "Web Development",
-    location: "Doha, Qatar",
-    clientName: "Tech Solutions Inc.",
-    description:
-      "Client requires a complete overhaul of their existing corporate website to improve user engagement and brand image.",
-  },
-  {
-    id: "bid-2",
-    tenderId: "tender-102",
-    tenderTitle: "Mobile App Development",
-    bidAmount: 12000,
-    submittedAt: "2024-07-18",
-    status: "pending",
-    bidDescription:
-      "Development of a cross-platform mobile application for iOS and Android using React Native.",
-    budget: 15000,
-    deadline: "2024-09-15",
-    category: "Mobile Development",
-    location: "Remote",
-    clientName: "Innovate Apps LLC",
-    description:
-      "Seeking a developer to build a new mobile application for their e-commerce platform, including user authentication and product listings.",
-  },
-  {
-    id: "bid-3",
-    tenderId: "tender-103",
-    tenderTitle: "SEO Optimization Service",
-    bidAmount: 1500,
-    submittedAt: "2024-07-15",
-    status: "rejected",
-    rejectionReason: "Bid amount was higher than other competitive offers.",
-    bidDescription:
-      "Monthly SEO services including keyword research, on-page optimization, and link building.",
-    budget: 1000,
-    deadline: "2024-07-25",
-    category: "Digital Marketing",
-    location: "Doha, Qatar",
-    clientName: "Marketing Pros",
-    description:
-      "Looking for an SEO expert to improve search engine rankings and organic traffic for their online business.",
-  },
-  {
-    id: "bid-4",
-    tenderId: "tender-104",
-    tenderTitle: "Graphic Design for Branding",
-    bidAmount: 2500,
-    submittedAt: "2024-07-10",
-    status: "Withdrawn",
-    bidDescription:
-      "Creation of a new brand identity, including logo, color palette, and typography guidelines.",
-    budget: 3000,
-    deadline: "2024-08-01",
-    category: "Graphic Design",
-    location: "Remote",
-    clientName: "Creative Solutions",
-    description:
-      "Need a graphic designer to develop a comprehensive brand guide for a new startup.",
-  },
-  {
-    id: "bid-5",
-    tenderId: "tender-105",
-    tenderTitle: "IT Network Setup",
-    bidAmount: 8000,
-    submittedAt: "2024-07-05",
-    status: "closed",
-    bidDescription:
-      "Installation and configuration of a new office network, including servers and workstations.",
-    budget: 9000,
-    deadline: "2024-07-28",
-    category: "IT Services",
-    location: "Al Khor, Qatar",
-    clientName: "Enterprise Systems",
-    description:
-      "Require an IT professional to set up a secure and efficient network infrastructure for their new office.",
-  },
-  {
-    id: "bid-6",
-    tenderId: "tender-106",
-    tenderTitle: "Content Writing for Blog",
-    bidAmount: 700,
-    submittedAt: "2024-07-22",
-    status: "pending",
-    bidDescription:
-      "Writing 5 blog posts per month on technology trends, 1000 words each.",
-    budget: 800,
-    deadline: "2024-08-25",
-    category: "Content Creation",
-    location: "Remote",
-    clientName: "Bloggers United",
-    description:
-      "Seeking a content writer for regular blog posts on various tech topics.",
-  },
-];
+type BidUI = {
+  id: string;
+  amount: number;
+  description: string;
+  status: ApiBid["status"];
+  submittedAt: string;
+  paymentStatus?: string;
+  paymentAmount?: number;
+  tenderId: string;
+  tenderTitle: string;
+  budget?: number | null;
+  deadline?: string | null;
+  category?: string | null;
+  location?: string | null;
+  clientName?: string | null;
+  tenderDescription?: string | null;
+};
 
 export default function MyBidsPage() {
   const { t } = useTranslation();
-
+  const [bids, setBids] = useState<BidUI[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("all");
-  const [bids, setBids] = useState<Bid[]>(sampleBids);
-  const [showBidDetailsModal, setShowBidDetailsModal] = useState(false);
-  const [selectedBidForDetails, setSelectedBidForDetails] =
-    useState<Bid | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [showBidDetailsModal, setShowBidDetailsModal] = useState(false);
+  const [selectedBidForDetails, setSelectedBidForDetails] =
+    useState<BidUI | null>(null);
+
+  // Fetch bids and enrich with tender details
+  const fetchBids = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const apiBids: ApiBid[] = await getUserBids();
+
+      // Normalize and enrich by fetching tender details in parallel
+      const enriched = await Promise.all(
+        apiBids.map(async (b) => {
+          const tenderId =
+            typeof b.tender === "string" ? b.tender : (b.tender as any)?._id;
+          let tenderTitle = "-";
+          let budget = null;
+          let deadline = null;
+          let category = null;
+          let location = null;
+          let clientName = null;
+          let tenderDescription = null;
+
+          try {
+            if (tenderId) {
+              const tender = await getTender(tenderId);
+              // tender may be an object with various fields depending on your API
+              tenderTitle = tender?.title || tender?.name || tenderTitle;
+              budget = tender?.budget || tender?.estimatedBudget || null;
+              deadline = tender?.deadline || tender?.dueDate || null;
+              category = tender?.category?.name || tender?.category || null;
+              location = tender?.location || null;
+              clientName = tender?.clientName || tender?.owner?.name || null;
+              tenderDescription = tender?.description || null;
+            }
+          } catch (err) {
+            // If tender lookup fails, continue with limited data
+            console.warn("Failed to fetch tender details for", tenderId, err);
+          }
+
+          return {
+            id: b._id,
+            amount: b.amount,
+            description: b.description,
+            status: b.status,
+            submittedAt: b.createdAt,
+            paymentStatus: b.paymentStatus,
+            paymentAmount: b.paymentAmount,
+            tenderId,
+            tenderTitle,
+            budget,
+            deadline,
+            category,
+            location,
+            clientName,
+            tenderDescription,
+          } as BidUI;
+        })
+      );
+
+      setBids(enriched);
+    } catch (err: any) {
+      console.error(err);
+      setError(err?.message || "Failed to load bids");
+      toast({
+        title: "Error",
+        description: err?.message || "Failed to load bids",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchBids();
+  }, []);
+
+  // Derived values
+  const categories = [
+    "all",
+    ...Array.from(new Set(bids.map((b) => b.category || "Uncategorized"))),
+  ];
+
+  const totalBids = bids.length;
+  const activeBids = bids.filter((b) => b.status === "submitted").length;
+  const awardedBids = bids.filter((b) => b.status === "accepted").length;
+  const rejectedBids = bids.filter((b) => b.status === "rejected").length;
+  const completedBids = bids.filter((b) => b.status === "completed").length;
+  const submittedBids = bids.filter((b) => b.status === "submitted").length;
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "awarded":
-        return "bg-green-100 text-green-800 border-green-200";
-      case "pending":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      case "accepted":
+        return "bg-green-50 text-green-700 border-green-200 py-2 ";
+      case "submitted":
+        return "bg-amber-50 text-amber-700 border-amber-200 py-2";
       case "rejected":
-        return "bg-red-100 text-red-800 border-red-200";
-      case "Withdrawn":
-        return "bg-gray-100 text-gray-800 border-gray-200";
-      case "closed":
-        return "bg-blue-100 text-blue-800 border-blue-200";
+        return "bg-red-50 text-red-700 border-red-200 py-2";
+      case "completed":
+        return "bg-blue-50 text-blue-700 border-blue-200 py-2 ";
       default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
+        return "bg-gray-50 text-gray-700 border-gray-200 py-2";
     }
   };
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case "awarded":
-        return "Awarded";
-      case "pending":
-        return "Pending";
+      case "accepted":
+        return "Accepted";
+      case "submitted":
+        return "Submitted";
       case "rejected":
         return "Rejected";
-      case "Withdrawn":
-        return "Withdrawn";
-      case "closed":
-        return "Closed";
+      case "completed":
+        return "Completed";
       default:
-        return "Unknown";
+        return status;
     }
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case "awarded":
-        return <Trophy className="h-4 w-4" />;
-      case "pending":
+      case "accepted":
+        return <CheckCircle className="h-4 w-4" />;
+      case "submitted":
         return <Clock className="h-4 w-4" />;
       case "rejected":
         return <XCircle className="h-4 w-4" />;
-      case "Withdrawn":
-        return <FileText className="h-4 w-4" />;
-      case "closed":
-        return <Lock className="h-4 w-4" />;
+      case "completed":
+        return <Trophy className="h-4 w-4" />;
       default:
         return <FileText className="h-4 w-4" />;
     }
   };
 
-  // Get unique categories for the filter
-  const categories = ["all", ...new Set(bids.map((bid) => bid.category))];
-
-  // Analytics calculations
-  const totalBids = bids.length;
-  const activeBids = bids.filter(
-    (bid) => bid.status === "pending" || bid.status === "awarded"
-  ).length;
-  const awardedBids = bids.filter((bid) => bid.status === "awarded").length;
-  const rejectedBids = bids.filter((bid) => bid.status === "rejected").length;
-  const closedBids = bids.filter((bid) => bid.status === "closed").length;
-
   const filteredBids = bids.filter((bid) => {
-    // Filter by tab
+    // Tab filter
     let tabFilter = true;
     if (activeTab !== "all") {
       if (activeTab === "active") {
-        tabFilter = bid.status === "pending" || bid.status === "awarded";
+        tabFilter = bid.status === "submitted";
       } else {
         tabFilter = bid.status === activeTab;
       }
     }
 
-    // Filter by search query
+    // Search
     const searchFilter =
       searchQuery === "" ||
-      bid.tenderTitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      bid.clientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      bid.category.toLowerCase().includes(searchQuery.toLowerCase());
+      (bid.tenderTitle &&
+        bid.tenderTitle.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (bid.clientName &&
+        bid.clientName.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (bid.category &&
+        bid.category.toLowerCase().includes(searchQuery.toLowerCase()));
 
-    // Filter by category
+    // Category
     const categoryFilter =
-      selectedCategory === "all" || bid.category === selectedCategory;
+      selectedCategory === "all" ||
+      (bid.category || "Uncategorized") === selectedCategory;
 
     return tabFilter && searchFilter && categoryFilter;
   });
 
-  const handleViewBidDetails = (bid: Bid) => {
+  // Actions
+  const handleViewBidDetails = (bid: BidUI) => {
     setSelectedBidForDetails(bid);
     setShowBidDetailsModal(true);
   };
 
-  const handleEditBid = (bidId: string) => {
+  const handleCloseBid = async (id: string) => {
+    try {
+      // Update bid status to rejected to effectively "close" it
+      await apiUpdateBidStatus(id, "rejected");
+      setBids((prev) =>
+        prev.map((b) => (b.id === id ? { ...b, status: "rejected" } : b))
+      );
+      toast({
+        title: "Bid Closed",
+        description: "Bid has been closed successfully.",
+      });
+    } catch (err: any) {
+      console.error(err);
+      toast({
+        title: "Error",
+        description: err?.message || "Failed to close bid",
+      });
+    }
+  };
+
+  const handleEditBid = async (id: string) => {
     toast({
-      title: "Edit Bid",
-      description: `Navigating to edit bid ${bidId}. (Functionality not yet implemented)`,
+      title: "Edit",
+      description: "Redirect to edit page (implement route).",
+    });
+    // You can navigate to edit page or open an edit modal here
+  };
+
+  const handleReapply = async (id: string) => {
+    try {
+      await apiUpdateBidStatus(id, "submitted");
+      setBids((prev) =>
+        prev.map((b) => (b.id === id ? { ...b, status: "submitted" } : b))
+      );
+      setShowBidDetailsModal(false);
+      toast({
+        title: "Reapplied",
+        description: "Reapplication submitted.",
+      });
+    } catch (err: any) {
+      console.error(err);
+      toast({
+        title: "Error",
+        description: err?.message || "Failed to reapply",
+      });
+    }
+  };
+
+  const handleGoToChat = (bidId: string) => {
+    // Navigate to chat page - implement your navigation logic here
+    toast({
+      title: "Opening Chat",
+      description: "Redirecting to chat...",
     });
   };
 
-  const handleDeleteBid = (bidId: string) => {
-    toast({
-      title: "Delete Bid",
-      description: `Deleting bid ${bidId}. (Functionality not yet implemented)`,
-    });
-    setBids((prevBids) => prevBids.filter((bid) => bid.id !== bidId));
-  };
-
-  const handleReapply = (bidId: string) => {
-    toast({
-      title: "Reapplication Submitted",
-      description: `You have reapplied for bid ${bidId}.`,
-    });
-    setShowBidDetailsModal(false);
-    setBids((prevBids) =>
-      prevBids.map((bid) =>
-        bid.id === bidId
-          ? { ...bid, status: "pending", rejectionReason: undefined }
-          : bid
-      )
+  if (loading) {
+    return (
+      <div className="container mx-auto px-6 py-8 flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
+      </div>
     );
-  };
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto px-6 py-8">
+        <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
+          <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+          <p className="text-red-700 text-lg font-medium">{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="container mx-auto px-6 py-8 space-y-6">
+    <div className="container mx-auto px-6 py-8 space-y-8 bg-gray-50 min-h-screen">
       {/* Analytics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-        <Card className="bg-blue-500 text-white">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-white">
-              {t("total_bids")}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+        <Card className="bg-white border-0 shadow-sm hover:shadow-md transition-all duration-200 rounded-2xl backdrop-blur-sm">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+            <CardTitle className="text-sm font-semibold text-gray-700">
+              {t("total_bids") || "Total Bids"}
             </CardTitle>
-            <FileText className="h-4 w-4 text-white" />
+            <div className="p-2 bg-blue-50 rounded-xl">
+              <FileText className="h-4 w-4 text-blue-600" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white">{totalBids}</div>
-            <p className="text-xs text-white opacity-80">
-              {t("all_submitted_bids")}
+            <div className="text-3xl font-bold text-gray-900 mb-1">
+              {totalBids}
+            </div>
+            <p className="text-sm text-gray-500">
+              {t("all_submitted_bids") || "All submitted bids"}
             </p>
           </CardContent>
         </Card>
 
-        <Card className="bg-blue-500 text-white">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-white">
-              {t("active_bids")}
+        <Card className="bg-white border-0 shadow-sm hover:shadow-md transition-all duration-200 rounded-2xl">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+            <CardTitle className="text-sm font-semibold text-gray-700">
+              {t("active_bids") || "Active Bids"}
             </CardTitle>
-            <TrendingUp className="h-4 w-4 text-white" />
+            <div className="p-2 bg-amber-50 rounded-xl">
+              <TrendingUp className="h-4 w-4 text-amber-600" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white">{activeBids}</div>
-            <p className="text-xs text-white opacity-80">
-              {t("pending_and_awarded")}
+            <div className="text-3xl font-bold text-gray-900 mb-1">
+              {activeBids}
+            </div>
+            <p className="text-sm text-gray-500">
+              {t("open_bids") || "Open bids"}
             </p>
           </CardContent>
         </Card>
 
-        <Card className="bg-blue-500 text-white">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-white">
-              {t("awarded_bids")}
+        <Card className="bg-white border-0 shadow-sm hover:shadow-md transition-all duration-200 rounded-2xl">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+            <CardTitle className="text-sm font-semibold text-gray-700">
+              {t("awarded_bids") || "Awarded Bids"}
             </CardTitle>
-            <CheckCircle className="h-4 w-4 text-white" />
+            <div className="p-2 bg-green-50 rounded-xl">
+              <CheckCircle className="h-4 w-4 text-green-600" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white">{awardedBids}</div>
-            <p className="text-xs text-white opacity-80">
-              {t("successfully_awarded")}
+            <div className="text-3xl font-bold text-gray-900 mb-1">
+              {awardedBids}
+            </div>
+            <p className="text-sm text-gray-500">
+              {t("successfully_awarded") || "Successfully awarded"}
             </p>
           </CardContent>
         </Card>
 
-        <Card className="bg-blue-500 text-white">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-white">
-              {t("rejected_bids")}
+        <Card className="bg-white border-0 shadow-sm hover:shadow-md transition-all duration-200 rounded-2xl">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+            <CardTitle className="text-sm font-semibold text-gray-700">
+              {t("rejected_bids") || "Rejected Bids"}
             </CardTitle>
-            <AlertCircle className="h-4 w-4 text-white" />
+            <div className="p-2 bg-red-50 rounded-xl">
+              <AlertCircle className="h-4 w-4 text-red-600" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white">{rejectedBids}</div>
-            <p className="text-xs text-white opacity-80">
-              {t("not_successful")}
+            <div className="text-3xl font-bold text-gray-900 mb-1">
+              {rejectedBids}
+            </div>
+            <p className="text-sm text-gray-500">
+              {t("not_successful") || "Not successful"}
             </p>
           </CardContent>
         </Card>
 
-        <Card className="bg-blue-500 text-white">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-white">
-              {t("closed_bids")}
+        <Card className="bg-white border-0 shadow-sm hover:shadow-md transition-all duration-200 rounded-2xl">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+            <CardTitle className="text-sm font-semibold text-gray-700">
+              {t("completed_bids") || "Completed Bids"}
             </CardTitle>
-            <Lock className="h-4 w-4 text-white" />
+            <div className="p-2 bg-blue-50 rounded-xl">
+              <Trophy className="h-4 w-4 text-blue-600" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white">{closedBids}</div>
-            <p className="text-xs text-white opacity-80">
-              {t("tender_completed")}
+            <div className="text-3xl font-bold text-gray-900 mb-1">
+              {completedBids}
+            </div>
+            <p className="text-sm text-gray-500">
+              {t("successfully_completed") || "Successfully completed"}
             </p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Search and Filter Section */}
-      <div className="flex flex-col sm:flex-row gap-4 items-center justify-between rounded-lg ">
+      {/* Filters */}
+      <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
         <div className="relative flex-1 min-w-0">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
           <Input
-            placeholder={t("search_bids_placeholder")}
+            placeholder={t("search_bids_placeholder") || "Search bids..."}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
+            className="pl-11 h-12 border-0 bg-white shadow-sm rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-            <SelectTrigger className="w-48">
-              <SelectValue placeholder={t("select_category")} />
+            <SelectTrigger className="w-48 h-12 border-0 bg-white shadow-sm rounded-2xl">
+              <SelectValue
+                placeholder={t("select_category") || "Select category"}
+              />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{t("all_categories")}</SelectItem>
+            <SelectContent className="rounded-xl border-0 shadow-lg">
+              <SelectItem value="all">
+                {t("all_categories") || "All Categories"}
+              </SelectItem>
               {categories.slice(1).map((category) => (
                 <SelectItem key={category} value={category}>
                   {category}
@@ -430,259 +485,414 @@ export default function MyBidsPage() {
         </div>
       </div>
 
-      {/* Tabs Section */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-6 rounded-lg border bg-gray-50 p-1">
-          <TabsTrigger value="all">{t("all")}</TabsTrigger>
-          <TabsTrigger value="active">{t("active")}</TabsTrigger>
-          <TabsTrigger value="awarded">{t("awarded")}</TabsTrigger>
-          <TabsTrigger value="rejected">{t("rejected")}</TabsTrigger>
-          <TabsTrigger value="closed">{t("closed")}</TabsTrigger>
-          <TabsTrigger value="pending">{t("pending")}</TabsTrigger>
-        </TabsList>
+      {/* Tabs + Table */}
+      <div className="bg-white rounded-2xl shadow-sm border-0 overflow-hidden">
+        <div className="border-b border-gray-100 p-6">
+          <div className="flex flex-wrap gap-2">
+            {[
+              { key: "all", label: t("all") || "All" },
+              { key: "accepted", label: t("accepted") || "Accepted" },
+              { key: "rejected", label: t("rejected") || "Rejected" },
+              { key: "submitted", label: t("submitted") || "Submitted" },
+              { key: "completed", label: t("completed") || "Completed" },
+            ].map((tab) => (
+              <button
+                key={tab.key}
+                className={`py-3 px-6 rounded-xl text-sm font-medium transition-all duration-200 ${
+                  activeTab === tab.key
+                    ? "bg-blue-100 text-blue-700 shadow-sm"
+                    : "text-gray-600 hover:bg-gray-50"
+                }`}
+                onClick={() => setActiveTab(tab.key)}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        </div>
 
-        <TabsContent value={activeTab} className="mt-6">
-          <div className="bg-white rounded-lg shadow-md border overflow-hidden">
-            <Table>
-              <TableHeader className="bg-gray-50">
-                <TableRow>
-                  <TableHead className="px-6 py-3">
-                    {t("tender_title")}
-                  </TableHead>
-                  <TableHead className="px-6 py-3">{t("category")}</TableHead>
-                  <TableHead className="px-6 py-3">{t("your_bid")}</TableHead>
-                  <TableHead className="px-6 py-3">{t("submitted")}</TableHead>
-                  <TableHead className="px-6 py-3">{t("status")}</TableHead>
-                  <TableHead className="px-6 py-3 text-right">
-                    {t("actions")}
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredBids.length > 0 ? (
-                  filteredBids.map((bid) => (
-                    <TableRow
-                      key={bid.id}
-                      className="hover:bg-gray-50 transition"
+        <Table>
+          <TableHeader className="bg-gray-50/50">
+            <TableRow className="border-none">
+              <TableHead className="px-6 py-4 font-semibold text-gray-700">
+                {t("tender_title") || "Tender Title"}
+              </TableHead>
+              <TableHead className="px-6 py-4 font-semibold text-gray-700">
+                {t("category") || "Category"}
+              </TableHead>
+              <TableHead className="px-6 py-4 font-semibold text-gray-700">
+                {t("your_bid") || "Your Bid"}
+              </TableHead>
+              <TableHead className="px-6 py-4 font-semibold text-gray-700">
+                {t("submitted") || "Submitted"}
+              </TableHead>
+              <TableHead className="px-6 py-4 font-semibold text-gray-700">
+                {t("status") || "Status"}
+              </TableHead>
+              <TableHead className="px-6 py-4 text-right font-semibold text-gray-700">
+                {t("actions") || "Actions"}
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredBids.length > 0 ? (
+              filteredBids.map((bid) => (
+                <TableRow
+                  key={bid.id}
+                  className="border-none hover:bg-gray-50/50 transition-colors"
+                >
+                  <TableCell className="px-6 py-5">
+                    <div>
+                      <div className="font-semibold text-gray-900 mb-1">
+                        {bid.tenderTitle}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        {bid.clientName}
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell className="px-6 py-5">
+                    <Badge
+                      variant="outline"
+                      className="text-xs bg-gray-50 border-gray-200 text-gray-700 rounded-lg"
                     >
-                      <TableCell className="px-6 py-4 font-medium">
-                        <div>
-                          <div className="font-semibold">{bid.tenderTitle}</div>
-                          <div className="text-sm text-gray-500">
-                            {bid.clientName}
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell className="px-6 py-4">
-                        <Badge variant="outline" className="text-xs">
-                          {bid.category}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="px-6 py-4">
-                        <div className="font-semibold">{bid.bidAmount} QAR</div>
-                        <div className="text-xs text-gray-500">
-                          {t("budget")}: {bid.budget} QAR
-                        </div>
-                      </TableCell>
-                      <TableCell className="px-6 py-4">
-                        {bid.submittedAt}
-                      </TableCell>
-                      <TableCell className="px-6 py-4">
-                        <Badge
-                          className={`text-xs border flex items-center gap-1 w-fit ${getStatusColor(
-                            bid.status
-                          )}`}
+                      {bid.category || "-"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="px-6 py-5">
+                    <div className="font-semibold text-gray-900">
+                      {bid.amount} QAR
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      {t("budget") || "Budget"}: {bid.budget ?? "-"} QAR
+                    </div>
+                  </TableCell>
+                  <TableCell className="px-6 py-5 text-gray-600">
+                    {new Date(bid.submittedAt).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell className="px-6 py-5">
+                    <Badge
+                      className={`text-xs border flex items-center gap-1 w-fit rounded-lg font-medium ${getStatusColor(
+                        bid.status
+                      )}`}
+                    >
+                      {getStatusIcon(bid.status)}
+                      {getStatusText(bid.status)}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="px-6 py-5 text-right">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-10 w-10 rounded-xl"
                         >
-                          {getStatusIcon(bid.status)}
-                          {getStatusText(bid.status)}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="px-6 py-4 text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem
-                              onClick={() => handleViewBidDetails(bid)}
-                            >
-                              <Eye className="h-4 w-4 mr-2" />
-                              {t("view")}
-                            </DropdownMenuItem>
-                            {bid.status === "pending" && (
-                              <DropdownMenuItem
-                                onClick={() => handleEditBid(bid.id)}
-                              >
-                                <Pencil className="h-4 w-4 mr-2" />
-                                {t("edit")}
-                              </DropdownMenuItem>
-                            )}
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent
+                        align="end"
+                        className="rounded-xl border-0 shadow-lg"
+                      >
+                        <DropdownMenuItem
+                          onClick={() => handleViewBidDetails(bid)}
+                          className="rounded-lg"
+                        >
+                          <Eye className="h-4 w-4 mr-2" />
+                          {t("view") || "View"}
+                        </DropdownMenuItem>
+                        {bid.status === "submitted" && (
+                          <DropdownMenuItem
+                            onClick={() => handleEditBid(bid.id)}
+                            className="rounded-lg"
+                          >
+                            <Pencil className="h-4 w-4 mr-2" />
+                            {t("edit") || "Edit"}
+                          </DropdownMenuItem>
+                        )}
+                        {(bid.status === "accepted" ||
+                          bid.status === "completed") && (
+                          <DropdownMenuItem
+                            onClick={() => handleGoToChat(bid.id)}
+                            className="rounded-lg"
+                          >
+                            <MessageCircle className="h-4 w-4 mr-2" />
+                            {t("go_to_chat") || "Go to Chat"}
+                          </DropdownMenuItem>
+                        )}
+                        {bid.status !== "completed" && (
+                          <>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem
-                              onClick={() => handleDeleteBid(bid.id)}
-                              className="text-red-600"
+                              onClick={() => handleCloseBid(bid.id)}
+                              className="text-red-600 rounded-lg"
                             >
-                              <Trash2 className="h-4 w-4 mr-2" />
-                              {t("delete")}
+                              <X className="h-4 w-4 mr-2" />
+                              {t("close_bid") || "Close Bid"}
                             </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell
-                      colSpan={6}
-                      className="text-center py-12 text-gray-500"
-                    >
-                      <div className="flex flex-col items-center gap-2">
-                        <Search className="h-8 w-8 text-gray-300" />
-                        <p>{t("no_bids_found")}</p>
-                        <p className="text-sm">
-                          {t("try_adjusting_search_filters")}
-                        </p>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </TabsContent>
-      </Tabs>
+                          </>
+                        )}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={6}
+                  className="text-center py-16 text-gray-500"
+                >
+                  <div className="flex flex-col items-center gap-3">
+                    <Search className="h-12 w-12 text-gray-300" />
+                    <p className="text-lg font-medium">
+                      {t("no_bids_found") || "No bids found"}
+                    </p>
+                    <p className="text-sm">
+                      {t("try_adjusting_search_filters") ||
+                        "Try adjusting your search filters"}
+                    </p>
+                  </div>
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
 
-      {/* Bid Details Modal */}
+      {/* Bid Details Modal with Apple-like animations */}
       {selectedBidForDetails && (
         <Dialog
           open={showBidDetailsModal}
           onOpenChange={setShowBidDetailsModal}
         >
-          <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto p-6">
-            <DialogHeader>
-              <DialogTitle className="text-2xl font-bold">
-                {selectedBidForDetails.tenderTitle}
-              </DialogTitle>
-              <DialogDescription className="mt-1">
-                {t("bid_details_description")}
-              </DialogDescription>
-            </DialogHeader>
+          <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto p-0 border-0 shadow-2xl rounded-3xl bg-white backdrop-blur-xl animate-in zoom-in-95 duration-200">
+            <div className="relative">
+              <DialogHeader className="p-8 pb-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-t-3xl">
+                <button
+                  onClick={() => setShowBidDetailsModal(false)}
+                  className="absolute top-6 right-6 p-2 hover:bg-white/50 rounded-full transition-colors"
+                >
+                  <X className="h-5 w-5 text-gray-500" />
+                </button>
+                <DialogTitle className="text-2xl font-bold text-gray-900 mb-2">
+                  {selectedBidForDetails.tenderTitle}
+                </DialogTitle>
+                <DialogDescription className="text-gray-600">
+                  {t("bid_details_description") ||
+                    "Detailed information about your bid"}
+                </DialogDescription>
+              </DialogHeader>
 
-            <div className="grid gap-6 py-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <h3 className="font-semibold text-lg">
-                    {t("your_bid_details")}
-                  </h3>
-                  <div className="space-y-2 text-sm">
-                    <p className="flex items-center">
-                      <DollarSign className="h-4 w-4 mr-2 text-gray-500" />
-                      <strong>{t("bid")}:</strong>{" "}
-                      {selectedBidForDetails.bidAmount} QAR
-                    </p>
-                    <p className="flex items-center">
-                      <Calendar className="h-4 w-4 mr-2 text-gray-500" />
-                      <strong>{t("submitted")}:</strong>{" "}
-                      {selectedBidForDetails.submittedAt}
-                    </p>
-                    <p className="flex items-center">
-                      {getStatusIcon(selectedBidForDetails.status)}
-                      <strong className="ml-2">{t("status")}:</strong>
-                      <Badge
-                        className={`ml-2 text-xs border ${getStatusColor(
-                          selectedBidForDetails.status
-                        )}`}
-                      >
-                        {getStatusText(selectedBidForDetails.status)}
-                      </Badge>
-                    </p>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold mb-1">
-                      {t("bid_description")}:
-                    </h4>
-                    <p className="text-sm text-gray-700">
-                      {selectedBidForDetails.bidDescription}
-                    </p>
-                  </div>
-                </div>
+              <div className="p-8 space-y-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="space-y-6">
+                    <h3 className="font-semibold text-xl text-gray-900">
+                      {t("your_bid_details") || "Your Bid Details"}
+                    </h3>
+                    <div className="bg-gray-50 rounded-2xl p-6 space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                          <div className="p-2 bg-green-100 rounded-xl mr-3">
+                            <DollarSign className="h-4 w-4 text-green-600" />
+                          </div>
+                          <div>
+                            <p className="text-sm text-gray-500">
+                              {t("bid_amount") || "Bid Amount"}
+                            </p>
+                            <p className="font-semibold text-gray-900">
+                              {selectedBidForDetails.amount} QAR
+                            </p>
+                          </div>
+                        </div>
+                      </div>
 
-                <div className="space-y-4">
-                  <h3 className="font-semibold text-lg">
-                    {t("tender_overview")}
-                  </h3>
-                  <div className="space-y-2 text-sm">
-                    <p className="flex items-center">
-                      <DollarSign className="h-4 w-4 mr-2 text-gray-500" />
-                      <strong>{t("budget")}:</strong>{" "}
-                      {selectedBidForDetails.budget} QAR
-                    </p>
-                    <p className="flex items-center">
-                      <Calendar className="h-4 w-4 mr-2 text-gray-500" />
-                      <strong>{t("deadline")}:</strong>{" "}
-                      {selectedBidForDetails.deadline}
-                    </p>
-                    <p className="flex items-center">
-                      <FileText className="h-4 w-4 mr-2 text-gray-500" />
-                      <strong>{t("category")}:</strong>{" "}
-                      {selectedBidForDetails.category}
-                    </p>
-                    <p className="flex items-center">
-                      <Info className="h-4 w-4 mr-2 text-gray-500" />
-                      <strong>{t("location")}:</strong>{" "}
-                      {selectedBidForDetails.location}
-                    </p>
-                    <p className="flex items-center">
-                      <Info className="h-4 w-4 mr-2 text-gray-500" />
-                      <strong>{t("client")}:</strong>{" "}
-                      {selectedBidForDetails.clientName}
-                    </p>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold mb-1">
-                      {t("tender_description")}:
-                    </h4>
-                    <p className="text-sm text-gray-700">
-                      {selectedBidForDetails.description}
-                    </p>
-                  </div>
-                </div>
-              </div>
+                      <div className="flex items-center">
+                        <div className="p-2 bg-blue-100 rounded-xl mr-3">
+                          <Calendar className="h-4 w-4 text-blue-600" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-500">
+                            {t("submitted") || "Submitted"}
+                          </p>
+                          <p className="font-medium text-gray-900">
+                            {new Date(
+                              selectedBidForDetails.submittedAt
+                            ).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
 
-              {selectedBidForDetails.status === "rejected" && (
-                <div className="p-4 bg-red-50 border border-red-200 rounded-md">
-                  <div className="flex items-start">
-                    <Info className="h-5 w-5 text-red-600 mr-3 shrink-0" />
-                    <div>
-                      <h3 className="font-semibold text-red-800 mb-1">
-                        {t("rejection_reason")}
-                      </h3>
-                      <p className="text-sm text-red-800">
-                        {selectedBidForDetails.rejectionReason}
+                      <div className="flex items-center">
+                        <div className="p-2 bg-gray-100 rounded-xl mr-3">
+                          {getStatusIcon(selectedBidForDetails.status)}
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-500">
+                            {t("status") || "Status"}
+                          </p>
+                          <Badge
+                            className={`text-sm font-medium rounded-lg ${getStatusColor(
+                              selectedBidForDetails.status
+                            )}`}
+                          >
+                            {getStatusText(selectedBidForDetails.status)}
+                          </Badge>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-white border border-gray-100 rounded-2xl p-6">
+                      <h4 className="font-semibold mb-3 text-gray-900">
+                        {t("bid_description") || "Bid Description"}
+                      </h4>
+                      <p className="text-gray-700 leading-relaxed">
+                        {selectedBidForDetails.description}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-6">
+                    <h3 className="font-semibold text-xl text-gray-900">
+                      {t("tender_overview") || "Tender Overview"}
+                    </h3>
+                    <div className="bg-gray-50 rounded-2xl p-6 space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <div className="flex items-center mb-2">
+                            <DollarSign className="h-4 w-4 text-gray-500 mr-2" />
+                            <span className="text-sm text-gray-500">
+                              {t("budget") || "Budget"}
+                            </span>
+                          </div>
+                          <p className="font-semibold text-gray-900">
+                            {selectedBidForDetails.budget ?? "-"} QAR
+                          </p>
+                        </div>
+                        <div>
+                          <div className="flex items-center mb-2">
+                            <Calendar className="h-4 w-4 text-gray-500 mr-2" />
+                            <span className="text-sm text-gray-500">
+                              {t("deadline") || "Deadline"}
+                            </span>
+                          </div>
+                          <p className="font-semibold text-gray-900">
+                            {selectedBidForDetails.deadline ?? "-"}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <div className="flex items-center mb-2">
+                            <FileText className="h-4 w-4 text-gray-500 mr-2" />
+                            <span className="text-sm text-gray-500">
+                              {t("category") || "Category"}
+                            </span>
+                          </div>
+                          <p className="font-semibold text-gray-900">
+                            {selectedBidForDetails.category ?? "-"}
+                          </p>
+                        </div>
+                        <div>
+                          <div className="flex items-center mb-2">
+                            <Info className="h-4 w-4 text-gray-500 mr-2" />
+                            <span className="text-sm text-gray-500">
+                              {t("location") || "Location"}
+                            </span>
+                          </div>
+                          <p className="font-semibold text-gray-900">
+                            {selectedBidForDetails.location ?? "-"}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div>
+                        <div className="flex items-center mb-2">
+                          <Info className="h-4 w-4 text-gray-500 mr-2" />
+                          <span className="text-sm text-gray-500">
+                            {t("client") || "Client"}
+                          </span>
+                        </div>
+                        <p className="font-semibold text-gray-900">
+                          {selectedBidForDetails.clientName ?? "-"}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="bg-white border border-gray-100 rounded-2xl p-6">
+                      <h4 className="font-semibold mb-3 text-gray-900">
+                        {t("tender_description") || "Tender Description"}
+                      </h4>
+                      <p className="text-gray-700 leading-relaxed">
+                        {selectedBidForDetails.tenderDescription ?? "-"}
                       </p>
                     </div>
                   </div>
                 </div>
-              )}
-            </div>
 
-            <DialogFooter className="flex flex-wrap gap-2">
-              <Link
-                href={`/business-dashboard/service-providing/tender-details/${selectedBidForDetails.tenderId}`}
-              >
-                <Button variant="outline">{t("view_original_tender")}</Button>
-              </Link>
-              {selectedBidForDetails.status === "rejected" && (
-                <Button onClick={() => handleReapply(selectedBidForDetails.id)}>
-                  {t("reapply")}
+                {selectedBidForDetails.status === "rejected" && (
+                  <div className="p-6 bg-red-50 border border-red-100 rounded-2xl">
+                    <div className="flex items-start">
+                      <div className="p-2 bg-red-100 rounded-xl mr-4 shrink-0">
+                        <Info className="h-5 w-5 text-red-600" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-red-800 mb-2">
+                          {t("rejection_reason") || "Rejection Reason"}
+                        </h3>
+                        <p className="text-red-700 leading-relaxed">
+                          {selectedBidForDetails.description}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <DialogFooter className="flex flex-wrap gap-3 p-8 pt-0 border-t border-gray-100">
+                <Link
+                  href={`/business-dashboard/tender-details/${selectedBidForDetails.tenderId}`}
+                >
+                  <Button
+                    variant="outline"
+                    className="rounded-xl border-gray-200 hover:bg-gray-50 transition-colors"
+                  >
+                    <Eye className="h-4 w-4 mr-2" />
+                    {t("view_original_tender") || "View Original Tender"}
+                  </Button>
+                </Link>
+
+                {(selectedBidForDetails.status === "accepted" ||
+                  selectedBidForDetails.status === "completed") && (
+                  <Button
+                    onClick={() => handleGoToChat(selectedBidForDetails.id)}
+                    className="rounded-xl bg-green-600 hover:bg-green-700 text-white transition-colors"
+                  >
+                    <MessageCircle className="h-4 w-4 mr-2" />
+                    {t("go_to_chat") || "Go to Chat"}
+                  </Button>
+                )}
+
+                {selectedBidForDetails.status === "rejected" && (
+                  <Button
+                    onClick={() => handleReapply(selectedBidForDetails.id)}
+                    className="rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition-colors"
+                  >
+                    {t("reapply") || "Reapply"}
+                  </Button>
+                )}
+
+                <Button
+                  onClick={() => setShowBidDetailsModal(false)}
+                  variant="ghost"
+                  className="rounded-xl hover:bg-gray-100 transition-colors"
+                >
+                  {t("close") || "Close"}
                 </Button>
-              )}
-              <Button onClick={() => setShowBidDetailsModal(false)}>
-                {t("close")}
-              </Button>
-            </DialogFooter>
+              </DialogFooter>
+            </div>
           </DialogContent>
         </Dialog>
       )}
