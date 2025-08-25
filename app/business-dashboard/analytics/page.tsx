@@ -3,7 +3,14 @@ import * as React from "react";
 import {
   Area,
   AreaChart,
+  Bar,
+  BarChart,
   CartesianGrid,
+  Cell,
+  Line,
+  LineChart,
+  Pie,
+  PieChart,
   ResponsiveContainer,
   XAxis,
   YAxis,
@@ -23,21 +30,46 @@ import {
 } from "@/components/ui/select";
 import { getUserTenders } from "@/app/services/tenderService";
 import { getUserBids } from "@/app/services/BidService";
-import { Loader2, TrendingUp, Calendar, Award } from "lucide-react";
+import {
+  Loader2,
+  TrendingUp,
+  Calendar,
+  Award,
+  ArrowUpRight,
+  ArrowDownLeft,
+  Users,
+  DollarSign,
+  CheckCircle,
+} from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
+import useTranslation from "@/lib/hooks/useTranslation";
 
 const chartConfig = {
   tenders: { label: "Tenders" },
   tendersPosted: { label: "Tenders Posted", color: "#007AFF" },
   bidsReceived: { label: "Bids Received", color: "#34C759" },
   myBids: { label: "My Bids", color: "#AF52DE" },
+  bidsPlaced: { label: "Bids Placed", color: "#FF9500" },
+  bidsWon: { label: "Bids Won", color: "#34C759" },
+  avgBidValue: { label: "Avg Bid Value", color: "#FF3B30" },
+  totalActivity: { label: "Total Activity", color: "#007AFF" },
+  submitted: { label: "Submitted", color: "#007AFF" },
+  accepted: { label: "Accepted", color: "#34C759" },
+  rejected: { label: "Rejected", color: "#FF3B30" },
 } satisfies ChartConfig;
+
+const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884d8"];
 
 interface ChartDataPoint {
   date: string;
   tendersPosted: number;
   bidsReceived: number;
   myBids: number;
+  totalBidValue: number;
+  bidCount: number;
 }
 
 interface BidSuccessData {
@@ -46,12 +78,51 @@ interface BidSuccessData {
   bidsWon: number;
 }
 
+interface TenderBidData {
+  name: string;
+  bids: number;
+}
+
+interface StatusData {
+  name: string;
+  value: number;
+}
+
+interface DayOfWeekData {
+  day: string;
+  count: number;
+}
+
+interface BidStatusTimelineData {
+  date: string;
+  submitted: number;
+  accepted: number;
+  rejected: number;
+}
+
 export default function page() {
   const [timeRange, setTimeRange] = React.useState("7d");
   const [chartData, setChartData] = React.useState<ChartDataPoint[]>([]);
   const [bidSuccessData, setBidSuccessData] = React.useState<BidSuccessData[]>(
     []
   );
+  const [topTendersByBids, setTopTendersByBids] = React.useState<
+    TenderBidData[]
+  >([]);
+  const [bidStatusData, setBidStatusData] = React.useState<StatusData[]>([]);
+  const [tenderStatusData, setTenderStatusData] = React.useState<StatusData[]>(
+    []
+  );
+  const [avgBidValueData, setAvgBidValueData] = React.useState<
+    { date: string; avgBidValue: number }[]
+  >([]);
+  const [engagementData, setEngagementData] = React.useState<
+    { date: string; totalActivity: number }[]
+  >([]);
+  const [bidByDayData, setBidByDayData] = React.useState<DayOfWeekData[]>([]);
+  const [bidStatusTimelineData, setBidStatusTimelineData] = React.useState<
+    BidStatusTimelineData[]
+  >([]);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
   const [stats, setStats] = React.useState({
@@ -61,12 +132,16 @@ export default function page() {
     completedTenders: 0,
     pendingBids: 0,
     acceptedBids: 0,
+    completedBids: 0,
+    avgBidsPerProject: 0,
+    projectsWithNoBids: 0,
+    totalBidsReceived: 0,
   });
   const { user } = useAuth();
 
   const processDataForChart = (tenders: any[], bids: any[]) => {
     const dataMap = new Map<string, ChartDataPoint>();
-    const days = timeRange === "30d" ? 30 : timeRange === "7d" ? 7 : 90;
+    const days = timeRange === "4d" ? 4 : timeRange === "7d" ? 7 : 90;
     const endDate = new Date();
     const startDate = new Date(endDate);
     startDate.setDate(startDate.getDate() - days);
@@ -82,6 +157,8 @@ export default function page() {
         tendersPosted: 0,
         bidsReceived: 0,
         myBids: 0,
+        totalBidValue: 0,
+        bidCount: 0,
       });
     }
 
@@ -96,7 +173,14 @@ export default function page() {
 
     bids.forEach((bid: any) => {
       const bidDate = new Date(bid.createdAt).toISOString().split("T")[0];
-      if (dataMap.has(bidDate)) dataMap.get(bidDate)!.myBids += 1;
+      if (dataMap.has(bidDate)) {
+        const existing = dataMap.get(bidDate)!;
+        existing.myBids += 1;
+        if (bid.amount) {
+          existing.totalBidValue += parseFloat(bid.amount);
+          existing.bidCount += 1;
+        }
+      }
     });
 
     return Array.from(dataMap.values()).sort(
@@ -106,7 +190,7 @@ export default function page() {
 
   const processBidSuccessData = (bids: any[]) => {
     const dataMap = new Map<string, BidSuccessData>();
-    const days = timeRange === "30d" ? 30 : timeRange === "7d" ? 7 : 90;
+    const days = timeRange === "4d" ? 4 : timeRange === "7d" ? 7 : 90;
     const endDate = new Date();
     const startDate = new Date(endDate);
     startDate.setDate(startDate.getDate() - days);
@@ -135,15 +219,130 @@ export default function page() {
     );
   };
 
+  const processTopTendersByBids = (tenders: any[]) => {
+    return tenders
+      .sort((a, b) => (b.bidCount || 0) - (a.bidCount || 0))
+      .slice(0, 5)
+      .map((t) => ({
+        name: t.title.length > 20 ? `${t.title.substring(0, 20)}...` : t.title,
+        bids: t.bidCount || 0,
+      }));
+  };
+
+  const processBidStatusData = (bids: any[]) => {
+    const statusCounts: Record<string, number> = {};
+    bids.forEach((bid) => {
+      statusCounts[bid.status] = (statusCounts[bid.status] || 0) + 1;
+    });
+    return Object.entries(statusCounts).map(([name, value]) => ({
+      name,
+      value,
+    }));
+  };
+
+  const processTenderStatusData = (tenders: any[]) => {
+    const statusCounts: Record<string, number> = {};
+    tenders.forEach((tender) => {
+      statusCounts[tender.status] = (statusCounts[tender.status] || 0) + 1;
+    });
+    return Object.entries(statusCounts).map(([name, value]) => ({
+      name,
+      value,
+    }));
+  };
+
+  const processAvgBidValueData = (data: ChartDataPoint[]) => {
+    return data.map((day) => ({
+      date: day.date,
+      avgBidValue: day.bidCount ? day.totalBidValue / day.bidCount : 0,
+    }));
+  };
+
+  const processEngagementData = (data: ChartDataPoint[]) => {
+    return data.map((day) => ({
+      date: day.date,
+      totalActivity: day.tendersPosted + day.myBids,
+    }));
+  };
+
+  const processBidByDayData = (bids: any[]) => {
+    const dayOfWeekMap = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const bidByDay = Array(7).fill(0);
+
+    bids.forEach((bid) => {
+      const day = new Date(bid.createdAt).getDay();
+      bidByDay[day] += 1;
+    });
+
+    return bidByDay.map((count, index) => ({
+      day: dayOfWeekMap[index],
+      count,
+    }));
+  };
+
+  const processBidStatusTimelineData = (bids: any[]) => {
+    const dataMap = new Map<
+      string,
+      { submitted: number; accepted: number; rejected: number }
+    >();
+    const days = timeRange === "4d" ? 4 : timeRange === "7d" ? 7 : 90;
+    const endDate = new Date();
+    const startDate = new Date(endDate);
+    startDate.setDate(startDate.getDate() - days);
+
+    for (
+      let d = new Date(startDate);
+      d <= endDate;
+      d.setDate(d.getDate() + 1)
+    ) {
+      const dateStr = d.toISOString().split("T")[0];
+      dataMap.set(dateStr, { submitted: 0, accepted: 0, rejected: 0 });
+    }
+
+    bids.forEach((bid: any) => {
+      const bidDate = new Date(bid.createdAt).toISOString().split("T")[0];
+      if (dataMap.has(bidDate)) {
+        const existing = dataMap.get(bidDate)!;
+        if (bid.status === "submitted") {
+          existing.submitted += 1;
+        } else if (bid.status === "accepted") {
+          existing.accepted += 1;
+        } else if (bid.status === "rejected") {
+          existing.rejected += 1;
+        }
+      }
+    });
+
+    return Array.from(dataMap.entries())
+      .map(([date, counts]) => ({
+        date,
+        submitted: counts.submitted,
+        accepted: counts.accepted,
+        rejected: counts.rejected,
+      }))
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  };
+
   const calculateStats = (tenders: any[], bids: any[]) => {
     const activeTenders = tenders.filter((t) => t.status === "active").length;
     const completedTenders = tenders.filter(
       (t) => t.status === "completed"
     ).length;
-    const pendingBids = bids.filter(
-      (b) => b.status === "pending" || b.status === "submitted"
-    ).length;
+    const pendingBids = bids.filter((b) => b.status === "submitted").length;
     const acceptedBids = bids.filter((b) => b.status === "accepted").length;
+    const completedBids = bids.filter((b) => b.status === "completed").length;
+    // Calculate additional stats
+    const totalBidsReceived = tenders.reduce(
+      (sum, tender) => sum + (tender.bidCount || 0),
+      0
+    );
+    const projectsWithNoBids = tenders.filter(
+      (t) => !t.bidCount || t.bidCount === 0
+    ).length;
+    const avgBidsPerProject =
+      tenders.length > 0
+        ? parseFloat((totalBidsReceived / tenders.length).toFixed(1))
+        : 0;
 
     return {
       totalTenders: tenders.length,
@@ -152,8 +351,14 @@ export default function page() {
       completedTenders,
       pendingBids,
       acceptedBids,
+      completedBids,
+      avgBidsPerProject,
+      projectsWithNoBids,
+      totalBidsReceived,
     };
   };
+
+  const { t } = useTranslation();
 
   React.useEffect(() => {
     const fetchData = async () => {
@@ -170,21 +375,52 @@ export default function page() {
         const tenders = tendersResponse || [];
         const bids = bidsResponse || [];
 
-        setChartData(processDataForChart(tenders, bids));
-        setBidSuccessData(processBidSuccessData(bids));
+        const processedChartData = processDataForChart(tenders, bids);
+        const processedBidSuccessData = processBidSuccessData(bids);
+        const processedTopTenders = processTopTendersByBids(tenders);
+        const processedBidStatusData = processBidStatusData(bids);
+        const processedTenderStatusData = processTenderStatusData(tenders);
+        const processedAvgBidValueData =
+          processAvgBidValueData(processedChartData);
+        const processedEngagementData =
+          processEngagementData(processedChartData);
+        const processedBidByDayData = processBidByDayData(bids);
+        const processedBidStatusTimelineData =
+          processBidStatusTimelineData(bids);
+
+        setChartData(processedChartData);
+        setBidSuccessData(processedBidSuccessData);
+        setTopTendersByBids(processedTopTenders);
+        setBidStatusData(processedBidStatusData);
+        setTenderStatusData(processedTenderStatusData);
+        setAvgBidValueData(processedAvgBidValueData);
+        setEngagementData(processedEngagementData);
+        setBidByDayData(processedBidByDayData);
+        setBidStatusTimelineData(processedBidStatusTimelineData);
         setStats(calculateStats(tenders, bids));
       } catch (err) {
-        console.error("Failed to fetch data:", err);
+        console.error("Failed to fetch ", err);
         setError(err instanceof Error ? err.message : "Failed to load data");
         setChartData([]);
         setBidSuccessData([]);
+        setTopTendersByBids([]);
+        setBidStatusData([]);
+        setTenderStatusData([]);
+        setAvgBidValueData([]);
+        setEngagementData([]);
+        setBidByDayData([]);
+        setBidStatusTimelineData([]);
         setStats({
           totalTenders: 0,
           totalBids: 0,
           activeTenders: 0,
           completedTenders: 0,
           pendingBids: 0,
+          completedBids: 0,
           acceptedBids: 0,
+          avgBidsPerProject: 0,
+          projectsWithNoBids: 0,
+          totalBidsReceived: 0,
         });
       } finally {
         setLoading(false);
@@ -196,7 +432,7 @@ export default function page() {
 
   const filteredData = React.useMemo(() => {
     if (!chartData.length) return [];
-    const days = timeRange === "30d" ? 30 : timeRange === "7d" ? 7 : 90;
+    const days = timeRange === "4d" ? 4 : timeRange === "7d" ? 7 : 90;
     return chartData.slice(-days);
   }, [chartData, timeRange]);
 
@@ -212,7 +448,7 @@ export default function page() {
   }
 
   return (
-    <div className="w-full h-full flex flex-col space-y-6 py-6">
+    <div className="w-full h-full flex flex-col space-y-6 py-6 px-4 md:px-6 lg:px-8">
       {/* Header */}
       <div className="flex items-center justify-between border-b pb-4">
         <div className="grid flex-1 gap-1">
@@ -230,7 +466,7 @@ export default function page() {
             <SelectValue placeholder="Last 3 months" />
           </SelectTrigger>
           <SelectContent className="rounded-xl">
-            <SelectItem value="30d">Last 30 days</SelectItem>
+            <SelectItem value="4d">Last 4 days</SelectItem>
             <SelectItem value="7d">Last 7 days</SelectItem>
           </SelectContent>
         </Select>
@@ -245,94 +481,98 @@ export default function page() {
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Tenders Posted */}
-        <div className="bg-blue-50 p-4 rounded-2xl border border-blue-100">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-              <Calendar className="h-5 w-5 text-blue-600" />
+        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-blue-800">
+              Tenders Posted
+            </CardTitle>
+            <Calendar className="h-5 w-5 text-blue-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-blue-900">
+              {stats.totalTenders}
             </div>
-            <div>
-              <p className="text-sm text-gray-500">Tenders Posted</p>
-              <p className="text-xl font-semibold text-gray-900">
-                {filteredData.reduce(
-                  (sum, item) => sum + item.tendersPosted,
-                  0
-                )}
-              </p>
-            </div>
-          </div>
-        </div>
+            <p className="text-xs text-blue-700 mt-1">
+              {stats.activeTenders} active
+            </p>
+          </CardContent>
+        </Card>
 
         {/* Bids Placed */}
-        <div className="bg-purple-50 p-4 rounded-2xl border border-purple-100">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
-              <TrendingUp className="h-5 w-5 text-purple-600" />
+        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-purple-800">
+              Bids Placed
+            </CardTitle>
+            <TrendingUp className="h-5 w-5 text-purple-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-purple-900">
+              {stats.totalBids}
             </div>
-            <div>
-              <p className="text-sm text-gray-500">Bids Placed</p>
-              <p className="text-xl font-semibold text-gray-900">
-                {bidSuccessData.reduce((sum, item) => sum + item.bidsPlaced, 0)}
-              </p>
-            </div>
-          </div>
-        </div>
+            <p className="text-xs text-purple-700 mt-1">
+              {stats.pendingBids} Not Accepted Yet
+            </p>
+          </CardContent>
+        </Card>
 
         {/* Bids Won */}
-        <div className="bg-green-50 p-4 rounded-2xl border border-green-100">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
-              <Award className="h-5 w-5 text-green-600" />
+        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-green-800">
+              Bids Won
+            </CardTitle>
+            <Award className="h-5 w-5 text-green-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-green-900">
+              {stats.acceptedBids + stats.completedBids}
             </div>
-            <div>
-              <p className="text-sm text-gray-500">Bids Won</p>
-              <p className="text-xl font-semibold text-gray-900">
-                {bidSuccessData.reduce((sum, item) => sum + item.bidsWon, 0)}
-              </p>
-            </div>
-          </div>
-        </div>
+            <p className="text-xs text-green-700 mt-1">
+              Win rate:{" "}
+              {stats.totalBids > 0
+                ? Math.round(
+                    ((stats.acceptedBids + stats.completedBids) /
+                      stats.totalBids) *
+                      100
+                  )
+                : 0}
+              %
+            </p>
+          </CardContent>
+        </Card>
 
         {/* Win Rate */}
-        <div className="bg-amber-50 p-4 rounded-2xl border border-amber-100">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center">
-              <Award className="h-5 w-5 text-amber-600" />
+        <Card className="bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-amber-800">
+              Avg Bids Per Project
+            </CardTitle>
+            <CheckCircle className="h-5 w-5 text-amber-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-amber-900">
+              {stats.avgBidsPerProject}
             </div>
-            <div>
-              <p className="text-sm text-gray-500">Win Rate</p>
-              <p className="text-xl font-semibold text-gray-900">
-                {bidSuccessData.reduce((sum, item) => sum + item.bidsPlaced, 0)
-                  ? Math.round(
-                      (bidSuccessData.reduce(
-                        (sum, item) => sum + item.bidsWon,
-                        0
-                      ) /
-                        bidSuccessData.reduce(
-                          (sum, item) => sum + item.bidsPlaced,
-                          0
-                        )) *
-                        100
-                    )
-                  : 0}
-                %
-              </p>
-            </div>
-          </div>
-        </div>
+            <p className="text-xs text-amber-700 mt-1">
+              {stats.projectsWithNoBids} projects with no bids
+            </p>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Timeline Chart */}
-        <div className="bg-white p-5 rounded-2xl h-[300px] lg:h-[400px]">
-          <h4 className="text-md font-semibold mb-4 text-gray-900">
+        <div className="bg-white p-4 rounded-2xl shadow-sm">
+          <h4 className="text-md font-semibold mb-4 text-gray-900 px-2">
             Activity Timeline
           </h4>
-          <ChartContainer config={chartConfig} className="w-full h-full">
+          <ChartContainer config={chartConfig} className="w-full h-[280px]">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart
                 data={filteredData}
-                margin={{ top: 10, right: 0, left: 0, bottom: 0 }}
+                margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
               >
                 <defs>
                   <linearGradient
@@ -410,107 +650,244 @@ export default function page() {
         </div>
 
         {/* Bid Success Chart */}
-        <div className="bg-white p-5 rounded-2xl h-[300px] lg:h-[400px]">
-          <h4 className="text-md font-semibold mb-4 text-gray-900">
+        <div className="bg-white p-4 rounded-2xl shadow-sm">
+          <h4 className="text-md font-semibold mb-4 text-gray-900 px-2">
             Bid Success Rate
           </h4>
-          {bidSuccessData.some(
-            (item) => item.bidsPlaced > 0 || item.bidsWon > 0
-          ) ? (
-            <ChartContainer config={chartConfig} className="w-full h-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart
-                  data={bidSuccessData}
-                  margin={{ top: 10, right: 0, left: 0, bottom: 0 }}
-                >
-                  <defs>
-                    <linearGradient
-                      id="fillBidsPlaced"
-                      x1="0"
-                      y1="0"
-                      x2="0"
-                      y2="1"
-                    >
-                      <stop offset="5%" stopColor="#FF9500" stopOpacity={0.2} />
-                      <stop offset="95%" stopColor="#FF9500" stopOpacity={0} />
-                    </linearGradient>
-                    <linearGradient
-                      id="fillBidsWon"
-                      x1="0"
-                      y1="0"
-                      x2="0"
-                      y2="1"
-                    >
-                      <stop offset="5%" stopColor="#34C759" stopOpacity={0.2} />
-                      <stop offset="95%" stopColor="#34C759" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid vertical={false} stroke="#f0f0f0" />
-                  <XAxis
-                    dataKey="date"
-                    tickLine={false}
-                    axisLine={false}
-                    tickMargin={8}
-                    minTickGap={32}
-                    tickFormatter={(value) =>
-                      new Date(value).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                      })
-                    }
-                    className="text-xs text-gray-500"
-                  />
-                  <YAxis
-                    tickLine={false}
-                    axisLine={false}
-                    tickFormatter={(value) => `${value}`}
-                    className="text-xs text-gray-500"
-                    width={30}
-                  />
-                  <ChartTooltip
-                    cursor={false}
-                    content={
-                      <ChartTooltipContent
-                        labelFormatter={(value) =>
-                          new Date(value).toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "numeric",
-                            year: "numeric",
-                          })
-                        }
-                        indicator="dot"
-                        formatter={(value, name) => [
-                          value,
-                          name === "bidsPlaced" ? "Bids Placed" : "Bids Won",
-                        ]}
-                        className="bg-white shadow-lg rounded-xl border border-gray-200"
-                      />
-                    }
-                  />
-                  <Area
-                    dataKey="bidsPlaced"
-                    type="monotone"
-                    fill="url(#fillBidsPlaced)"
-                    stroke="#FF9500"
-                    strokeWidth={2}
-                    stackId="a"
-                  />
-                  <Area
-                    dataKey="bidsWon"
-                    type="monotone"
-                    fill="url(#fillBidsWon)"
-                    stroke="#34C759"
-                    strokeWidth={2}
-                    stackId="b"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </ChartContainer>
-          ) : (
-            <div className="h-full flex items-center justify-center text-gray-400">
-              <p>No bidding activity yet</p>
-            </div>
-          )}
+          <ChartContainer config={chartConfig} className="w-full h-[280px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart
+                data={bidSuccessData}
+                margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+              >
+                <defs>
+                  <linearGradient
+                    id="fillBidsPlaced"
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
+                    <stop offset="5%" stopColor="#FF9500" stopOpacity={0.2} />
+                    <stop offset="95%" stopColor="#FF9500" stopOpacity={0} />
+                  </linearGradient>
+                  <linearGradient id="fillBidsWon" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#34C759" stopOpacity={0.2} />
+                    <stop offset="95%" stopColor="#34C759" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid vertical={false} stroke="#f0f0f0" />
+                <XAxis
+                  dataKey="date"
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={8}
+                  minTickGap={32}
+                  tickFormatter={(value) =>
+                    new Date(value).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                    })
+                  }
+                  className="text-xs text-gray-500"
+                />
+                <YAxis
+                  tickLine={false}
+                  axisLine={false}
+                  tickFormatter={(value) => `${value}`}
+                  className="text-xs text-gray-500"
+                  width={30}
+                />
+                <ChartTooltip
+                  cursor={false}
+                  content={
+                    <ChartTooltipContent
+                      labelFormatter={(value) =>
+                        new Date(value).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })
+                      }
+                      indicator="dot"
+                      formatter={(value, name) => [
+                        value,
+                        name === "bidsPlaced" ? "Bids Placed" : "Bids Won",
+                      ]}
+                      className="bg-white shadow-lg rounded-xl border border-gray-200"
+                    />
+                  }
+                />
+                <Area
+                  dataKey="bidsPlaced"
+                  type="monotone"
+                  fill="url(#fillBidsPlaced)"
+                  stroke="#FF9500"
+                  strokeWidth={2}
+                  stackId="a"
+                />
+                <Area
+                  dataKey="bidsWon"
+                  type="monotone"
+                  fill="url(#fillBidsWon)"
+                  stroke="#34C759"
+                  strokeWidth={2}
+                  stackId="b"
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </ChartContainer>
+        </div>
+
+        {/* Bid Status Timeline */}
+        <div className="bg-white p-4 rounded-2xl shadow-sm">
+          <h4 className="text-md font-semibold mb-4 text-gray-900 px-2">
+            Bid Status Timeline
+          </h4>
+          <ChartContainer config={chartConfig} className="w-full h-[280px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart
+                data={bidStatusTimelineData}
+                margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+              >
+                <CartesianGrid vertical={false} stroke="#f0f0f0" />
+                <XAxis
+                  dataKey="date"
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={8}
+                  minTickGap={32}
+                  tickFormatter={(value) =>
+                    new Date(value).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                    })
+                  }
+                  className="text-xs text-gray-500"
+                />
+                <YAxis
+                  tickLine={false}
+                  axisLine={false}
+                  tickFormatter={(value) => `${value}`}
+                  className="text-xs text-gray-500"
+                  width={30}
+                />
+                <ChartTooltip
+                  cursor={false}
+                  content={
+                    <ChartTooltipContent
+                      labelFormatter={(value) =>
+                        new Date(value).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })
+                      }
+                      indicator="line"
+                      className="bg-white shadow-lg rounded-xl border border-gray-200"
+                    />
+                  }
+                />
+                <Line
+                  type="monotone"
+                  dataKey="submitted"
+                  stroke="#007AFF"
+                  strokeWidth={2}
+                  dot={false}
+                  activeDot={{ r: 6 }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="accepted"
+                  stroke="#34C759"
+                  strokeWidth={2}
+                  dot={false}
+                  activeDot={{ r: 6 }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="rejected"
+                  stroke="#FF3B30"
+                  strokeWidth={2}
+                  dot={false}
+                  activeDot={{ r: 6 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </ChartContainer>
+        </div>
+
+        {/* Average Bid Value Over Time */}
+        <div className="bg-white p-4 rounded-2xl shadow-sm">
+          <h4 className="text-md font-semibold mb-4 text-gray-900 px-2">
+            Average Bid Value Over Time
+          </h4>
+          <ChartContainer config={chartConfig} className="w-full h-[280px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart
+                data={avgBidValueData}
+                margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+              >
+                <defs>
+                  <linearGradient
+                    id="fillAvgBidValue"
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
+                    <stop offset="5%" stopColor="#FF3B30" stopOpacity={0.2} />
+                    <stop offset="95%" stopColor="#FF3B30" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid vertical={false} stroke="#f0f0f0" />
+                <XAxis
+                  dataKey="date"
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={8}
+                  minTickGap={32}
+                  tickFormatter={(value) =>
+                    new Date(value).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                    })
+                  }
+                  className="text-xs text-gray-500"
+                />
+                <YAxis
+                  tickLine={false}
+                  axisLine={false}
+                  tickFormatter={(value) => `₹${value.toFixed(0)}`}
+                  className="text-xs text-gray-500"
+                  width={40}
+                />
+                <ChartTooltip
+                  cursor={false}
+                  content={
+                    <ChartTooltipContent
+                      labelFormatter={(value) =>
+                        new Date(value).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })
+                      }
+                      indicator="dot"
+                      className="bg-white shadow-lg rounded-xl border border-gray-200"
+                    />
+                  }
+                />
+                <Area
+                  dataKey="avgBidValue"
+                  type="monotone"
+                  fill="url(#fillAvgBidValue)"
+                  stroke="#FF3B30"
+                  strokeWidth={2}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </ChartContainer>
         </div>
       </div>
     </div>
