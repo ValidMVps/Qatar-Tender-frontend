@@ -126,7 +126,8 @@ export function OverviewChart() {
       if (dataMap.has(bidDate)) {
         const existing = dataMap.get(bidDate)!;
         existing.bidsPlaced += 1;
-        if (bid.status === "accepted") existing.bidsWon += 1;
+        if (bid.status === "accepted" || bid.status === "completed")
+          existing.bidsWon += 1;
       }
     });
 
@@ -143,7 +144,9 @@ export function OverviewChart() {
     const pendingBids = bids.filter(
       (b) => b.status === "pending" || b.status === "submitted"
     ).length;
-    const acceptedBids = bids.filter((b) => b.status === "accepted").length;
+    const acceptedBids = bids.filter(
+      (b) => b.status === "accepted" || b.status === "completed"
+    ).length;
 
     return {
       totalTenders: tenders.length,
@@ -160,7 +163,7 @@ export function OverviewChart() {
       setLoading(true);
       setError(null);
       try {
-        const userId = user._id;
+        const userId = user?._id;
         if (!userId) throw new Error("User not found. Please log in again.");
 
         const [tendersResponse, bidsResponse] = await Promise.all([
@@ -214,27 +217,6 @@ export function OverviewChart() {
   return (
     <div className="w-full h-full flex flex-col space-y-6 py-6">
       {/* Header */}
-      <div className="flex items-center justify-between border-b pb-4">
-        <div className="grid flex-1 gap-1">
-          <h3 className="text-xl font-semibold text-gray-900">
-            Activity Overview
-          </h3>
-          <p className="text-sm text-gray-500">
-            {error
-              ? "Error loading data - please check your connection"
-              : "Your tender and bidding activity"}
-          </p>
-        </div>
-        <Select value={timeRange} onValueChange={setTimeRange}>
-          <SelectTrigger className="w-[160px] rounded-full bg-gray-100 border-0">
-            <SelectValue placeholder="Last 3 months" />
-          </SelectTrigger>
-          <SelectContent className="rounded-xl">
-            <SelectItem value="30d">Last 30 days</SelectItem>
-            <SelectItem value="7d">Last 7 days</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
 
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-800 text-sm">
@@ -242,88 +224,18 @@ export function OverviewChart() {
         </div>
       )}
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Tenders Posted */}
-        <div className="bg-blue-50 p-4 rounded-2xl border border-blue-100">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-              <Calendar className="h-5 w-5 text-blue-600" />
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Tenders Posted</p>
-              <p className="text-xl font-semibold text-gray-900">
-                {filteredData.reduce(
-                  (sum, item) => sum + item.tendersPosted,
-                  0
-                )}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Bids Placed */}
-        <div className="bg-purple-50 p-4 rounded-2xl border border-purple-100">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
-              <TrendingUp className="h-5 w-5 text-purple-600" />
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Bids Placed</p>
-              <p className="text-xl font-semibold text-gray-900">
-                {bidSuccessData.reduce((sum, item) => sum + item.bidsPlaced, 0)}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Bids Won */}
-        <div className="bg-green-50 p-4 rounded-2xl border border-green-100">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
-              <Award className="h-5 w-5 text-green-600" />
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Bids Won</p>
-              <p className="text-xl font-semibold text-gray-900">
-                {bidSuccessData.reduce((sum, item) => sum + item.bidsWon, 0)}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Win Rate */}
-        <div className="bg-amber-50 p-4 rounded-2xl border border-amber-100">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center">
-              <Award className="h-5 w-5 text-amber-600" />
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Win Rate</p>
-              <p className="text-xl font-semibold text-gray-900">
-                {bidSuccessData.reduce((sum, item) => sum + item.bidsPlaced, 0)
-                  ? Math.round(
-                      (bidSuccessData.reduce(
-                        (sum, item) => sum + item.bidsWon,
-                        0
-                      ) /
-                        bidSuccessData.reduce(
-                          (sum, item) => sum + item.bidsPlaced,
-                          0
-                        )) *
-                        100
-                    )
-                  : 0}
-                %
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Charts Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Timeline Chart */}
+      <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
+        {/* Timeline Chart */}{" "}
+        {/* <Select value={timeRange} onValueChange={setTimeRange}>
+          <SelectTrigger className="w-[160px] rounded-full bg-gray-100 border-0">
+            <SelectValue placeholder="Last 3 months" />
+          </SelectTrigger>
+          <SelectContent className="rounded-xl">
+            <SelectItem value="30d">Last 30 days</SelectItem>
+            <SelectItem value="7d">Last 7 days</SelectItem>
+          </SelectContent>
+        </Select> */}
         <div className="bg-white p-5 rounded-2xl h-[300px] lg:h-[400px]">
           <h4 className="text-md font-semibold mb-4 text-gray-900">
             Activity Timeline
@@ -407,110 +319,6 @@ export function OverviewChart() {
               </AreaChart>
             </ResponsiveContainer>
           </ChartContainer>
-        </div>
-
-        {/* Bid Success Chart */}
-        <div className="bg-white p-5 rounded-2xl h-[300px] lg:h-[400px]">
-          <h4 className="text-md font-semibold mb-4 text-gray-900">
-            Bid Success Rate
-          </h4>
-          {bidSuccessData.some(
-            (item) => item.bidsPlaced > 0 || item.bidsWon > 0
-          ) ? (
-            <ChartContainer config={chartConfig} className="w-full h-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart
-                  data={bidSuccessData}
-                  margin={{ top: 10, right: 0, left: 0, bottom: 0 }}
-                >
-                  <defs>
-                    <linearGradient
-                      id="fillBidsPlaced"
-                      x1="0"
-                      y1="0"
-                      x2="0"
-                      y2="1"
-                    >
-                      <stop offset="5%" stopColor="#FF9500" stopOpacity={0.2} />
-                      <stop offset="95%" stopColor="#FF9500" stopOpacity={0} />
-                    </linearGradient>
-                    <linearGradient
-                      id="fillBidsWon"
-                      x1="0"
-                      y1="0"
-                      x2="0"
-                      y2="1"
-                    >
-                      <stop offset="5%" stopColor="#34C759" stopOpacity={0.2} />
-                      <stop offset="95%" stopColor="#34C759" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid vertical={false} stroke="#f0f0f0" />
-                  <XAxis
-                    dataKey="date"
-                    tickLine={false}
-                    axisLine={false}
-                    tickMargin={8}
-                    minTickGap={32}
-                    tickFormatter={(value) =>
-                      new Date(value).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                      })
-                    }
-                    className="text-xs text-gray-500"
-                  />
-                  <YAxis
-                    tickLine={false}
-                    axisLine={false}
-                    tickFormatter={(value) => `${value}`}
-                    className="text-xs text-gray-500"
-                    width={30}
-                  />
-                  <ChartTooltip
-                    cursor={false}
-                    content={
-                      <ChartTooltipContent
-                        labelFormatter={(value) =>
-                          new Date(value).toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "numeric",
-                            year: "numeric",
-                          })
-                        }
-                        indicator="dot"
-                        formatter={(value, name) => [
-                          value,
-                          name === "bidsPlaced" ? "Bids Placed" : "Bids Won",
-                        ]}
-                        className="bg-white shadow-lg rounded-xl border border-gray-200"
-                      />
-                    }
-                  />
-                  <Area
-                    dataKey="bidsPlaced"
-                    type="monotone"
-                    fill="url(#fillBidsPlaced)"
-                    stroke="#FF9500"
-                    strokeWidth={2}
-                    stackId="a"
-                  />
-                  <Area
-                    dataKey="bidsWon"
-                    type="monotone"
-                    fill="url(#fillBidsWon)"
-                    stroke="#34C759"
-                    strokeWidth={2}
-                    stackId="b"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </ChartContainer>
-          ) : (
-            <div className="h-full flex items-center justify-center text-gray-400">
-              <p>No bidding activity yet</p>
-            </div>
-          )}
         </div>
       </div>
     </div>

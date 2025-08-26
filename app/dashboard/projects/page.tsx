@@ -273,12 +273,20 @@ export default function Component() {
                       budget: selectedTender.budget,
                       status: selectedTender.status,
                       startDate: selectedTender.startDate,
-                      awardedTo: selectedTender.awardedTo,
+                      awardedTo:
+                        typeof selectedTender.awardedTo === "string"
+                          ? undefined
+                          : selectedTender.awardedTo,
+                      postedBy:
+                        typeof selectedTender.postedBy === "string"
+                          ? selectedTender.postedBy
+                          : selectedTender.postedBy._id,
                     }
                   : null
               }
               getStatusColor={getStatusColor}
               onMarkComplete={() => setIsReviewDialogOpen(true)}
+              currentUserId={""}
             />
           </div>
 
@@ -373,15 +381,20 @@ export default function Component() {
                         budget: selectedTender.budget,
                         status: selectedTender.status,
                         startDate: selectedTender.startDate,
-                        awardedTo: getAwardedToName(selectedTender.awardedTo),
+                        awardedTo:
+                          typeof selectedTender.awardedTo === "string"
+                            ? undefined
+                            : selectedTender.awardedTo,
+                        postedBy:
+                          typeof selectedTender.postedBy === "string"
+                            ? selectedTender.postedBy
+                            : selectedTender.postedBy._id,
                       }
                     : null
                 }
                 getStatusColor={getStatusColor}
-                onMarkComplete={() => {
-                  setIsReviewDialogOpen(true);
-                  setIsProjectDetailsOpen(false);
-                }}
+                onMarkComplete={() => setIsReviewDialogOpen(true)}
+                currentUserId={""}
               />
             </SheetContent>
           </Sheet>
@@ -489,12 +502,20 @@ export default function Component() {
                       budget: selectedTender.budget,
                       status: selectedTender.status,
                       startDate: selectedTender.startDate,
-                      awardedTo: getAwardedToName(selectedTender.awardedTo),
+                      awardedTo:
+                        typeof selectedTender.awardedTo === "string"
+                          ? undefined
+                          : selectedTender.awardedTo,
+                      postedBy:
+                        typeof selectedTender.postedBy === "string"
+                          ? selectedTender.postedBy
+                          : selectedTender.postedBy._id,
                     }
                   : null
               }
               getStatusColor={getStatusColor}
               onMarkComplete={() => setIsReviewDialogOpen(true)}
+              currentUserId={""}
             />
           </div>
 
@@ -590,13 +611,22 @@ export default function Component() {
                         budget: selectedTender.budget,
                         status: selectedTender.status,
                         startDate: selectedTender.startDate,
-                        awardedTo: getAwardedToName(selectedTender.awardedTo),
-                        postedBy: getPostedById(selectedTender.postedBy),
+                        awardedTo:
+                          typeof selectedTender.awardedTo === "string"
+                            ? undefined
+                            : selectedTender.awardedTo, // ✅ pass object, not string
+                        postedBy:
+                          typeof selectedTender.postedBy === "string"
+                            ? selectedTender.postedBy
+                            : selectedTender.postedBy._id,
                       }
                     : null
                 }
                 getStatusColor={getStatusColor}
-                currentUserId={user._id}
+                currentUserId={user?._id || ""}
+                onMarkComplete={function (): void {
+                  throw new Error("Function not implemented.");
+                }}
               />
             </SheetContent>
           </Sheet>

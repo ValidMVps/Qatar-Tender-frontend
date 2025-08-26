@@ -17,6 +17,7 @@ interface Profile {
   user: string;
   phone?: string;
   fullName?: string;
+  companyName?: string;
   address?: string;
   rating?: number;
   ratingCount?: number;
@@ -36,6 +37,7 @@ interface Profile {
 interface AuthContextType {
   user: User | null;
   profile: Profile | null;
+
   isLoading: boolean;
   isAuthenticated: boolean;
   login: (

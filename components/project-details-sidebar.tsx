@@ -40,6 +40,7 @@ interface ProjectDetailsSidebarProps
     description: string;
     status: string;
     startDate: string;
+    budget: string;
     awardedTo?: {
       _id: string;
       email: string;
@@ -65,7 +66,11 @@ export function ProjectDetailsSidebar({
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [loading, setLoading] = useState(false);
-  const [bid, setbid] = useState();
+  const [bid, setbid] = useState<{
+    _id: string;
+    amount: number;
+    status: string;
+  } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [hasReview, setHasReview] = useState(false);
   const [selectedBidAmount, setSelectedBidAmount] = useState<string | null>(
@@ -119,7 +124,10 @@ export function ProjectDetailsSidebar({
     setError(null);
 
     try {
-      await updateBidStatus(bid?._id, "completed");
+      if (!bid?._id) {
+        throw new Error("Bid ID is undefined");
+      }
+      await updateBidStatus(bid._id, "completed");
       await updateTenderStatus(selectedProject.id, "completed");
       onMarkComplete(); // This should trigger a refresh of the selectedProject
       setCompleteStep(2); // Move to review step in dialog

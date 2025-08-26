@@ -210,7 +210,8 @@ export default function page() {
       if (dataMap.has(bidDate)) {
         const existing = dataMap.get(bidDate)!;
         existing.bidsPlaced += 1;
-        if (bid.status === "accepted") existing.bidsWon += 1;
+        if (bid.status === "accepted" || bid.status === "completed")
+          existing.bidsWon += 1;
       }
     });
 
@@ -305,7 +306,7 @@ export default function page() {
         const existing = dataMap.get(bidDate)!;
         if (bid.status === "submitted") {
           existing.submitted += 1;
-        } else if (bid.status === "accepted") {
+        } else if (bid.status === "accepted" || bid.status == "completed") {
           existing.accepted += 1;
         } else if (bid.status === "rejected") {
           existing.rejected += 1;
@@ -329,7 +330,9 @@ export default function page() {
       (t) => t.status === "completed"
     ).length;
     const pendingBids = bids.filter((b) => b.status === "submitted").length;
-    const acceptedBids = bids.filter((b) => b.status === "accepted").length;
+    const acceptedBids = bids.filter(
+      (b) => b.status === "accepted" || b.status === "completed"
+    ).length;
     const completedBids = bids.filter((b) => b.status === "completed").length;
     // Calculate additional stats
     const totalBidsReceived = tenders.reduce(
@@ -365,7 +368,7 @@ export default function page() {
       setLoading(true);
       setError(null);
       try {
-        const userId = user._id;
+        const userId = user?._id;
         if (!userId) throw new Error("User not found. Please log in again.");
 
         const [tendersResponse, bidsResponse] = await Promise.all([

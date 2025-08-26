@@ -155,7 +155,7 @@ export default function TenderDetailPage() {
       const questionsData = await getQuestionsForTender(tenderId);
       setTender(tenderData);
       setBids(bidsData);
-      setQuestions(questionsData);
+      setQuestions(questionsData as unknown as Question[]);
     } catch (err: any) {
       console.error("Error fetching tender data:", err);
       setError(err.response?.data?.message || "Failed to load tender data");
@@ -691,7 +691,7 @@ export default function TenderDetailPage() {
                                   ...prev,
                                   [question._id]: validation.valid
                                     ? ""
-                                    : validation.message,
+                                    : validation.message ?? "",
                                 }));
                               }}
                               className={`rounded-md border-gray-200 focus:border-blue-500 focus:ring-blue-500 mb-2 min-h-[100px] resize-none ${

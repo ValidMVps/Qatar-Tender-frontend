@@ -40,6 +40,7 @@ import { createBid, getUserBids } from "@/app/services/BidService";
 import QnaSection from "@/components/QnaSection";
 
 interface Tender {
+  bidCount: string | number;
   _id: string;
   title: string;
   description: string;
@@ -863,7 +864,7 @@ export default function TenderDetailsPage({ params }: PageProps) {
                         </span>
                       </div>
                       <p className="text-lg font-semibold text-yellow-700">
-                        {tender.bidCount}
+                        {tender?.bidCount}
                       </p>
                     </div>
                   </div>

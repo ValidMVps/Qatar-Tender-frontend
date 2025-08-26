@@ -68,7 +68,8 @@ interface AnalyticsSummary {
   averageRating: number;
   totalReviews: number;
   fiveStarPercentage: number;
-  mostFrequentTag: string;
+  topProject: string;
+  mostFrequentTag?: string; // optional: compute if you have tags
 }
 
 // Transform API review to UI review (reviews you received)
