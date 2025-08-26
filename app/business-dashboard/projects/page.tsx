@@ -1,11 +1,11 @@
 "use client";
+
 import * as React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Inbox, Search } from "lucide-react";
 import Link from "next/link";
-
 import { ProjectDetailsSidebar } from "@/components/project-details-sidebar";
 import ChatSection from "@/components/ChatSection";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
@@ -13,6 +13,8 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { getUserTenders, getTender } from "@/app/services/tenderService";
 import { useAuth } from "@/context/AuthContext";
 import { useTranslation } from "react-i18next";
+import { getUserBids } from "@/app/services/BidService";
+import { ProjectDetailsSidebarawarded } from "@/components/project-details-sidebar-awarded";
 
 type Tender = {
   id: string;
@@ -23,7 +25,7 @@ type Tender = {
   startDate: string;
   awardedTo?: string | { _id: string; email: string; userType: string };
   createdAt: string;
-  postedBy: string | { _id: string }; // This is the correct field from your schema
+  postedBy: { _id: string; email: string; userType: string }; // This is the correct field from your schema
 };
 
 export default function Component() {
@@ -35,12 +37,11 @@ export default function Component() {
   );
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
-
   const [isReviewDialogOpen, setIsReviewDialogOpen] = React.useState(false);
   const [isProjectListOpen, setIsProjectListOpen] = React.useState(false);
   const [isProjectDetailsOpen, setIsProjectDetailsOpen] = React.useState(false);
   const [activeTab, setActiveTab] = React.useState("owned");
-
+  const [awardedtome, setawardedtome] = React.useState([]);
   // Fetch tenders when user or tab changes
   React.useEffect(() => {
     if (!user) return;
@@ -49,7 +50,6 @@ export default function Component() {
       try {
         setLoading(true);
         setError(null);
-
         let fetchedTenders: Tender[] = await getUserTenders(user._id);
 
         if (activeTab === "owned") {
@@ -69,15 +69,22 @@ export default function Component() {
           });
         } else if (activeTab === "awarded") {
           // Fetch tenders that are AWARDED TO the user (user WON these bids)
-          fetchedTenders = fetchedTenders.filter((tender) => {
-            const isAwardedToUser =
-              tender.awardedTo &&
-              (typeof tender.awardedTo === "string"
-                ? tender.awardedTo === user._id
-                : tender.awardedTo._id === user._id);
+          const gottenBids = await getUserBids();
 
-            return isAwardedToUser;
-          });
+          // 1. Filter awarded bids
+          const awardedBids = gottenBids.filter(
+            (bid) => bid.status === "accepted" || bid.status === "completed"
+          );
+
+          // 2. Map to tenders
+          const awardedTenders = awardedBids.map((bid) => bid.tender);
+
+          // 3. (Optional) Remove duplicates
+          const uniqueAwardedTenders = Array.from(
+            new Map(awardedTenders.map((t) => [t._id, t])).values()
+          );
+          setawardedtome(uniqueAwardedTenders);
+          console.log(uniqueAwardedTenders);
         }
 
         setTenders(fetchedTenders);
@@ -148,10 +155,10 @@ export default function Component() {
   };
 
   // Function to safely extract postedBy name/userId
-  const getPostedById = (postedBy: Tender["postedBy"]): string => {
+  const getPostedById = (postedBy: Tender["postedBy"]) => {
     if (!postedBy) return "";
     if (typeof postedBy === "string") return postedBy;
-    return postedBy._id || "";
+    return postedBy;
   };
 
   if (loading) {
@@ -198,6 +205,9 @@ export default function Component() {
                 <TabsList className="w-full">
                   <TabsTrigger value="owned" className="flex-1">
                     {t("owned_projects")}
+                  </TabsTrigger>
+                  <TabsTrigger value="awarded" className="flex-1">
+                    {t("awarded_projects")}
                   </TabsTrigger>
                 </TabsList>
               </div>
@@ -273,20 +283,12 @@ export default function Component() {
                       budget: selectedTender.budget,
                       status: selectedTender.status,
                       startDate: selectedTender.startDate,
-                      awardedTo:
-                        typeof selectedTender.awardedTo === "string"
-                          ? undefined
-                          : selectedTender.awardedTo,
-                      postedBy:
-                        typeof selectedTender.postedBy === "string"
-                          ? selectedTender.postedBy
-                          : selectedTender.postedBy._id,
+                      awardedTo: selectedTender.awardedTo,
                     }
                   : null
               }
               getStatusColor={getStatusColor}
               onMarkComplete={() => setIsReviewDialogOpen(true)}
-              currentUserId={""}
             />
           </div>
 
@@ -381,20 +383,15 @@ export default function Component() {
                         budget: selectedTender.budget,
                         status: selectedTender.status,
                         startDate: selectedTender.startDate,
-                        awardedTo:
-                          typeof selectedTender.awardedTo === "string"
-                            ? undefined
-                            : selectedTender.awardedTo,
-                        postedBy:
-                          typeof selectedTender.postedBy === "string"
-                            ? selectedTender.postedBy
-                            : selectedTender.postedBy._id,
+                        awardedTo: getAwardedToName(selectedTender.awardedTo),
                       }
                     : null
                 }
                 getStatusColor={getStatusColor}
-                onMarkComplete={() => setIsReviewDialogOpen(true)}
-                currentUserId={""}
+                onMarkComplete={() => {
+                  setIsReviewDialogOpen(true);
+                  setIsProjectDetailsOpen(false);
+                }}
               />
             </SheetContent>
           </Sheet>
@@ -447,11 +444,11 @@ export default function Component() {
                       {t("no_projects_found")}
                     </div>
                   ) : (
-                    tenders.map((tender) => (
+                    awardedtome.map((tender) => (
                       <Link
                         key={tender.id}
                         href="#"
-                        className={`flex flex-col gap-1 rounded-lg border p-3 hover:bg-muted/90 ${
+                        className={`flex flex-col gap-1 rounded-lg border w-full p-3 hover:bg-muted/90 ${
                           selectedTender?.id === tender.id ? "bg-muted" : ""
                         }`}
                         prefetch={false}
@@ -466,7 +463,7 @@ export default function Component() {
                             {formatDate(tender.createdAt)}
                           </div>
                         </div>
-                        <div className="text-sm text-muted-foreground line-clamp-2">
+                        <div className="text-sm w-[300] overflow-hidden text-muted-foreground line-clamp-2">
                           {tender.description}
                         </div>
                         <div className="flex flex-wrap gap-2 pt-2">
@@ -491,7 +488,7 @@ export default function Component() {
               onOpenProjectDetails={() => setIsProjectDetailsOpen(true)}
             />
 
-            <ProjectDetailsSidebar
+            <ProjectDetailsSidebarawarded
               className="hidden lg:flex lg:col-span-3"
               selectedProject={
                 selectedTender
@@ -502,20 +499,13 @@ export default function Component() {
                       budget: selectedTender.budget,
                       status: selectedTender.status,
                       startDate: selectedTender.startDate,
-                      awardedTo:
-                        typeof selectedTender.awardedTo === "string"
-                          ? undefined
-                          : selectedTender.awardedTo,
-                      postedBy:
-                        typeof selectedTender.postedBy === "string"
-                          ? selectedTender.postedBy
-                          : selectedTender.postedBy._id,
+                      awardedTo: getAwardedToName(selectedTender.awardedTo),
+                      postedBy: selectedTender.postedBy,
                     }
                   : null
               }
               getStatusColor={getStatusColor}
-              onMarkComplete={() => setIsReviewDialogOpen(true)}
-              currentUserId={""}
+              currentUserId={user._id}
             />
           </div>
 
@@ -600,7 +590,7 @@ export default function Component() {
             onOpenChange={setIsProjectDetailsOpen}
           >
             <SheetContent side="right" className="w-64 p-0 sm:w-80">
-              <ProjectDetailsSidebar
+              <ProjectDetailsSidebarawarded
                 className="hidden lg:flex lg:col-span-3"
                 selectedProject={
                   selectedTender
@@ -611,22 +601,13 @@ export default function Component() {
                         budget: selectedTender.budget,
                         status: selectedTender.status,
                         startDate: selectedTender.startDate,
-                        awardedTo:
-                          typeof selectedTender.awardedTo === "string"
-                            ? undefined
-                            : selectedTender.awardedTo, // ✅ pass object, not string
-                        postedBy:
-                          typeof selectedTender.postedBy === "string"
-                            ? selectedTender.postedBy
-                            : selectedTender.postedBy._id,
+                        awardedTo: getAwardedToName(selectedTender.awardedTo),
+                        postedBy: selectedTender.postedBy,
                       }
                     : null
                 }
                 getStatusColor={getStatusColor}
-                currentUserId={user?._id || ""}
-                onMarkComplete={function (): void {
-                  throw new Error("Function not implemented.");
-                }}
+                currentUserId={user._id}
               />
             </SheetContent>
           </Sheet>

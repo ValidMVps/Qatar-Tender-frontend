@@ -55,7 +55,7 @@ interface Tender {
   location?: string;
   estimatedBudget?: number;
   budget?: string | number;
-  bidsCount?: number;
+  bidCount?: number;
   awardedTo?: string;
   awardedBidId?: string;
 }
@@ -92,7 +92,7 @@ interface ActiveTender {
   deadline: string;
   postedBy?: { companyName?: string; _id: string };
   createdAt: string;
-  bidsCount?: number;
+  bidCount?: number;
 }
 
 export default function DashboardPage() {
@@ -144,9 +144,7 @@ export default function DashboardPage() {
         const tenders = Array.isArray(tendersRes) ? tendersRes : [];
 
         setRecentTenders(tenders.slice(0, 6));
-        setTendersWithNoBids(
-          tenders.filter((t) => !t.bidsCount || t.bidsCount === 0)
-        );
+        setTendersWithNoBids(tenders.filter((t) => t.bidCount === 0));
         setAwardedByMe(
           tenders.filter(
             (t) => t.status === "awarded" || t.status === "completed"
@@ -586,7 +584,7 @@ export default function DashboardPage() {
                                       </AppleBadge>
                                     )}
                                     <AppleBadge variant="outline">
-                                      {tender.bidsCount || 0} bids
+                                      {tender.bidCount || 0} bids
                                     </AppleBadge>
                                   </div>
                                 </div>
@@ -693,7 +691,7 @@ export default function DashboardPage() {
                               </TableCell>
                               <TableCell>
                                 <AppleBadge variant="outline">
-                                  {tender.bidsCount || 0}
+                                  {tender.bidCount || 0}
                                 </AppleBadge>
                               </TableCell>
                               <TableCell>

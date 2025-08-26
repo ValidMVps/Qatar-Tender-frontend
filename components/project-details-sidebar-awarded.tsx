@@ -45,14 +45,14 @@ interface ProjectDetailsSidebarProps
       _id: string;
       email: string;
     };
-    postedBy: string;
+    postedBy: string | { _id: string; email: string; userType?: string };
   } | null;
   getStatusColor: (status: string) => string;
   onMarkComplete: () => void;
   currentUserId: string;
 }
 
-export function ProjectDetailsSidebar({
+export function ProjectDetailsSidebarawarded({
   selectedProject,
   getStatusColor,
   onMarkComplete,
@@ -86,6 +86,10 @@ export function ProjectDetailsSidebar({
 
   // Fetch the selected bid amount when project changes
   useEffect(() => {
+    console.log(
+      selectedProject,
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    );
     const fetchSelectedBidAmount = async () => {
       if (!selectedProject || !selectedProject.awardedTo) return;
 
@@ -161,22 +165,6 @@ export function ProjectDetailsSidebar({
       console.error(err);
     }
   };
-
-  const fetchReviewStatus = async () => {
-    if (!selectedProject) return;
-
-    try {
-      const review = await getReviewForTender(selectedProject.id);
-      // If review is not null, it means review was given
-      setHasReview(!!review);
-    } catch (err) {
-      console.error("Failed to check review status", err);
-    }
-  };
-
-  useEffect(() => {
-    fetchReviewStatus();
-  }, [selectedProject]);
 
   const handleCloseCompleteDialog = () => {
     setIsCompleteDialogOpen(false);
@@ -273,10 +261,10 @@ export function ProjectDetailsSidebar({
                 <div>
                   <label className="text-sm font-medium text-gray-600 flex items-center gap-1">
                     <User className="w-4 h-4" />
-                    {t("awarded_to")}
+                    {t("awarded_by")}
                   </label>
                   <p className="text-sm mt-1 text-gray-800">
-                    {selectedProject.awardedTo.email}
+                    {selectedProject.postedBy.email}
                   </p>
                 </div>
               )}
