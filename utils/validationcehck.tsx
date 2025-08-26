@@ -559,7 +559,7 @@ function findDirectMatches(text: string): ContactDetection[] {
 
         if (!isFalsePositive(cleanMatch)) {
           detections.push({
-            type: pattern.type,
+            type: pattern.type as ContactDetection['type'],
             pattern: cleanMatch,
             rawPattern: match,
             severity: "high",
@@ -624,7 +624,7 @@ function findSpaceSeparatedUrlMatches(text: string): ContactDetection[] {
 
       if (cleanMatch.length >= 3 && !isFalsePositive(cleanMatch)) {
         detections.push({
-          type: pattern.type,
+          type: pattern.type as ContactDetection['type'],
           pattern: cleanMatch,
           rawPattern: fullMatch,
           severity: "high",
@@ -703,7 +703,7 @@ function findMultiWordPatterns(text: string): ContactDetection[] {
       ["dot", "."].includes(words[i + 3].toLowerCase()) &&
       DOMAIN_KEYWORDS.some((kw) => word3.includes(kw))
     ) {
-      const pattern = `${word1}@${word3}.${word5}`;
+      const pattern = `${word1}@${word3}.${word1}`;
       const rawPattern = `${words[i]} ${words[i + 1]} ${words[i + 2]} ${
         words[i + 3]
       } ${words[i + 4]}`;
@@ -749,9 +749,9 @@ function findMultiWordPatterns(text: string): ContactDetection[] {
       isNameLike(word1) &&
       ["at", "@"].includes(words[i + 1].toLowerCase()) &&
       EMAIL_KEYWORDS.some((kw) => word3.includes(kw)) &&
-      DOMAIN_KEYWORDS.some((kw) => word4.includes(kw))
+      DOMAIN_KEYWORDS.some((kw) => word1.includes(kw))
     ) {
-      const pattern = `${word1}@${word3}.${word4}`;
+      const pattern = `${word1}@${word3}.${word1}`;
       const rawPattern = `${words[i]} ${words[i + 1]} ${words[i + 2]} ${
         words[i + 3]
       }`;
@@ -1161,7 +1161,7 @@ function findNormalizedMatches(text: string): ContactDetection[] {
         const cleanMatch = cleanMatchResult(match, pattern.type);
         if (cleanMatch.length >= 3 && !isFalsePositive(cleanMatch)) {
           detections.push({
-            type: pattern.type,
+            type: pattern.type as ContactDetection['type'],
             pattern: cleanMatch,
             severity: "medium",
             confidence: pattern.baseConfidence,
@@ -1179,7 +1179,7 @@ function findNormalizedMatches(text: string): ContactDetection[] {
         const cleanMatch = cleanMatchResult(match, pattern.type);
         if (cleanMatch.length >= 3 && !isFalsePositive(cleanMatch)) {
           detections.push({
-            type: pattern.type,
+            type: pattern.type as ContactDetection['type'],
             pattern: cleanMatch,
             severity: "medium",
             confidence: pattern.baseConfidence,
@@ -1241,7 +1241,7 @@ function findDeepMatches(text: string): ContactDetection[] {
         const cleanMatch = cleanMatchResult(match, pattern.type);
         if (cleanMatch.length >= 3 && !isFalsePositive(cleanMatch)) {
           detections.push({
-            type: pattern.type,
+            type: pattern.type as ContactDetection['type'],
             pattern: cleanMatch,
             severity: "high",
             confidence: pattern.baseConfidence,
@@ -1259,7 +1259,7 @@ function findDeepMatches(text: string): ContactDetection[] {
         const cleanMatch = cleanMatchResult(match, pattern.type);
         if (cleanMatch.length >= 3 && !isFalsePositive(cleanMatch)) {
           detections.push({
-            type: pattern.type,
+            type: pattern.type as ContactDetection['type'],
             pattern: cleanMatch,
             severity: "high",
             confidence: pattern.baseConfidence,
@@ -1460,7 +1460,7 @@ function calculateConfidence(
   return detections
     .map((detection) => {
       // Adjust severity based on confidence
-      const severity =
+      const severity: ContactDetection["severity"] =
         detection.confidence >= 85
           ? "high"
           : detection.confidence >= 65

@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useEffect, useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -17,12 +18,18 @@ interface QnaSectionProps {
   tenderid: string;
 }
 
+// Types for detectContactInfo
+interface Detection {
+  type: string;
+  severity: "low" | "medium" | "high";
+}
+
 function QnaSection({ tenderid }: QnaSectionProps) {
   const { t } = useTranslation();
   const [questions, setQuestions] = useState<Question[]>([]);
-  const [newQuestion, setNewQuestion] = useState("");
+  const [newQuestion, setNewQuestion] = useState<string>("");
   const [questionError, setQuestionError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   // Validation function
   const validateQuestion = (text: string): string | null => {
@@ -30,7 +37,7 @@ function QnaSection({ tenderid }: QnaSectionProps) {
       return t("question_cannot_be_empty");
     }
 
-    const detections = detectContactInfo(text);
+    const detections: Detection[] = detectContactInfo(text) || [];
     const highSeverity = detections.filter((d) => d.severity === "high");
 
     if (highSeverity.length > 0) {
@@ -41,10 +48,11 @@ function QnaSection({ tenderid }: QnaSectionProps) {
     return null;
   };
 
-  const fetchQuestions = async () => {
+  const fetchQuestions = async (): Promise<void> => {
     try {
       const data = await getQuestionsForTender(tenderid);
-      setQuestions(data);
+      console.log("Fetched questions:", data);
+      setQuestions(data as unknown as Question[]);
     } catch (err) {
       console.error("Failed to fetch questions:", err);
     }
@@ -54,7 +62,7 @@ function QnaSection({ tenderid }: QnaSectionProps) {
     fetchQuestions();
   }, [tenderid]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const error = validateQuestion(newQuestion);
     if (error) {
@@ -75,8 +83,6 @@ function QnaSection({ tenderid }: QnaSectionProps) {
       setLoading(false);
     }
   };
-
-  const answeredQuestions = questions.filter((q) => q.answer);
 
   return (
     <div className="mb-8">
@@ -107,7 +113,9 @@ function QnaSection({ tenderid }: QnaSectionProps) {
                       Q: {qa.question}
                     </p>
                     <p className="text-sm text-gray-500">
-                      {new Date(qa.createdAt).toLocaleString()}
+                      {qa.createdAt
+                        ? new Date(qa.createdAt).toLocaleString()
+                        : ""}
                     </p>
                   </div>
                   {qa.answer ? (

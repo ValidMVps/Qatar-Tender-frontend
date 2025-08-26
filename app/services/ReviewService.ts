@@ -36,6 +36,7 @@ export interface UpdateReviewData {
 export const createReview = async (
   reviewData: CreateReviewData
 ): Promise<Review> => {
+  console.log("Creating review:", reviewData);
   try {
     const response = await api.post<Review>("/api/reviews", reviewData);
     return response.data;
