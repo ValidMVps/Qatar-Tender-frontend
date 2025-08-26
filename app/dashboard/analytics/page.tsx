@@ -239,7 +239,7 @@ export default function IndividualDashboard() {
       setLoading(true);
       setError(null);
       try {
-        const userId = user._id;
+        const userId = user?._id;
         if (!userId) throw new Error("User not found. Please log in again.");
 
         const tendersResponse = await getUserTenders(userId);
@@ -497,35 +497,100 @@ export default function IndividualDashboard() {
           </ChartContainer>
         </div>
 
-        {/* Tender Status Distribution */}
+        {/* Tender Status Distribution (Area Chart - Linear) */}
         <div className="bg-white p-4 rounded-2xl shadow-sm">
           <h4 className="text-md font-semibold mb-4 text-gray-900 px-2">
             Tender Status Distribution
           </h4>
           <ChartContainer config={chartConfig} className="w-full h-[280px]">
             <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={tenderStatusData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="value"
-                  label={({ name, percent }) =>
-                    `${name} ${(percent * 100).toFixed(0)}%`
+              <AreaChart
+                data={tenderStatusTimelineData}
+                margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+              >
+                <defs>
+                  <linearGradient id="fillActive" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#007AFF" stopOpacity={0.2} />
+                    <stop offset="95%" stopColor="#007AFF" stopOpacity={0} />
+                  </linearGradient>
+                  <linearGradient
+                    id="fillCompleted"
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
+                    <stop offset="5%" stopColor="#34C759" stopOpacity={0.2} />
+                    <stop offset="95%" stopColor="#34C759" stopOpacity={0} />
+                  </linearGradient>
+                  <linearGradient id="fillClosed" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#FF9500" stopOpacity={0.2} />
+                    <stop offset="95%" stopColor="#FF9500" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid vertical={false} stroke="#f0f0f0" />
+                <XAxis
+                  dataKey="date"
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={8}
+                  minTickGap={32}
+                  tickFormatter={(value) =>
+                    new Date(value).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                    })
                   }
-                >
-                  {tenderStatusData.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={COLORS[index % COLORS.length]}
+                  className="text-xs text-gray-500"
+                />
+                <YAxis
+                  tickLine={false}
+                  axisLine={false}
+                  tickFormatter={(value) => `${value}`}
+                  className="text-xs text-gray-500"
+                  width={30}
+                />
+                <ChartTooltip
+                  cursor={false}
+                  content={
+                    <ChartTooltipContent
+                      labelFormatter={(value) =>
+                        new Date(value).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })
+                      }
+                      indicator="dot"
+                      className="bg-white shadow-lg rounded-xl border border-gray-200"
                     />
-                  ))}
-                </Pie>
-                <ChartTooltip />
-              </PieChart>
+                  }
+                />
+                <Area
+                  dataKey="active"
+                  type="monotone"
+                  fill="url(#fillActive)"
+                  stroke="#007AFF"
+                  strokeWidth={2}
+                  stackId="a"
+                />
+                <Area
+                  dataKey="completed"
+                  type="monotone"
+                  fill="url(#fillCompleted)"
+                  stroke="#34C759"
+                  strokeWidth={2}
+                  stackId="a"
+                />
+                <Area
+                  dataKey="closed"
+                  type="monotone"
+                  fill="url(#fillClosed)"
+                  stroke="#FF9500"
+                  strokeWidth={2}
+                  stackId="a"
+                />
+              </AreaChart>
             </ResponsiveContainer>
           </ChartContainer>
         </div>
@@ -608,43 +673,64 @@ export default function IndividualDashboard() {
           </ChartContainer>
         </div>
 
-        {/* Top Performing Tenders */}
+        {/* Top Performing Tenders (Area Chart - Step) */}
         <div className="bg-white p-4 rounded-2xl shadow-sm">
           <h4 className="text-md font-semibold mb-4 text-gray-900 px-2">
             Top Performing Tenders
           </h4>
           <ChartContainer config={chartConfig} className="w-full h-[280px]">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart
+              <AreaChart
                 data={topTendersByBids}
-                layout="horizontal"
                 margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
               >
-                <CartesianGrid
-                  horizontal={true}
-                  vertical={false}
-                  stroke="#f0f0f0"
-                />
+                <defs>
+                  <linearGradient
+                    id="fillTopTenders"
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
+                    <stop offset="5%" stopColor="#AF52DE" stopOpacity={0.2} />
+                    <stop offset="95%" stopColor="#AF52DE" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid vertical={false} stroke="#f0f0f0" />
                 <XAxis
-                  type="number"
-                  tickLine={false}
-                  axisLine={false}
-                  tickMargin={8}
-                  className="text-xs text-gray-500"
-                />
-                <YAxis
-                  type="category"
                   dataKey="name"
-                  width={100}
                   tickLine={false}
                   axisLine={false}
                   tickMargin={8}
                   tick={{ fontSize: 12 }}
                   className="text-xs text-gray-500"
                 />
-                <ChartTooltip />
-                <Bar dataKey="bids" fill="#AF52DE" radius={[0, 4, 4, 0]} />
-              </BarChart>
+                <YAxis
+                  tickLine={false}
+                  axisLine={false}
+                  tickFormatter={(value) => `${value}`}
+                  className="text-xs text-gray-500"
+                  width={30}
+                />
+                <ChartTooltip
+                  cursor={false}
+                  content={
+                    <ChartTooltipContent
+                      indicator="dot"
+                      className="bg-white shadow-lg rounded-xl border border-gray-200"
+                    />
+                  }
+                />
+                <Area
+                  dataKey="bids"
+                  type="step"
+                  fill="url(#fillTopTenders)"
+                  stroke="#AF52DE"
+                  strokeWidth={2}
+                  dot={{ r: 4 }}
+                  activeDot={{ r: 6 }}
+                />
+              </AreaChart>
             </ResponsiveContainer>
           </ChartContainer>
         </div>

@@ -1163,6 +1163,22 @@
   "explore_new_tenders": "استكشاف المناقصات الجديدة",
   "discover_recently_posted_opportunities": "اكتشاف الفرص المنشورة مؤخرًا",
   "recent_tenders_posted": "المناقصات المنشورة مؤخرًا",
+  "no_questions_asked_yet": "لم يتم طرح أي أسئلة بعد.",
   "browse_all_tenders": "تصفح جميع المناقصات",
-  "note_do_not_include_contact_information_in_your_answer": "لا تتضمن عناوين البريد الإلكتروني أو أرقام الهواتف أو روابط المواقع الإلكترونية. يجب أن تظل الاتصالات على المنصة."
+  "note_do_not_include_contact_information_in_your_answer": "لا تتضمن عناوين البريد الإلكتروني أو أرقام الهواتف أو روابط المواقع الإلكترونية. يجب أن تظل الاتصالات على المنصة.",
+  "enter_current_password": "أدخل كلمة المرور الحالية",
+  "enter_new_password": "أدخل كلمة مرور جديدة",
+  "activity_overview": "نظرة عامة على النشاط",
+  "your_tender_and_bidding_activity": "نشاط المناقصات والمزايدات الخاص بك",
+  "error_loading_data_please_check_your_connection": "خطأ في تحميل البيانات - يرجى التحقق من اتصالك",
+  "loading_dashboard_data": "جارٍ تحميل بيانات لوحة التحكم...",
+  "user_not_found_please_log_in_again": "لم يتم العثور على المستخدم. يرجى تسجيل الدخول مرة أخرى.",
+  "failed_to_load_data": "فشل في تحميل البيانات",
+  "last_4_days": "آخر 4 أيام",
+  "not_accepted_yet": "لم يتم قبوله بعد",
+  "win_rate": "معدل الفوز",
+  "activity_timeline": "جدول النشاط",
+  "bid_success_rate": "معدل نجاح العطاءات",
+  "bid_status_timeline": "جدول حالة العطاءات",
+  "average_bid_value_over_time": "متوسط قيمة العطاءات بمرور الوقت"
 }

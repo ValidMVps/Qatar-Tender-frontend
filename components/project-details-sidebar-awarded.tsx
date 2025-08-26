@@ -264,7 +264,9 @@ export function ProjectDetailsSidebarawarded({
                     {t("awarded_by")}
                   </label>
                   <p className="text-sm mt-1 text-gray-800">
-                    {selectedProject.postedBy.email}
+                    {typeof selectedProject.postedBy === "object"
+                      ? selectedProject.postedBy.email
+                      : selectedProject.postedBy}
                   </p>
                 </div>
               )}

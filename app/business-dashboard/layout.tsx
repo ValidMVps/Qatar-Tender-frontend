@@ -78,11 +78,6 @@ export default function DashboardLayout({
           href: "/business-dashboard/bids",
           icon: PenSquare,
         },
-        {
-          name: t("saved_jobs"),
-          href: "/business-dashboard/saved-jobs",
-          icon: Save,
-        },
       ],
     },
     {

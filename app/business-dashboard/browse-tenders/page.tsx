@@ -598,13 +598,7 @@ export default function ServiceProvidingDashboardPage() {
                   </button>
                 </div>
 
-                <Button
-                  variant="outline"
-                  className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-xl font-medium transition-all duration-300 border-0"
-                >
-                  <Save className="h-4 w-4" />
-                  <span>{t("saved_jobs")} (5)</span>
-                </Button>
+        
 
                 <Select
                   value={sortOption}

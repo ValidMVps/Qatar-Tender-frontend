@@ -617,22 +617,29 @@ export default function MyBidsPage() {
                             onClick={() => handleGoToChat(bid.id)}
                             className="rounded-lg"
                           >
-                            <MessageCircle className="h-4 w-4 mr-2" />
-                            {t("go_to_chat") || "Go to Chat"}
+                            {" "}
+                            <Link
+                              href={`/business-dashboard/projects`}
+                              className="flex"
+                            >
+                              <MessageCircle className="h-4 w-4 mr-2" />
+                              {t("go_to_chat") || "Go to Chat"}
+                            </Link>
                           </DropdownMenuItem>
                         )}
-                        {bid.status !== "completed" && (
-                          <>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem
-                              onClick={() => handleCloseBid(bid.id)}
-                              className="text-red-600 rounded-lg"
-                            >
-                              <X className="h-4 w-4 mr-2" />
-                              {t("close_bid") || "Close Bid"}
-                            </DropdownMenuItem>
-                          </>
-                        )}
+                        {bid.status !== "completed" &&
+                          bid.status !== "accepted" && (
+                            <>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                onClick={() => handleCloseBid(bid.id)}
+                                className="text-red-600 rounded-lg"
+                              >
+                                <X className="h-4 w-4 mr-2" />
+                                {t("close_bid") || "Close Bid"}
+                              </DropdownMenuItem>
+                            </>
+                          )}
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
@@ -863,13 +870,12 @@ export default function MyBidsPage() {
 
                 {(selectedBidForDetails.status === "accepted" ||
                   selectedBidForDetails.status === "completed") && (
-                  <Button
-                    onClick={() => handleGoToChat(selectedBidForDetails.id)}
-                    className="rounded-xl bg-green-600 hover:bg-green-700 text-white transition-colors"
-                  >
-                    <MessageCircle className="h-4 w-4 mr-2" />
-                    {t("go_to_chat") || "Go to Chat"}
-                  </Button>
+                  <Link href={`/business-dashboard/projects`}>
+                    <Button className="rounded-xl bg-green-600 hover:bg-green-700 text-white transition-colors">
+                      <MessageCircle className="h-4 w-4 mr-2" />
+                      {t("go_to_chat")}
+                    </Button>
+                  </Link>
                 )}
 
                 {selectedBidForDetails.status === "rejected" && (

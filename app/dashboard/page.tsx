@@ -285,7 +285,7 @@ export default function IndividualDashboardPage() {
     })),
   ].slice(0, 3);
 
-  // Reusable KPI Card
+  // Apple-style KPI Card
   const KpiCard = ({
     title,
     icon: Icon,
@@ -295,129 +295,213 @@ export default function IndividualDashboardPage() {
     icon: React.ElementType;
     children: React.ReactNode;
   }) => (
-    <Card className="bg-white/80 backdrop-blur-sm border border-gray-100/60 hover:shadow-xs transition-all h-full">
-      <CardHeader className="pb-3">
-        <div className="flex items-center gap-2">
-          <Icon className="w-4 h-4 text-blue-600" />
-          <CardTitle className="text-sm font-medium text-gray-900">
+    <motion.div className="bg-white/90 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-100/50 transition-all duration-300 h-full group">
+      <div className="p-6">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 bg-gradient-to-br from-blue-50 to-blue-100 rounded-full flex items-center justify-center transition-transform duration-300">
+            <Icon className="w-5 h-5 text-blue-600" />
+          </div>
+          <h3 className="text-sm font-medium text-gray-600 tracking-wide">
             {title}
-          </CardTitle>
+          </h3>
         </div>
-      </CardHeader>
-      <CardContent>{children}</CardContent>
-    </Card>
+        <div className="space-y-3">{children}</div>
+      </div>
+    </motion.div>
   );
+
+  // Apple-style Badge Component
+  const AppleBadge = ({
+    variant,
+    className,
+    children,
+  }: {
+    variant?: string;
+    className?: string;
+    children: React.ReactNode;
+  }) => {
+    const baseClasses =
+      "inline-flex items-center px-3 py-1 rounded-full text-xs font-medium transition-all duration-200";
+    if (variant === "outline") {
+      return (
+        <span
+          className={`${baseClasses} bg-gray-50/80 text-gray-600 border border-gray-200/60 hover:bg-gray-100/80 ${className}`}
+        >
+          {children}
+        </span>
+      );
+    }
+    return <span className={`${baseClasses} ${className}`}>{children}</span>;
+  };
 
   return (
     <TooltipProvider>
       <motion.div
         initial="hidden"
         animate="show"
-        variants={{ show: { transition: { staggerChildren: 0.05 } } }}
-        className="min-h-screen bg-gray-50/30"
+        variants={{ show: { transition: { staggerChildren: 0.01 } } }}
+        className="min-h-screen bg-gradient-to-br from-gray-50/50 via-white to-blue-50/30"
       >
-        <div className="mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-          {/* Welcome Header */}
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between py-8 px-8 rounded-lg bg-white backdrop-blur-xl shadow-xs border border-gray-200 relative overflow-hidden">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.03),transparent_50%)]"></div>
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(147,197,253,0.02),transparent_50%)]"></div>
-
-            <div className="mb-6 md:mb-0 relative z-10">
-              <h1 className="md:text-3xl text-xl font-semibold text-gray-900">
-                {t("welcome_back")}{" "}
-                <span className="text-blue-600">
-                  {profile?.fullName || profile?.companyName}
-                </span>
-              </h1>
-              <p className="text-base text-gray-700 font-medium">
-                Manage your tenders and review contractor bids.
-              </p>
+        <div className="mx-auto px-6 sm:px-8 lg:px-12 py-8 space-y-8">
+          {/* Apple-style Welcome Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 5 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            className="relative overflow-hidden"
+          >
+            <div className="bg-white/70 backdrop-blur-2xl rounded-3xl p-8 md:p-10 shadow-sm border border-gray-100/50 relative">
+              {/* Subtle gradient overlay */}
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-purple-500/5 rounded-3xl"></div>
+              <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-blue-100/30 to-transparent rounded-full blur-3xl"></div>
+              <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+                <div className="space-y-3">
+                  <h1 className="text-3xl md:text-4xl font-semibold text-gray-900 tracking-tight">
+                    {t("welcome_back")}{" "}
+                    <span className="text-blue-600">
+                      {profile?.fullName || profile?.companyName}
+                    </span>
+                  </h1>
+                  <p className="text-lg text-gray-600 font-normal max-w-2xl leading-relaxed">
+                    Manage your tenders and review contractor bids.
+                  </p>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => setOpenTenderModal(true)}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-2xl font-medium shadow-lg shadow-blue-600/25 transition-all duration-200 flex items-center gap-2"
+                  >
+                    <Plus className="w-5 h-5" />
+                    Post New Tender
+                  </motion.button>
+                </div>
+              </div>
             </div>
-            <div className="flex-shrink-0 flex gap-4">
-              <Button
-                onClick={() => setOpenTenderModal(true)}
-                className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2.5 rounded-lg"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Post New Tender
-              </Button>
-            </div>
-          </div>
+          </motion.div>
 
-          {/* KPI Summary Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <KpiCard title="My Tenders" icon={ClipboardList}>
-              <div className="text-2xl font-bold text-gray-900">
-                {totalTenders}
-              </div>
-              <p className="text-xs text-gray-500">Total posted</p>
-            </KpiCard>
-
-            <KpiCard title="Bids Received" icon={TrendingUp}>
-              <div className="text-2xl font-bold text-gray-900">
-                {totalBidsReceived}
-              </div>
-              <p className="text-xs text-gray-500">From contractors</p>
-            </KpiCard>
-
-            {/* ✅ Tender Status KPI Card */}
-            <KpiCard title="Tender Status" icon={BarChart2}>
-              <div className="space-y-1.5 text-sm">
-                {tenderStatusSummary.open > 0 && (
-                  <div className="flex justify-between">
-                    <span className="text-gray-700">Open</span>
-                    <Badge className="bg-green-50 text-green-700">
-                      {tenderStatusSummary.open}
-                    </Badge>
-                  </div>
-                )}
-                {tenderStatusSummary.awarded > 0 && (
-                  <div className="flex justify-between">
-                    <span className="text-gray-700">Awarded</span>
-                    <Badge className="bg-blue-50 text-blue-700">
-                      {tenderStatusSummary.awarded}
-                    </Badge>
-                  </div>
-                )}
-                {tenderStatusSummary.expired > 0 && (
-                  <div className="flex justify-between">
-                    <span className="text-gray-700">Expired</span>
-                    <Badge className="bg-red-50 text-red-700">
-                      {tenderStatusSummary.expired}
-                    </Badge>
-                  </div>
-                )}
-                {Object.values(tenderStatusSummary).every((v) => v === 0) && (
-                  <p className="text-gray-400 text-xs">No tenders</p>
-                )}
-              </div>
-            </KpiCard>
-
-            {/* Optional: Keep Upcoming Deadlines */}
-            <KpiCard title="Upcoming Deadlines" icon={Timer}>
-              <div className="space-y-2 text-sm">
-                {upcomingDeadlines.length === 0 ? (
-                  <p className="text-gray-400 text-xs">No deadlines soon</p>
-                ) : (
-                  upcomingDeadlines.map((item, i) => (
-                    <div key={i} className="flex justify-between text-gray-700">
-                      <span className="truncate max-w-[160px]">
-                        {item.title}
-                      </span>
-                      <span className="text-amber-600 font-medium">
-                        {formatShortDate(item.deadline!.toString())}
+          {/* Apple-style KPI Cards */}
+          <motion.div
+            className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6"
+            initial={{ opacity: 0, y: 5 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+          >
+            {/* Recent Activity */}
+            <KpiCard title="Recent Activity" icon={ClipboardList}>
+              {recentActivity.length === 0 ? (
+                <p className="text-gray-400 text-sm">No recent activity</p>
+              ) : (
+                recentActivity.map((act, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center justify-between py-2 px-3 bg-gray-50/50 rounded-xl"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={`w-2 h-2 rounded-full ${
+                          act.type === "tender" ? "bg-blue-500" : "bg-green-500"
+                        }`}
+                      ></div>
+                      <span className="text-sm text-gray-700 truncate max-w-[140px]">
+                        {act.type === "tender" ? "Posted: " : "Bid received: "}
+                        {act.title}
                       </span>
                     </div>
-                  ))
-                )}
+                    <span className="text-xs text-gray-500 font-medium">
+                      {act.time}
+                    </span>
+                  </div>
+                ))
+              )}
+            </KpiCard>
+
+            {/* Bids Received Summary */}
+            <KpiCard title="Bids Received" icon={Users}>
+              <div className="flex items-center justify-between py-2 px-3 bg-gray-50/50 rounded-xl">
+                <span className="text-sm text-gray-700 font-medium">
+                  Total Bids
+                </span>
+                <AppleBadge className="bg-blue-100/80 text-blue-700 min-w-[24px] text-center">
+                  {totalBidsReceived}
+                </AppleBadge>
+              </div>
+              <div className="flex items-center justify-between py-2 px-3 bg-gray-50/50 rounded-xl">
+                <span className="text-sm text-gray-700 font-medium">
+                  Avg per Tender
+                </span>
+                <AppleBadge className="bg-purple-100/80 text-purple-700 min-w-[24px] text-center">
+                  {myTenders.length > 0
+                    ? (totalBidsReceived / myTenders.length).toFixed(1)
+                    : "0"}
+                </AppleBadge>
               </div>
             </KpiCard>
-          </div>
 
-          {/* Tabs */}
-          <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-xs border border-gray-100/50 overflow-hidden">
-            <div className="border-b border-gray-100/50 px-6 py-4">
-              <nav className="flex space-x-8 overflow-x-auto">
+            {/* Tender Status */}
+            <KpiCard title="Tender Status" icon={BarChart2}>
+              {Object.entries(tenderStatusSummary).map(([status, count]) => {
+                if (count === 0) return null;
+                return (
+                  <div
+                    key={status}
+                    className="flex items-center justify-between py-2 px-3 bg-gray-50/50 rounded-xl"
+                  >
+                    <span className="capitalize text-sm text-gray-700 font-medium">
+                      {status}
+                    </span>
+                    <AppleBadge
+                      className={`min-w-[24px] text-center ${
+                        status === "awarded"
+                          ? "bg-green-100/80 text-green-700"
+                          : status === "open"
+                          ? "bg-blue-100/80 text-blue-700"
+                          : "bg-red-100/80 text-red-700"
+                      }`}
+                    >
+                      {count}
+                    </AppleBadge>
+                  </div>
+                );
+              })}
+              {Object.values(tenderStatusSummary).every((v) => v === 0) && (
+                <p className="text-gray-400 text-sm">No tenders</p>
+              )}
+            </KpiCard>
+
+            {/* Upcoming Deadlines */}
+            <KpiCard title="Upcoming Deadlines" icon={Timer}>
+              {upcomingDeadlines.length === 0 ? (
+                <p className="text-gray-400 text-sm">No deadlines soon</p>
+              ) : (
+                upcomingDeadlines.map((item, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center justify-between py-2 px-3 bg-amber-50/50 rounded-xl border border-amber-100/50"
+                  >
+                    <span className="text-sm text-gray-700 truncate max-w-[140px]">
+                      {item.title}
+                    </span>
+                    <span className="text-xs text-amber-600 font-semibold">
+                      {formatShortDate(item.deadline!.toString())}
+                    </span>
+                  </div>
+                ))
+              )}
+            </KpiCard>
+          </motion.div>
+
+          {/* Apple-style Tabs */}
+          <motion.div
+            initial={{ opacity: 0, y: 5 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="bg-white/70 backdrop-blur-2xl rounded-3xl shadow-sm border border-gray-100/50 overflow-hidden"
+          >
+            {/* Tab Navigation */}
+            <div className="border-b border-gray-100/50 p-6 pb-0">
+              <nav className="flex space-x-1 bg-gray-100/50 rounded-2xl p-1">
                 {[
                   { id: "my-tenders", label: "My Tenders", icon: FileText },
                   { id: "bids-received", label: "Bids Received", icon: Users },
@@ -430,18 +514,20 @@ export default function IndividualDashboardPage() {
                 ].map((tab) => {
                   const Icon = tab.icon;
                   return (
-                    <button
+                    <motion.button
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id as any)}
-                      className={`flex items-center space-x-2 pb-2 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
+                      className={`flex items-center space-x-2 px-4 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 whitespace-nowrap ${
                         activeTab === tab.id
-                          ? "border-blue-500 text-blue-600"
-                          : "border-transparent text-gray-500 hover:text-gray-700"
+                          ? "bg-white text-blue-600 shadow-sm"
+                          : "text-gray-600 hover:text-gray-800 hover:bg-white/50"
                       }`}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
                     >
                       <Icon className="w-4 h-4" />
                       <span>{tab.label}</span>
-                    </button>
+                    </motion.button>
                   );
                 })}
               </nav>
@@ -453,99 +539,120 @@ export default function IndividualDashboardPage() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-              className="p-6"
+              transition={{ duration: 0.3 }}
+              className="p-8"
             >
               {loading ? (
-                <div className="text-center py-12">
-                  <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500 mx-auto"></div>
-                  <p className="text-gray-400 mt-3">Loading...</p>
+                <div className="text-center py-16">
+                  <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+                  <p className="text-gray-500 mt-4 text-lg">Loading...</p>
                 </div>
               ) : activeTab === "my-tenders" ? (
                 <div>
-                  <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-lg font-medium text-gray-900">
+                  <div className="flex items-center justify-between mb-8">
+                    <h3 className="text-2xl font-semibold text-gray-900">
                       My Tenders
                     </h3>
                     <Link
                       href="/individual-dashboard/my-tenders"
-                      className="text-blue-500 hover:text-blue-600 text-sm flex items-center"
+                      className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-1 bg-blue-50/80 px-4 py-2 rounded-xl transition-colors"
                     >
                       View All
-                      <ChevronRight className="w-4 h-4 ml-1" />
+                      <ChevronRight className="w-4 h-4" />
                     </Link>
                   </div>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Title</TableHead>
-                        <TableHead>Category</TableHead>
-                        <TableHead>Location</TableHead>
-                        <TableHead>Budget</TableHead>
-                        <TableHead>Bids</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Deadline</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {myTenders.length === 0 ? (
-                        <TableRow>
-                          <TableCell
-                            colSpan={7}
-                            className="text-center py-8 text-gray-500"
-                          >
-                            No tenders posted yet.
-                          </TableCell>
+                  <div className="bg-white/90 rounded-2xl border border-gray-100/60 overflow-hidden">
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="border-gray-100/60 bg-gray-50/50">
+                          <TableHead className="font-semibold text-gray-700">
+                            Title
+                          </TableHead>
+                          <TableHead className="font-semibold text-gray-700">
+                            Category
+                          </TableHead>
+                          <TableHead className="font-semibold text-gray-700">
+                            Location
+                          </TableHead>
+                          <TableHead className="font-semibold text-gray-700">
+                            Budget
+                          </TableHead>
+                          <TableHead className="font-semibold text-gray-700">
+                            Bids
+                          </TableHead>
+                          <TableHead className="font-semibold text-gray-700">
+                            Status
+                          </TableHead>
+                          <TableHead className="font-semibold text-gray-700">
+                            Deadline
+                          </TableHead>
                         </TableRow>
-                      ) : (
-                        myTenders.map((tender) => (
-                          <TableRow
-                            key={tender._id}
-                            className="hover:bg-gray-50/50 cursor-pointer"
-                          >
-                            <TableCell>
-                              <Link
-                                href={`/individual-dashboard/tender/${tender._id}`}
-                                className="font-medium text-gray-900 hover:text-blue-600"
-                              >
-                                {tender.title}
-                              </Link>
-                            </TableCell>
-                            <TableCell>{resolveCategoryName(tender)}</TableCell>
-                            <TableCell>{tender.location || "—"}</TableCell>
-                            <TableCell>
-                              {resolveBudget(tender) > 0
-                                ? `${new Intl.NumberFormat().format(
-                                    resolveBudget(tender)
-                                  )} QAR`
-                                : "Not specified"}
-                            </TableCell>
-                            <TableCell>
-                              <Badge variant="outline">
-                                {tender.bidsCount || 0}
-                              </Badge>
-                            </TableCell>
-                            <TableCell>
-                              {getTenderStatusBadge(tender.status)}
-                            </TableCell>
-                            <TableCell>
-                              {parseDeadline(tender)?.toLocaleDateString() ||
-                                "—"}
+                      </TableHeader>
+                      <TableBody>
+                        {myTenders.length === 0 ? (
+                          <TableRow>
+                            <TableCell
+                              colSpan={7}
+                              className="text-center py-12 text-gray-500"
+                            >
+                              <FileText className="w-12 h-12 mx-auto text-gray-300 mb-4" />
+                              <p className="text-lg">No tenders posted yet.</p>
                             </TableCell>
                           </TableRow>
-                        ))
-                      )}
-                    </TableBody>
-                  </Table>
+                        ) : (
+                          myTenders.map((tender) => (
+                            <TableRow
+                              key={tender._id}
+                              className="hover:bg-gray-50/50 cursor-pointer border-gray-100/60 transition-colors"
+                            >
+                              <TableCell>
+                                <Link
+                                  href={`/individual-dashboard/tender/${tender._id}`}
+                                  className="font-medium text-gray-900 hover:text-blue-600 transition-colors"
+                                >
+                                  {tender.title}
+                                </Link>
+                              </TableCell>
+                              <TableCell className="text-gray-600">
+                                {resolveCategoryName(tender)}
+                              </TableCell>
+                              <TableCell className="text-gray-600">
+                                {tender.location || "—"}
+                              </TableCell>
+                              <TableCell className="font-medium">
+                                {resolveBudget(tender) > 0
+                                  ? `${new Intl.NumberFormat().format(
+                                      resolveBudget(tender)
+                                    )} ${t("QAR")}`
+                                  : "Not specified"}
+                              </TableCell>
+                              <TableCell>
+                                <AppleBadge variant="outline">
+                                  {tender.bidsCount || 0}
+                                </AppleBadge>
+                              </TableCell>
+                              <TableCell>
+                                {getTenderStatusBadge(tender.status)}
+                              </TableCell>
+                              <TableCell className="text-gray-600">
+                                {parseDeadline(tender)?.toLocaleDateString() ||
+                                  "—"}
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
                 </div>
               ) : activeTab === "bids-received" ? (
                 <div>
-                  <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-lg font-medium text-gray-900">
+                  <div className="flex items-center justify-between mb-8">
+                    <h3 className="text-2xl font-semibold text-gray-900">
                       Bids Received on Your Tenders
                     </h3>
                   </div>
-                  <div className="space-y-6">
+                  <div className="space-y-8">
                     {myTenders.length === 0 ? (
                       <p className="text-gray-500 text-center py-6">
                         No tenders posted.
@@ -558,48 +665,68 @@ export default function IndividualDashboardPage() {
                       myTenders
                         .filter((t) => bidsReceived[t._id]?.length > 0)
                         .map((tender) => (
-                          <div key={tender._id}>
-                            <h4 className="font-medium text-gray-900 mb-3">
-                              {tender.title}
-                            </h4>
+                          <div
+                            key={tender._id}
+                            className="bg-white/90 rounded-2xl border border-gray-100/60 overflow-hidden"
+                          >
+                            <div className="p-4 border-b border-gray-100/60">
+                              <h4 className="font-semibold text-gray-900">
+                                {tender.title}
+                              </h4>
+                            </div>
                             <Table>
                               <TableHeader>
-                                <TableRow>
-                                  <TableHead>Contractor</TableHead>
-                                  <TableHead>Proposal</TableHead>
-                                  <TableHead>Amount</TableHead>
-                                  <TableHead>Status</TableHead>
-                                  <TableHead>Submitted</TableHead>
-                                  <TableHead>Action</TableHead>
+                                <TableRow className="border-gray-100/60 bg-gray-50/50">
+                                  <TableHead className="font-semibold text-gray-700">
+                                    Contractor
+                                  </TableHead>
+                                  <TableHead className="font-semibold text-gray-700">
+                                    Proposal
+                                  </TableHead>
+                                  <TableHead className="font-semibold text-gray-700">
+                                    Amount
+                                  </TableHead>
+                                  <TableHead className="font-semibold text-gray-700">
+                                    Status
+                                  </TableHead>
+                                  <TableHead className="font-semibold text-gray-700">
+                                    Submitted
+                                  </TableHead>
+                                  <TableHead className="font-semibold text-gray-700">
+                                    Action
+                                  </TableHead>
                                 </TableRow>
                               </TableHeader>
                               <TableBody>
                                 {bidsReceived[tender._id]?.map((bid) => (
-                                  <TableRow key={bid._id}>
-                                    <TableCell className="font-medium">
+                                  <TableRow
+                                    key={bid._id}
+                                    className="hover:bg-gray-50/50 border-gray-100/60 transition-colors"
+                                  >
+                                    <TableCell className="font-medium text-gray-900">
                                       {bid.contractor?.companyName}
                                     </TableCell>
-                                    <TableCell className="text-gray-600 text-sm line-clamp-1 max-w-xs">
+                                    <TableCell className="text-gray-600 text-sm max-w-xs line-clamp-1">
                                       {bid.description || "No details"}
                                     </TableCell>
-                                    <TableCell className="font-semibold">
+                                    <TableCell className="font-semibold text-gray-900">
                                       {new Intl.NumberFormat().format(
                                         bid.amount
                                       )}{" "}
-                                      QAR
+                                      {t("QAR")}
                                     </TableCell>
                                     <TableCell>
                                       {getBidStatusBadge(bid.status)}
                                     </TableCell>
-                                    <TableCell>
+                                    <TableCell className="text-gray-600">
                                       {new Date(
                                         bid.createdAt
                                       ).toLocaleDateString()}
                                     </TableCell>
                                     <TableCell>
                                       <Link
-                                        href={`dashboard/tender/${tender._id}`}
-                                        className="text-blue-500 hover:text-blue-600 text-sm"
+                                        href={`/individual-dashboard/tender/${tender._id}`}
+                                        className="text-blue-600 hover:text-blue-700 font-medium bg-blue-50/80 px-3 py-1 rounded-lg transition-colors"
                                       >
                                         Review
                                       </Link>
@@ -615,134 +742,184 @@ export default function IndividualDashboardPage() {
                 </div>
               ) : activeTab === "awaiting" ? (
                 <div>
-                  <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-lg font-medium text-gray-900">
+                  <div className="flex items-center justify-between mb-8">
+                    <h3 className="text-2xl font-semibold text-gray-900">
                       Tenders Awaiting Bids
                     </h3>
+                    <Link
+                      href="/individual-dashboard/my-tenders?filter=no-bids"
+                      className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-1 bg-blue-50/80 px-4 py-2 rounded-xl transition-colors"
+                    >
+                      View All
+                      <ChevronRight className="w-4 h-4" />
+                    </Link>
                   </div>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Title</TableHead>
-                        <TableHead>Category</TableHead>
-                        <TableHead>Location</TableHead>
-                        <TableHead>Budget</TableHead>
-                        <TableHead>Description</TableHead>
-                        <TableHead>Deadline</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {tendersWithNoBids.length === 0 ? (
-                        <TableRow>
-                          <TableCell
-                            colSpan={6}
-                            className="text-center py-8 text-gray-500"
-                          >
-                            All tenders have received bids!
-                          </TableCell>
+                  <div className="bg-white/90 rounded-2xl border border-gray-100/60 overflow-hidden">
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="border-gray-100/60 bg-gray-50/50">
+                          <TableHead className="font-semibold text-gray-700">
+                            Title
+                          </TableHead>
+                          <TableHead className="font-semibold text-gray-700">
+                            Category
+                          </TableHead>
+                          <TableHead className="font-semibold text-gray-700">
+                            Location
+                          </TableHead>
+                          <TableHead className="font-semibold text-gray-700">
+                            Budget
+                          </TableHead>
+                          <TableHead className="font-semibold text-gray-700">
+                            Description
+                          </TableHead>
+                          <TableHead className="font-semibold text-gray-700">
+                            Deadline
+                          </TableHead>
                         </TableRow>
-                      ) : (
-                        tendersWithNoBids.map((tender) => (
-                          <TableRow
-                            key={tender._id}
-                            className="hover:bg-gray-50/50 cursor-pointer"
-                          >
-                            <TableCell>
-                              <Link
-                                href={`/individual-dashboard/tender/${tender._id}`}
-                                className="font-medium text-gray-900 hover:text-blue-600"
-                              >
-                                {tender.title}
-                              </Link>
-                            </TableCell>
-                            <TableCell>{resolveCategoryName(tender)}</TableCell>
-                            <TableCell>{tender.location || "—"}</TableCell>
-                            <TableCell>
-                              {resolveBudget(tender) > 0
-                                ? `${new Intl.NumberFormat().format(
-                                    resolveBudget(tender)
-                                  )} QAR`
-                                : "Not specified"}
-                            </TableCell>
-                            <TableCell className="text-gray-600 text-sm line-clamp-1 max-w-xs">
-                              {tender.description || "No description."}
-                            </TableCell>
-                            <TableCell>
-                              {parseDeadline(tender)?.toLocaleDateString() ||
-                                "—"}
+                      </TableHeader>
+                      <TableBody>
+                        {tendersWithNoBids.length === 0 ? (
+                          <TableRow>
+                            <TableCell
+                              colSpan={6}
+                              className="text-center py-12 text-gray-500"
+                            >
+                              <CheckCircle className="w-12 h-12 mx-auto text-green-300 mb-4" />
+                              <p className="text-lg">
+                                All tenders have received bids!
+                              </p>
                             </TableCell>
                           </TableRow>
-                        ))
-                      )}
-                    </TableBody>
-                  </Table>
+                        ) : (
+                          tendersWithNoBids.map((tender) => (
+                            <TableRow
+                              key={tender._id}
+                              className="hover:bg-gray-50/50 cursor-pointer border-gray-100/60 transition-colors"
+                            >
+                              <TableCell>
+                                <Link
+                                  href={`/individual-dashboard/tender/${tender._id}`}
+                                  className="font-medium text-gray-900 hover:text-blue-600 transition-colors"
+                                >
+                                  {tender.title}
+                                </Link>
+                              </TableCell>
+                              <TableCell className="text-gray-600">
+                                {resolveCategoryName(tender)}
+                              </TableCell>
+                              <TableCell className="text-gray-600">
+                                {tender.location || "—"}
+                              </TableCell>
+                              <TableCell className="font-medium">
+                                {resolveBudget(tender) > 0
+                                  ? `${new Intl.NumberFormat().format(
+                                      resolveBudget(tender)
+                                    )} ${t("QAR")}`
+                                  : "Not specified"}
+                              </TableCell>
+                              <TableCell className="text-gray-600 text-sm line-clamp-1 max-w-xs">
+                                {tender.description || "No description."}
+                              </TableCell>
+                              <TableCell className="text-gray-600">
+                                {parseDeadline(tender)?.toLocaleDateString() ||
+                                  "—"}
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
                 </div>
               ) : activeTab === "awarded" ? (
                 <div>
-                  <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-lg font-medium text-gray-900">
+                  <div className="flex items-center justify-between mb-8">
+                    <h3 className="text-2xl font-semibold text-gray-900">
                       Awarded Projects
                     </h3>
                   </div>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Project</TableHead>
-                        <TableHead>Contractor</TableHead>
-                        <TableHead>Budget</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Deadline</TableHead>
-                        <TableHead>Action</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {awardedProjects.length === 0 ? (
-                        <TableRow>
-                          <TableCell
-                            colSpan={6}
-                            className="text-center py-8 text-gray-500"
-                          >
-                            No projects awarded yet.
-                          </TableCell>
+                  <div className="bg-white/90 rounded-2xl border border-gray-100/60 overflow-hidden">
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="border-gray-100/60 bg-gray-50/50">
+                          <TableHead className="font-semibold text-gray-700">
+                            Project
+                          </TableHead>
+                          <TableHead className="font-semibold text-gray-700">
+                            Contractor
+                          </TableHead>
+                          <TableHead className="font-semibold text-gray-700">
+                            Budget
+                          </TableHead>
+                          <TableHead className="font-semibold text-gray-700">
+                            Status
+                          </TableHead>
+                          <TableHead className="font-semibold text-gray-700">
+                            Deadline
+                          </TableHead>
+                          <TableHead className="font-semibold text-gray-700">
+                            Action
+                          </TableHead>
                         </TableRow>
-                      ) : (
-                        awardedProjects.map((tender) => (
-                          <TableRow key={tender._id}>
-                            <TableCell className="font-medium">
-                              {tender.title}
-                            </TableCell>
-                            <TableCell>Contractor Assigned</TableCell>
-                            <TableCell>
-                              {resolveBudget(tender) > 0
-                                ? `${new Intl.NumberFormat().format(
-                                    resolveBudget(tender)
-                                  )} QAR`
-                                : "—"}
-                            </TableCell>
-                            <TableCell>
-                              {getTenderStatusBadge(tender.status)}
-                            </TableCell>
-                            <TableCell>
-                              {parseDeadline(tender)?.toLocaleDateString() ||
-                                "—"}
-                            </TableCell>
-                            <TableCell>
-                              <Link
-                                href={`/individual-dashboard/chat/${tender._id}`}
-                                className="text-blue-500 hover:text-blue-600 text-sm"
-                              >
-                                Go to Chat
-                              </Link>
+                      </TableHeader>
+                      <TableBody>
+                        {awardedProjects.length === 0 ? (
+                          <TableRow>
+                            <TableCell
+                              colSpan={6}
+                              className="text-center py-12 text-gray-500"
+                            >
+                              <FileText className="w-12 h-12 mx-auto text-gray-300 mb-4" />
+                              <p className="text-lg">
+                                No projects awarded yet.
+                              </p>
                             </TableCell>
                           </TableRow>
-                        ))
-                      )}
-                    </TableBody>
-                  </Table>
+                        ) : (
+                          awardedProjects.map((tender) => (
+                            <TableRow
+                              key={tender._id}
+                              className="hover:bg-gray-50/50 border-gray-100/60 transition-colors"
+                            >
+                              <TableCell className="font-medium text-gray-900">
+                                {tender.title}
+                              </TableCell>
+                              <TableCell className="text-gray-600">
+                                Contractor Assigned
+                              </TableCell>
+                              <TableCell className="font-medium">
+                                {resolveBudget(tender) > 0
+                                  ? `${new Intl.NumberFormat().format(
+                                      resolveBudget(tender)
+                                    )} ${t("QAR")}`
+                                  : "—"}
+                              </TableCell>
+                              <TableCell>
+                                {getTenderStatusBadge(tender.status)}
+                              </TableCell>
+                              <TableCell className="text-gray-600">
+                                {parseDeadline(tender)?.toLocaleDateString() ||
+                                  "—"}
+                              </TableCell>
+                              <TableCell>
+                                <Link
+                                  href={`/individual-dashboard/chat/${tender._id}`}
+                                  className="text-blue-600 hover:text-blue-700 font-medium bg-blue-50/80 px-3 py-1 rounded-lg transition-colors"
+                                >
+                                  Go to Chat
+                                </Link>
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
                 </div>
               ) : null}
             </motion.div>
-          </div>
+          </motion.div>
 
           <CreateTenderModal
             open={openTenderModal}

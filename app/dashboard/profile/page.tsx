@@ -417,26 +417,7 @@ export default function Component() {
           <div className="pb-6 mb-6 border-b border-gray-200">
             <div className="flex flex-col sm:flex-row items-center justify-between flex-wrap gap-4">
               <div className="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
-                <div className="relative">
-                  <Avatar className="w-20 h-20 md:w-28 md:h-28">
-                    <AvatarImage
-                      src="/placeholder.svg?height=112&width=112"
-                      alt={t("user_avatar")}
-                    />
-                    <AvatarFallback>
-                      {(
-                        profileData.fullName || profileData.companyName
-                      )?.charAt(0) || "U"}
-                    </AvatarFallback>
-                  </Avatar>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="absolute bottom-0 right-0 rounded-full bg-white border border-gray-200 shadow-sm w-8 h-8 md:w-9 md:h-9"
-                  >
-                    <Camera className="w-4 h-4 md:w-5 md:h-5 text-gray-600" />
-                  </Button>
-                </div>
+             
                 <div>
                   <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
                     {profileData.fullName ||

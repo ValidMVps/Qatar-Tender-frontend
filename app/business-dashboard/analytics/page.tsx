@@ -334,7 +334,6 @@ export default function page() {
       (b) => b.status === "accepted" || b.status === "completed"
     ).length;
     const completedBids = bids.filter((b) => b.status === "completed").length;
-    // Calculate additional stats
     const totalBidsReceived = tenders.reduce(
       (sum, tender) => sum + (tender.bidCount || 0),
       0
@@ -369,7 +368,7 @@ export default function page() {
       setError(null);
       try {
         const userId = user?._id;
-        if (!userId) throw new Error("User not found. Please log in again.");
+        if (!userId) throw new Error(t("user_not_found_please_log_in_again"));
 
         const [tendersResponse, bidsResponse] = await Promise.all([
           getUserTenders(userId),
@@ -402,8 +401,8 @@ export default function page() {
         setBidStatusTimelineData(processedBidStatusTimelineData);
         setStats(calculateStats(tenders, bids));
       } catch (err) {
-        console.error("Failed to fetch ", err);
-        setError(err instanceof Error ? err.message : "Failed to load data");
+        console.error(t("failed_to_fetch"), err);
+        setError(err instanceof Error ? err.message : t("failed_to_load_data"));
         setChartData([]);
         setBidSuccessData([]);
         setTopTendersByBids([]);
@@ -431,7 +430,7 @@ export default function page() {
     };
 
     fetchData();
-  }, [timeRange]);
+  }, [timeRange, t]);
 
   const filteredData = React.useMemo(() => {
     if (!chartData.length) return [];
@@ -444,7 +443,7 @@ export default function page() {
       <div className="w-full h-full flex items-center justify-center h-[400px]">
         <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
         <span className="ml-2 text-sm text-gray-500">
-          Loading dashboard data...
+          {t("loading_dashboard_data")}
         </span>
       </div>
     );
@@ -456,21 +455,21 @@ export default function page() {
       <div className="flex items-center justify-between border-b pb-4">
         <div className="grid flex-1 gap-1">
           <h3 className="text-xl font-semibold text-gray-900">
-            Activity Overview
+            {t("activity_overview")}
           </h3>
           <p className="text-sm text-gray-500">
             {error
-              ? "Error loading data - please check your connection"
-              : "Your tender and bidding activity"}
+              ? t("error_loading_data_please_check_your_connection")
+              : t("your_tender_and_bidding_activity")}
           </p>
         </div>
         <Select value={timeRange} onValueChange={setTimeRange}>
           <SelectTrigger className="w-[160px] rounded-full bg-gray-100 border-0">
-            <SelectValue placeholder="Last 3 months" />
+            <SelectValue placeholder={t("last_3_months")} />
           </SelectTrigger>
           <SelectContent className="rounded-xl">
-            <SelectItem value="4d">Last 4 days</SelectItem>
-            <SelectItem value="7d">Last 7 days</SelectItem>
+            <SelectItem value="4d">{t("last_4_days")}</SelectItem>
+            <SelectItem value="7d">{t("last_7_days")}</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -487,7 +486,7 @@ export default function page() {
         <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-blue-800">
-              Tenders Posted
+              {t("tenders_posted")}
             </CardTitle>
             <Calendar className="h-5 w-5 text-blue-600" />
           </CardHeader>
@@ -496,7 +495,7 @@ export default function page() {
               {stats.totalTenders}
             </div>
             <p className="text-xs text-blue-700 mt-1">
-              {stats.activeTenders} active
+              {stats.activeTenders} {t("active")}
             </p>
           </CardContent>
         </Card>
@@ -505,7 +504,7 @@ export default function page() {
         <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-purple-800">
-              Bids Placed
+              {t("bids_placed")}
             </CardTitle>
             <TrendingUp className="h-5 w-5 text-purple-600" />
           </CardHeader>
@@ -514,7 +513,7 @@ export default function page() {
               {stats.totalBids}
             </div>
             <p className="text-xs text-purple-700 mt-1">
-              {stats.pendingBids} Not Accepted Yet
+              {stats.pendingBids} {t("not_accepted_yet")}
             </p>
           </CardContent>
         </Card>
@@ -523,7 +522,7 @@ export default function page() {
         <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-green-800">
-              Bids Won
+              {t("bids_won")}
             </CardTitle>
             <Award className="h-5 w-5 text-green-600" />
           </CardHeader>
@@ -532,7 +531,7 @@ export default function page() {
               {stats.acceptedBids + stats.completedBids}
             </div>
             <p className="text-xs text-green-700 mt-1">
-              Win rate:{" "}
+              {t("win_rate")}:{" "}
               {stats.totalBids > 0
                 ? Math.round(
                     ((stats.acceptedBids + stats.completedBids) /
@@ -545,11 +544,11 @@ export default function page() {
           </CardContent>
         </Card>
 
-        {/* Win Rate */}
+        {/* Avg Bids Per Project */}
         <Card className="bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-amber-800">
-              Avg Bids Per Project
+              {t("avg_bids_per_project")}
             </CardTitle>
             <CheckCircle className="h-5 w-5 text-amber-600" />
           </CardHeader>
@@ -558,7 +557,7 @@ export default function page() {
               {stats.avgBidsPerProject}
             </div>
             <p className="text-xs text-amber-700 mt-1">
-              {stats.projectsWithNoBids} projects with no bids
+              {stats.projectsWithNoBids} {t("projects_with_no_bids")}
             </p>
           </CardContent>
         </Card>
@@ -569,7 +568,7 @@ export default function page() {
         {/* Timeline Chart */}
         <div className="bg-white p-4 rounded-2xl shadow-sm">
           <h4 className="text-md font-semibold mb-4 text-gray-900 px-2">
-            Activity Timeline
+            {t("activity_timeline")}
           </h4>
           <ChartContainer config={chartConfig} className="w-full h-[280px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -655,7 +654,7 @@ export default function page() {
         {/* Bid Success Chart */}
         <div className="bg-white p-4 rounded-2xl shadow-sm">
           <h4 className="text-md font-semibold mb-4 text-gray-900 px-2">
-            Bid Success Rate
+            {t("bid_success_rate")}
           </h4>
           <ChartContainer config={chartConfig} className="w-full h-[280px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -715,7 +714,9 @@ export default function page() {
                       indicator="dot"
                       formatter={(value, name) => [
                         value,
-                        name === "bidsPlaced" ? "Bids Placed" : "Bids Won",
+                        name === "bidsPlaced"
+                          ? t("bids_placed")
+                          : t("bids_won"),
                       ]}
                       className="bg-white shadow-lg rounded-xl border border-gray-200"
                     />
@@ -745,7 +746,7 @@ export default function page() {
         {/* Bid Status Timeline */}
         <div className="bg-white p-4 rounded-2xl shadow-sm">
           <h4 className="text-md font-semibold mb-4 text-gray-900 px-2">
-            Bid Status Timeline
+            {t("bid_status_timeline")}
           </h4>
           <ChartContainer config={chartConfig} className="w-full h-[280px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -823,7 +824,7 @@ export default function page() {
         {/* Average Bid Value Over Time */}
         <div className="bg-white p-4 rounded-2xl shadow-sm">
           <h4 className="text-md font-semibold mb-4 text-gray-900 px-2">
-            Average Bid Value Over Time
+            {t("average_bid_value_over_time")}
           </h4>
           <ChartContainer config={chartConfig} className="w-full h-[280px]">
             <ResponsiveContainer width="100%" height="100%">

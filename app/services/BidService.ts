@@ -84,8 +84,9 @@ export const updateBid = async (
 // NEW: Update bid status (specifically for accepting/rejecting bids)
 export const updateBidStatus = async (
   bidId: string,
-  status: "accepted" | "rejected" | "under_review" | "submitted" | "completed"
+  status: "accepted" | "rejected" | "submitted" | "completed"
 ) => {
+  console.log("Updating bid status:", bidId, status);
   try {
     const res = await api.put(`/api/bids/${bidId}/status`, { status });
     return res.data;
