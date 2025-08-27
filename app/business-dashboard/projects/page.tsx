@@ -15,6 +15,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useTranslation } from "react-i18next";
 import { getUserBids } from "@/app/services/BidService";
 import { ProjectDetailsSidebarawarded } from "@/components/project-details-sidebar-awarded";
+import PageTransitionWrapper from "@/components/animations/PageTransitionWrapper";
 
 type Tender = {
   id: string;
@@ -176,125 +177,17 @@ export default function Component() {
   }
 
   return (
-    <Tabs
-      value={activeTab}
-      onValueChange={setActiveTab}
-      className="h-full flex flex-col"
-    >
-      <TabsContent value="owned" className="flex-1 overflow-hidden">
-        <div className="flex w-full flex-col h-[100%] py-0 md:py-5 md:h-[calc(100vh-85px)] overflow-hidden">
-          <div className="grid flex-1 h-full overflow-hidden grid-cols-1 md:grid-cols-12 border">
-            {/* Left Sidebar - Project List (Desktop) */}
-            <div className="hidden flex-col h-full border-r bg-background md:flex md:col-span-3">
-              <div className="flex items-center h-16 justify-between px-4 py-3 border-b">
-                <div className="flex items-center gap-2">
-                  <Inbox className="h-5 w-5 text-muted-foreground" />
-                  <span className="font-semibold">{t("inbox")}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-muted-foreground">
-                    {t("all")}
-                  </span>
-                  <Switch />
-                  <span className="text-sm text-muted-foreground">
-                    {t("unread")}
-                  </span>
-                </div>
-              </div>
-              <div className="px-4 py-3 border-b">
-                <TabsList className="w-full">
-                  <TabsTrigger value="owned" className="flex-1">
-                    {t("owned_projects")}
-                  </TabsTrigger>
-                  <TabsTrigger value="awarded" className="flex-1">
-                    {t("awarded_projects")}
-                  </TabsTrigger>
-                </TabsList>
-              </div>
-              <div className="flex items-center mt-2 gap-2 p-4">
-                <div className="relative w-full">
-                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    placeholder={t("search_projects")}
-                    type="search"
-                    className="pl-9"
-                  />
-                </div>
-              </div>
-              <div className="flex-1 overflow-auto">
-                <nav className="grid gap-1 px-4 text-sm font-medium">
-                  {tenders.length === 0 ? (
-                    <div className="text-center py-4 text-muted-foreground">
-                      {t("no_projects_found")}
-                    </div>
-                  ) : (
-                    tenders.map((tender) => (
-                      <Link
-                        key={tender.id}
-                        href="#"
-                        className={`flex flex-col gap-1 rounded-lg border p-3 hover:bg-muted/90 ${
-                          selectedTender?.id === tender.id ? "bg-muted" : ""
-                        }`}
-                        prefetch={false}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setSelectedTender(tender);
-                        }}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="font-semibold">{tender.title}</div>
-                          <div className="text-xs text-muted-foreground">
-                            {formatDate(tender.createdAt)}
-                          </div>
-                        </div>
-                        <div className="text-sm text-muted-foreground line-clamp-2">
-                          {tender.description}
-                        </div>
-                        <div className="flex flex-wrap gap-2 pt-2">
-                          <Badge variant="secondary">
-                            {tender.status === "awarded"
-                              ? t("awarded")
-                              : tender.status === "completed"
-                              ? t("completed")
-                              : t("active")}
-                          </Badge>
-                        </div>
-                      </Link>
-                    ))
-                  )}
-                </nav>
-              </div>
-            </div>
-
-            <ChatSection
-              className="col-span-full md:col-span-9 lg:col-span-6"
-              onOpenProjectList={() => setIsProjectListOpen(true)}
-              onOpenProjectDetails={() => setIsProjectDetailsOpen(true)}
-            />
-
-            <ProjectDetailsSidebar
-              className="hidden lg:flex lg:col-span-3"
-              selectedProject={
-                selectedTender
-                  ? {
-                      id: selectedTender.id,
-                      title: selectedTender.title,
-                      description: selectedTender.description,
-                      budget: selectedTender.budget,
-                      status: selectedTender.status,
-                      startDate: selectedTender.startDate,
-                      awardedTo: selectedTender.awardedTo,
-                    }
-                  : null
-              }
-              getStatusColor={getStatusColor}
-              onMarkComplete={() => setIsReviewDialogOpen(true)}
-            />
-          </div>
-
-          <Sheet open={isProjectListOpen} onOpenChange={setIsProjectListOpen}>
-            <SheetContent side="left" className="w-64 p-0 sm:w-80">
-              <div className="flex flex-col h-full bg-background">
+    <PageTransitionWrapper>
+      <Tabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="h-full flex flex-col"
+      >
+        <TabsContent value="owned" className="flex-1 overflow-hidden">
+          <div className="flex w-full flex-col h-[100%] py-0 md:py-5 md:h-[calc(100vh-85px)] overflow-hidden">
+            <div className="grid flex-1 h-full overflow-hidden grid-cols-1 md:grid-cols-12 border">
+              {/* Left Sidebar - Project List (Desktop) */}
+              <div className="hidden flex-col h-full border-r bg-background md:flex md:col-span-3">
                 <div className="flex items-center h-16 justify-between px-4 py-3 border-b">
                   <div className="flex items-center gap-2">
                     <Inbox className="h-5 w-5 text-muted-foreground" />
@@ -309,6 +202,16 @@ export default function Component() {
                       {t("unread")}
                     </span>
                   </div>
+                </div>
+                <div className="px-4 py-3 border-b">
+                  <TabsList className="w-full">
+                    <TabsTrigger value="owned" className="flex-1">
+                      {t("owned_projects")}
+                    </TabsTrigger>
+                    <TabsTrigger value="awarded" className="flex-1">
+                      {t("awarded_projects")}
+                    </TabsTrigger>
+                  </TabsList>
                 </div>
                 <div className="flex items-center mt-2 gap-2 p-4">
                   <div className="relative w-full">
@@ -338,7 +241,6 @@ export default function Component() {
                           onClick={(e) => {
                             e.preventDefault();
                             setSelectedTender(tender);
-                            setIsProjectListOpen(false);
                           }}
                         >
                           <div className="flex items-center justify-between">
@@ -365,15 +267,15 @@ export default function Component() {
                   </nav>
                 </div>
               </div>
-            </SheetContent>
-          </Sheet>
 
-          <Sheet
-            open={isProjectDetailsOpen}
-            onOpenChange={setIsProjectDetailsOpen}
-          >
-            <SheetContent side="right" className="w-64 p-0 sm:w-80">
+              <ChatSection
+                className="col-span-full md:col-span-9 lg:col-span-6"
+                onOpenProjectList={() => setIsProjectListOpen(true)}
+                onOpenProjectDetails={() => setIsProjectDetailsOpen(true)}
+              />
+
               <ProjectDetailsSidebar
+                className="hidden lg:flex lg:col-span-3"
                 selectedProject={
                   selectedTender
                     ? {
@@ -383,135 +285,127 @@ export default function Component() {
                         budget: selectedTender.budget,
                         status: selectedTender.status,
                         startDate: selectedTender.startDate,
-                        awardedTo: getAwardedToName(selectedTender.awardedTo),
+                        awardedTo: selectedTender.awardedTo,
                       }
                     : null
                 }
                 getStatusColor={getStatusColor}
-                onMarkComplete={() => {
-                  setIsReviewDialogOpen(true);
-                  setIsProjectDetailsOpen(false);
-                }}
+                onMarkComplete={() => setIsReviewDialogOpen(true)}
               />
-            </SheetContent>
-          </Sheet>
-        </div>
-      </TabsContent>
-
-      <TabsContent value="awarded" className="flex-1 overflow-hidden">
-        <div className="flex w-full flex-col h-[100%] py-0 md:py-5 md:h-[calc(100vh-85px)] overflow-hidden">
-          <div className="grid flex-1 h-full overflow-hidden grid-cols-1 md:grid-cols-12 border">
-            <div className="hidden flex-col h-full border-r bg-background md:flex md:col-span-3">
-              <div className="flex items-center h-16 justify-between px-4 py-3 border-b">
-                <div className="flex items-center gap-2">
-                  <Inbox className="h-5 w-5 text-muted-foreground" />
-                  <span className="font-semibold">{t("inbox")}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-muted-foreground">
-                    {t("all")}
-                  </span>
-                  <Switch />
-                  <span className="text-sm text-muted-foreground">
-                    {t("unread")}
-                  </span>
-                </div>
-              </div>
-              <div className="px-4 py-3 border-b">
-                <TabsList className="w-full">
-                  <TabsTrigger value="owned" className="flex-1">
-                    {t("owned_projects")}
-                  </TabsTrigger>
-                  <TabsTrigger value="awarded" className="flex-1">
-                    {t("awarded_to_me")}
-                  </TabsTrigger>
-                </TabsList>
-              </div>
-              <div className="flex items-center mt-2 gap-2 p-4">
-                <div className="relative w-full">
-                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    placeholder={t("search_projects")}
-                    type="search"
-                    className="pl-9"
-                  />
-                </div>
-              </div>
-              <div className="flex-1 overflow-auto">
-                <nav className="grid gap-1 px-4 text-sm font-medium">
-                  {tenders.length === 0 ? (
-                    <div className="text-center py-4 text-muted-foreground">
-                      {t("no_projects_found")}
-                    </div>
-                  ) : (
-                    awardedtome.map((tender) => (
-                      <Link
-                        key={tender.id}
-                        href="#"
-                        className={`flex flex-col gap-1 rounded-lg border w-full p-3 hover:bg-muted/90 ${
-                          selectedTender?.id === tender.id ? "bg-muted" : ""
-                        }`}
-                        prefetch={false}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setSelectedTender(tender);
-                        }}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="font-semibold">{tender.title}</div>
-                          <div className="text-xs text-muted-foreground">
-                            {formatDate(tender.createdAt)}
-                          </div>
-                        </div>
-                        <div className="text-sm w-[300] overflow-hidden text-muted-foreground line-clamp-2">
-                          {tender.description}
-                        </div>
-                        <div className="flex flex-wrap gap-2 pt-2">
-                          <Badge variant="secondary">
-                            {tender.status === "awarded"
-                              ? t("awarded")
-                              : tender.status === "completed"
-                              ? t("completed")
-                              : t("active")}
-                          </Badge>
-                        </div>
-                      </Link>
-                    ))
-                  )}
-                </nav>
-              </div>
             </div>
 
-            <ChatSection
-              className="col-span-full md:col-span-9 lg:col-span-6"
-              onOpenProjectList={() => setIsProjectListOpen(true)}
-              onOpenProjectDetails={() => setIsProjectDetailsOpen(true)}
-            />
+            <Sheet open={isProjectListOpen} onOpenChange={setIsProjectListOpen}>
+              <SheetContent side="left" className="w-64 p-0 sm:w-80">
+                <div className="flex flex-col h-full bg-background">
+                  <div className="flex items-center h-16 justify-between px-4 py-3 border-b">
+                    <div className="flex items-center gap-2">
+                      <Inbox className="h-5 w-5 text-muted-foreground" />
+                      <span className="font-semibold">{t("inbox")}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-muted-foreground">
+                        {t("all")}
+                      </span>
+                      <Switch />
+                      <span className="text-sm text-muted-foreground">
+                        {t("unread")}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-center mt-2 gap-2 p-4">
+                    <div className="relative w-full">
+                      <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        placeholder={t("search_projects")}
+                        type="search"
+                        className="pl-9"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex-1 overflow-auto">
+                    <nav className="grid gap-1 px-4 text-sm font-medium">
+                      {tenders.length === 0 ? (
+                        <div className="text-center py-4 text-muted-foreground">
+                          {t("no_projects_found")}
+                        </div>
+                      ) : (
+                        tenders.map((tender) => (
+                          <Link
+                            key={tender.id}
+                            href="#"
+                            className={`flex flex-col gap-1 rounded-lg border p-3 hover:bg-muted/90 ${
+                              selectedTender?.id === tender.id ? "bg-muted" : ""
+                            }`}
+                            prefetch={false}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setSelectedTender(tender);
+                              setIsProjectListOpen(false);
+                            }}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="font-semibold">
+                                {tender.title}
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                {formatDate(tender.createdAt)}
+                              </div>
+                            </div>
+                            <div className="text-sm text-muted-foreground line-clamp-2">
+                              {tender.description}
+                            </div>
+                            <div className="flex flex-wrap gap-2 pt-2">
+                              <Badge variant="secondary">
+                                {tender.status === "awarded"
+                                  ? t("awarded")
+                                  : tender.status === "completed"
+                                  ? t("completed")
+                                  : t("active")}
+                              </Badge>
+                            </div>
+                          </Link>
+                        ))
+                      )}
+                    </nav>
+                  </div>
+                </div>
+              </SheetContent>
+            </Sheet>
 
-            <ProjectDetailsSidebarawarded
-              className="hidden lg:flex lg:col-span-3"
-              selectedProject={
-                selectedTender
-                  ? {
-                      id: selectedTender.id,
-                      title: selectedTender.title,
-                      description: selectedTender.description,
-                      budget: selectedTender.budget,
-                      status: selectedTender.status,
-                      startDate: selectedTender.startDate,
-                      awardedTo: getAwardedToName(selectedTender.awardedTo),
-                      postedBy: selectedTender.postedBy,
-                    }
-                  : null
-              }
-              getStatusColor={getStatusColor}
-              currentUserId={user._id}
-            />
+            <Sheet
+              open={isProjectDetailsOpen}
+              onOpenChange={setIsProjectDetailsOpen}
+            >
+              <SheetContent side="right" className="w-64 p-0 sm:w-80">
+                <ProjectDetailsSidebar
+                  selectedProject={
+                    selectedTender
+                      ? {
+                          id: selectedTender.id,
+                          title: selectedTender.title,
+                          description: selectedTender.description,
+                          budget: selectedTender.budget,
+                          status: selectedTender.status,
+                          startDate: selectedTender.startDate,
+                          awardedTo: getAwardedToName(selectedTender.awardedTo),
+                        }
+                      : null
+                  }
+                  getStatusColor={getStatusColor}
+                  onMarkComplete={() => {
+                    setIsReviewDialogOpen(true);
+                    setIsProjectDetailsOpen(false);
+                  }}
+                />
+              </SheetContent>
+            </Sheet>
           </div>
+        </TabsContent>
 
-          <Sheet open={isProjectListOpen} onOpenChange={setIsProjectListOpen}>
-            <SheetContent side="left" className="w-64 p-0 sm:w-80">
-              <div className="flex flex-col h-full bg-background">
+        <TabsContent value="awarded" className="flex-1 overflow-hidden">
+          <div className="flex w-full flex-col h-[100%] py-0 md:py-5 md:h-[calc(100vh-85px)] overflow-hidden">
+            <div className="grid flex-1 h-full overflow-hidden grid-cols-1 md:grid-cols-12 border">
+              <div className="hidden flex-col h-full border-r bg-background md:flex md:col-span-3">
                 <div className="flex items-center h-16 justify-between px-4 py-3 border-b">
                   <div className="flex items-center gap-2">
                     <Inbox className="h-5 w-5 text-muted-foreground" />
@@ -526,6 +420,16 @@ export default function Component() {
                       {t("unread")}
                     </span>
                   </div>
+                </div>
+                <div className="px-4 py-3 border-b">
+                  <TabsList className="w-full">
+                    <TabsTrigger value="owned" className="flex-1">
+                      {t("owned_projects")}
+                    </TabsTrigger>
+                    <TabsTrigger value="awarded" className="flex-1">
+                      {t("awarded_to_me")}
+                    </TabsTrigger>
+                  </TabsList>
                 </div>
                 <div className="flex items-center mt-2 gap-2 p-4">
                   <div className="relative w-full">
@@ -544,18 +448,17 @@ export default function Component() {
                         {t("no_projects_found")}
                       </div>
                     ) : (
-                      tenders.map((tender) => (
+                      awardedtome.map((tender) => (
                         <Link
                           key={tender.id}
                           href="#"
-                          className={`flex flex-col gap-1 rounded-lg border p-3 hover:bg-muted/90 ${
+                          className={`flex flex-col gap-1 rounded-lg border w-full p-3 hover:bg-muted/90 ${
                             selectedTender?.id === tender.id ? "bg-muted" : ""
                           }`}
                           prefetch={false}
                           onClick={(e) => {
                             e.preventDefault();
                             setSelectedTender(tender);
-                            setIsProjectListOpen(false);
                           }}
                         >
                           <div className="flex items-center justify-between">
@@ -564,7 +467,7 @@ export default function Component() {
                               {formatDate(tender.createdAt)}
                             </div>
                           </div>
-                          <div className="text-sm text-muted-foreground line-clamp-2">
+                          <div className="text-sm w-[300] overflow-hidden text-muted-foreground line-clamp-2">
                             {tender.description}
                           </div>
                           <div className="flex flex-wrap gap-2 pt-2">
@@ -582,14 +485,13 @@ export default function Component() {
                   </nav>
                 </div>
               </div>
-            </SheetContent>
-          </Sheet>
 
-          <Sheet
-            open={isProjectDetailsOpen}
-            onOpenChange={setIsProjectDetailsOpen}
-          >
-            <SheetContent side="right" className="w-64 p-0 sm:w-80">
+              <ChatSection
+                className="col-span-full md:col-span-9 lg:col-span-6"
+                onOpenProjectList={() => setIsProjectListOpen(true)}
+                onOpenProjectDetails={() => setIsProjectDetailsOpen(true)}
+              />
+
               <ProjectDetailsSidebarawarded
                 className="hidden lg:flex lg:col-span-3"
                 selectedProject={
@@ -609,10 +511,115 @@ export default function Component() {
                 getStatusColor={getStatusColor}
                 currentUserId={user._id}
               />
-            </SheetContent>
-          </Sheet>
-        </div>
-      </TabsContent>
-    </Tabs>
+            </div>
+
+            <Sheet open={isProjectListOpen} onOpenChange={setIsProjectListOpen}>
+              <SheetContent side="left" className="w-64 p-0 sm:w-80">
+                <div className="flex flex-col h-full bg-background">
+                  <div className="flex items-center h-16 justify-between px-4 py-3 border-b">
+                    <div className="flex items-center gap-2">
+                      <Inbox className="h-5 w-5 text-muted-foreground" />
+                      <span className="font-semibold">{t("inbox")}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-muted-foreground">
+                        {t("all")}
+                      </span>
+                      <Switch />
+                      <span className="text-sm text-muted-foreground">
+                        {t("unread")}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-center mt-2 gap-2 p-4">
+                    <div className="relative w-full">
+                      <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        placeholder={t("search_projects")}
+                        type="search"
+                        className="pl-9"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex-1 overflow-auto">
+                    <nav className="grid gap-1 px-4 text-sm font-medium">
+                      {tenders.length === 0 ? (
+                        <div className="text-center py-4 text-muted-foreground">
+                          {t("no_projects_found")}
+                        </div>
+                      ) : (
+                        tenders.map((tender) => (
+                          <Link
+                            key={tender.id}
+                            href="#"
+                            className={`flex flex-col gap-1 rounded-lg border p-3 hover:bg-muted/90 ${
+                              selectedTender?.id === tender.id ? "bg-muted" : ""
+                            }`}
+                            prefetch={false}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setSelectedTender(tender);
+                              setIsProjectListOpen(false);
+                            }}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="font-semibold">
+                                {tender.title}
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                {formatDate(tender.createdAt)}
+                              </div>
+                            </div>
+                            <div className="text-sm text-muted-foreground line-clamp-2">
+                              {tender.description}
+                            </div>
+                            <div className="flex flex-wrap gap-2 pt-2">
+                              <Badge variant="secondary">
+                                {tender.status === "awarded"
+                                  ? t("awarded")
+                                  : tender.status === "completed"
+                                  ? t("completed")
+                                  : t("active")}
+                              </Badge>
+                            </div>
+                          </Link>
+                        ))
+                      )}
+                    </nav>
+                  </div>
+                </div>
+              </SheetContent>
+            </Sheet>
+
+            <Sheet
+              open={isProjectDetailsOpen}
+              onOpenChange={setIsProjectDetailsOpen}
+            >
+              <SheetContent side="right" className="w-64 p-0 sm:w-80">
+                <ProjectDetailsSidebarawarded
+                  className="hidden lg:flex lg:col-span-3"
+                  selectedProject={
+                    selectedTender
+                      ? {
+                          id: selectedTender.id,
+                          title: selectedTender.title,
+                          description: selectedTender.description,
+                          budget: selectedTender.budget,
+                          status: selectedTender.status,
+                          startDate: selectedTender.startDate,
+                          awardedTo: getAwardedToName(selectedTender.awardedTo),
+                          postedBy: selectedTender.postedBy,
+                        }
+                      : null
+                  }
+                  getStatusColor={getStatusColor}
+                  currentUserId={user._id}
+                />
+              </SheetContent>
+            </Sheet>
+          </div>
+        </TabsContent>
+      </Tabs>
+    </PageTransitionWrapper>
   );
 }

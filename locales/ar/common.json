@@ -1180,5 +1180,8 @@
   "activity_timeline": "جدول النشاط",
   "bid_success_rate": "معدل نجاح العطاءات",
   "bid_status_timeline": "جدول حالة العطاءات",
-  "average_bid_value_over_time": "متوسط قيمة العطاءات بمرور الوقت"
+  "average_bid_value_over_time": "متوسط قيمة العطاءات بمرور الوقت",
+  "go_to_chat": "اذهب إلى الدردشة",
+  "this_will_permanently_remove_your_bid": "سيؤدي ذلك إلى إزالة عرضك بشكل دائم.",
+  "delete_forever": "احذف إلى الأبد"
 }

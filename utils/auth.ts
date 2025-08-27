@@ -51,14 +51,32 @@ class AuthService {
 
       return { success: false, error: "No access token received" };
     } catch (error: any) {
-      return {
-        success: false,
-        error: error.response?.data?.message || "Login failed",
-      };
+      let errorMessage = "Login failed. Please try again.";
+
+      if (error.response) {
+        // Backend returned an error response
+        if (error.response.data?.message) {
+          errorMessage = error.response.data.message;
+        } else if (error.response.status === 401) {
+          errorMessage = "Invalid credentials or account not verified.";
+        } else if (error.response.status >= 500) {
+          errorMessage = "Server error. Please try again later.";
+        }
+      } else if (error.request) {
+        // No response from backend
+        errorMessage =
+          "No response from server. Check your network connection.";
+      } else {
+        // Something went wrong setting up the request
+        errorMessage = error.message || "Unexpected error occurred.";
+      }
+
+      return { success: false, error: errorMessage };
     }
   }
 
   async logout() {
+    console.log("Logging out...");
     try {
       await api.post("/api/users/logout");
     } catch (error) {
@@ -166,6 +184,21 @@ class AuthService {
     } catch (error) {
       console.error("Token refresh failed:", error);
       return false;
+    }
+  }
+  async changePassword(currentPassword: string, newPassword: string) {
+    try {
+      const response = await api.patch("/api/users/change-password", {
+        currentPassword,
+        newPassword,
+      });
+
+      return { success: true, message: response.data.message };
+    } catch (error: any) {
+      return {
+        success: false,
+        error: error.response?.data?.message || "Failed to change password",
+      };
     }
   }
 }

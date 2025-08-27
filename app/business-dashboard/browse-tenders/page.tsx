@@ -37,6 +37,7 @@ import Link from "next/link";
 import { useTranslation } from "../../../lib/hooks/useTranslation";
 import { getActiveTenders } from "@/app/services/tenderService";
 import { useAuth } from "@/context/AuthContext";
+import PageTransitionWrapper from "@/components/animations/PageTransitionWrapper";
 
 export default function ServiceProvidingDashboardPage() {
   const { t } = useTranslation();
@@ -529,404 +530,407 @@ export default function ServiceProvidingDashboardPage() {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br pb-10 ">
-      <TooltipProvider>
-        {/* Header */}
-        <div className="bg-white/80 backdrop-blur-xl border-b border-gray-100/50 sticky top-0 z-50">
-          <div className="container mx-auto px-0 py-4">
-            <div className="flex items-center justify-between gap-6">
-              <div className="relative flex-1 max-w-2xl">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                <Input
-                  type="text"
-                  placeholder={t("search_tenders") || "Search tenders..."}
-                  className="pl-12 pr-12 py-4 bg-gray-50/80 border border-gray-200/50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all duration-300"
-                  value={searchTerm}
-                  onChange={(e) => {
-                    setSearchTerm(e.target.value);
-                    setCurrentPage(1);
-                  }}
-                />
-                {searchTerm && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="absolute right-4 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-gray-200 transition-colors duration-200"
-                    onClick={() => {
-                      setSearchTerm("");
+    <PageTransitionWrapper>
+      <div className="min-h-screen bg-gradient-to-br pb-10 ">
+        <TooltipProvider>
+          {/* Header */}
+          <div className="bg-white/80 backdrop-blur-xl border-b border-gray-100/50 sticky top-0 z-50">
+            <div className="container mx-auto px-0 py-4">
+              <div className="flex items-center justify-between gap-6">
+                <div className="relative flex-1 max-w-2xl">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <Input
+                    type="text"
+                    placeholder={t("search_tenders") || "Search tenders..."}
+                    className="pl-12 pr-12 py-4 bg-gray-50/80 border border-gray-200/50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all duration-300"
+                    value={searchTerm}
+                    onChange={(e) => {
+                      setSearchTerm(e.target.value);
                       setCurrentPage(1);
                     }}
-                  >
-                    <XCircle className="h-5 w-5 text-gray-400" />
-                  </Button>
-                )}
-              </div>
-
-              <div className="flex items-center gap-4">
-                <button
-                  onClick={() => setShowFilters(!showFilters)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all duration-300 ${
-                    showFilters
-                      ? "bg-blue-500 text-white shadow-lg shadow-blue-500/25"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
-                >
-                  <Filter className="h-4 w-4" />
-                  Filters
-                </button>
-
-                <div className="flex items-center bg-gray-100 rounded-xl p-1">
-                  <button
-                    onClick={() => setViewMode("grid")}
-                    className={`p-2 rounded-lg transition-all duration-200 ${
-                      viewMode === "grid"
-                        ? "bg-white text-blue-600 shadow-sm"
-                        : "text-gray-500"
-                    }`}
-                  >
-                    <Grid className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => setViewMode("list")}
-                    className={`p-2 rounded-lg transition-all duration-200 ${
-                      viewMode === "list"
-                        ? "bg-white text-blue-600 shadow-sm"
-                        : "text-gray-500"
-                    }`}
-                  >
-                    <List className="h-4 w-4" />
-                  </button>
+                  />
+                  {searchTerm && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-gray-200 transition-colors duration-200"
+                      onClick={() => {
+                        setSearchTerm("");
+                        setCurrentPage(1);
+                      }}
+                    >
+                      <XCircle className="h-5 w-5 text-gray-400" />
+                    </Button>
+                  )}
                 </div>
 
-        
+                <div className="flex items-center gap-4">
+                  <button
+                    onClick={() => setShowFilters(!showFilters)}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all duration-300 ${
+                      showFilters
+                        ? "bg-blue-500 text-white shadow-lg shadow-blue-500/25"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    }`}
+                  >
+                    <Filter className="h-4 w-4" />
+                    Filters
+                  </button>
 
-                <Select
-                  value={sortOption}
-                  onValueChange={(v) => setSortOption(v as any)}
-                >
-                  <SelectTrigger className="w-[220px] rounded-xl bg-white/70 border-gray-200/50">
-                    <SelectValue placeholder={t("sort_by_newest")} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="newest">
-                      {t("sort_by_newest")}
-                    </SelectItem>
-                    <SelectItem value="oldest">
-                      {t("sort_by_oldest")}
-                    </SelectItem>
-                    <SelectItem value="budget-high">
-                      {t("sort_by_budget_high_to_low")}
-                    </SelectItem>
-                    <SelectItem value="budget-low">
-                      {t("sort_by_budget_low_to_high")}
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
+                  <div className="flex items-center bg-gray-100 rounded-xl p-1">
+                    <button
+                      onClick={() => setViewMode("grid")}
+                      className={`p-2 rounded-lg transition-all duration-200 ${
+                        viewMode === "grid"
+                          ? "bg-white text-blue-600 shadow-sm"
+                          : "text-gray-500"
+                      }`}
+                    >
+                      <Grid className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => setViewMode("list")}
+                      className={`p-2 rounded-lg transition-all duration-200 ${
+                        viewMode === "list"
+                          ? "bg-white text-blue-600 shadow-sm"
+                          : "text-gray-500"
+                      }`}
+                    >
+                      <List className="h-4 w-4" />
+                    </button>
+                  </div>
+
+                  <Select
+                    value={sortOption}
+                    onValueChange={(v) => setSortOption(v as any)}
+                  >
+                    <SelectTrigger className="w-[220px] rounded-xl bg-white/70 border-gray-200/50">
+                      <SelectValue placeholder={t("sort_by_newest")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="newest">
+                        {t("sort_by_newest")}
+                      </SelectItem>
+                      <SelectItem value="oldest">
+                        {t("sort_by_oldest")}
+                      </SelectItem>
+                      <SelectItem value="budget-high">
+                        {t("sort_by_budget_high_to_low")}
+                      </SelectItem>
+                      <SelectItem value="budget-low">
+                        {t("sort_by_budget_low_to_high")}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <div className="container mx-auto px-0 py-4">
-          <div
-            className={!showFilters ? "flex  px-0 gap-2" : "flex  px-0 gap-6"}
-          >
-            {/* Filters Sidebar */}
+          <div className="container mx-auto px-0 py-4">
             <div
-              className={`transition-all duration-500 ${
-                showFilters
-                  ? "w-80 opacity-100"
-                  : "w-0 opacity-0 overflow-hidden"
-              }`}
+              className={!showFilters ? "flex  px-0 gap-2" : "flex  px-0 gap-6"}
             >
-              <div className="bg-white/70 backdrop-blur-xl rounded-md p-6  border border-gray-100  top-24">
-                <h2 className="font-bold text-xl text-gray-900 mb-6">
-                  Filters
-                </h2>
-
-                <Accordion
-                  type="multiple"
-                  defaultValue={[
-                    "category",
-                    "budget",
-                    "bids",
-                    "location",
-                    "deadline",
-                  ]}
-                >
-                  {/* Category */}
-                  <AccordionItem
-                    value="category"
-                    className="border-b border-gray-100"
-                  >
-                    <AccordionTrigger className="font-semibold text-gray-800 hover:no-underline py-4">
-                      {t("category") || "Category"}
-                    </AccordionTrigger>
-                    <AccordionContent className="pt-2 pb-4">
-                      <CheckboxGroup
-                        items={Array.from(
-                          new Set(
-                            tenders
-                              .map((t) => resolveCategoryName(t))
-                              .filter(Boolean)
-                          )
-                        ).slice(0, 50)}
-                        selected={selectedCategories}
-                        onToggle={toggleCategory}
-                      />
-                      {tenders.length === 0 && (
-                        <div className="text-sm text-gray-500">
-                          No categories
-                        </div>
-                      )}
-                    </AccordionContent>
-                  </AccordionItem>
-
-                  {/* Budget */}
-                  <AccordionItem
-                    value="budget"
-                    className="border-b border-gray-100"
-                  >
-                    <AccordionTrigger className="font-semibold text-gray-800 hover:no-underline py-4">
-                      {t("budget") || "Budget"}
-                    </AccordionTrigger>
-                    <AccordionContent className="pt-2 pb-4">
-                      <CheckboxGroup
-                        items={fixedPriceRanges}
-                        selected={selectedFixedPriceRange}
-                        onToggle={toggleFixedRange}
-                      />
-                    </AccordionContent>
-                  </AccordionItem>
-
-                  {/* Number of bids */}
-                  <AccordionItem
-                    value="bids"
-                    className="border-b border-gray-100"
-                  >
-                    <AccordionTrigger className="font-semibold text-gray-800 hover:no-underline py-4">
-                      {t("number_of_bids") || "Number of bids"}
-                    </AccordionTrigger>
-                    <AccordionContent className="pt-2 pb-4">
-                      <CheckboxGroup
-                        items={bidCounts}
-                        selected={selectedBidCounts}
-                        onToggle={toggleBidCount}
-                      />
-                    </AccordionContent>
-                  </AccordionItem>
-
-                  {/* Location */}
-                  <AccordionItem
-                    value="location"
-                    className="border-b border-gray-100"
-                  >
-                    <AccordionTrigger className="font-semibold text-gray-800 hover:no-underline py-4">
-                      {t("location") || "Location"}
-                    </AccordionTrigger>
-                    <AccordionContent className="pt-2 pb-4">
-                      <Select
-                        value={selectedLocation}
-                        onValueChange={(v) => onLocationChange(v)}
-                      >
-                        <SelectTrigger className="w-full rounded-xl bg-gray-50 border-gray-200">
-                          <SelectValue
-                            placeholder={
-                              t("select_location") || "Select location"
-                            }
-                          />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {locations.map((loc) => (
-                            <SelectItem key={loc} value={loc}>
-                              {loc === "all" ? "All Locations" : loc}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </AccordionContent>
-                  </AccordionItem>
-
-                  {/* Deadline */}
-                  <AccordionItem
-                    value="deadline"
-                    className="border-b border-gray-100"
-                  >
-                    <AccordionTrigger className="font-semibold text-gray-800 hover:no-underline py-4">
-                      {t("deadline") || "Deadline"}
-                    </AccordionTrigger>
-                    <AccordionContent className="pt-2 pb-4">
-                      <div className="flex flex-col space-y-3">
-                        {[
-                          { value: "any", label: t("any") || "Any" },
-                          {
-                            value: "7days",
-                            label: t("due_in_7_days") || "Due in 7 days",
-                          },
-                          {
-                            value: "30days",
-                            label: t("due_in_30_days") || "Due in 30 days",
-                          },
-                          {
-                            value: "over30",
-                            label: t("over_30_days") || "Over 30 days",
-                          },
-                          { value: "today", label: t("today") || "Today" },
-                          { value: "past", label: t("past") || "Past due" },
-                        ].map(({ value, label }) => {
-                          const id = `dl-${value}`;
-                          return (
-                            <label
-                              key={value}
-                              htmlFor={id}
-                              className="flex items-center gap-3 cursor-pointer group"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                onDeadlineChange(
-                                  value as typeof selectedDeadlineFilter
-                                );
-                              }}
-                            >
-                              <input
-                                id={id}
-                                type="radio"
-                                name="deadline"
-                                value={value}
-                                checked={selectedDeadlineFilter === value}
-                                onChange={() =>
-                                  onDeadlineChange(
-                                    value as typeof selectedDeadlineFilter
-                                  )
-                                }
-                                className="sr-only"
-                              />
-
-                              <div
-                                className={`w-5 h-5 rounded-full border-2 transition-all duration-200 flex items-center justify-center ${
-                                  selectedDeadlineFilter === value
-                                    ? "bg-blue-500 border-blue-500"
-                                    : "border-gray-300 group-hover:border-blue-400"
-                                }`}
-                              >
-                                {selectedDeadlineFilter === value && (
-                                  <div className="w-2 h-2 bg-white rounded-full"></div>
-                                )}
-                              </div>
-
-                              <span className="text-gray-700 text-sm group-hover:text-gray-900 transition-colors duration-200">
-                                {label}
-                              </span>
-                            </label>
-                          );
-                        })}
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
-
-                <div className="pt-4 border-t border-gray-100">
-                  <p className="text-sm font-medium text-gray-600">
-                    {sortedTenders.length} results
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Main Content */}
-            <div className="flex-1 ">
-              {/* Tender Listings */}
+              {/* Filters Sidebar */}
               <div
-                className={`${
-                  viewMode === "grid"
-                    ? "grid grid-cols-1 md:grid-cols-2 gap-6"
-                    : "space-y-4"
+                className={`transition-all duration-500 ${
+                  showFilters
+                    ? "w-80 opacity-100"
+                    : "w-0 opacity-0 overflow-hidden"
                 }`}
               >
-                {loading ? (
-                  <div className="col-span-full text-center py-16 bg-white/70 backdrop-blur-xl rounded-2xl border border-gray-100/50">
-                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-                    <p className="mt-4 text-gray-600">Loading tenders...</p>
-                  </div>
-                ) : error ? (
-                  <div className="col-span-full text-center py-16 bg-white/70 backdrop-blur-xl rounded-2xl border border-gray-100/50">
-                    <p className="text-red-600 font-medium">Error: {error}</p>
-                  </div>
-                ) : tendersToDisplay.length > 0 ? (
-                  tendersToDisplay.map((tender) => (
-                    <TenderCard
-                      key={tender._id || tender.id}
-                      tender={mapTenderForCard(tender)}
-                    />
-                  ))
-                ) : (
-                  <div className="col-span-full text-center py-16 bg-white/70 backdrop-blur-xl rounded-2xl border border-gray-100/50">
-                    <Search className="h-16 w-16 text-gray-300 mx-auto mb-6" />
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                      {t("no_tenders_found") || "No tenders found"}
-                    </h3>
-                    <p className="text-gray-600 mb-8">
-                      {t("adjust_filters_or_try_different_search") ||
-                        "Try adjusting your filters or search terms"}
+                <div className="bg-white/70 backdrop-blur-xl rounded-md p-6  border border-gray-100  top-24">
+                  <h2 className="font-bold text-xl text-gray-900 mb-6">
+                    Filters
+                  </h2>
+
+                  <Accordion
+                    type="multiple"
+                    defaultValue={[
+                      "category",
+                      "budget",
+                      "bids",
+                      "location",
+                      "deadline",
+                    ]}
+                  >
+                    {/* Category */}
+                    <AccordionItem
+                      value="category"
+                      className="border-b border-gray-100"
+                    >
+                      <AccordionTrigger className="font-semibold text-gray-800 hover:no-underline py-4">
+                        {t("category") || "Category"}
+                      </AccordionTrigger>
+                      <AccordionContent className="pt-2 pb-4">
+                        <CheckboxGroup
+                          items={Array.from(
+                            new Set(
+                              tenders
+                                .map((t) => resolveCategoryName(t))
+                                .filter(Boolean)
+                            )
+                          ).slice(0, 50)}
+                          selected={selectedCategories}
+                          onToggle={toggleCategory}
+                        />
+                        {tenders.length === 0 && (
+                          <div className="text-sm text-gray-500">
+                            No categories
+                          </div>
+                        )}
+                      </AccordionContent>
+                    </AccordionItem>
+
+                    {/* Budget */}
+                    <AccordionItem
+                      value="budget"
+                      className="border-b border-gray-100"
+                    >
+                      <AccordionTrigger className="font-semibold text-gray-800 hover:no-underline py-4">
+                        {t("budget") || "Budget"}
+                      </AccordionTrigger>
+                      <AccordionContent className="pt-2 pb-4">
+                        <CheckboxGroup
+                          items={fixedPriceRanges}
+                          selected={selectedFixedPriceRange}
+                          onToggle={toggleFixedRange}
+                        />
+                      </AccordionContent>
+                    </AccordionItem>
+
+                    {/* Number of bids */}
+                    <AccordionItem
+                      value="bids"
+                      className="border-b border-gray-100"
+                    >
+                      <AccordionTrigger className="font-semibold text-gray-800 hover:no-underline py-4">
+                        {t("number_of_bids") || "Number of bids"}
+                      </AccordionTrigger>
+                      <AccordionContent className="pt-2 pb-4">
+                        <CheckboxGroup
+                          items={bidCounts}
+                          selected={selectedBidCounts}
+                          onToggle={toggleBidCount}
+                        />
+                      </AccordionContent>
+                    </AccordionItem>
+
+                    {/* Location */}
+                    <AccordionItem
+                      value="location"
+                      className="border-b border-gray-100"
+                    >
+                      <AccordionTrigger className="font-semibold text-gray-800 hover:no-underline py-4">
+                        {t("location") || "Location"}
+                      </AccordionTrigger>
+                      <AccordionContent className="pt-2 pb-4">
+                        <Select
+                          value={selectedLocation}
+                          onValueChange={(v) => onLocationChange(v)}
+                        >
+                          <SelectTrigger className="w-full rounded-xl bg-gray-50 border-gray-200">
+                            <SelectValue
+                              placeholder={
+                                t("select_location") || "Select location"
+                              }
+                            />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {locations.map((loc) => (
+                              <SelectItem key={loc} value={loc}>
+                                {loc === "all" ? "All Locations" : loc}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </AccordionContent>
+                    </AccordionItem>
+
+                    {/* Deadline */}
+                    <AccordionItem
+                      value="deadline"
+                      className="border-b border-gray-100"
+                    >
+                      <AccordionTrigger className="font-semibold text-gray-800 hover:no-underline py-4">
+                        {t("deadline") || "Deadline"}
+                      </AccordionTrigger>
+                      <AccordionContent className="pt-2 pb-4">
+                        <div className="flex flex-col space-y-3">
+                          {[
+                            { value: "any", label: t("any") || "Any" },
+                            {
+                              value: "7days",
+                              label: t("due_in_7_days") || "Due in 7 days",
+                            },
+                            {
+                              value: "30days",
+                              label: t("due_in_30_days") || "Due in 30 days",
+                            },
+                            {
+                              value: "over30",
+                              label: t("over_30_days") || "Over 30 days",
+                            },
+                            { value: "today", label: t("today") || "Today" },
+                            { value: "past", label: t("past") || "Past due" },
+                          ].map(({ value, label }) => {
+                            const id = `dl-${value}`;
+                            return (
+                              <label
+                                key={value}
+                                htmlFor={id}
+                                className="flex items-center gap-3 cursor-pointer group"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  onDeadlineChange(
+                                    value as typeof selectedDeadlineFilter
+                                  );
+                                }}
+                              >
+                                <input
+                                  id={id}
+                                  type="radio"
+                                  name="deadline"
+                                  value={value}
+                                  checked={selectedDeadlineFilter === value}
+                                  onChange={() =>
+                                    onDeadlineChange(
+                                      value as typeof selectedDeadlineFilter
+                                    )
+                                  }
+                                  className="sr-only"
+                                />
+
+                                <div
+                                  className={`w-5 h-5 rounded-full border-2 transition-all duration-200 flex items-center justify-center ${
+                                    selectedDeadlineFilter === value
+                                      ? "bg-blue-500 border-blue-500"
+                                      : "border-gray-300 group-hover:border-blue-400"
+                                  }`}
+                                >
+                                  {selectedDeadlineFilter === value && (
+                                    <div className="w-2 h-2 bg-white rounded-full"></div>
+                                  )}
+                                </div>
+
+                                <span className="text-gray-700 text-sm group-hover:text-gray-900 transition-colors duration-200">
+                                  {label}
+                                </span>
+                              </label>
+                            );
+                          })}
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+
+                  <div className="pt-4 border-t border-gray-100">
+                    <p className="text-sm font-medium text-gray-600">
+                      {sortedTenders.length} results
                     </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Main Content */}
+              <div className="flex-1 ">
+                {/* Tender Listings */}
+                <div
+                  className={`${
+                    viewMode === "grid"
+                      ? "grid grid-cols-1 md:grid-cols-2 gap-6"
+                      : "space-y-4"
+                  }`}
+                >
+                  {loading ? (
+                    <div className="col-span-full text-center py-16 bg-white/70 backdrop-blur-xl rounded-2xl border border-gray-100/50">
+                      <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                      <p className="mt-4 text-gray-600">Loading tenders...</p>
+                    </div>
+                  ) : error ? (
+                    <div className="col-span-full text-center py-16 bg-white/70 backdrop-blur-xl rounded-2xl border border-gray-100/50">
+                      <p className="text-red-600 font-medium">Error: {error}</p>
+                    </div>
+                  ) : tendersToDisplay.length > 0 ? (
+                    tendersToDisplay.map((tender) => (
+                      <TenderCard
+                        key={tender._id || tender.id}
+                        tender={mapTenderForCard(tender)}
+                      />
+                    ))
+                  ) : (
+                    <div className="col-span-full text-center py-16 bg-white/70 backdrop-blur-xl rounded-2xl border border-gray-100/50">
+                      <Search className="h-16 w-16 text-gray-300 mx-auto mb-6" />
+                      <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                        {t("no_tenders_found") || "No tenders found"}
+                      </h3>
+                      <p className="text-gray-600 mb-8">
+                        {t("adjust_filters_or_try_different_search") ||
+                          "Try adjusting your filters or search terms"}
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-center gap-2 mt-12">
+                    <Button
+                      disabled={currentPage <= 1}
+                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                      variant="outline"
+                      className="px-6 py-2 bg-white/70 border border-gray-200/50 rounded-xl disabled:opacity-50 hover:bg-gray-50 transition-all duration-300"
+                    >
+                      Prev
+                    </Button>
+
+                    <div className="flex items-center gap-2">
+                      {Array.from(
+                        { length: Math.min(5, totalPages) },
+                        (_, i) => {
+                          const pageNum = i + 1;
+                          return (
+                            <button
+                              key={pageNum}
+                              onClick={() => setCurrentPage(pageNum)}
+                              className={`w-10 h-10 rounded-xl font-medium transition-all duration-300 ${
+                                currentPage === pageNum
+                                  ? "bg-blue-500 text-white shadow-lg shadow-blue-500/25"
+                                  : "bg-white/70 text-gray-700 hover:bg-gray-100 border border-gray-200/50"
+                              }`}
+                            >
+                              {pageNum}
+                            </button>
+                          );
+                        }
+                      )}
+                      {totalPages > 5 && (
+                        <>
+                          <span className="text-gray-400">...</span>
+                          <div className="text-sm text-gray-600">
+                            Page {currentPage} / {totalPages}
+                          </div>
+                        </>
+                      )}
+                    </div>
+
+                    <Button
+                      disabled={currentPage >= totalPages}
+                      onClick={() =>
+                        setCurrentPage((p) => Math.min(totalPages, p + 1))
+                      }
+                      variant="outline"
+                      className="px-6 py-2 bg-white/70 border border-gray-200/50 rounded-xl disabled:opacity-50 hover:bg-gray-50 transition-all duration-300"
+                    >
+                      Next
+                    </Button>
                   </div>
                 )}
               </div>
-
-              {/* Pagination */}
-              {totalPages > 1 && (
-                <div className="flex items-center justify-center gap-2 mt-12">
-                  <Button
-                    disabled={currentPage <= 1}
-                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                    variant="outline"
-                    className="px-6 py-2 bg-white/70 border border-gray-200/50 rounded-xl disabled:opacity-50 hover:bg-gray-50 transition-all duration-300"
-                  >
-                    Prev
-                  </Button>
-
-                  <div className="flex items-center gap-2">
-                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                      const pageNum = i + 1;
-                      return (
-                        <button
-                          key={pageNum}
-                          onClick={() => setCurrentPage(pageNum)}
-                          className={`w-10 h-10 rounded-xl font-medium transition-all duration-300 ${
-                            currentPage === pageNum
-                              ? "bg-blue-500 text-white shadow-lg shadow-blue-500/25"
-                              : "bg-white/70 text-gray-700 hover:bg-gray-100 border border-gray-200/50"
-                          }`}
-                        >
-                          {pageNum}
-                        </button>
-                      );
-                    })}
-                    {totalPages > 5 && (
-                      <>
-                        <span className="text-gray-400">...</span>
-                        <div className="text-sm text-gray-600">
-                          Page {currentPage} / {totalPages}
-                        </div>
-                      </>
-                    )}
-                  </div>
-
-                  <Button
-                    disabled={currentPage >= totalPages}
-                    onClick={() =>
-                      setCurrentPage((p) => Math.min(totalPages, p + 1))
-                    }
-                    variant="outline"
-                    className="px-6 py-2 bg-white/70 border border-gray-200/50 rounded-xl disabled:opacity-50 hover:bg-gray-50 transition-all duration-300"
-                  >
-                    Next
-                  </Button>
-                </div>
-              )}
             </div>
           </div>
-        </div>
-      </TooltipProvider>
-    </div>
+        </TooltipProvider>
+      </div>
+    </PageTransitionWrapper>
   );
 }

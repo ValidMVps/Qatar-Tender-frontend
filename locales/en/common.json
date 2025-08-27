@@ -1180,5 +1180,8 @@
   "bid_success_rate": "Bid Success Rate",
   "bid_status_timeline": "Bid Status Timeline",
   "average_bid_value_over_time": "Average Bid Value Over Time",
+  "go_to_chat": "Go to Chat",
+  "this_will_permanently_remove_your_bid": "This will permanently remove your bid.",
+  "delete_forever": "Delete Forever",
   "note_do_not_include_contact_information_in_your_answer": "Do not include email, phone, or website links. Communication should stay on platform."
 }

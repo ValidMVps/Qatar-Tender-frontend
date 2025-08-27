@@ -177,7 +177,7 @@ export default function DashboardLayout({
         )}
 
         {/* Desktop sidebar */}
-        <aside className="bg-white border-r border-gray-200 hidden lg:flex flex-col w-64">
+        <aside className="sticky top-0 h-screen bg-white border-r border-gray-200 hidden lg:flex flex-col w-64">
           <div className="px-4 py-6">
             <div className="flex items-center space-x-3">
               <div className="w-9 h-9 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-sm">
@@ -200,7 +200,7 @@ export default function DashboardLayout({
             setSidebarOpen={setSidebarOpen}
             sidebarLinks={[]} // Navbar no longer needs flat list
           />
-          <main className="flex-1 w-full px-2 sm:px-4 py-0 md:mt-0 mt-[70px] bg-neutral-50/30">
+          <main className="flex-1 w-full px-2 sm:px-4 py-0 md:mt-0  mt-[70px] bg-neutral-50/30">
             {children}
           </main>
         </div>

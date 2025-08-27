@@ -149,9 +149,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       }
 
       return result;
-    } catch (error) {
-      console.error("Login error:", error);
-      return { success: false, error: "An unexpected error occurred" };
+    } catch (error: any) {
+      // Log raw error for debugging (dev only)
+      if (process.env.NODE_ENV === "development") {
+        console.error("Login error:", error);
+      }
+
+      return {
+        success: false,
+        error: error?.message || "An unexpected error occurred",
+      };
     } finally {
       setIsLoading(false);
     }

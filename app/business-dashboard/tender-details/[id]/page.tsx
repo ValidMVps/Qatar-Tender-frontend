@@ -38,6 +38,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { createBid, getUserBids } from "@/app/services/BidService";
 import QnaSection from "@/components/QnaSection";
+import PageTransitionWrapper from "@/components/animations/PageTransitionWrapper";
 
 interface Tender {
   bidCount: string | number;
@@ -731,461 +732,465 @@ export default function TenderDetailsPage({ params }: PageProps) {
   }
 
   return (
-    <TooltipProvider>
-      <div className="min-h-screen">
-        <div className="container mx-auto py-1 lg:px-0">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            {/* Main Tender Details */}
-            <div className="lg:col-span-3">
-              <div className="bg-white/80 backdrop-blur-xl rounded-2xl 5 overflow-hidden">
-                {/* Header Section */}
-                <div className="p-8 pb-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-3 text-sm text-gray-500">
-                      <Clock className="h-4 w-4" />
-                      <span>Posted {formatTimeAgo(tender.createdAt)}</span>
-                      <span>•</span>
-                      <span>Updated {formatTimeAgo(tender.updatedAt)}</span>
-                    </div>
-                    <Link href="/business-dashboard/browse-tenders" passHref>
-                      <Button
-                        variant="outline"
-                        className="text-sm bg-white/60 border-gray-200/50 hover:bg-blue-50 hover:border-blue-200 hover:text-blue-600 rounded-xl transition-all duration-300"
-                      >
-                        <ArrowLeft className="h-4 w-4 mr-2" />
-                        Back to Tenders
-                      </Button>
-                    </Link>
-                  </div>
-
-                  <h1 className="text-4xl font-bold text-gray-900 mb-6 leading-tight">
-                    {tender.title}
-                  </h1>
-
-                  {/* Client Information Card - Enhanced with rating */}
-
-                  <div className="bg-blue-50/50 rounded-xl p-4 mb-6">
-                    <div className="flex items-center gap-4 mb-3">
-                      <div className="h-12 w-12 bg-blue-500 rounded-full flex items-center justify-center">
-                        <User className="h-6 w-6 text-white" />
+    <PageTransitionWrapper>
+      <TooltipProvider>
+        <div className="min-h-screen">
+          <div className="container mx-auto py-1 lg:px-0">
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+              {/* Main Tender Details */}
+              <div className="lg:col-span-3">
+                <div className="bg-white/80 backdrop-blur-xl rounded-2xl 5 overflow-hidden">
+                  {/* Header Section */}
+                  <div className="p-8 pb-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-3 text-sm text-gray-500">
+                        <Clock className="h-4 w-4" />
+                        <span>Posted {formatTimeAgo(tender.createdAt)}</span>
+                        <span>•</span>
+                        <span>Updated {formatTimeAgo(tender.updatedAt)}</span>
                       </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-semibold text-gray-900">
-                            {hasUserBid
-                              ? tender.postedBy?.name ||
-                                tender.postedBy?.email ||
-                                "Anonymous Client"
-                              : "Anonymous Client"}
-                          </h3>
+                      <Link href="/business-dashboard/browse-tenders" passHref>
+                        <Button
+                          variant="outline"
+                          className="text-sm bg-white/60 border-gray-200/50 hover:bg-blue-50 hover:border-blue-200 hover:text-blue-600 rounded-xl transition-all duration-300"
+                        >
+                          <ArrowLeft className="h-4 w-4 mr-2" />
+                          Back to Tenders
+                        </Button>
+                      </Link>
+                    </div>
 
-                          {tender.postedBy?.isVerified && (
-                            <CheckCircle className="h-4 w-4 text-blue-500" />
-                          )}
+                    <h1 className="text-4xl font-bold text-gray-900 mb-6 leading-tight">
+                      {tender.title}
+                    </h1>
+
+                    {/* Client Information Card - Enhanced with rating */}
+
+                    <div className="bg-blue-50/50 rounded-xl p-4 mb-6">
+                      <div className="flex items-center gap-4 mb-3">
+                        <div className="h-12 w-12 bg-blue-500 rounded-full flex items-center justify-center">
+                          <User className="h-6 w-6 text-white" />
                         </div>
-                        <div className="flex items-center gap-4">
-                          <p className="text-sm text-gray-600">
-                            {getUserTypeLabel(tender.postedBy?.userType)}
-                          </p>
-                          {tender.postedBy?.rating && (
-                            <div className="flex items-center gap-1">
-                              {renderStars(tender.postedBy.rating)}
-                              <span className="text-sm font-medium text-gray-700 ml-1">
-                                {tender.postedBy.rating}
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="font-semibold text-gray-900">
+                              {hasUserBid
+                                ? tender.postedBy?.name ||
+                                  tender.postedBy?.email ||
+                                  "Anonymous Client"
+                                : "Anonymous Client"}
+                            </h3>
+
+                            {tender.postedBy?.isVerified && (
+                              <CheckCircle className="h-4 w-4 text-blue-500" />
+                            )}
+                          </div>
+                          <div className="flex items-center gap-4">
+                            <p className="text-sm text-gray-600">
+                              {getUserTypeLabel(tender.postedBy?.userType)}
+                            </p>
+                            {tender.postedBy?.rating && (
+                              <div className="flex items-center gap-1">
+                                {renderStars(tender.postedBy.rating)}
+                                <span className="text-sm font-medium text-gray-700 ml-1">
+                                  {tender.postedBy.rating}
+                                </span>
+                              </div>
+                            )}
+                            {tender.postedBy?.completedProjects && (
+                              <span className="text-sm text-gray-600">
+                                {tender.postedBy.completedProjects} projects
+                                completed
                               </span>
-                            </div>
-                          )}
-                          {tender.postedBy?.completedProjects && (
-                            <span className="text-sm text-gray-600">
-                              {tender.postedBy.completedProjects} projects
-                              completed
-                            </span>
-                          )}
+                            )}
+                          </div>
                         </div>
                       </div>
+                      <div className="flex items-center gap-4 text-sm text-gray-600">
+                        {hasUserBid && (
+                          <div className="flex items-center gap-1">
+                            <Mail className="h-4 w-4" />
+                            <span>{tender.contactEmail}</span>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                    <div className="flex items-center gap-4 text-sm text-gray-600">
-                      {hasUserBid && (
-                        <div className="flex items-center gap-1">
-                          <Mail className="h-4 w-4" />
-                          <span>{tender.contactEmail}</span>
+
+                    {/* Key Information Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                      {/* Budget */}
+                      <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-5 border border-green-100">
+                        <div className="flex items-center gap-2 mb-2">
+                          <DollarSign className="h-5 w-5 text-green-600" />
+                          <span className="text-sm font-medium text-green-700">
+                            Budget
+                          </span>
                         </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Key Information Grid */}
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                    {/* Budget */}
-                    <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-5 border border-green-100">
-                      <div className="flex items-center gap-2 mb-2">
-                        <DollarSign className="h-5 w-5 text-green-600" />
-                        <span className="text-sm font-medium text-green-700">
-                          Budget
-                        </span>
+                        <p className="text-2xl font-bold text-green-700">
+                          ${tender.estimatedBudget?.toLocaleString()}
+                        </p>
                       </div>
-                      <p className="text-2xl font-bold text-green-700">
-                        ${tender.estimatedBudget?.toLocaleString()}
-                      </p>
-                    </div>
 
-                    {/* Deadline */}
-                    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-5 border border-blue-100">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Calendar className="h-5 w-5 text-blue-600" />
-                        <span className="text-sm font-medium text-blue-700">
-                          Deadline
-                        </span>
+                      {/* Deadline */}
+                      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-5 border border-blue-100">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Calendar className="h-5 w-5 text-blue-600" />
+                          <span className="text-sm font-medium text-blue-700">
+                            Deadline
+                          </span>
+                        </div>
+                        <p className="text-lg font-semibold text-blue-700">
+                          {formatDate(tender.deadline)}
+                        </p>
                       </div>
-                      <p className="text-lg font-semibold text-blue-700">
-                        {formatDate(tender.deadline)}
-                      </p>
-                    </div>
 
-                    {/* Location */}
-                    <div className="bg-gradient-to-br from-purple-50 to-violet-50 rounded-xl p-5 border border-purple-100">
-                      <div className="flex items-center gap-2 mb-2">
-                        <MapPin className="h-5 w-5 text-purple-600" />
-                        <span className="text-sm font-medium text-purple-700">
-                          Location
-                        </span>
+                      {/* Location */}
+                      <div className="bg-gradient-to-br from-purple-50 to-violet-50 rounded-xl p-5 border border-purple-100">
+                        <div className="flex items-center gap-2 mb-2">
+                          <MapPin className="h-5 w-5 text-purple-600" />
+                          <span className="text-sm font-medium text-purple-700">
+                            Location
+                          </span>
+                        </div>
+                        <p className="text-lg font-semibold text-purple-700">
+                          {tender.location}
+                        </p>
                       </div>
-                      <p className="text-lg font-semibold text-purple-700">
-                        {tender.location}
-                      </p>
-                    </div>
 
-                    {/* Bids Placed */}
-                    <div className="bg-gradient-to-br from-yellow-50 to-amber-50 rounded-xl p-5 border border-yellow-100">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Star className="h-5 w-5 text-yellow-600" />
-                        <span className="text-sm font-medium text-yellow-700">
-                          Bids Placed
-                        </span>
+                      {/* Bids Placed */}
+                      <div className="bg-gradient-to-br from-yellow-50 to-amber-50 rounded-xl p-5 border border-yellow-100">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Star className="h-5 w-5 text-yellow-600" />
+                          <span className="text-sm font-medium text-yellow-700">
+                            Bids Placed
+                          </span>
+                        </div>
+                        <p className="text-lg font-semibold text-yellow-700">
+                          {tender?.bidCount}
+                        </p>
                       </div>
-                      <p className="text-lg font-semibold text-yellow-700">
-                        {tender?.bidCount}
-                      </p>
                     </div>
-                  </div>
 
-                  {/* Status and Category */}
-                  <div className="flex flex-wrap gap-3 mb-6">
-                    <Badge
-                      className={`px-4 py-2 rounded-full font-medium text-sm ${
-                        tender.status === "active"
-                          ? "bg-green-100 text-green-700 border-green-200"
-                          : "bg-gray-100 text-gray-700 border-gray-200"
-                      }`}
-                    >
-                      {tender.status === "active"
-                        ? "🟢 Active"
-                        : "⭕ " + tender.status}
-                    </Badge>
-                    <Badge
-                      variant="outline"
-                      className="px-4 py-2 rounded-full bg-blue-50 text-blue-700 border-blue-200"
-                    >
-                      <Tag className="h-3 w-3 mr-1" />
-                      {tender.category?.name}
-                    </Badge>
-                  </div>
-
-                  {/* Tender Image */}
-                  {tender.image && (
-                    <div className="mb-6">
-                      <img
-                        src={tender.image}
-                        alt={tender.title}
-                        className="w-full h-64 object-cover rounded-xl border border-gray-200/50"
-                        onError={(e) => {
-                          e.currentTarget.style.display = "none";
-                        }}
-                      />
-                    </div>
-                  )}
-                </div>
-
-                {/* Content Section */}
-                <div className="px-8 pb-8">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                    Project Description
-                  </h2>
-                  <div className="prose prose-gray max-w-none">
-                    <p className="text-gray-700 text-lg leading-relaxed whitespace-pre-wrap mb-6">
-                      {tender.description}
-                    </p>
-                  </div>
-
-                  {tender.category?.description && (
-                    <div className="bg-gray-50 rounded-xl p-4 mb-6">
-                      <h3 className="font-semibold text-gray-800 mb-2">
-                        Category Details
-                      </h3>
-                      <p className="text-gray-600">
-                        {tender.category.description}
-                      </p>
-                    </div>
-                  )}
-
-                  {/* User's Bid Status - Only show if user has bid */}
-
-                  {/* Q&A Section */}
-                  <QnaSection tenderid={tender._id} />
-                </div>
-              </div>
-            </div>
-
-            {/* Apply to Bid Sidebar */}
-            <div className="lg:col-span-1 mt-5">
-              <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-gray-100/50 shadow-lg shadow-blue-500/5 sticky top-6">
-                <div className="p-6">
-                  <h2 className="text-xl font-bold text-gray-900 mb-4">
-                    Your Bid on this Project
-                  </h2>
-
-                  <div className="space-y-4 mb-6">
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="text-gray-600">Status:</span>
+                    {/* Status and Category */}
+                    <div className="flex flex-wrap gap-3 mb-6">
                       <Badge
-                        className={`px-2 py-1 text-xs ${
+                        className={`px-4 py-2 rounded-full font-medium text-sm ${
                           tender.status === "active"
-                            ? "bg-green-100 text-green-700"
-                            : "bg-gray-100 text-gray-700"
+                            ? "bg-green-100 text-green-700 border-green-200"
+                            : "bg-gray-100 text-gray-700 border-gray-200"
                         }`}
                       >
-                        {tender.status}
+                        {tender.status === "active"
+                          ? "🟢 Active"
+                          : "⭕ " + tender.status}
+                      </Badge>
+                      <Badge
+                        variant="outline"
+                        className="px-4 py-2 rounded-full bg-blue-50 text-blue-700 border-blue-200"
+                      >
+                        <Tag className="h-3 w-3 mr-1" />
+                        {tender.category?.name}
                       </Badge>
                     </div>
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="text-gray-600">Deadline:</span>
-                      <span className="font-medium text-gray-900">
-                        {formatDate(tender.deadline)}
-                      </span>
-                    </div>
-                    {userBid && (
-                      <div className="flex justify-between items-center text-sm">
-                        <span className="text-gray-600">Your Bid:</span>
-                        <span className="font-bold text-green-600">
-                          ${userBid.amount.toLocaleString()}
-                        </span>
+
+                    {/* Tender Image */}
+                    {tender.image && (
+                      <div className="mb-6">
+                        <img
+                          src={tender.image}
+                          alt={tender.title}
+                          className="w-full h-64 object-cover rounded-xl border border-gray-200/50"
+                          onError={(e) => {
+                            e.currentTarget.style.display = "none";
+                          }}
+                        />
                       </div>
                     )}
                   </div>
 
-                  {userBid ? (
-                    // Show My Bids button if user has already bid
-                    <div className="space-y-3">
-                      <Button
-                        onClick={() => router.push("/business-dashboard/bids")}
-                        className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-xl py-3 font-medium transition-all duration-300 shadow-lg shadow-blue-500/25"
-                      >
-                        View My Bids
-                      </Button>
-                    </div>
-                  ) : tender.status === "active" &&
-                    new Date(tender.deadline) > new Date() ? (
-                    // Show Submit Bid button if user hasn't bid and tender is active
-                    <div className="space-y-3">
-                      <Button
-                        onClick={() => setShowApplyForm(true)}
-                        className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-xl py-3 font-medium transition-all duration-300 shadow-lg shadow-blue-500/25"
-                      >
-                        Submit Your Bid
-                      </Button>
-                    </div>
-                  ) : (
-                    // Show inactive message
-                    <div className="text-center py-6 bg-gray-50/50 rounded-xl">
-                      <p className="text-gray-500 text-sm font-medium">
-                        {tender.status !== "active"
-                          ? "🚫 This tender is no longer active"
-                          : "⏰ Bidding deadline has passed"}
+                  {/* Content Section */}
+                  <div className="px-8 pb-8">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                      Project Description
+                    </h2>
+                    <div className="prose prose-gray max-w-none">
+                      <p className="text-gray-700 text-lg leading-relaxed whitespace-pre-wrap mb-6">
+                        {tender.description}
                       </p>
                     </div>
-                  )}
+
+                    {tender.category?.description && (
+                      <div className="bg-gray-50 rounded-xl p-4 mb-6">
+                        <h3 className="font-semibold text-gray-800 mb-2">
+                          Category Details
+                        </h3>
+                        <p className="text-gray-600">
+                          {tender.category.description}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* User's Bid Status - Only show if user has bid */}
+
+                    {/* Q&A Section */}
+                    <QnaSection tenderid={tender._id} />
+                  </div>
+                </div>
+              </div>
+
+              {/* Apply to Bid Sidebar */}
+              <div className="lg:col-span-1 mt-5">
+                <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-gray-100/50 shadow-lg shadow-blue-500/5 sticky top-6">
+                  <div className="p-6">
+                    <h2 className="text-xl font-bold text-gray-900 mb-4">
+                      Your Bid on this Project
+                    </h2>
+
+                    <div className="space-y-4 mb-6">
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="text-gray-600">Status:</span>
+                        <Badge
+                          className={`px-2 py-1 text-xs ${
+                            tender.status === "active"
+                              ? "bg-green-100 text-green-700"
+                              : "bg-gray-100 text-gray-700"
+                          }`}
+                        >
+                          {tender.status}
+                        </Badge>
+                      </div>
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="text-gray-600">Deadline:</span>
+                        <span className="font-medium text-gray-900">
+                          {formatDate(tender.deadline)}
+                        </span>
+                      </div>
+                      {userBid && (
+                        <div className="flex justify-between items-center text-sm">
+                          <span className="text-gray-600">Your Bid:</span>
+                          <span className="font-bold text-green-600">
+                            ${userBid.amount.toLocaleString()}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    {userBid ? (
+                      // Show My Bids button if user has already bid
+                      <div className="space-y-3">
+                        <Button
+                          onClick={() =>
+                            router.push("/business-dashboard/bids")
+                          }
+                          className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-xl py-3 font-medium transition-all duration-300 shadow-lg shadow-blue-500/25"
+                        >
+                          View My Bids
+                        </Button>
+                      </div>
+                    ) : tender.status === "active" &&
+                      new Date(tender.deadline) > new Date() ? (
+                      // Show Submit Bid button if user hasn't bid and tender is active
+                      <div className="space-y-3">
+                        <Button
+                          onClick={() => setShowApplyForm(true)}
+                          className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-xl py-3 font-medium transition-all duration-300 shadow-lg shadow-blue-500/25"
+                        >
+                          Submit Your Bid
+                        </Button>
+                      </div>
+                    ) : (
+                      // Show inactive message
+                      <div className="text-center py-6 bg-gray-50/50 rounded-xl">
+                        <p className="text-gray-500 text-sm font-medium">
+                          {tender.status !== "active"
+                            ? "🚫 This tender is no longer active"
+                            : "⏰ Bidding deadline has passed"}
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Multi-Step Bid Form Modal */}
-        {showApplyForm && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="p-8">
-                {/* Header with Progress */}
-                <div className="flex items-center justify-between mb-6">
-                  <div>
-                    <h2 className="text-2xl font-bold text-gray-900">
-                      {getStepTitle()}
-                    </h2>
-                    <p className="text-sm text-gray-500 mt-1">
-                      Step {currentStep} of {Object.keys(BidStep).length / 2}
-                    </p>
+          {/* Multi-Step Bid Form Modal */}
+          {showApplyForm && (
+            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+              <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                <div className="p-8">
+                  {/* Header with Progress */}
+                  <div className="flex items-center justify-between mb-6">
+                    <div>
+                      <h2 className="text-2xl font-bold text-gray-900">
+                        {getStepTitle()}
+                      </h2>
+                      <p className="text-sm text-gray-500 mt-1">
+                        Step {currentStep} of {Object.keys(BidStep).length / 2}
+                      </p>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => {
+                        setShowApplyForm(false);
+                        setCurrentStep(BidStep.BID_DETAILS);
+                      }}
+                      className="h-8 w-8 rounded-full hover:bg-gray-100"
+                      disabled={paymentProcessing}
+                    >
+                      ✕
+                    </Button>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => {
-                      setShowApplyForm(false);
-                      setCurrentStep(BidStep.BID_DETAILS);
-                    }}
-                    className="h-8 w-8 rounded-full hover:bg-gray-100"
-                    disabled={paymentProcessing}
-                  >
-                    ✕
-                  </Button>
-                </div>
 
-                {/* Progress Bar */}
-                <div className="mb-8">
-                  <div className="flex items-center justify-between mb-2">
-                    <div
-                      className={`h-2 w-2 rounded-full ${
-                        currentStep >= BidStep.BID_DETAILS
-                          ? "bg-blue-500"
-                          : "bg-gray-200"
-                      }`}
-                    ></div>
-                    <div
-                      className={`flex-1 h-1 mx-2 ${
-                        currentStep > BidStep.BID_DETAILS
-                          ? "bg-blue-500"
-                          : "bg-gray-200"
-                      }`}
-                    ></div>
-                    <div
-                      className={`h-2 w-2 rounded-full ${
-                        currentStep >= BidStep.REVIEW
-                          ? "bg-blue-500"
-                          : "bg-gray-200"
-                      }`}
-                    ></div>
-                    <div
-                      className={`flex-1 h-1 mx-2 ${
-                        currentStep > BidStep.REVIEW
-                          ? "bg-blue-500"
-                          : "bg-gray-200"
-                      }`}
-                    ></div>
-                    <div
-                      className={`h-2 w-2 rounded-full ${
-                        currentStep >= BidStep.PAYMENT
-                          ? "bg-blue-500"
-                          : "bg-gray-200"
-                      }`}
-                    ></div>
-                    <div
-                      className={`flex-1 h-1 mx-2 ${
-                        currentStep > BidStep.PAYMENT
-                          ? "bg-blue-500"
-                          : "bg-gray-200"
-                      }`}
-                    ></div>
-                    <div
-                      className={`h-2 w-2 rounded-full ${
-                        currentStep >= BidStep.CONFIRMATION
-                          ? "bg-blue-500"
-                          : "bg-gray-200"
-                      }`}
-                    ></div>
+                  {/* Progress Bar */}
+                  <div className="mb-8">
+                    <div className="flex items-center justify-between mb-2">
+                      <div
+                        className={`h-2 w-2 rounded-full ${
+                          currentStep >= BidStep.BID_DETAILS
+                            ? "bg-blue-500"
+                            : "bg-gray-200"
+                        }`}
+                      ></div>
+                      <div
+                        className={`flex-1 h-1 mx-2 ${
+                          currentStep > BidStep.BID_DETAILS
+                            ? "bg-blue-500"
+                            : "bg-gray-200"
+                        }`}
+                      ></div>
+                      <div
+                        className={`h-2 w-2 rounded-full ${
+                          currentStep >= BidStep.REVIEW
+                            ? "bg-blue-500"
+                            : "bg-gray-200"
+                        }`}
+                      ></div>
+                      <div
+                        className={`flex-1 h-1 mx-2 ${
+                          currentStep > BidStep.REVIEW
+                            ? "bg-blue-500"
+                            : "bg-gray-200"
+                        }`}
+                      ></div>
+                      <div
+                        className={`h-2 w-2 rounded-full ${
+                          currentStep >= BidStep.PAYMENT
+                            ? "bg-blue-500"
+                            : "bg-gray-200"
+                        }`}
+                      ></div>
+                      <div
+                        className={`flex-1 h-1 mx-2 ${
+                          currentStep > BidStep.PAYMENT
+                            ? "bg-blue-500"
+                            : "bg-gray-200"
+                        }`}
+                      ></div>
+                      <div
+                        className={`h-2 w-2 rounded-full ${
+                          currentStep >= BidStep.CONFIRMATION
+                            ? "bg-blue-500"
+                            : "bg-gray-200"
+                        }`}
+                      ></div>
+                    </div>
+                    <div className="flex justify-between text-xs text-gray-500">
+                      <span>Details</span>
+                      <span>Review</span>
+                      <span>Payment</span>
+                      <span>Done</span>
+                    </div>
                   </div>
-                  <div className="flex justify-between text-xs text-gray-500">
-                    <span>Details</span>
-                    <span>Review</span>
-                    <span>Payment</span>
-                    <span>Done</span>
-                  </div>
-                </div>
 
-                {/* Step Content */}
-                {renderBidStep()}
+                  {/* Step Content */}
+                  {renderBidStep()}
 
-                {/* Action Buttons */}
-                <div className="flex gap-4 mt-8">
-                  {currentStep > BidStep.BID_DETAILS &&
-                    currentStep < BidStep.CONFIRMATION && (
-                      <Button
-                        variant="outline"
-                        onClick={handlePrevStep}
-                        className="flex-1 rounded-xl border-gray-200 hover:bg-gray-50 py-3 font-medium transition-all duration-300"
-                        disabled={paymentProcessing}
-                      >
-                        <ChevronLeft className="h-4 w-4 mr-2" />
-                        Previous
-                      </Button>
+                  {/* Action Buttons */}
+                  <div className="flex gap-4 mt-8">
+                    {currentStep > BidStep.BID_DETAILS &&
+                      currentStep < BidStep.CONFIRMATION && (
+                        <Button
+                          variant="outline"
+                          onClick={handlePrevStep}
+                          className="flex-1 rounded-xl border-gray-200 hover:bg-gray-50 py-3 font-medium transition-all duration-300"
+                          disabled={paymentProcessing}
+                        >
+                          <ChevronLeft className="h-4 w-4 mr-2" />
+                          Previous
+                        </Button>
+                      )}
+
+                    {currentStep === BidStep.BID_DETAILS && (
+                      <>
+                        <Button
+                          variant="outline"
+                          onClick={() => setShowApplyForm(false)}
+                          className="flex-1 rounded-xl border-gray-200 hover:bg-gray-50 py-3 font-medium transition-all duration-300"
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          onClick={handleNextStep}
+                          className="flex-1 bg-blue-500 hover:bg-blue-600 text-white rounded-xl py-3 font-medium transition-all duration-300 shadow-lg shadow-blue-500/25"
+                          disabled={!bidAmount || !bidDescription.trim()}
+                        >
+                          Next
+                          <ArrowRight className="h-4 w-4 ml-2" />
+                        </Button>
+                      </>
                     )}
 
-                  {currentStep === BidStep.BID_DETAILS && (
-                    <>
-                      <Button
-                        variant="outline"
-                        onClick={() => setShowApplyForm(false)}
-                        className="flex-1 rounded-xl border-gray-200 hover:bg-gray-50 py-3 font-medium transition-all duration-300"
-                      >
-                        Cancel
-                      </Button>
+                    {currentStep === BidStep.REVIEW && (
                       <Button
                         onClick={handleNextStep}
                         className="flex-1 bg-blue-500 hover:bg-blue-600 text-white rounded-xl py-3 font-medium transition-all duration-300 shadow-lg shadow-blue-500/25"
-                        disabled={!bidAmount || !bidDescription.trim()}
                       >
-                        Next
+                        Proceed to Payment
                         <ArrowRight className="h-4 w-4 ml-2" />
                       </Button>
-                    </>
-                  )}
+                    )}
 
-                  {currentStep === BidStep.REVIEW && (
-                    <Button
-                      onClick={handleNextStep}
-                      className="flex-1 bg-blue-500 hover:bg-blue-600 text-white rounded-xl py-3 font-medium transition-all duration-300 shadow-lg shadow-blue-500/25"
-                    >
-                      Proceed to Payment
-                      <ArrowRight className="h-4 w-4 ml-2" />
-                    </Button>
-                  )}
+                    {currentStep === BidStep.PAYMENT && (
+                      <Button
+                        onClick={handlePayment}
+                        className="flex-1 bg-green-500 hover:bg-green-600 text-white rounded-xl py-3 font-medium transition-all duration-300 shadow-lg shadow-green-500/25"
+                        disabled={
+                          paymentProcessing ||
+                          (paymentMethod === "card" &&
+                            (!cardNumber || !expiryDate || !cvv || !cardHolder))
+                        }
+                      >
+                        {paymentProcessing ? (
+                          <div className="flex items-center justify-center">
+                            <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                            Processing Payment...
+                          </div>
+                        ) : (
+                          <>
+                            <CreditCard className="h-4 w-4 mr-2" />
+                            Pay 100 QAR
+                          </>
+                        )}
+                      </Button>
+                    )}
 
-                  {currentStep === BidStep.PAYMENT && (
-                    <Button
-                      onClick={handlePayment}
-                      className="flex-1 bg-green-500 hover:bg-green-600 text-white rounded-xl py-3 font-medium transition-all duration-300 shadow-lg shadow-green-500/25"
-                      disabled={
-                        paymentProcessing ||
-                        (paymentMethod === "card" &&
-                          (!cardNumber || !expiryDate || !cvv || !cardHolder))
-                      }
-                    >
-                      {paymentProcessing ? (
-                        <div className="flex items-center justify-center">
-                          <Loader2 className="h-5 w-5 animate-spin mr-2" />
-                          Processing Payment...
-                        </div>
-                      ) : (
-                        <>
-                          <CreditCard className="h-4 w-4 mr-2" />
-                          Pay 100 QAR
-                        </>
-                      )}
-                    </Button>
-                  )}
-
-                  {currentStep === BidStep.CONFIRMATION && (
-                    <Button
-                      onClick={handleComplete}
-                      className="flex-1 bg-blue-500 hover:bg-blue-600 text-white rounded-xl py-3 font-medium transition-all duration-300 shadow-lg shadow-blue-500/25"
-                    >
-                      Complete
-                    </Button>
-                  )}
+                    {currentStep === BidStep.CONFIRMATION && (
+                      <Button
+                        onClick={handleComplete}
+                        className="flex-1 bg-blue-500 hover:bg-blue-600 text-white rounded-xl py-3 font-medium transition-all duration-300 shadow-lg shadow-blue-500/25"
+                      >
+                        Complete
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        )}
-      </div>
-    </TooltipProvider>
+          )}
+        </div>
+      </TooltipProvider>
+    </PageTransitionWrapper>
   );
 }

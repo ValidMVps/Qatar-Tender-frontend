@@ -31,6 +31,7 @@ import CreateTenderModal from "./CreateTenderModal";
 
 import { useTranslation } from "../lib/hooks/useTranslation";
 import { LanguageToggle } from "./LanguageToggle";
+import { useAuth } from "@/context/AuthContext";
 // Utility to capitalize and space hyphenated words
 const toTitleCase = (str: string) =>
   str.replace(/-/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
@@ -56,7 +57,7 @@ export default function BNavbar({
 }: NavbarProps) {
   const pathname = usePathname();
   const { t } = useTranslation();
-
+  const { logout } = useAuth();
   const currentUser = {
     name: "Ahmed Al-Mahmoud",
     email: "ahmed@example.com",
@@ -82,8 +83,12 @@ export default function BNavbar({
     "/business-dashboard/active-projects",
   ].some((route) => pathname.startsWith(route));
 
+  const logoutfunction = () => {
+    setProfileDropdownOpen(false);
+    logout();
+  };
   return (
-    <header className="md:relative fixed w-full z-10 border-b flex bg-white px-4 md:px-0">
+    <header className=" sticky top-0 w-full z-10 border-b flex bg-white/40 backdrop-blur-md px-4 md:px-0">
       {/* Sidebar toggle */}
       <button
         onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -202,13 +207,13 @@ export default function BNavbar({
                       {t("help")}
                     </Link>
                     <div className="border-t border-gray-200 my-1" />
-                    <Link
-                      href="/login"
+                    <div
+                      onClick={logoutfunction}
                       className="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
                     >
                       <LogOut className="w-4 h-4 text-red-500" />
                       Sign out
-                    </Link>
+                    </div>
                   </div>
                 </motion.div>
               )}

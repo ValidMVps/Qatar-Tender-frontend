@@ -37,6 +37,7 @@ import {
 import type { Review as ApiReview } from "../../services/ReviewService";
 import { toast } from "@/components/ui/use-toast";
 import { useAuth } from "@/context/AuthContext";
+import PageTransitionWrapper from "@/components/animations/PageTransitionWrapper";
 
 // TypeScript Interfaces
 interface Review {
@@ -612,181 +613,195 @@ const ReviewsRatingsPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-6 py-8 space-y-8">
-        {/* Analytics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <AnalyticsCard
-            title={t("average_rating") || "Average Rating"}
-            value={analytics?.averageRating}
-            icon={<TrendingUp className="w-4 h-4" />}
-            description={t("out_of_5_stars") || "out of 5 stars"}
-          />
-          <AnalyticsCard
-            title={t("total_reviews") || "Total Reviews"}
-            value={analytics?.totalReviews}
-            icon={<MessageSquare className="w-4 h-4" />}
-            description={
-              t("from_completed_projects") || "from completed projects"
-            }
-          />
-          <AnalyticsCard
-            title={t("5_star_reviews") || "5-Star Reviews"}
-            value={`${analytics.fiveStarPercentage}%`}
-            icon={<Award className="w-4 h-4" />}
-            description={t("excellent_ratings") || "excellent ratings"}
-          />
-          <AnalyticsCard
-            title={t("top_project") || "Top Project"}
-            value={analytics.topProject}
-            icon={<Clock className="w-4 h-4" />}
-            description={t("most_reviewed_project") || "most reviewed project"}
-          />
-        </div>
+    <PageTransitionWrapper>
+      <div className="min-h-screen bg-gray-50">
+        <div className="container mx-auto px-6 py-8 space-y-8">
+          {/* Analytics Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <AnalyticsCard
+              title={t("average_rating") || "Average Rating"}
+              value={analytics?.averageRating}
+              icon={<TrendingUp className="w-4 h-4" />}
+              description={t("out_of_5_stars") || "out of 5 stars"}
+            />
+            <AnalyticsCard
+              title={t("total_reviews") || "Total Reviews"}
+              value={analytics?.totalReviews}
+              icon={<MessageSquare className="w-4 h-4" />}
+              description={
+                t("from_completed_projects") || "from completed projects"
+              }
+            />
+            <AnalyticsCard
+              title={t("5_star_reviews") || "5-Star Reviews"}
+              value={`${analytics.fiveStarPercentage}%`}
+              icon={<Award className="w-4 h-4" />}
+              description={t("excellent_ratings") || "excellent ratings"}
+            />
+            <AnalyticsCard
+              title={t("top_project") || "Top Project"}
+              value={analytics.topProject}
+              icon={<Clock className="w-4 h-4" />}
+              description={
+                t("most_reviewed_project") || "most reviewed project"
+              }
+            />
+          </div>
 
-        {/* Tabs */}
-        <div className="bg-white rounded-2xl shadow-sm border-0 overflow-hidden">
-          <Tabs
-            value={activeTab}
-            onValueChange={(v) => setActiveTab(v as any)}
-            className="w-full"
-          >
-            <div className="border-b border-gray-100 p-6">
-              <TabsList className="grid w-full max-w-md grid-cols-2 bg-gray-100 rounded-xl p-1">
-                <TabsTrigger
-                  value="received"
-                  className="rounded-xl font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm"
-                >
-                  {t("reviews_received") || "Reviews Received"}
-                </TabsTrigger>
-                <TabsTrigger
-                  value="given"
-                  className="rounded-xl font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm"
-                >
-                  {t("reviews_given_by_me") || "Reviews Given by Me"}
-                </TabsTrigger>
-              </TabsList>
-            </div>
+          {/* Tabs */}
+          <div className="bg-white rounded-2xl shadow-sm border-0 overflow-hidden">
+            <Tabs
+              value={activeTab}
+              onValueChange={(v) => setActiveTab(v as any)}
+              className="w-full"
+            >
+              <div className="border-b border-gray-100 p-6">
+                <TabsList className="grid w-full max-w-md grid-cols-2 bg-gray-100 rounded-xl p-1">
+                  <TabsTrigger
+                    value="received"
+                    className="rounded-xl font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                  >
+                    {t("reviews_received") || "Reviews Received"}
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="given"
+                    className="rounded-xl font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                  >
+                    {t("reviews_given_by_me") || "Reviews Given by Me"}
+                  </TabsTrigger>
+                </TabsList>
+              </div>
 
-            <div className="p-6">
-              <TabsContent value="received" className="space-y-8 mt-0">
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <div className="relative flex-1 max-w-md">
-                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                    <Input
-                      placeholder={
-                        t(
-                          "search_by_contractor_name_project_or_review_content"
-                        ) || "Search by contractor, project, or content"
-                      }
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-11 h-12 border-0 bg-gray-50 rounded-2xl focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                  <Select value={ratingFilter} onValueChange={setRatingFilter}>
-                    <SelectTrigger className="w-full sm:w-48 h-12 border-0 bg-gray-50 rounded-2xl">
-                      <SelectValue
+              <div className="p-6">
+                <TabsContent value="received" className="space-y-8 mt-0">
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <div className="relative flex-1 max-w-md">
+                      <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                      <Input
                         placeholder={
-                          t("filter_by_rating") || "Filter by rating"
+                          t(
+                            "search_by_contractor_name_project_or_review_content"
+                          ) || "Search by contractor, project, or content"
                         }
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-11 h-12 border-0 bg-gray-50 rounded-2xl focus:ring-2 focus:ring-blue-500"
                       />
-                    </SelectTrigger>
-                    <SelectContent className="rounded-xl border-0 shadow-lg">
-                      <SelectItem value="all">
-                        {t("all_ratings") || "All Ratings"}
-                      </SelectItem>
-                      <SelectItem value="5">
-                        5 {t("stars") || "Stars"}
-                      </SelectItem>
-                      <SelectItem value="4">
-                        4 {t("stars") || "Stars"}
-                      </SelectItem>
-                      <SelectItem value="3">
-                        3 {t("stars") || "Stars"}
-                      </SelectItem>
-                      <SelectItem value="2">
-                        2 {t("stars") || "Stars"}
-                      </SelectItem>
-                      <SelectItem value="1">1 {t("star") || "Star"}</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                  {filteredReviews.length > 0 ? (
-                    filteredReviews.map((review) => (
-                      <ReviewCard key={review.id} review={review} />
-                    ))
-                  ) : (
-                    <EmptyState type="received" />
-                  )}
-                </div>
-              </TabsContent>
-
-              <TabsContent value="given" className="space-y-8 mt-0">
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <div className="relative flex-1 max-w-md">
-                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                    <Input
-                      placeholder={
-                        t(
-                          "search_by_project_owner_name_project_or_review_content"
-                        ) || "Search by project owner, project, or content"
-                      }
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-11 h-12 border-0 bg-gray-50 rounded-2xl focus:ring-2 focus:ring-blue-500"
-                    />
+                    </div>
+                    <Select
+                      value={ratingFilter}
+                      onValueChange={setRatingFilter}
+                    >
+                      <SelectTrigger className="w-full sm:w-48 h-12 border-0 bg-gray-50 rounded-2xl">
+                        <SelectValue
+                          placeholder={
+                            t("filter_by_rating") || "Filter by rating"
+                          }
+                        />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-xl border-0 shadow-lg">
+                        <SelectItem value="all">
+                          {t("all_ratings") || "All Ratings"}
+                        </SelectItem>
+                        <SelectItem value="5">
+                          5 {t("stars") || "Stars"}
+                        </SelectItem>
+                        <SelectItem value="4">
+                          4 {t("stars") || "Stars"}
+                        </SelectItem>
+                        <SelectItem value="3">
+                          3 {t("stars") || "Stars"}
+                        </SelectItem>
+                        <SelectItem value="2">
+                          2 {t("stars") || "Stars"}
+                        </SelectItem>
+                        <SelectItem value="1">
+                          1 {t("star") || "Star"}
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
-                  <Select value={ratingFilter} onValueChange={setRatingFilter}>
-                    <SelectTrigger className="w-full sm:w-48 h-12 border-0 bg-gray-50 rounded-2xl">
-                      <SelectValue
-                        placeholder={
-                          t("filter_by_rating") || "Filter by rating"
-                        }
-                      />
-                    </SelectTrigger>
-                    <SelectContent className="rounded-xl border-0 shadow-lg">
-                      <SelectItem value="all">
-                        {t("all_ratings") || "All Ratings"}
-                      </SelectItem>
-                      <SelectItem value="5">
-                        5 {t("stars") || "Stars"}
-                      </SelectItem>
-                      <SelectItem value="4">
-                        4 {t("stars") || "Stars"}
-                      </SelectItem>
-                      <SelectItem value="3">
-                        3 {t("stars") || "Stars"}
-                      </SelectItem>
-                      <SelectItem value="2">
-                        2 {t("stars") || "Stars"}
-                      </SelectItem>
-                      <SelectItem value="1">1 {t("star") || "Star"}</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
 
-                <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                  {filteredReviewsGiven.length > 0 ? (
-                    filteredReviewsGiven.map((review) => (
-                      <EditableReviewCard
-                        key={review.id}
-                        review={review}
-                        onUpdate={handleReviewUpdate}
+                  <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                    {filteredReviews.length > 0 ? (
+                      filteredReviews.map((review) => (
+                        <ReviewCard key={review.id} review={review} />
+                      ))
+                    ) : (
+                      <EmptyState type="received" />
+                    )}
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="given" className="space-y-8 mt-0">
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <div className="relative flex-1 max-w-md">
+                      <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                      <Input
+                        placeholder={
+                          t(
+                            "search_by_project_owner_name_project_or_review_content"
+                          ) || "Search by project owner, project, or content"
+                        }
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-11 h-12 border-0 bg-gray-50 rounded-2xl focus:ring-2 focus:ring-blue-500"
                       />
-                    ))
-                  ) : (
-                    <EmptyState type="given" />
-                  )}
-                </div>
-              </TabsContent>
-            </div>
-          </Tabs>
+                    </div>
+                    <Select
+                      value={ratingFilter}
+                      onValueChange={setRatingFilter}
+                    >
+                      <SelectTrigger className="w-full sm:w-48 h-12 border-0 bg-gray-50 rounded-2xl">
+                        <SelectValue
+                          placeholder={
+                            t("filter_by_rating") || "Filter by rating"
+                          }
+                        />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-xl border-0 shadow-lg">
+                        <SelectItem value="all">
+                          {t("all_ratings") || "All Ratings"}
+                        </SelectItem>
+                        <SelectItem value="5">
+                          5 {t("stars") || "Stars"}
+                        </SelectItem>
+                        <SelectItem value="4">
+                          4 {t("stars") || "Stars"}
+                        </SelectItem>
+                        <SelectItem value="3">
+                          3 {t("stars") || "Stars"}
+                        </SelectItem>
+                        <SelectItem value="2">
+                          2 {t("stars") || "Stars"}
+                        </SelectItem>
+                        <SelectItem value="1">
+                          1 {t("star") || "Star"}
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                    {filteredReviewsGiven.length > 0 ? (
+                      filteredReviewsGiven.map((review) => (
+                        <EditableReviewCard
+                          key={review.id}
+                          review={review}
+                          onUpdate={handleReviewUpdate}
+                        />
+                      ))
+                    ) : (
+                      <EmptyState type="given" />
+                    )}
+                  </div>
+                </TabsContent>
+              </div>
+            </Tabs>
+          </div>
         </div>
       </div>
-    </div>
+    </PageTransitionWrapper>
   );
 };
 

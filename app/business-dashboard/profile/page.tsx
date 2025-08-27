@@ -39,6 +39,7 @@ import {
 import { uploadToCloudinary } from "../../../utils/uploadToCloudinary";
 import { profileApi } from "@/app/services/profileApi";
 import { useAuth } from "@/context/AuthContext";
+import PageTransitionWrapper from "@/components/animations/PageTransitionWrapper";
 
 interface ProfileData {
   companyName: string;
@@ -319,418 +320,425 @@ export default function Component() {
   }
 
   return (
-    <div className="flex min-h-screen bg-white container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="flex-1 flex flex-col">
-        {error && (
-          <Alert className="mb-4 border-red-200 bg-red-50">
-            <AlertCircle className="w-4 h-4 text-red-600" />
-            <AlertDescription className="text-red-800">
-              {error}
-            </AlertDescription>
-          </Alert>
-        )}
+    <PageTransitionWrapper>
+      <div className="flex min-h-screen bg-white container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex-1 flex flex-col">
+          {error && (
+            <Alert className="mb-4 border-red-200 bg-red-50">
+              <AlertCircle className="w-4 h-4 text-red-600" />
+              <AlertDescription className="text-red-800">
+                {error}
+              </AlertDescription>
+            </Alert>
+          )}
 
-        {success && (
-          <Alert className="mb-4 border-green-200 bg-green-50">
-            <CheckCircle className="w-4 h-4 text-green-600" />
-            <AlertDescription className="text-green-800">
-              {success}
-            </AlertDescription>
-          </Alert>
-        )}
+          {success && (
+            <Alert className="mb-4 border-green-200 bg-green-50">
+              <CheckCircle className="w-4 h-4 text-green-600" />
+              <AlertDescription className="text-green-800">
+                {success}
+              </AlertDescription>
+            </Alert>
+          )}
 
-        <main className="flex-1 p-0 sm:p-6 overflow-auto">
-          <div className="pb-6 mb-6 border-b border-gray-200">
-            <div className="flex flex-col sm:flex-row items-center justify-between flex-wrap gap-4">
-              <div className="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
-                <div>
-                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
-                    {profileData.companyName || "Company Name"}
-                  </h2>
-                  <p className="text-base sm:text-lg text-gray-600">
-                    {profileData.companyDescription || "Company description"}
-                  </p>
-                  <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-6 text-sm sm:text-base text-gray-500 mt-3">
-                    <div className="flex items-center gap-2">
-                      <Mail className="w-4 h-4 sm:w-5 sm:h-5" />
-                      <span>
-                        {profileData.companyEmail || "company@email.com"}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Phone className="w-4 h-4 sm:w-5 sm:h-5" />
-                      <span>
-                        {profileData.companyPhoneCountryCode}{" "}
-                        {profileData.companyPhoneNumber || "Phone number"}
-                      </span>
+          <main className="flex-1 p-0 sm:p-6 overflow-auto">
+            <div className="pb-6 mb-6 border-b border-gray-200">
+              <div className="flex flex-col sm:flex-row items-center justify-between flex-wrap gap-4">
+                <div className="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
+                  <div>
+                    <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
+                      {profileData.companyName || "Company Name"}
+                    </h2>
+                    <p className="text-base sm:text-lg text-gray-600">
+                      {profileData.companyDescription || "Company description"}
+                    </p>
+                    <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-6 text-sm sm:text-base text-gray-500 mt-3">
+                      <div className="flex items-center gap-2">
+                        <Mail className="w-4 h-4 sm:w-5 sm:h-5" />
+                        <span>
+                          {profileData.companyEmail || "company@email.com"}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Phone className="w-4 h-4 sm:w-5 sm:h-5" />
+                        <span>
+                          {profileData.companyPhoneCountryCode}{" "}
+                          {profileData.companyPhoneNumber || "Phone number"}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
+                <div className="flex items-center gap-4 mt-4 sm:mt-0">
+                  {verificationStatus === "verified" ? (
+                    <div className="flex items-center gap-2 text-green-600 font-medium">
+                      <CheckCircle className="w-5 h-5" />
+                      <span>Verified</span>
+                    </div>
+                  ) : verificationStatus === "pending" ? (
+                    <div className="flex items-center gap-2 text-blue-600 font-medium">
+                      <Loader2 className="w-5 h-5" />
+                      <span>Verification Pending</span>
+                    </div>
+                  ) : verificationStatus === "rejected" ? (
+                    <div className="flex items-center gap-2 text-red-600 font-medium">
+                      <AlertCircle className="w-5 h-5" />
+                      <span>Verification Rejected</span>
+                    </div>
+                  ) : !isEditing ? (
+                    <Button
+                      onClick={handleEditClick}
+                      className="bg-[#5A4DFF] hover:bg-[#4a3dff] text-white rounded-md px-4 py-2 sm:px-6 sm:py-2 text-sm sm:text-base"
+                    >
+                      {t("edit_profile")}
+                    </Button>
+                  ) : (
+                    <>
+                      <Button
+                        onClick={handleSaveClick}
+                        disabled={saving}
+                        className="bg-green-500 hover:bg-green-600 text-white rounded-md px-4 py-2 sm:px-6 sm:py-2 flex items-center gap-2 text-sm sm:text-base"
+                      >
+                        {saving ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Save className="w-4 h-4" />
+                        )}
+                        {saving ? "Saving..." : t("save_changes")}
+                      </Button>
+                      <Button
+                        onClick={handleCancelClick}
+                        disabled={saving}
+                        variant="outline"
+                        className="rounded-md px-4 py-2 sm:px-6 sm:py-2 flex items-center gap-2 bg-transparent text-sm sm:text-base"
+                      >
+                        <X className="w-4 h-4" />
+                        {t("cancel")}
+                      </Button>
+                    </>
+                  )}
+                </div>
               </div>
-              <div className="flex items-center gap-4 mt-4 sm:mt-0">
-                {verificationStatus === "verified" ? (
-                  <div className="flex items-center gap-2 text-green-600 font-medium">
-                    <CheckCircle className="w-5 h-5" />
-                    <span>Verified</span>
-                  </div>
-                ) : verificationStatus === "pending" ? (
-                  <div className="flex items-center gap-2 text-blue-600 font-medium">
-                    <Loader2 className="w-5 h-5" />
-                    <span>Verification Pending</span>
-                  </div>
-                ) : verificationStatus === "rejected" ? (
-                  <div className="flex items-center gap-2 text-red-600 font-medium">
-                    <AlertCircle className="w-5 h-5" />
-                    <span>Verification Rejected</span>
-                  </div>
-                ) : !isEditing ? (
+              <div className="mt-8 pt-6 border-t border-gray-100">
+                <div className="flex items-center justify-between mb-2">
+                  <Label className="text-gray-700 font-semibold text-sm sm:text-base">
+                    {t("profile_completion")}
+                  </Label>
+                  <span className="text-sm font-medium text-gray-700">
+                    {Math.round(profileCompletion)}%
+                  </span>
+                </div>
+                <Progress
+                  value={profileCompletion}
+                  className="h-3 bg-gray-200 [&>*]:bg-[#5A4DFF]"
+                />
+                <p className="text-xs sm:text-sm text-gray-500 mt-2">
+                  {t("complete_your_profile_to_unlock_all_features")}
+                </p>
+                {canCompleteProfile && (
                   <Button
-                    onClick={handleEditClick}
-                    className="bg-[#5A4DFF] hover:bg-[#4a3dff] text-white rounded-md px-4 py-2 sm:px-6 sm:py-2 text-sm sm:text-base"
+                    onClick={handleCompleteProfileClick}
+                    className="mt-4 bg-blue-600 hover:bg-blue-700 text-white rounded-md px-4 py-2 sm:px-6 sm:py-2 text-sm sm:text-base"
                   >
-                    {t("edit_profile")}
+                    {t("complete_profile")}
                   </Button>
-                ) : (
-                  <>
-                    <Button
-                      onClick={handleSaveClick}
-                      disabled={saving}
-                      className="bg-green-500 hover:bg-green-600 text-white rounded-md px-4 py-2 sm:px-6 sm:py-2 flex items-center gap-2 text-sm sm:text-base"
-                    >
-                      {saving ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <Save className="w-4 h-4" />
-                      )}
-                      {saving ? "Saving..." : t("save_changes")}
-                    </Button>
-                    <Button
-                      onClick={handleCancelClick}
-                      disabled={saving}
-                      variant="outline"
-                      className="rounded-md px-4 py-2 sm:px-6 sm:py-2 flex items-center gap-2 bg-transparent text-sm sm:text-base"
-                    >
-                      <X className="w-4 h-4" />
-                      {t("cancel")}
-                    </Button>
-                  </>
                 )}
               </div>
             </div>
-            <div className="mt-8 pt-6 border-t border-gray-100">
-              <div className="flex items-center justify-between mb-2">
-                <Label className="text-gray-700 font-semibold text-sm sm:text-base">
-                  {t("profile_completion")}
-                </Label>
-                <span className="text-sm font-medium text-gray-700">
-                  {Math.round(profileCompletion)}%
-                </span>
-              </div>
-              <Progress
-                value={profileCompletion}
-                className="h-3 bg-gray-200 [&>*]:bg-[#5A4DFF]"
-              />
-              <p className="text-xs sm:text-sm text-gray-500 mt-2">
-                {t("complete_your_profile_to_unlock_all_features")}
-              </p>
-              {canCompleteProfile && (
-                <Button
-                  onClick={handleCompleteProfileClick}
-                  className="mt-4 bg-blue-600 hover:bg-blue-700 text-white rounded-md px-4 py-2 sm:px-6 sm:py-2 text-sm sm:text-base"
-                >
-                  {t("complete_profile")}
-                </Button>
-              )}
-            </div>
-          </div>
 
-          <Tabs defaultValue="profile-details" className="w-full mt-6">
-            <TabsList className="grid w-full grid-cols-2 bg-gray-100 rounded-lg p-1">
-              <TabsTrigger
-                value="profile-details"
-                className="data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-md text-sm sm:text-base"
-              >
-                {t("company_details")}
-              </TabsTrigger>
-              <TabsTrigger
-                value="account-verification"
-                className="data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-md text-sm sm:text-base"
-              >
-                {t("commercial_registration")}
-              </TabsTrigger>
-            </TabsList>
-            <TabsContent value="profile-details" className="pt-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <Label
-                    htmlFor="companyName"
-                    className="text-gray-700 text-sm sm:text-base"
-                  >
-                    {t("company_name")} *
-                  </Label>
-                  <Input
-                    id="companyName"
-                    value={profileData.companyName}
-                    onChange={handleInputChange}
-                    disabled={areInputsDisabled}
-                    className="mt-1"
-                  />
-                </div>
-                <div>
-                  <Label
-                    htmlFor="contactPersonName"
-                    className="text-gray-700 text-sm sm:text-base"
-                  >
-                    {t("contact_person_name")} *
-                  </Label>
-                  <Input
-                    id="contactPersonName"
-                    value={profileData.contactPersonName}
-                    onChange={handleInputChange}
-                    disabled={areInputsDisabled}
-                    className="mt-1"
-                  />
-                </div>
-                <div>
-                  <Label
-                    htmlFor="personalEmail"
-                    className="text-gray-700 text-sm sm:text-base"
-                  >
-                    {t("personal_email")} *
-                  </Label>
-                  <Input
-                    id="personalEmail"
-                    type="email"
-                    value={profileData.personalEmail}
-                    onChange={handleInputChange}
-                    disabled={areInputsDisabled}
-                    className="mt-1"
-                  />
-                </div>
-                <div>
-                  <Label
-                    htmlFor="companyEmail"
-                    className="text-gray-700 text-sm sm:text-base"
-                  >
-                    {t("company_email")} *
-                  </Label>
-                  <Input
-                    id="companyEmail"
-                    type="email"
-                    value={profileData.companyEmail}
-                    onChange={handleInputChange}
-                    disabled={areInputsDisabled}
-                    className="mt-1"
-                  />
-                </div>
-                <div>
-                  <Label
-                    htmlFor="companyPhoneNumber"
-                    className="text-gray-700 text-sm sm:text-base"
-                  >
-                    {t("company_phone")} *
-                  </Label>
-                  <div className="flex gap-2 mt-1">
-                    <Select
-                      value={profileData.companyPhoneCountryCode}
-                      onValueChange={handleSelectChange}
-                      disabled={areInputsDisabled}
+            <Tabs defaultValue="profile-details" className="w-full mt-6">
+              <TabsList className="grid w-full grid-cols-2 bg-gray-100 rounded-lg p-1">
+                <TabsTrigger
+                  value="profile-details"
+                  className="data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-md text-sm sm:text-base"
+                >
+                  {t("company_details")}
+                </TabsTrigger>
+                <TabsTrigger
+                  value="account-verification"
+                  className="data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-md text-sm sm:text-base"
+                >
+                  {t("commercial_registration")}
+                </TabsTrigger>
+              </TabsList>
+              <TabsContent value="profile-details" className="pt-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <Label
+                      htmlFor="companyName"
+                      className="text-gray-700 text-sm sm:text-base"
                     >
-                      <SelectTrigger className="w-[100px] sm:w-[120px]">
-                        <SelectValue placeholder={t("country")} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="QA">QA +974</SelectItem>
-                        <SelectItem value="US">US +1</SelectItem>
-                        <SelectItem value="UK">UK +44</SelectItem>
-                      </SelectContent>
-                    </Select>
+                      {t("company_name")} *
+                    </Label>
                     <Input
-                      id="companyPhoneNumber"
-                      value={profileData.companyPhoneNumber}
+                      id="companyName"
+                      value={profileData.companyName}
                       onChange={handleInputChange}
                       disabled={areInputsDisabled}
-                      className="flex-1"
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label
+                      htmlFor="contactPersonName"
+                      className="text-gray-700 text-sm sm:text-base"
+                    >
+                      {t("contact_person_name")} *
+                    </Label>
+                    <Input
+                      id="contactPersonName"
+                      value={profileData.contactPersonName}
+                      onChange={handleInputChange}
+                      disabled={areInputsDisabled}
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label
+                      htmlFor="personalEmail"
+                      className="text-gray-700 text-sm sm:text-base"
+                    >
+                      {t("personal_email")} *
+                    </Label>
+                    <Input
+                      id="personalEmail"
+                      type="email"
+                      value={profileData.personalEmail}
+                      onChange={handleInputChange}
+                      disabled={areInputsDisabled}
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label
+                      htmlFor="companyEmail"
+                      className="text-gray-700 text-sm sm:text-base"
+                    >
+                      {t("company_email")} *
+                    </Label>
+                    <Input
+                      id="companyEmail"
+                      type="email"
+                      value={profileData.companyEmail}
+                      onChange={handleInputChange}
+                      disabled={areInputsDisabled}
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label
+                      htmlFor="companyPhoneNumber"
+                      className="text-gray-700 text-sm sm:text-base"
+                    >
+                      {t("company_phone")} *
+                    </Label>
+                    <div className="flex gap-2 mt-1">
+                      <Select
+                        value={profileData.companyPhoneCountryCode}
+                        onValueChange={handleSelectChange}
+                        disabled={areInputsDisabled}
+                      >
+                        <SelectTrigger className="w-[100px] sm:w-[120px]">
+                          <SelectValue placeholder={t("country")} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="QA">QA +974</SelectItem>
+                          <SelectItem value="US">US +1</SelectItem>
+                          <SelectItem value="UK">UK +44</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Input
+                        id="companyPhoneNumber"
+                        value={profileData.companyPhoneNumber}
+                        onChange={handleInputChange}
+                        disabled={areInputsDisabled}
+                        className="flex-1"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <Label
+                      htmlFor="address"
+                      className="text-gray-700 text-sm sm:text-base"
+                    >
+                      Address *
+                    </Label>
+                    <Input
+                      id="address"
+                      value={profileData.address}
+                      onChange={handleInputChange}
+                      disabled={areInputsDisabled}
+                      className="mt-1"
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <Label
+                      htmlFor="companyDescription"
+                      className="text-gray-700 text-sm sm:text-base"
+                    >
+                      {t("company_description")} *
+                    </Label>
+                    <Input
+                      id="companyDescription"
+                      value={profileData.companyDescription}
+                      onChange={handleInputChange}
+                      disabled={areInputsDisabled}
+                      className="mt-1"
                     />
                   </div>
                 </div>
-                <div>
-                  <Label
-                    htmlFor="address"
-                    className="text-gray-700 text-sm sm:text-base"
-                  >
-                    Address *
-                  </Label>
-                  <Input
-                    id="address"
-                    value={profileData.address}
-                    onChange={handleInputChange}
-                    disabled={areInputsDisabled}
-                    className="mt-1"
-                  />
-                </div>
-                <div className="md:col-span-2">
-                  <Label
-                    htmlFor="companyDescription"
-                    className="text-gray-700 text-sm sm:text-base"
-                  >
-                    {t("company_description")} *
-                  </Label>
-                  <Input
-                    id="companyDescription"
-                    value={profileData.companyDescription}
-                    onChange={handleInputChange}
-                    disabled={areInputsDisabled}
-                    className="mt-1"
-                  />
-                </div>
-              </div>
-            </TabsContent>
-            <TabsContent value="account-verification" className="pt-6">
-              <div className="grid grid-cols-1 gap-6">
-                <div>
-                  <h3 className="text-base sm:text-lg font-semibold text-gray-900">
-                    {t("commercial_registration_verification")}
-                  </h3>
-                  <p className="text-xs sm:text-sm text-gray-500 mb-4">
-                    {t("this_info_is_used_to_verify_your_company_registration")}
-                  </p>
-                  <Label
-                    htmlFor="commercialRegistrationNumber"
-                    className="text-gray-700 text-sm sm:text-base"
-                  >
-                    {t("commercial_registration_number")} *
-                  </Label>
-                  <Input
-                    id="commercialRegistrationNumber"
-                    value={documentData.commercialRegistrationNumber}
-                    onChange={(e) =>
-                      setDocumentData((prev) => ({
-                        ...prev,
-                        commercialRegistrationNumber: e.target.value,
-                      }))
-                    }
-                    disabled={areInputsDisabled}
-                    className="mt-1"
-                  />
-                </div>
-                <div>
-                  <Label className="text-gray-700 text-sm sm:text-base">
-                    {t("upload_cr_document_pdf_jpg_png")} *
-                  </Label>
-                  {documentData.commercialRegistrationDoc ? (
-                    <div className="mt-1 p-4 border-2 border-green-300 rounded-lg bg-green-50">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <CheckCircle className="w-5 h-5 text-green-600" />
-                          <span className="text-green-800 text-sm">
-                            Document uploaded successfully
-                          </span>
-                        </div>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() =>
-                            window.open(
-                              documentData.commercialRegistrationDoc!,
-                              "_blank"
-                            )
-                          }
-                        >
-                          View
-                        </Button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="mt-1 border-2 border-dashed border-gray-300 rounded-lg p-4 sm:p-6 text-center flex flex-col items-center justify-center space-y-3">
-                      {uploadingFile ? (
-                        <>
-                          <Loader2 className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400 animate-spin" />
-                          <p className="text-xs sm:text-sm text-gray-600">
-                            Uploading document...
-                          </p>
-                        </>
-                      ) : (
-                        <>
-                          <Upload className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" />
-                          <p className="text-xs sm:text-sm text-gray-600">
-                            {t(
-                              "drag_and_drop_your_file_here_or_click_to_browse"
-                            )}
-                          </p>
+              </TabsContent>
+              <TabsContent value="account-verification" className="pt-6">
+                <div className="grid grid-cols-1 gap-6">
+                  <div>
+                    <h3 className="text-base sm:text-lg font-semibold text-gray-900">
+                      {t("commercial_registration_verification")}
+                    </h3>
+                    <p className="text-xs sm:text-sm text-gray-500 mb-4">
+                      {t(
+                        "this_info_is_used_to_verify_your_company_registration"
+                      )}
+                    </p>
+                    <Label
+                      htmlFor="commercialRegistrationNumber"
+                      className="text-gray-700 text-sm sm:text-base"
+                    >
+                      {t("commercial_registration_number")} *
+                    </Label>
+                    <Input
+                      id="commercialRegistrationNumber"
+                      value={documentData.commercialRegistrationNumber}
+                      onChange={(e) =>
+                        setDocumentData((prev) => ({
+                          ...prev,
+                          commercialRegistrationNumber: e.target.value,
+                        }))
+                      }
+                      disabled={areInputsDisabled}
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-gray-700 text-sm sm:text-base">
+                      {t("upload_cr_document_pdf_jpg_png")} *
+                    </Label>
+                    {documentData.commercialRegistrationDoc ? (
+                      <div className="mt-1 p-4 border-2 border-green-300 rounded-lg bg-green-50">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <CheckCircle className="w-5 h-5 text-green-600" />
+                            <span className="text-green-800 text-sm">
+                              Document uploaded successfully
+                            </span>
+                          </div>
                           <Button
                             variant="outline"
-                            className="px-4 py-2 sm:px-6 sm:py-2 bg-transparent text-sm sm:text-base relative"
-                            disabled={areInputsDisabled || uploadingFile}
+                            size="sm"
+                            onClick={() =>
+                              window.open(
+                                documentData.commercialRegistrationDoc!,
+                                "_blank"
+                              )
+                            }
                           >
-                            {t("choose_file")}
-                            <input
-                              type="file"
-                              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                              accept=".pdf,.jpg,.jpeg,.png"
-                              onChange={handleFileUpload}
-                              disabled={areInputsDisabled || uploadingFile}
-                            />
+                            View
                           </Button>
-                          <p className="text-xs text-gray-500">
-                            {t("pdf_jpg_png_up_to_10mb")}
-                          </p>
-                        </>
-                      )}
-                    </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="mt-1 border-2 border-dashed border-gray-300 rounded-lg p-4 sm:p-6 text-center flex flex-col items-center justify-center space-y-3">
+                        {uploadingFile ? (
+                          <>
+                            <Loader2 className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400 animate-spin" />
+                            <p className="text-xs sm:text-sm text-gray-600">
+                              Uploading document...
+                            </p>
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" />
+                            <p className="text-xs sm:text-sm text-gray-600">
+                              {t(
+                                "drag_and_drop_your_file_here_or_click_to_browse"
+                              )}
+                            </p>
+                            <Button
+                              variant="outline"
+                              className="px-4 py-2 sm:px-6 sm:py-2 bg-transparent text-sm sm:text-base relative"
+                              disabled={areInputsDisabled || uploadingFile}
+                            >
+                              {t("choose_file")}
+                              <input
+                                type="file"
+                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                accept=".pdf,.jpg,.jpeg,.png"
+                                onChange={handleFileUpload}
+                                disabled={areInputsDisabled || uploadingFile}
+                              />
+                            </Button>
+                            <p className="text-xs text-gray-500">
+                              {t("pdf_jpg_png_up_to_10mb")}
+                            </p>
+                          </>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {verificationStatus === "rejected" && (
+                    <Alert className="border-red-200 bg-red-50">
+                      <AlertCircle className="w-4 h-4 text-red-600" />
+                      <AlertDescription className="text-red-800">
+                        <strong>Verification Rejected:</strong>{" "}
+                        {verificationStatus}
+                      </AlertDescription>
+                    </Alert>
                   )}
                 </div>
+              </TabsContent>
+            </Tabs>
+          </main>
+        </div>
 
-                {verificationStatus === "rejected" && (
-                  <Alert className="border-red-200 bg-red-50">
-                    <AlertCircle className="w-4 h-4 text-red-600" />
-                    <AlertDescription className="text-red-800">
-                      <strong>Verification Rejected:</strong>{" "}
-                      {verificationStatus}
-                    </AlertDescription>
-                  </Alert>
+        <Dialog
+          open={showCompletionModal}
+          onOpenChange={setShowCompletionModal}
+        >
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>{t("confirm_profile_completion")}</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to submit your profile for verification?
+                Once submitted, your documents will be reviewed by our team and
+                you cannot edit them until the review is complete.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={handleCloseModal}
+                disabled={saving}
+              >
+                {t("cancel")}
+              </Button>
+              <Button
+                onClick={handleConfirmCompletion}
+                disabled={saving}
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                {saving ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                    Submitting...
+                  </>
+                ) : (
+                  t("confirm")
                 )}
-              </div>
-            </TabsContent>
-          </Tabs>
-        </main>
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
-
-      <Dialog open={showCompletionModal} onOpenChange={setShowCompletionModal}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>{t("confirm_profile_completion")}</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to submit your profile for verification?
-              Once submitted, your documents will be reviewed by our team and
-              you cannot edit them until the review is complete.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={handleCloseModal}
-              disabled={saving}
-            >
-              {t("cancel")}
-            </Button>
-            <Button
-              onClick={handleConfirmCompletion}
-              disabled={saving}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
-            >
-              {saving ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                  Submitting...
-                </>
-              ) : (
-                t("confirm")
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </div>
+    </PageTransitionWrapper>
   );
 }

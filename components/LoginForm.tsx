@@ -23,24 +23,34 @@ export default function LoginForm() {
     e.preventDefault();
     setIsPending(true);
 
-    const result = await login(email, password);
+    try {
+      const result = await login(email, password);
 
-    if (result.success) {
+      if (result.success) {
+        toast({
+          title: "✅ Success",
+          description: "Login successful! Redirecting...",
+          variant: "default",
+        });
+        // Redirect handled in AuthContext.login
+      } else {
+        toast({
+          title: "❌ Error",
+          description: result.error || "Invalid credentials",
+          variant: "destructive",
+        });
+      }
+    } catch (err: any) {
+      // Fallback if something unexpected bubbles up
+      console.error("LoginForm error:", err);
       toast({
-        title: "Success",
-        description: "Login successful! Redirecting...",
-        variant: "default",
-      });
-      // Redirect is already handled inside AuthContext.login()
-    } else {
-      toast({
-        title: "Error",
-        description: result.error || "Invalid credentials",
+        title: "Unexpected Error",
+        description: "Something went wrong. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsPending(false);
     }
-
-    setIsPending(false);
   };
 
   return (
@@ -55,6 +65,7 @@ export default function LoginForm() {
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          disabled={isPending}
         />
       </div>
 
@@ -76,6 +87,7 @@ export default function LoginForm() {
           required
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          disabled={isPending}
         />
       </div>
 
@@ -85,7 +97,7 @@ export default function LoginForm() {
         disabled={isPending}
       >
         {isPending ? "Logging in..." : "Login"}
-        <MailCheck className="ml-2 h-4 w-4" />
+        {!isPending && <MailCheck className="ml-2 h-4 w-4" />}
       </Button>
 
       <div className="mt-4 text-center text-sm text-muted-foreground">
