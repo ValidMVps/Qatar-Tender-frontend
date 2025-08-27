@@ -48,14 +48,12 @@ interface ProjectDetailsSidebarProps
     postedBy: string | { _id: string; email: string; userType?: string };
   } | null;
   getStatusColor: (status: string) => string;
-  onMarkComplete: () => void;
   currentUserId: string;
 }
 
 export function ProjectDetailsSidebarawarded({
   selectedProject,
   getStatusColor,
-  onMarkComplete,
   currentUserId,
   className,
   ...props
@@ -135,7 +133,6 @@ export function ProjectDetailsSidebarawarded({
       }
       await updateBidStatus(bid._id, "completed");
       await updateTenderStatus(selectedProject.id, "completed");
-      onMarkComplete(); // This should trigger a refresh of the selectedProject
       setCompleteStep(2); // Move to review step in dialog
     } catch (err) {
       setError("Failed to mark project as complete");
