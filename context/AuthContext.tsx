@@ -1,3 +1,4 @@
+// contexts/AuthProvider.js (or wherever your AuthProvider is located)
 "use client";
 
 import React, {
@@ -5,11 +6,14 @@ import React, {
   useContext,
   useEffect,
   useState,
+  useCallback,
   ReactNode,
 } from "react";
 import { useRouter } from "next/navigation";
-import { authService, RegisterData, User } from "@/utils/auth"; // import api here
+import { authService, RegisterData, User } from "@/utils/auth";
 import { api } from "@/lib/apiClient";
+import socketService from "@/lib/socket"; // Import our socket service
+import { getTokenFromCookie } from "@/utils/tokenHelpers";
 
 // Profile type (based on your backend schema)
 interface Profile {
@@ -119,10 +123,57 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
+  // Initialize socket connection when user is authenticated
+  const initializeSocketConnection = useCallback(() => {
+    if (user && user._id) {
+      console.log(
+        "AuthProvider: Initializing socket connection for user:",
+        user._id
+      );
+
+      // Get the auth token (adjust based on how your authService stores it)
+      const token = getTokenFromCookie(); // Make sure authService has getToken()
+
+      if (token) {
+        // Connect socket with the token for authentication
+        socketService.connect(token);
+
+        // Join user's specific room after a short delay to ensure connection
+        setTimeout(() => {
+          socketService.joinUserRoom(user._id);
+        }, 500); // Adjust delay if needed
+      } else {
+        console.warn(
+          "AuthProvider: No auth token found, cannot connect socket"
+        );
+      }
+    }
+  }, [user]); // Re-run if user changes
+
+  // Disconnect socket
+  const disconnectSocket = useCallback(() => {
+    console.log("AuthProvider: Disconnecting socket");
+    socketService.disconnect();
+  }, []);
+
   // Run on mount
   useEffect(() => {
     checkAuth();
   }, []);
+
+  // Handle socket connection when user state changes
+  useEffect(() => {
+    if (user) {
+      initializeSocketConnection();
+    } else {
+      disconnectSocket();
+    }
+
+    // Cleanup function on unmount or before user changes
+    return () => {
+      disconnectSocket();
+    };
+  }, [user, initializeSocketConnection, disconnectSocket]); // Dependencies
 
   // Re-check when window regains focus
   useEffect(() => {
@@ -181,6 +232,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     setUser(null);
     setProfile(null);
     authService.logout();
+    disconnectSocket(); // Explicitly disconnect on logout
   };
 
   const forgotPassword = async (email: string) => {

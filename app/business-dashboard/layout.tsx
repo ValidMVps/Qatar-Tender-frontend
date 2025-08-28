@@ -24,6 +24,7 @@ import BNavbar from "@/components/Bnavbar";
 
 import { useTranslation } from "../../lib/hooks/useTranslation";
 import { ProtectedRoute } from "@/components/auth-guard";
+import { NotificationProvider } from "@/context/NotificationContext";
 
 export default function DashboardLayout({
   children,
@@ -137,74 +138,76 @@ export default function DashboardLayout({
 
   return (
     <ProtectedRoute allowedUserTypes={["business"]}>
-      <div className="min-h-screen bg-gray-50 flex flex-col lg:flex-row">
-        {/* Mobile overlay menu */}
-        {sidebarOpen && (
-          <motion.div
-            className="fixed inset-0 z-40 flex lg:hidden"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ type: "keyframes", stiffness: 300, damping: 30 }}
-          >
-            <div
-              className="fixed inset-0 bg-black/20"
-              onClick={() => setSidebarOpen(false)}
-            />
+      <NotificationProvider>
+        <div className="min-h-screen bg-gray-50 flex flex-col lg:flex-row">
+          {/* Mobile overlay menu */}
+          {sidebarOpen && (
             <motion.div
-              className="relative flex w-64 flex-col bg-white h-full z-50 shadow-lg"
-              initial={{ x: -200 }}
-              animate={{ x: 0 }}
-              exit={{ x: -200 }}
+              className="fixed inset-0 z-40 flex lg:hidden"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
               transition={{ type: "keyframes", stiffness: 300, damping: 30 }}
             >
-              <div className="flex items-center justify-between px-3 py-4">
-                <div className="flex items-center">
-                  <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center shadow-sm">
-                    <Building2 className="h-5 w-5 text-white" />
+              <div
+                className="fixed inset-0 bg-black/20"
+                onClick={() => setSidebarOpen(false)}
+              />
+              <motion.div
+                className="relative flex w-64 flex-col bg-white h-full z-50 shadow-lg"
+                initial={{ x: -200 }}
+                animate={{ x: 0 }}
+                exit={{ x: -200 }}
+                transition={{ type: "keyframes", stiffness: 300, damping: 30 }}
+              >
+                <div className="flex items-center justify-between px-3 py-4">
+                  <div className="flex items-center">
+                    <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center shadow-sm">
+                      <Building2 className="h-5 w-5 text-white" />
+                    </div>
+                    <span className="ml-2 text-lg font-semibold text-gray-900">
+                      {t("tenderhub_qatar")}
+                    </span>
                   </div>
-                  <span className="ml-2 text-lg font-semibold text-gray-900">
-                    {t("tenderhub_qatar")}
-                  </span>
+                  <button onClick={() => setSidebarOpen(false)}>
+                    <X className="h-6 w-6 text-gray-600" />
+                  </button>
                 </div>
-                <button onClick={() => setSidebarOpen(false)}>
-                  <X className="h-6 w-6 text-gray-600" />
-                </button>
-              </div>
-              <nav className="mt-2 px-2">{renderLinks()}</nav>
+                <nav className="mt-2 px-2">{renderLinks()}</nav>
+              </motion.div>
             </motion.div>
-          </motion.div>
-        )}
+          )}
 
-        {/* Desktop sidebar */}
-        <aside className="sticky top-0 h-screen bg-white border-r border-gray-200 hidden lg:flex flex-col w-64">
-          <div className="px-4 py-6">
-            <div className="flex items-center space-x-3">
-              <div className="w-9 h-9 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-sm">
-                <Building2 className="h-5 w-5 text-white" />
+          {/* Desktop sidebar */}
+          <aside className="sticky top-0 h-screen bg-white border-r border-gray-200 hidden lg:flex flex-col w-64">
+            <div className="px-4 py-6">
+              <div className="flex items-center space-x-3">
+                <div className="w-9 h-9 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-sm">
+                  <Building2 className="h-5 w-5 text-white" />
+                </div>
+                <span className="text-2xl font-semibold text-gray-900">
+                  {t("tenderhub")}
+                </span>
               </div>
-              <span className="text-2xl font-semibold text-gray-900">
-                {t("tenderhub")}
-              </span>
             </div>
-          </div>
-          <nav className="px-2 pb-4 flex-1 overflow-y-auto">
-            {renderLinks()}
-          </nav>
-        </aside>
+            <nav className="px-2 pb-4 flex-1 overflow-y-auto">
+              {renderLinks()}
+            </nav>
+          </aside>
 
-        {/* Main content */}
-        <div className="flex-1 flex flex-col min-w-0 bg-white">
-          <BNavbar
-            sidebarOpen={sidebarOpen}
-            setSidebarOpen={setSidebarOpen}
-            sidebarLinks={[]} // Navbar no longer needs flat list
-          />
-          <main className="flex-1 w-full px-2 sm:px-4 py-0 md:mt-0  mt-[70px] bg-neutral-50/30">
-            {children}
-          </main>
+          {/* Main content */}
+          <div className="flex-1 flex flex-col min-w-0 bg-white">
+            <BNavbar
+              sidebarOpen={sidebarOpen}
+              setSidebarOpen={setSidebarOpen}
+              sidebarLinks={[]} // Navbar no longer needs flat list
+            />
+            <main className="flex-1 w-full px-2 sm:px-4 py-0 md:mt-0  mt-[70px] bg-neutral-50/30">
+              {children}
+            </main>
+          </div>
         </div>
-      </div>
+      </NotificationProvider>
     </ProtectedRoute>
   );
 }
