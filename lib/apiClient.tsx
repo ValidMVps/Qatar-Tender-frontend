@@ -5,7 +5,7 @@ import {
   clearTokens,
 } from "@/utils/tokenHelpers";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 // Create axios instance
 const api = axios.create({
