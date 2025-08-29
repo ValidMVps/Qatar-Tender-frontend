@@ -23,12 +23,13 @@ import {
   CheckCircle,
   Star,
   Eye,
+  ChevronRight,
 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { useTranslation } from "../lib/hooks/useTranslation";
 import { updateTenderStatus } from "@/app/services/tenderService";
 import { createReview, getReviewForTender } from "@/app/services/ReviewService";
-import { getTenderBids, updateBidStatus } from "@/app/services/BidService"; // Import bid service
+import { getTenderBids, updateBidStatus } from "@/app/services/BidService";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 
@@ -62,7 +63,7 @@ export function ProjectDetailsSidebarawarded({
 }: ProjectDetailsSidebarProps) {
   const [isCompleteDialogOpen, setIsCompleteDialogOpen] = useState(false);
   const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false);
-  const [completeStep, setCompleteStep] = useState(1); // 1: confirm, 2: review
+  const [completeStep, setCompleteStep] = useState(1);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [loading, setLoading] = useState(false);
@@ -86,15 +87,12 @@ export function ProjectDetailsSidebarawarded({
 
   // Fetch the selected bid amount when project changes
   useEffect(() => {
-
     const fetchSelectedBidAmount = async () => {
       if (!selectedProject || !selectedProject.awardedTo) return;
 
       setBidLoading(true);
       try {
         const bids = await getTenderBids(selectedProject.id);
-        // Find the bid from the awarded user
-     
         const awardedBid = bids.find(
           (bid: any) => bid.status === "accepted" || bid.status === "completed"
         );
@@ -127,7 +125,7 @@ export function ProjectDetailsSidebarawarded({
       }
       await updateBidStatus(bid._id, "completed");
       await updateTenderStatus(selectedProject.id, "completed");
-      setCompleteStep(2); // Move to review step in dialog
+      setCompleteStep(2);
     } catch (err) {
       setError("Failed to mark project as complete");
       console.error(err);
@@ -149,7 +147,7 @@ export function ProjectDetailsSidebarawarded({
       });
       setIsCompleteDialogOpen(false);
       setIsReviewDialogOpen(false);
-      setCompleteStep(1); // Reset for next time
+      setCompleteStep(1);
       setRating(0);
       setComment("");
       setRefresh((prev) => prev + 1);
@@ -162,7 +160,7 @@ export function ProjectDetailsSidebarawarded({
 
   const handleCloseCompleteDialog = () => {
     setIsCompleteDialogOpen(false);
-    setCompleteStep(1); // Reset to first step
+    setCompleteStep(1);
     setRating(0);
     setComment("");
     setError(null);
@@ -178,11 +176,18 @@ export function ProjectDetailsSidebarawarded({
   if (!selectedProject) {
     return (
       <div
-        className={`flex flex-col h-full border-l bg-background overflow-hidden ${className}`}
+        className={`flex flex-col h-full overflow-hidden ${className}`}
         {...props}
       >
-        <div className="flex items-center justify-center h-full">
-          <p className="text-muted-foreground">{t("select_a_project")}</p>
+        <div className="h-full bg-white/80 backdrop-blur-sm rounded-2xl border border-gray-200/60 shadow-lg shadow-gray-200/40 dark:bg-gray-900/80 dark:border-gray-700/60 dark:shadow-gray-900/40 flex items-center justify-center">
+          <div className="text-center p-8">
+            <div className="p-4 bg-gray-100 dark:bg-gray-800 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+              <FileText className="h-6 w-6 text-gray-400" />
+            </div>
+            <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">
+              {t("select_a_project")}
+            </p>
+          </div>
         </div>
       </div>
     );
@@ -190,160 +195,219 @@ export function ProjectDetailsSidebarawarded({
 
   return (
     <div
-      className={`flex flex-col h-full border-l bg-background overflow-hidden ${className}`}
+      className={`flex flex-col h-full overflow-hidden ${className}`}
       {...props}
     >
-      <ScrollArea className="h-full">
-        <div className="p-6">
-          <h3 className="text-lg font-semibold mb-6 text-black">
+      <div className="h-full bg-white/80 backdrop-blur-sm rounded-2xl border border-gray-200/60 shadow-lg shadow-gray-200/40 dark:bg-gray-900/80 dark:border-gray-700/60 dark:shadow-gray-900/40 flex flex-col overflow-hidden">
+        {/* Header */}
+        <div className="p-6 pb-4 border-b border-gray-100 dark:border-gray-700/50">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-3">
+            <div className="p-2 bg-blue-100 dark:bg-blue-900/40 rounded-lg">
+              <FileText className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+            </div>
             {t("project_details")}
           </h3>
-          <Card className="mb-6 bg-transparent px-0 border-0 rounded-lg shadow-none">
-            <CardHeader className="px-0">
-              <CardTitle className="flex items-center gap-2 text-black">
-                <FileText className="w-5 h-5" />
+        </div>
+
+        <ScrollArea className="flex-1">
+          <div className="p-6 space-y-6">
+            {/* Project Title Card */}
+            <div className="bg-gradient-to-br from-gray-50/80 to-white dark:from-gray-800/80 dark:to-gray-900/80 rounded-xl border border-gray-200/60 dark:border-gray-700/60 p-4">
+              <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-3 leading-5">
                 {selectedProject.title}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4 px-0">
-              <div>
-                <label className="text-sm font-medium text-gray-600">
-                  {t("description")}
-                </label>
-                <p className="text-sm mt-1 text-gray-800">
-                  {selectedProject.description}
-                </p>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-medium text-gray-600 flex items-center gap-1">
-                    <DollarSign className="w-4 h-4" />
-                    {/* Changed heading to "selected amount" */}
-                    {t("selected_amount")}
+              </h4>
+
+              <div className="space-y-4">
+                {/* Description */}
+                <div className="space-y-2">
+                  <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                    {t("description")}
                   </label>
-                  <p className="text-sm font-semibold mt-1 text-gray-800">
-                    {/* Display the fetched bid amount */}
-                    {bidLoading
-                      ? "Loading..."
-                      : selectedBidAmount || "Not specified"}
+                  <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                    {selectedProject.description}
                   </p>
                 </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-600">
-                    {t("status")}
-                  </label>
-                  <div className="mt-1">
-                    <Badge
-                      variant="secondary"
-                      className={getStatusColor(selectedProject.status)}
-                    >
-                      {selectedProject.status}
-                    </Badge>
+
+                {/* Status and Amount */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide flex items-center gap-1">
+                      <DollarSign className="w-3 h-3" />
+                      {t("selected_amount")}
+                    </label>
+                    <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-200/60 dark:border-gray-700/60">
+                      {bidLoading ? (
+                        <div className="flex items-center gap-2">
+                          <div className="animate-pulse bg-gray-200 dark:bg-gray-700 rounded h-4 w-16"></div>
+                        </div>
+                      ) : (
+                        <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                          {selectedBidAmount || "Not specified"}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                      {t("status")}
+                    </label>
+                    <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-200/60 dark:border-gray-700/60">
+                      <Badge
+                        variant="secondary"
+                        className={`${getStatusColor(
+                          selectedProject.status
+                        )} text-xs px-2 py-1 rounded-full border-0 font-medium`}
+                      >
+                        {selectedProject.status}
+                      </Badge>
+                    </div>
                   </div>
                 </div>
+
+                {/* Start Date */}
+                <div className="space-y-2">
+                  <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide flex items-center gap-1">
+                    <Calendar className="w-3 h-3" />
+                    {t("start_date")}
+                  </label>
+                  <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-200/60 dark:border-gray-700/60">
+                    <p className="text-sm text-gray-700 dark:text-gray-300">
+                      {selectedProject.startDate.slice(0, 10)}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Awarded By */}
+                {selectedProject.awardedTo && (
+                  <div className="space-y-2">
+                    <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide flex items-center gap-1">
+                      <User className="w-3 h-3" />
+                      {t("awarded_by")}
+                    </label>
+                    <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-200/60 dark:border-gray-700/60">
+                      <p className="text-sm text-gray-700 dark:text-gray-300">
+                        {typeof selectedProject.postedBy === "object"
+                          ? selectedProject.postedBy.email
+                          : selectedProject.postedBy}
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
-              <div>
-                <label className="text-sm font-medium text-gray-600 flex items-center gap-1">
-                  <Calendar className="w-4 h-4" />
-                  {t("start_date")}
-                </label>
-                <p className="text-sm mt-1 text-gray-800">
-                  {selectedProject.startDate}
+            </div>
+
+            {/* Error Display */}
+            {error && (
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4">
+                <p className="text-sm text-red-700 dark:text-red-400">
+                  {error}
                 </p>
               </div>
-              {selectedProject.awardedTo && (
-                <div>
-                  <label className="text-sm font-medium text-gray-600 flex items-center gap-1">
-                    <User className="w-4 h-4" />
-                    {t("awarded_by")}
-                  </label>
-                  <p className="text-sm mt-1 text-gray-800">
-                    {typeof selectedProject.postedBy === "object"
-                      ? selectedProject.postedBy.email
-                      : selectedProject.postedBy}
-                  </p>
-                </div>
+            )}
+
+            {/* Action Buttons */}
+            <div className="space-y-3">
+              {/* View Details Button */}
+              <Link href={`/business-dashboard/tender-details/${selectedProject.id}`}>
+                <Button className="w-full group bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl py-6 transition-all duration-200 shadow-md hover:shadow-lg">
+                  <div className="flex items-center justify-between w-full">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-white/20 rounded-lg">
+                        <Eye className="w-4 h-4" />
+                      </div>
+                      <span className="font-medium">
+                        {t("view_tender_details")}
+                      </span>
+                    </div>
+                    <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </Button>
+              </Link>
+
+              {/* Mark as Complete Button */}
+              {isTenderOwner && isAwarded && (
+                <Button
+                  className="w-full group bg-gradient-to-r from-gray-900 to-gray-800 hover:from-black hover:to-gray-900 text-white rounded-xl py-6 transition-all duration-200 shadow-md hover:shadow-lg"
+                  onClick={() => setIsCompleteDialogOpen(true)}
+                >
+                  <div className="flex items-center justify-between w-full">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-white/20 rounded-lg">
+                        <CheckCircle className="w-4 h-4" />
+                      </div>
+                      <span className="font-medium">
+                        {t("mark_as_completed")}
+                      </span>
+                    </div>
+                    <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </Button>
               )}
-            </CardContent>
-          </Card>
 
-          {error && (
-            <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">
-              {error}
+              {/* Leave Review Button */}
+              {isTenderOwner && isCompleted && !hasReview && (
+                <Button
+                  className="w-full group bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white rounded-xl py-6 transition-all duration-200 shadow-md hover:shadow-lg"
+                  onClick={() => setIsReviewDialogOpen(true)}
+                >
+                  <div className="flex items-center justify-between w-full">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-white/20 rounded-lg">
+                        <Star className="w-4 h-4" />
+                      </div>
+                      <span className="font-medium">{t("leave_review")}</span>
+                    </div>
+                    <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </Button>
+              )}
             </div>
-          )}
-
-          <div className="space-y-3">
-            {/* Always visible View Details button */}
-            <Link
-              href={
-                profile?.userType !== "business"
-                  ? `/dashboard/tender/${selectedProject.id}`
-                  : `/business-dashboard/tender/${selectedProject.id}`
-              }
-            >
-              <Button
-                className="w-full justify-start rounded-lg bg-blue-600 text-white hover:bg-blue-700"
-                variant="default"
-              >
-                <Eye className="w-4 h-4 mr-2" />
-                {t("view_tender_details")}
-              </Button>
-            </Link>
-
-            {isTenderOwner && isAwarded && (
-              <Button
-                className="w-full justify-start mt-4 rounded-lg bg-black text-white hover:bg-gray-800"
-                variant="default"
-                onClick={() => setIsCompleteDialogOpen(true)}
-              >
-                <CheckCircle className="w-4 h-4 mr-2" />
-                {t("mark_as_completed")}
-              </Button>
-            )}
-
-            {isTenderOwner && isCompleted && !hasReview && (
-              <Button
-                className="w-full justify-start rounded-lg bg-green-600 text-white hover:bg-green-700"
-                variant="default"
-                onClick={() => setIsReviewDialogOpen(true)}
-              >
-                <Star className="w-4 h-4 mr-2" />
-                {t("leave_review")}
-              </Button>
-            )}
           </div>
-        </div>
-      </ScrollArea>
+        </ScrollArea>
+      </div>
 
-      {/* Mark as Complete Dialog (Multi-step) */}
+      {/* Mark as Complete Dialog */}
       <Dialog
         open={isCompleteDialogOpen}
         onOpenChange={handleCloseCompleteDialog}
       >
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[500px] bg-white/95 backdrop-blur-sm border-0 shadow-2xl rounded-2xl">
           {completeStep === 1 && (
             <>
-              <DialogHeader>
-                <DialogTitle>{t("mark_as_completed")}</DialogTitle>
-                <DialogDescription>
+              <DialogHeader className="pb-6">
+                <DialogTitle className="text-xl font-semibold text-gray-900 flex items-center gap-3">
+                  <div className="p-2 bg-gray-100 rounded-lg">
+                    <CheckCircle className="h-5 w-5 text-gray-700" />
+                  </div>
+                  {t("mark_as_completed")}
+                </DialogTitle>
+                <DialogDescription className="text-gray-600 mt-2">
                   {t("confirm_mark_complete")}
                 </DialogDescription>
               </DialogHeader>
-              <DialogFooter>
+              <DialogFooter className="flex gap-3 pt-6">
                 <Button
                   variant="outline"
                   onClick={handleCloseCompleteDialog}
                   disabled={loading}
+                  className="rounded-xl px-6 py-3 border-gray-300 hover:bg-gray-50"
                 >
                   {t("cancel")}
                 </Button>
                 <Button
                   onClick={handleMarkAsComplete}
                   disabled={loading}
-                  className="bg-black text-white hover:bg-gray-800"
+                  className="bg-gradient-to-r from-gray-900 to-gray-800 hover:from-black hover:to-gray-900 text-white rounded-xl px-6 py-3"
                 >
-                  {loading ? t("processing") : t("confirm")}
+                  {loading ? (
+                    <div className="flex items-center gap-2">
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                      {t("processing")}
+                    </div>
+                  ) : (
+                    t("confirm")
+                  )}
                 </Button>
               </DialogFooter>
             </>
@@ -351,43 +415,61 @@ export function ProjectDetailsSidebarawarded({
 
           {completeStep === 2 && (
             <>
-              <DialogHeader>
-                <DialogTitle>{t("rate_project_completion")}</DialogTitle>
-                <DialogDescription>{t("please_rate_worker")}</DialogDescription>
+              <DialogHeader className="pb-6">
+                <DialogTitle className="text-xl font-semibold text-gray-900 flex items-center gap-3">
+                  <div className="p-2 bg-yellow-100 rounded-lg">
+                    <Star className="h-5 w-5 text-yellow-600" />
+                  </div>
+                  {t("rate_project_completion")}
+                </DialogTitle>
+                <DialogDescription className="text-gray-600 mt-2">
+                  {t("please_rate_worker")}
+                </DialogDescription>
               </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="flex items-center gap-2">
-                  <label className="text-right w-16">{t("rating")}</label>
-                  <div className="flex gap-1">
+
+              <div className="space-y-6 py-4">
+                <div className="space-y-3">
+                  <label className="text-sm font-medium text-gray-700">
+                    {t("rating")}
+                  </label>
+                  <div className="flex gap-2">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <Star
                         key={star}
-                        className={`h-6 w-6 cursor-pointer ${
+                        className={`h-8 w-8 cursor-pointer transition-all duration-200 ${
                           rating >= star
-                            ? "fill-yellow-400 text-yellow-400"
-                            : "text-muted-foreground"
+                            ? "fill-yellow-400 text-yellow-400 scale-110"
+                            : "text-gray-300 hover:text-yellow-300"
                         }`}
                         onClick={() => setRating(star)}
                       />
                     ))}
                   </div>
                 </div>
-                <div className="grid gap-2">
-                  <label htmlFor="comment">{t("review")}</label>
+
+                <div className="space-y-3">
+                  <label
+                    htmlFor="comment"
+                    className="text-sm font-medium text-gray-700"
+                  >
+                    {t("review")}
+                  </label>
                   <Textarea
                     id="comment"
                     placeholder={t("write_your_feedback")}
                     value={comment}
                     onChange={(e) => setComment(e.target.value)}
-                    className="min-h-[100px]"
+                    className="min-h-[120px] rounded-xl border-gray-300 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
                   />
                 </div>
               </div>
-              <DialogFooter>
+
+              <DialogFooter className="flex gap-3 pt-6">
                 <Button
                   variant="outline"
                   onClick={handleCloseCompleteDialog}
                   disabled={loading}
+                  className="rounded-xl px-6 py-3 border-gray-300 hover:bg-gray-50"
                 >
                   {t("skip")}
                 </Button>
@@ -395,9 +477,16 @@ export function ProjectDetailsSidebarawarded({
                   type="submit"
                   onClick={handleReviewSubmit}
                   disabled={rating === 0 || loading}
-                  className="bg-black text-white hover:bg-gray-800"
+                  className="bg-gradient-to-r from-gray-900 to-gray-800 hover:from-black hover:to-gray-900 text-white rounded-xl px-6 py-3"
                 >
-                  {loading ? t("submitting") : t("submit_review")}
+                  {loading ? (
+                    <div className="flex items-center gap-2">
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                      {t("submitting")}
+                    </div>
+                  ) : (
+                    t("submit_review")
+                  )}
                 </Button>
               </DialogFooter>
             </>
@@ -405,50 +494,71 @@ export function ProjectDetailsSidebarawarded({
         </DialogContent>
       </Dialog>
 
-      {/* Review Dialog (Separate dialog for completed projects) */}
+      {/* Review Dialog (Separate) */}
       <Dialog open={isReviewDialogOpen} onOpenChange={handleCloseReviewDialog}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>{t("rate_project_completion")}</DialogTitle>
-            <DialogDescription>{t("please_rate_worker")}</DialogDescription>
+        <DialogContent className="sm:max-w-[500px] bg-white/95 backdrop-blur-sm border-0 shadow-2xl rounded-2xl">
+          <DialogHeader className="pb-6">
+            <DialogTitle className="text-xl font-semibold text-gray-900 flex items-center gap-3">
+              <div className="p-2 bg-yellow-100 rounded-lg">
+                <Star className="h-5 w-5 text-yellow-600" />
+              </div>
+              {t("rate_project_completion")}
+            </DialogTitle>
+            <DialogDescription className="text-gray-600 mt-2">
+              {t("please_rate_worker")}
+            </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="flex items-center gap-2">
-              <label className="text-right w-16">{t("rating")}</label>
-              <div className="flex gap-1">
+
+          <div className="space-y-6 py-4">
+            <div className="space-y-3">
+              <label className="text-sm font-medium text-gray-700">
+                {t("rating")}
+              </label>
+              <div className="flex gap-2">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <Star
                     key={star}
-                    className={`h-6 w-6 cursor-pointer ${
+                    className={`h-8 w-8 cursor-pointer transition-all duration-200 ${
                       rating >= star
-                        ? "fill-yellow-400 text-yellow-400"
-                        : "text-muted-foreground"
+                        ? "fill-yellow-400 text-yellow-400 scale-110"
+                        : "text-gray-300 hover:text-yellow-300"
                     }`}
                     onClick={() => setRating(star)}
                   />
                 ))}
               </div>
             </div>
-            <div className="grid gap-2">
-              <label htmlFor="comment">{t("review")}</label>
+
+            <div className="space-y-3">
+              <label
+                htmlFor="comment"
+                className="text-sm font-medium text-gray-700"
+              >
+                {t("review")}
+              </label>
               <Textarea
                 id="comment"
                 placeholder={t("write_your_feedback")}
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
-                className="min-h-[100px]"
+                className="min-h-[120px] rounded-xl border-gray-300 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
               />
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={handleCloseReviewDialog}>
+
+          <DialogFooter className="flex gap-3 pt-6">
+            <Button
+              variant="outline"
+              onClick={handleCloseReviewDialog}
+              className="rounded-xl px-6 py-3 border-gray-300 hover:bg-gray-50"
+            >
               {t("cancel")}
             </Button>
             <Button
               type="submit"
               onClick={handleReviewSubmit}
               disabled={rating === 0}
-              className="bg-black text-white hover:bg-gray-800"
+              className="bg-gradient-to-r from-gray-900 to-gray-800 hover:from-black hover:to-gray-900 text-white rounded-xl px-6 py-3"
             >
               {t("submit_review")}
             </Button>
