@@ -32,6 +32,7 @@ import CreateTenderModal from "./CreateTenderModal";
 import { useTranslation } from "../lib/hooks/useTranslation";
 import { LanguageToggle } from "./LanguageToggle";
 import { useAuth } from "@/context/AuthContext";
+import { useNotifications } from "@/context/NotificationContext";
 // Utility to capitalize and space hyphenated words
 const toTitleCase = (str: string) =>
   str.replace(/-/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
@@ -57,7 +58,7 @@ export default function BNavbar({
 }: NavbarProps) {
   const pathname = usePathname();
   const { t } = useTranslation();
-  const { logout } = useAuth();
+  const { logout, profile } = useAuth();
   const currentUser = {
     name: "Ahmed Al-Mahmoud",
     email: "ahmed@example.com",
@@ -66,7 +67,7 @@ export default function BNavbar({
   };
 
   const pathSegments = pathname.split("/").filter(Boolean);
-
+  const { notifications, unreadCount, isLoading } = useNotifications();
   const pageName =
     pathSegments.length > 0
       ? toTitleCase(pathSegments[pathSegments.length - 1])
@@ -88,7 +89,7 @@ export default function BNavbar({
     logout();
   };
   return (
-    <header className=" sticky top-0 w-full z-10 border-b flex bg-white/40 backdrop-blur-md px-4 md:px-0">
+    <header className=" sticky top-0 w-full z-10 border-b flex bg-white/40 backdrop-blur-md px-4 py-3 md:px-0">
       {/* Sidebar toggle */}
       <button
         onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -122,48 +123,28 @@ export default function BNavbar({
               New Tender
             </Button>
           )}
-
-          {/* Notifications */}
-          <DropdownMenu open={open} onOpenChange={setOpen}>
-            <div className="relative">
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="relative text-gray-600 hover:text-gray-900"
-                >
-                  <Bell className="h-5 w-5" />
-                </Button>
-              </DropdownMenuTrigger>
-              {open && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.2 }}
-                  className="absolute md:right-0 right-2 mt-2 md:w-80 w-[90vw] max-w-[100vw] rounded-md border bg-white shadow-xl z-50"
-                  style={{ left: "auto", right: -50 }}
-                >
-                  <div className="p-3">
-                    <div className="text-sm font-semibold px-2 py-1">
-                      {t("notifications")}
-                    </div>
-                    <hr className="my-2" />
-                    <div className="flex flex-col space-y-3 max-h-60 overflow-y-auto">
-                      <div className="flex flex-col gap-1 px-2 py-1">
-                        <span className="font-medium text-gray-800">
-                          You received a new bid on 'Office Renovation Project'.
-                        </span>
-                        <span className="text-xs text-gray-500">
-                          5 minutes ago
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-            </div>
-          </DropdownMenu>
+          <div className="relative">
+            <Link
+              href={
+                profile?.userType == "business"
+                  ? "/business-dashboard/notification"
+                  : "/dashboard/notification"
+              }
+            >
+              <Button
+                variant="ghost"
+                size="icon"
+                className="relative p-2 text-gray-600 hover:text-gray-900"
+              >
+                <Bell className="h-7 w-7" />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white  text-[9px] font-semibold rounded-full h-5 w-5 flex items-center justify-center">
+                    {unreadCount > 99 ? "99+" : unreadCount}
+                  </span>
+                )}
+              </Button>
+            </Link>
+          </div>
 
           {/* Profile Menu */}
           <div className="relative">
