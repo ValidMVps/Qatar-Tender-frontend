@@ -68,17 +68,14 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // Mark a single notification as read
   const markAsRead = useCallback(async (id) => {
-    console.log("Attempting to mark notification as read:", id); // Debug log
     try {
       const response = await api.put(`/api/notifications/${id}/read`);
-      console.log("API response for markAsRead:", response.data); // Debug log
 
       // Update local state only after successful API call
       setNotifications((prev) =>
         prev.map((n) => (n._id === id ? { ...n, isRead: true } : n))
       );
       setUnreadCount((prev) => (prev > 0 ? prev - 1 : 0));
-      console.log("Local state updated for notification:", id); // Debug log
     } catch (error) {
       console.error("❌ Failed to mark notification as read:", error);
       // Handle error (e.g., show a toast message to the user)

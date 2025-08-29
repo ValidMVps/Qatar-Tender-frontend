@@ -49,6 +49,7 @@ interface ProjectDetailsSidebarProps
   } | null;
   getStatusColor: (status: string) => string;
   onMarkComplete: () => void;
+  setRefresh?: React.Dispatch<React.SetStateAction<number>>;
   currentUserId: string;
 }
 
@@ -58,6 +59,7 @@ export function ProjectDetailsSidebar({
   onMarkComplete,
   currentUserId,
   className,
+  setRefresh,
   ...props
 }: ProjectDetailsSidebarProps) {
   const [isCompleteDialogOpen, setIsCompleteDialogOpen] = useState(false);
@@ -93,15 +95,10 @@ export function ProjectDetailsSidebar({
       try {
         const bids = await getTenderBids(selectedProject.id);
         // Find the bid from the awarded user
-        console.log(
-          "All Bids:",
-          selectedProject.awardedTo._id,
-          selectedProject.awardedTo
-        );
+      
         const awardedBid = bids.find(
           (bid: any) => bid.status === "accepted" || bid.status === "completed"
         );
-        console.log("Awarded Bid:", awardedBid);
         setbid(awardedBid);
         if (awardedBid) {
           setSelectedBidAmount(awardedBid.amount + "QAR");
@@ -138,6 +135,7 @@ export function ProjectDetailsSidebar({
       console.error(err);
     } finally {
       setLoading(false);
+      setRefresh((prev) => (prev ? prev + 1 : 1));
     }
   };
 
@@ -156,9 +154,11 @@ export function ProjectDetailsSidebar({
       setCompleteStep(1); // Reset for next time
       setRating(0);
       setComment("");
+      setRefresh((prev) => (prev ? prev + 1 : 1));
     } catch (err) {
       setError("Failed to submit review");
       console.error(err);
+      setRefresh((prev) => (prev ? prev + 1 : 1));
     }
   };
 
@@ -309,7 +309,7 @@ export function ProjectDetailsSidebar({
 
             {isTenderOwner && isAwarded && (
               <Button
-                className="w-full justify-start rounded-lg bg-black text-white hover:bg-gray-800"
+                className="w-full justify-start rounded-lg mt-4 bg-black text-white hover:bg-gray-800"
                 variant="default"
                 onClick={() => setIsCompleteDialogOpen(true)}
               >

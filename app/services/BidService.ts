@@ -39,10 +39,8 @@ export const createBid = async (payload: CreateBidPayload) => {
 
 // Get bids for a specific tender
 export const getTenderBids = async (tenderId: string) => {
-  console.log("tenderId:", tenderId);
   try {
     const res = await api.get(`/api/bids/tender/${tenderId}`);
-    console.log("Bids for tender:", res.data);
     return res.data;
   } catch (error: any) {
     console.error(
@@ -86,7 +84,6 @@ export const updateBidStatus = async (
   bidId: string,
   status: "accepted" | "rejected" | "submitted" | "completed"
 ) => {
-  console.log("Updating bid status:", bidId, status);
   try {
     const res = await api.put(`/api/bids/${bidId}/status`, { status });
     return res.data;

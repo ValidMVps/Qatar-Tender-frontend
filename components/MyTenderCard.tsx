@@ -71,7 +71,6 @@ export default function MyTenderCard({
   };
 
   const { profile } = useAuth();
-  console.log(tender);
   return (
     <>
       <div className="bg-white/80 backdrop-blur-lg rounded-lg border border-gray-200 shadow-0 overflow-hidden transition-all hover:shadow-0">

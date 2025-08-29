@@ -139,7 +139,6 @@ export default function Component() {
   const loadVerificationStatus = async () => {
     try {
       const status = user?.isDocumentVerified;
-      console.log(status, user);
       setVerificationStatus(status || null);
       setIsProfileCompleted(status === "verified" || status === "pending");
     } catch (err: any) {

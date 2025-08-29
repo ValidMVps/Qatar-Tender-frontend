@@ -100,7 +100,6 @@ export default function Component() {
             new Map(awardedTenders.map((t) => [t._id, t])).values()
           );
           setawardedtome(uniqueAwardedTenders);
-          console.log(uniqueAwardedTenders);
         }
 
         setTenders(fetchedTenders);

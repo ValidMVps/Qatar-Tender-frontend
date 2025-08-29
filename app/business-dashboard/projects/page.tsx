@@ -54,6 +54,7 @@ export default function Component() {
     null
   );
   const [first, setfirst] = React.useState(true);
+  const [refresh, setRefresh] = React.useState(1);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
   const [isReviewDialogOpen, setIsReviewDialogOpen] = React.useState(false);
@@ -63,6 +64,7 @@ export default function Component() {
     "owned"
   );
   const [awardedtome, setawardedtome] = React.useState<Tender[]>([]);
+  React;
 
   // Fetch tenders when user or tab changes
   React.useEffect(() => {
@@ -100,7 +102,6 @@ export default function Component() {
             new Map(awardedTenders.map((t) => [t._id, t])).values()
           );
           setawardedtome(uniqueAwardedTenders);
-          console.log(uniqueAwardedTenders);
         }
 
         setTenders(fetchedTenders);
@@ -134,7 +135,7 @@ export default function Component() {
     };
 
     fetchTenderDetails();
-  }, [selectedTender?._id]);
+  }, [selectedTender?._id, refresh]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -292,7 +293,9 @@ export default function Component() {
                   </div>
                 </div>
 
+                {/* ✅ Pass tenderId to ChatSection */}
                 <ChatSection
+                  tenderId={selectedTender?._id}
                   className="col-span-full md:col-span-9 lg:col-span-6"
                   onOpenProjectList={() => setIsProjectListOpen(true)}
                   onOpenProjectDetails={() => setIsProjectDetailsOpen(true)}
@@ -330,6 +333,7 @@ export default function Component() {
                   getStatusColor={getStatusColor}
                   onMarkComplete={() => setIsReviewDialogOpen(true)}
                   currentUserId={user?._id || ""}
+                  setRefresh={setRefresh}
                 />
               </div>
 
@@ -454,6 +458,7 @@ export default function Component() {
                       setIsReviewDialogOpen(true);
                       setIsProjectDetailsOpen(false);
                     }}
+                    setRefresh={setRefresh}
                     currentUserId={user?._id || ""}
                   />
                 </SheetContent>
@@ -546,7 +551,9 @@ export default function Component() {
                 </div>
               </div>
 
+              {/* ✅ Pass tenderId to ChatSection */}
               <ChatSection
+                tenderId={selectedTender?._id}
                 className="col-span-full md:col-span-9 lg:col-span-6"
                 onOpenProjectList={() => setIsProjectListOpen(true)}
                 onOpenProjectDetails={() => setIsProjectDetailsOpen(true)}
@@ -580,6 +587,7 @@ export default function Component() {
                 }
                 getStatusColor={getStatusColor}
                 currentUserId={user?._id || ""}
+                setRefresh={setRefresh}
               />
             </div>
 
@@ -695,6 +703,7 @@ export default function Component() {
                       : null
                   }
                   getStatusColor={getStatusColor}
+                  setRefresh={setRefresh}
                   currentUserId={user?._id || ""}
                 />
               </SheetContent>

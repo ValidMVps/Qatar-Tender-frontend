@@ -36,7 +36,6 @@ export interface UpdateReviewData {
 export const createReview = async (
   reviewData: CreateReviewData
 ): Promise<Review> => {
-  console.log("Creating review:", reviewData);
   try {
     const response = await api.post<Review>("/api/reviews", reviewData);
     return response.data;
@@ -79,7 +78,6 @@ export const updateReview = async (
 export const getReviewForTender = async (
   tenderId: string
 ): Promise<Review | null> => {
-  console.log("Getting review for tender ID:", tenderId);
   try {
     const response = await api.get<Review>(`/api/reviews/tender/${tenderId}`);
     return response.data;

@@ -35,21 +35,16 @@ class NotificationService {
       const sockets = this.getConnectedSockets(userId);
 
       if (sockets.size === 0) {
-        console.log(
-          `💤 User ${userId} not connected. Saving notification only.`
-        );
+      
         return false;
       }
 
       // Emit to all connected sockets
       this.io.to(userRoom).emit("newNotification", notificationData);
-      console.log(
-        `🚀 Sent notification to ${sockets.size} socket(s) for user ${userId}`
-      );
+ 
 
       // Log each socket ID
       sockets.forEach((socketId) => {
-        console.log(`   📤 Sent to socket: ${socketId}`);
       });
 
       return true;
@@ -81,18 +76,14 @@ class NotificationService {
         ...relatedData,
       });
 
-      console.log(
-        `✅ Notification created: ${notification._id} for user ${userId}`
-      );
+    
 
       // Send real-time update if Socket.IO is available
       if (this.io) {
         const success = await this.emitToUser(userId, notification.toObject());
 
         if (!success) {
-          console.log(
-            `⚠️ Notification saved but not delivered (user offline): ${notification._id}`
-          );
+       
         }
       } else {
         console.warn("❌ Socket.IO not available. Notification saved only.");
@@ -126,9 +117,7 @@ class NotificationService {
       if (notification) notifications.push(notification);
     }
 
-    console.log(
-      `✅ Created ${notifications.length} notifications for ${userIds.length} users`
-    );
+   
 
     return notifications;
   }
@@ -156,7 +145,6 @@ class NotificationService {
       if (this.io) {
         const userRoom = userId.toString();
         this.io.to(userRoom).emit("notificationRead", { notificationId: id });
-        console.log(`📌 Read status updated for notification ${id}`);
       }
 
       return notification;
@@ -177,7 +165,6 @@ class NotificationService {
       joinedAt: new Date(),
       userId,
     });
-    console.log(`📌 User ${userId} connected via socket ${socketId}`);
   }
 
   /**
@@ -188,7 +175,6 @@ class NotificationService {
     for (let [userId, userData] of this.connectedUsers.entries()) {
       if (userData.socketId === socketId) {
         this.connectedUsers.delete(userId);
-        console.log(`🗑️ User ${userId} disconnected`);
         break;
       }
     }

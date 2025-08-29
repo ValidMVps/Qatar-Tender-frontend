@@ -76,14 +76,12 @@ class AuthService {
   }
 
   async logout() {
-    console.log("Logging out...");
     try {
       await api.post("/api/users/logout");
     } catch (error) {
       console.error("Logout error:", error);
     } finally {
       clearTokens();
-      console.log("logout");
       if (typeof window !== "undefined") {
         window.location.href = "/login";
       }

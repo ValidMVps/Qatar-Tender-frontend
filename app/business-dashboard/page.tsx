@@ -972,7 +972,6 @@ export default function DashboardPage() {
                             </TableHeader>
                             <TableBody>
                               {awardedToMe.map((bid) => {
-                                console.log(bid, "di");
                                 return (
                                   <TableRow
                                     key={bid._id}

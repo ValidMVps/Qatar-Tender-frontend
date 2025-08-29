@@ -49,12 +49,14 @@ interface ProjectDetailsSidebarProps
   } | null;
   getStatusColor: (status: string) => string;
   currentUserId: string;
+  setRefresh: React.Dispatch<React.SetStateAction<number>>;
 }
 
 export function ProjectDetailsSidebarawarded({
   selectedProject,
   getStatusColor,
   currentUserId,
+  setRefresh,
   className,
   ...props
 }: ProjectDetailsSidebarProps) {
@@ -84,10 +86,7 @@ export function ProjectDetailsSidebarawarded({
 
   // Fetch the selected bid amount when project changes
   useEffect(() => {
-    console.log(
-      selectedProject,
-      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-    );
+
     const fetchSelectedBidAmount = async () => {
       if (!selectedProject || !selectedProject.awardedTo) return;
 
@@ -95,15 +94,10 @@ export function ProjectDetailsSidebarawarded({
       try {
         const bids = await getTenderBids(selectedProject.id);
         // Find the bid from the awarded user
-        console.log(
-          "All Bids:",
-          selectedProject.awardedTo._id,
-          selectedProject.awardedTo
-        );
+     
         const awardedBid = bids.find(
           (bid: any) => bid.status === "accepted" || bid.status === "completed"
         );
-        console.log("Awarded Bid:", awardedBid);
         setbid(awardedBid);
         if (awardedBid) {
           setSelectedBidAmount(awardedBid.amount + "QAR");
@@ -139,6 +133,7 @@ export function ProjectDetailsSidebarawarded({
       console.error(err);
     } finally {
       setLoading(false);
+      setRefresh((prev) => prev + 1);
     }
   };
 
@@ -157,8 +152,10 @@ export function ProjectDetailsSidebarawarded({
       setCompleteStep(1); // Reset for next time
       setRating(0);
       setComment("");
+      setRefresh((prev) => prev + 1);
     } catch (err) {
       setError("Failed to submit review");
+      setRefresh((prev) => prev + 1);
       console.error(err);
     }
   };
@@ -296,7 +293,7 @@ export function ProjectDetailsSidebarawarded({
 
             {isTenderOwner && isAwarded && (
               <Button
-                className="w-full justify-start rounded-lg bg-black text-white hover:bg-gray-800"
+                className="w-full justify-start mt-4 rounded-lg bg-black text-white hover:bg-gray-800"
                 variant="default"
                 onClick={() => setIsCompleteDialogOpen(true)}
               >

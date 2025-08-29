@@ -14,7 +14,6 @@ export default function ActivateTenderButton({ tenderId }: Props) {
       const res = await api.put(`/api/tenders/${tenderId}/status`, {
         status: "active",
       });
-      console.log("Tender updated:", res.data.tender); // updated tender object
       alert("Tender is now active!");
     } catch (err: any) {
       console.error(

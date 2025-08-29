@@ -51,7 +51,6 @@ function QnaSection({ tenderid }: QnaSectionProps) {
   const fetchQuestions = async (): Promise<void> => {
     try {
       const data = await getQuestionsForTender(tenderid);
-      console.log("Fetched questions:", data);
       setQuestions(data as unknown as Question[]);
     } catch (err) {
       console.error("Failed to fetch questions:", err);

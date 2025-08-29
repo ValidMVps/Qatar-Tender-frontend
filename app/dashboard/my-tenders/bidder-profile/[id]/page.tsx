@@ -120,7 +120,6 @@ export default function BidderProfilePage() {
             },
           ],
         }));
-        console.log("Simulated Projects:", apiReviews);
 
         // Deduplicate projects by id
         const uniqueProjectsMap = new Map<string, Project>();

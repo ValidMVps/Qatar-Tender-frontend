@@ -274,7 +274,6 @@ const EditableReviewCard: React.FC<{
   const [isUpdating, setIsUpdating] = useState(false);
   const { t } = useTranslation();
   const router = useRouter();
-  console.log("Rendering EditableReviewCard for review ID:", review);
   const handleSave = async () => {
     setIsUpdating(true);
     try {
@@ -495,9 +494,7 @@ const ReviewsRatingsPage: React.FC = () => {
       topProject,
     };
   }, [profile, reviews]);
-  useEffect(() => {
-    console.log(profile);
-  }, [profile]);
+
   useEffect(() => {
     const fetchReviews = async () => {
       setLoading(true);
