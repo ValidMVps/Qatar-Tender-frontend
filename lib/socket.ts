@@ -1,50 +1,42 @@
-// lib/socket.js
-import { io } from "socket.io-client";
+// lib/socket.ts
+import { io, Socket } from "socket.io-client";
 
 class SocketService {
-  constructor() {
-    this.socket = null;
-    this.isConnected = false;
-  }
+  private socket: Socket | null = null;
+  private connected = false;
 
   // Initialize and connect the socket
-  connect(token) {
-    if (this.socket && this.isConnected) {
+  connect(token?: string): Socket {
+    if (this.socket && this.connected) {
       console.log("Socket already connected");
-      return;
+      return this.socket;
     }
 
-    // IMPORTANT: Make sure this URL matches your backend server URL
-    // Based on your server.js, it seems to run on PORT 5000 by default
-    const SOCKET_URL =
+    const SOCKET_URL: string =
       process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:5000";
 
     this.socket = io(SOCKET_URL, {
-      withCredentials: true, // Important for CORS
-      transports: ["websocket", "polling"], // Try WebSocket first, then polling
-      auth: {
-        token: token, // Send the auth token if your backend expects it
-      },
+      withCredentials: true,
+      transports: ["websocket", "polling"],
+      auth: { token },
     });
 
     this.socket.on("connect", () => {
-      console.log("✅ Socket connected:", this.socket.id);
-      this.isConnected = true;
+      console.log("✅ Socket connected:", this.socket?.id);
+      this.connected = true;
     });
 
-    this.socket.on("connect_error", (err) => {
+    this.socket.on("connect_error", (err: Error) => {
       console.error("❌ Socket connection error:", err.message);
-      this.isConnected = false;
+      this.connected = false;
     });
 
-    this.socket.on("disconnect", (reason) => {
+    this.socket.on("disconnect", (reason: Socket.DisconnectReason) => {
       console.log("🔌 Socket disconnected:", reason);
-      this.isConnected = false;
-      // You might want to implement reconnection logic here
+      this.connected = false;
     });
 
-    // Handle ping/pong for connection health
-    this.socket.on("pong", (data) => {
+    this.socket.on("pong", (data: any) => {
       console.log("🏓 Pong received:", data);
     });
 
@@ -52,8 +44,8 @@ class SocketService {
   }
 
   // Join a specific user room
-  joinUserRoom(userId) {
-    if (this.socket && this.isConnected) {
+  joinUserRoom(userId: string): void {
+    if (this.socket && this.connected) {
       console.log(`📡 Joining room for user: ${userId}`);
       this.socket.emit("join", userId);
     } else {
@@ -62,30 +54,30 @@ class SocketService {
   }
 
   // Leave a specific user room
-  leaveUserRoom(userId) {
-    if (this.socket && this.isConnected) {
+  leaveUserRoom(userId: string): void {
+    if (this.socket && this.connected) {
       console.log(`🚪 Leaving room for user: ${userId}`);
-      this.socket.emit("leave", userId); // You might need to implement this on backend
+      this.socket.emit("leave", userId);
     }
   }
 
   // Disconnect the socket
-  disconnect() {
+  disconnect(): void {
     if (this.socket) {
       this.socket.disconnect();
-      this.isConnected = false;
+      this.connected = false;
       console.log("🔌 Socket manually disconnected");
     }
   }
 
   // Get the socket instance
-  getSocket() {
+  getSocket(): Socket | null {
     return this.socket;
   }
 
   // Check connection status
-  isConnected() {
-    return this.isConnected;
+  isConnected(): boolean {
+    return this.connected;
   }
 }
 

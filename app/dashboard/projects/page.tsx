@@ -77,39 +77,50 @@ export default function Component() {
       try {
         setLoading(true);
         setError(null);
-        let fetchedTenders: Tender[] = await getUserTenders(user._id);
 
         if (activeTab === "owned") {
+          let fetchedTenders: Tender[] = await getUserTenders(user._id);
           fetchedTenders = fetchedTenders.filter((tender) => {
             const isPostedByUser =
               typeof tender.postedBy === "string"
                 ? tender.postedBy === user._id
                 : tender.postedBy._id === user._id;
-
             const isAwardedOrCompleted =
               tender.status === "awarded" || tender.status === "completed";
-
             return isPostedByUser && isAwardedOrCompleted;
           });
+
+          setTenders(fetchedTenders);
+
+          // Reset selection only if no tenders or force update
+          if (fetchedTenders.length > 0) {
+            // Always update selection if switching to this tab
+            if (!selectedTender || activeTab !== "owned") {
+              setSelectedTender(fetchedTenders[0]);
+            }
+          } else {
+            setSelectedTender(null);
+          }
         } else if (activeTab === "awarded") {
           const gottenBids: Bid[] = await getUserBids();
-
           const awardedBids = gottenBids.filter(
             (bid) => bid.status === "accepted" || bid.status === "completed"
           );
-
           const awardedTenders = awardedBids.map((bid) => bid.tender);
-
           const uniqueAwardedTenders = Array.from(
             new Map(awardedTenders.map((t) => [t._id, t])).values()
           );
           setawardedtome(uniqueAwardedTenders);
-        }
+          setTenders(uniqueAwardedTenders); // Sync with `tenders` for consistent rendering
 
-        setTenders(fetchedTenders);
-
-        if (fetchedTenders.length > 0 && !selectedTender) {
-          setSelectedTender(fetchedTenders[0]);
+          // Always select first if switching tab or none selected
+          if (uniqueAwardedTenders.length > 0) {
+            if (!selectedTender || activeTab !== "awarded") {
+              setSelectedTender(uniqueAwardedTenders[0]);
+            }
+          } else {
+            setSelectedTender(null);
+          }
         }
       } catch (err) {
         setError("Failed to fetch tenders");
@@ -281,8 +292,8 @@ export default function Component() {
               <div className="flex w-full flex-col h-full md:h-[calc(100vh-85px)] overflow-hidden">
                 <div className="grid flex-1 h-full overflow-hidden grid-cols-1 md:grid-cols-12 gap-4 p-4">
                   {/* Left Sidebar - Project List (Desktop) */}
-                  <div className="hidden md:flex md:col-span-4 lg:col-span-3 flex-col h-full">
-                    <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-gray-200/60 shadow-lg shadow-gray-200/40 dark:bg-gray-900/80 dark:border-gray-700/60 dark:shadow-gray-900/40 h-full flex flex-col overflow-hidden">
+                  <div className="hidden md:flex md:col-span-4 lg:col-span-3 flex-col overflow-y-scroll">
+                    <div className="bg-white/80 backdrop-blur-sm rounded-2xl h-10 border border-gray-200/60 shadow-lg shadow-gray-200/40 dark:bg-gray-900/80 dark:border-gray-700/60 dark:shadow-gray-900/40 h-full flex flex-col overflow-hidden">
                       {/* Header */}
                       <div className="flex items-center justify-between p-6 pb-4 border-b border-gray-100 dark:border-gray-700/50">
                         <div className="flex items-center gap-3">
@@ -313,13 +324,7 @@ export default function Component() {
                           >
                             {t("owned_projects")}
                           </TabsTrigger>
-                          <TabsTrigger
-                            value="awarded"
-                            className="flex-1 rounded-lg text-sm data-[state=active]:bg-white data-[state=active]:shadow-sm dark:data-[state=active]:bg-gray-700"
-                            onClick={() => setfirst(false)}
-                          >
-                            {t("awarded_projects")}
-                          </TabsTrigger>
+                
                         </TabsList>
                       </div>
 
@@ -364,7 +369,7 @@ export default function Component() {
 
                   {/* Chat Section */}
                   <ChatSection
-                    tenderId={selectedTender?._id}
+                    tenderId={selectedTender?._id ?? ""}
                     className="col-span-full md:col-span-8 lg:col-span-6 rounded-2xl overflow-hidden"
                     onOpenProjectList={() => setIsProjectListOpen(true)}
                     onOpenProjectDetails={() => setIsProjectDetailsOpen(true)}
@@ -509,227 +514,7 @@ export default function Component() {
             </TabsContent>
           )}
 
-          {/* Awarded Tab Content */}
-          <TabsContent
-            value="awarded"
-            className="flex-1 overflow-hidden m-0 p-0"
-          >
-            <div className="flex w-full flex-col h-full md:h-[calc(100vh-85px)] overflow-hidden">
-              <div className="grid flex-1 h-full overflow-hidden grid-cols-1 md:grid-cols-12 gap-4 p-4">
-                {/* Left Sidebar for Awarded Projects */}
-                <div className="hidden md:flex md:col-span-4 lg:col-span-3 flex-col h-full">
-                  <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-gray-200/60 shadow-lg shadow-gray-200/40 dark:bg-gray-900/80 dark:border-gray-700/60 dark:shadow-gray-900/40 h-full flex flex-col overflow-hidden">
-                    {/* Header */}
-                    <div className="flex items-center justify-between p-6 pb-4 border-b border-gray-100 dark:border-gray-700/50">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 bg-blue-100 dark:bg-blue-900/40 rounded-lg">
-                          <Inbox className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                        </div>
-                        <span className="font-semibold text-gray-900 dark:text-gray-100">
-                          {t("inbox")}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2 text-xs">
-                        <span className="text-gray-500 dark:text-gray-400">
-                          {t("all")}
-                        </span>
-                        <Switch className="scale-75" />
-                        <span className="text-gray-500 dark:text-gray-400">
-                          {t("unread")}
-                        </span>
-                      </div>
-                    </div>
 
-                    {/* Tabs */}
-                    <div className="px-6 pt-4 pb-4">
-                      <TabsList className="w-full bg-gray-100/80 dark:bg-gray-800/80 p-1 rounded-xl">
-                        <TabsTrigger
-                          value="owned"
-                          className="flex-1 rounded-lg text-sm data-[state=active]:bg-white data-[state=active]:shadow-sm dark:data-[state=active]:bg-gray-700"
-                        >
-                          {t("owned_projects")}
-                        </TabsTrigger>
-                        <TabsTrigger
-                          value="awarded"
-                          className="flex-1 rounded-lg text-sm data-[state=active]:bg-white data-[state=active]:shadow-sm dark:data-[state=active]:bg-gray-700"
-                        >
-                          {t("awarded_to_me")}
-                        </TabsTrigger>
-                      </TabsList>
-                    </div>
-
-                    {/* Search */}
-                    <div className="px-6 pb-4">
-                      <div className="relative">
-                        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                        <Input
-                          placeholder={t("search_projects")}
-                          type="search"
-                          className="pl-10 bg-gray-50/80 dark:bg-gray-800/80 border-gray-200/60 dark:border-gray-700/60 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
-                        />
-                      </div>
-                    </div>
-
-                    {/* Awarded Project List */}
-                    <div className="flex-1 overflow-y-auto px-6 pb-6">
-                      <div className="space-y-3">
-                        {awardedtome.length === 0 ? (
-                          <div className="text-center py-8">
-                            <div className="p-4 bg-gray-100 dark:bg-gray-800 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                              <Inbox className="h-6 w-6 text-gray-400" />
-                            </div>
-                            <p className="text-gray-500 dark:text-gray-400 text-sm">
-                              {t("no_projects_found")}
-                            </p>
-                          </div>
-                        ) : (
-                          awardedtome.map((tender) => (
-                            <ProjectCard
-                              key={tender._id}
-                              tender={tender}
-                              isSelected={selectedTender?._id === tender._id}
-                              onClick={() => setSelectedTender(tender)}
-                            />
-                          ))
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Chat Section */}
-                <ChatSection
-                  tenderId={selectedTender?._id}
-                  className="col-span-full md:col-span-8 lg:col-span-6 rounded-2xl overflow-hidden"
-                  onOpenProjectList={() => setIsProjectListOpen(true)}
-                  onOpenProjectDetails={() => setIsProjectDetailsOpen(true)}
-                />
-
-                {/* Project Details Sidebar for Awarded */}
-                <ProjectDetailsSidebarawarded
-                  className="hidden lg:flex lg:col-span-3"
-                  selectedProject={
-                    selectedTender
-                      ? {
-                          id: selectedTender._id,
-                          title: selectedTender.title,
-                          description: selectedTender.description,
-                          budget: selectedTender.budget,
-                          status: selectedTender.status,
-                          startDate: selectedTender.createdAt,
-                          awardedTo: selectedTender.awardedTo
-                            ? typeof selectedTender.awardedTo === "string"
-                              ? {
-                                  _id: selectedTender.awardedTo,
-                                  email: "unknown@example.com",
-                                }
-                              : {
-                                  _id: selectedTender.awardedTo._id,
-                                  email: selectedTender.awardedTo.email,
-                                }
-                            : undefined,
-                          postedBy: getPostedById(selectedTender.postedBy),
-                        }
-                      : null
-                  }
-                  getStatusColor={getStatusColor}
-                  currentUserId={user?._id || ""}
-                  setRefresh={setRefresh}
-                />
-              </div>
-
-              {/* Mobile Sheets for Awarded Tab */}
-              <Sheet
-                open={isProjectListOpen}
-                onOpenChange={setIsProjectListOpen}
-              >
-                <SheetContent
-                  side="left"
-                  className="w-80 p-0 bg-white/95 backdrop-blur-sm"
-                >
-                  <div className="flex flex-col h-full">
-                    <div className="flex items-center justify-between p-6 border-b border-gray-100">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 bg-blue-100 rounded-lg">
-                          <Inbox className="h-4 w-4 text-blue-600" />
-                        </div>
-                        <span className="font-semibold text-gray-900">
-                          {t("inbox")}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="px-6 py-4">
-                      <div className="relative">
-                        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                        <Input
-                          placeholder={t("search_projects")}
-                          type="search"
-                          className="pl-10 bg-gray-50 border-gray-200 rounded-xl"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="flex-1 overflow-y-auto px-6 pb-6">
-                      <div className="space-y-3">
-                        {awardedtome.map((tender) => (
-                          <ProjectCard
-                            key={tender._id}
-                            tender={tender}
-                            isSelected={selectedTender?._id === tender._id}
-                            onClick={() => {
-                              setSelectedTender(tender);
-                              setIsProjectListOpen(false);
-                            }}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </SheetContent>
-              </Sheet>
-
-              <Sheet
-                open={isProjectDetailsOpen}
-                onOpenChange={setIsProjectDetailsOpen}
-              >
-                <SheetContent
-                  side="right"
-                  className="w-80 p-0 bg-white/95 backdrop-blur-sm"
-                >
-                  <ProjectDetailsSidebarawarded
-                    selectedProject={
-                      selectedTender
-                        ? {
-                            id: selectedTender._id,
-                            title: selectedTender.title,
-                            description: selectedTender.description,
-                            budget: selectedTender.budget,
-                            status: selectedTender.status,
-                            startDate: selectedTender.createdAt,
-                            awardedTo: selectedTender.awardedTo
-                              ? typeof selectedTender.awardedTo === "string"
-                                ? {
-                                    _id: selectedTender.awardedTo,
-                                    email: "unknown@example.com",
-                                  }
-                                : {
-                                    _id: selectedTender.awardedTo._id,
-                                    email: selectedTender.awardedTo.email,
-                                  }
-                              : undefined,
-                            postedBy: getPostedById(selectedTender.postedBy),
-                          }
-                        : null
-                    }
-                    getStatusColor={getStatusColor}
-                    setRefresh={setRefresh}
-                    currentUserId={user?._id || ""}
-                  />
-                </SheetContent>
-              </Sheet>
-            </div>
-          </TabsContent>
         </Tabs>
       </div>
     </PageTransitionWrapper>

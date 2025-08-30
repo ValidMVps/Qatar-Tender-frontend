@@ -124,3 +124,7 @@
   display: none !important;
 }
 
+/* Optional: hide when not needed */
+*::-webkit-scrollbar {
+  display: none;
+}

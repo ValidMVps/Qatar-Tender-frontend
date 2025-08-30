@@ -72,7 +72,7 @@ const NotificationDemo = () => {
   const prefix = () =>
     profile?.userType === "business" ? "business-dashboard" : "dashboard";
 
-  const getId = (maybeObj) => {
+  const getId = (maybeObj: { _id: any; toString: () => any; }) => {
     if (!maybeObj) return null;
     if (typeof maybeObj === "string") return maybeObj;
     if (maybeObj._id) return String(maybeObj._id);
@@ -80,7 +80,7 @@ const NotificationDemo = () => {
     return null;
   };
 
-  const getNotificationRoute = (n) => {
+  const getNotificationRoute = (n: { relatedTender: { _id: any; toString: () => any; }; relatedBid: { _id: any; toString: () => any; }; relatedUser: { _id: any; toString: () => any; }; relatedPayment: { _id: any; toString: () => any; }; profileId: { _id: any; toString: () => any; }; type: any; }) => {
     const tenderId = getId(n.relatedTender);
     const bidId = getId(n.relatedBid);
     const userId = getId(n.relatedUser);
@@ -156,7 +156,7 @@ const NotificationDemo = () => {
     }
   };
 
-  const getNotificationTheme = (type) => {
+  const getNotificationTheme = (type: string) => {
     switch (type) {
       case "new_tender":
       case "tender_created":
@@ -247,7 +247,7 @@ const NotificationDemo = () => {
     }
   };
 
-  const getNotificationIcon = (type) => {
+  const getNotificationIcon = (type: string) => {
     const commonProps = {
       className: "w-5 h-5 flex-shrink-0",
       viewBox: "0 0 24 24",
@@ -355,12 +355,12 @@ const NotificationDemo = () => {
     }
   };
 
-  const formatTypeLabel = (type) => {
+  const formatTypeLabel = (type: string) => {
     if (!type) return "General";
     return type.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
   };
 
-  const timeAgoOrDate = (createdAt) => {
+  const timeAgoOrDate = (createdAt: string | number | Date) => {
     if (!createdAt) return "";
     const date = new Date(createdAt);
     // days difference relative to current "now"
@@ -373,7 +373,7 @@ const NotificationDemo = () => {
     return formatDistanceToNow(date, { addSuffix: true });
   };
 
-  const handleOpenNotification = async (n) => {
+  const handleOpenNotification = async (n: any) => {
     const route = getNotificationRoute(n);
     if (!route) return;
 

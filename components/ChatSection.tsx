@@ -76,11 +76,11 @@ export default function ChatSection({
       console.log("🟢 Socket connected:", socket.id);
     });
 
-    socket.on("connect_error", (error) => {
+    socket.on("connect_error", (error: any) => {
       console.error("🔴 Socket connection error:", error);
     });
 
-    socket.on("disconnect", (reason) => {
+    socket.on("disconnect", (reason: any) => {
       console.log("🟡 Socket disconnected:", reason);
     });
 
@@ -98,9 +98,9 @@ export default function ChatSection({
     const loadChatRoom = async () => {
       try {
         const room = await getChatRoomByTenderId(tenderId);
-        setRoomId(room.id);
+        setRoomId(String(room.id));
         console.log(room);
-        setRoomTitle(room.tenderTitle || "Chat");
+        setRoomTitle(room.tenderTitle);
         profileApi.getProfileById(room.participants[1]).then((data) => {
           setOtherParticipant(data);
           console.log(
@@ -143,7 +143,7 @@ export default function ChatSection({
     socket.emit("joinChatRoom", roomId);
 
     // Listen for new messages
-    socket.on("newMessage", (data) => {
+    socket.on("newMessage", (data: { roomId: string; message: { id: any; }; }) => {
       if (data.roomId === roomId) {
         setMessages((prev) => {
           const exists = prev.some((msg) => msg.id === data.message.id);
@@ -154,7 +154,7 @@ export default function ChatSection({
     });
 
     // Listen for typing
-    socket.on("userTyping", (data) => {
+    socket.on("userTyping", (data: { roomId: string; userId: string; senderName: any; }) => {
       if (data.roomId === roomId && data.userId !== user._id) {
         setOtherTyping(true);
         setTypingUserName(data.senderName || "Someone");

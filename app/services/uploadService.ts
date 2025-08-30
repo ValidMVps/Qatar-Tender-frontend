@@ -1,7 +1,7 @@
 // services/uploadService.js
 import { api } from "@/lib/apiClient";
 
-export const uploadMedia = async (files) => {
+export const uploadMedia = async (files: any[]) => {
   const formData = new FormData();
 
   // Append all files to FormData
@@ -15,9 +15,12 @@ export const uploadMedia = async (files) => {
         "Content-Type": "multipart/form-data",
       },
       onUploadProgress: (progressEvent) => {
-        const progress = Math.round(
-          (progressEvent.loaded * 100) / progressEvent.total
-        );
+        let progress = 0;
+        if (progressEvent.total) {
+          progress = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total
+          );
+        }
         console.log(`Upload Progress: ${progress}%`);
       },
     });
