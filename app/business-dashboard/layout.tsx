@@ -25,7 +25,7 @@ import BNavbar from "@/components/Bnavbar";
 import { useTranslation } from "../../lib/hooks/useTranslation";
 import { ProtectedRoute } from "@/components/auth-guard";
 import { NotificationProvider } from "@/context/NotificationContext";
-
+import DarkFilterController from "@/components/DarkFilterController";
 export default function DashboardLayout({
   children,
 }: {
@@ -205,6 +205,7 @@ export default function DashboardLayout({
             <main className="flex-1 w-full px-2 sm:px-4 py-0 md:mt-0  mt-[70px] bg-neutral-50/30">
               {children}
             </main>
+            <DarkFilterController />
           </div>
         </div>
       </NotificationProvider>

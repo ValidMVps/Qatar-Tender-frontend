@@ -128,3 +128,12 @@
 *::-webkit-scrollbar {
   display: none;
 }
+/* html {
+  filter: invert(0.05) hue-rotate(300deg) !important;
+}
+img,
+video,
+canvas {
+  filter: invert(1) hue-rotate(180deg) !important; 
+} 
+*/
