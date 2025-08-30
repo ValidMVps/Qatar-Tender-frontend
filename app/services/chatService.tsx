@@ -12,6 +12,9 @@ export interface ChatMessage {
 }
 
 export interface ChatRoom {
+  [x: string]: SetStateAction<string>;
+  title: string;
+  id(id: any): unknown;
   _id: string;
   tenderId?: string;
   participants: string[];

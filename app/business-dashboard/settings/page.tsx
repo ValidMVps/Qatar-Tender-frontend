@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -44,6 +44,30 @@ interface SettingRowProps {
 // Define tab types
 type TabId = "general" | "security";
 
+// 🔹 Your actual base blue hue (Tailwind blue-500 ≈ 220)
+const BASE_HUE = 220;
+
+// 🔹 Color themes defined in absolute HSL hue degrees
+// These will be adjusted *relative* to your base blue
+const COLOR_THEMES = [
+  { name: "Default", hue: 220 },
+  { name: "Blue", hue: 220 },
+  { name: "Sky", hue: 190 },
+  { name: "Teal", hue: 160 },
+  { name: "Cyan", hue: 180 },
+  { name: "Green", hue: 120 },
+  { name: "Yellow", hue: 60 },
+  { name: "Orange", hue: 30 },
+  { name: "Red", hue: 0 },
+  { name: "Pink", hue: 320 },
+  { name: "Purple", hue: 280 },
+  { name: "Indigo", hue: 250 },
+  { name: "Magenta", hue: 300 },
+  { name: "Warm", hue: 40 },
+  { name: "Cool", hue: 200 },
+  { name: "Custom Blue", hue: 220 },
+] as const;
+
 export default function AppleStyleSettings() {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<TabId>("general");
@@ -65,28 +89,61 @@ export default function AppleStyleSettings() {
   const [offlineMode, setOfflineMode] = useState<boolean>(false);
 
   // Notification Settings
-  const [notificationsEnabled, setNotificationsEnabled] =
-    useState<boolean>(true);
+  const [notificationsEnabled, setNotificationsEnabled] = useState<boolean>(true);
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
   const [pushNotifications, setPushNotifications] = useState<boolean>(true);
 
-  // Security Settings - Password
+  // Security Settings
   const [currentPassword, setCurrentPassword] = useState<string>("");
   const [newPassword, setNewPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [passwordError, setPasswordError] = useState<string>("");
   const [passwordSuccess, setPasswordSuccess] = useState<string>("");
   const [passwordLoading, setPasswordLoading] = useState<boolean>(false);
-
-  // Security Settings - Other
   const [twoFactorAuth, setTwoFactorAuth] = useState<boolean>(false);
   const [autoLock, setAutoLock] = useState<string>("15");
 
   // Appearance & Language
   const [appLanguage, setAppLanguage] = useState<string>("en");
-  const [theme, setTheme] = useState<string>("light");
+  const [theme, setTheme] = useState<"light" | "dark" | "auto">("light");
   const [fontSize, setFontSize] = useState<string>("medium");
   const [reducedMotion, setReducedMotion] = useState<boolean>(false);
+
+  // Custom Theme Filter Controls
+  const [isDark, setIsDark] = useState(false);
+  const [colorHue, setColorHue] = useState<number>(220); // Start with blue
+
+  // Apply filters based on theme and hue
+  useEffect(() => {
+    // 🔁 Relative hue rotation: how much to shift from your base blue
+    const rotation = colorHue - BASE_HUE;
+    const invertValue = isDark ? 0.98 : 0;
+    const filter = `invert(${invertValue}) hue-rotate(${rotation}deg)`;
+
+    // Apply main filter to the entire document
+    document.documentElement.style.filter = filter;
+
+    // Invert filter for media (so images aren't color-shifted/inverted)
+    const inverseFilter = `invert(${invertValue}) hue-rotate(${rotation}deg)`;
+
+    let style = document.getElementById("media-inverse-style") as HTMLStyleElement | null;
+    if (!style) {
+      style = document.createElement("style");
+      style.id = "media-inverse-style";
+      document.head.appendChild(style);
+    }
+
+    style.textContent = `
+      img, video, canvas, svg {
+        filter: ${inverseFilter} !important;
+      }
+    `;
+
+    return () => {
+      const el = document.getElementById("media-inverse-style");
+      el?.remove();
+    };
+  }, [isDark, colorHue]);
 
   const tabs = [
     { id: "general", label: t("General"), icon: Settings },
@@ -96,7 +153,6 @@ export default function AppleStyleSettings() {
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
     console.log(t("Saving_settings..."));
-    // Add save logic for general settings if needed
   };
 
   const handleLogout = () => {
@@ -135,21 +191,19 @@ export default function AppleStyleSettings() {
     </div>
   );
 
-  // Handle password change
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setPasswordError("");
     setPasswordSuccess("");
     setPasswordLoading(true);
 
-    // Validation
     if (!currentPassword || !newPassword || !confirmPassword) {
       setPasswordError(t("All_fields_are_required."));
       setPasswordLoading(false);
       return;
     }
     if (newPassword !== confirmPassword) {
-      setPasswordError(t("New_passwords_do_not_match."));
+      setPasswordError(t("New_password_do_not_match."));
       setPasswordLoading(false);
       return;
     }
@@ -159,7 +213,6 @@ export default function AppleStyleSettings() {
       return;
     }
 
-    // Call backend
     const result = await authService.changePassword(
       currentPassword,
       newPassword
@@ -169,7 +222,6 @@ export default function AppleStyleSettings() {
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
-      // Auto-clear success message
       setTimeout(() => setPasswordSuccess(""), 5000);
     } else {
       setPasswordError(result.error || t("Unable_to_update_password."));
@@ -216,16 +268,7 @@ export default function AppleStyleSettings() {
           <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
             {activeTab === "general" && (
               <div>
-                <div className="p-6 border-b border-gray-100">
-                  <h2 className="text-xl font-semibold text-gray-900">
-                    {t("General_Settings")}
-                  </h2>
-                  <p className="text-gray-600 mt-1">
-                    {t("Manage_your_basic_account_information")}
-                  </p>
-                </div>
-
-                {/* Notifications */}
+                {/* Notifications Section */}
                 <div className="border-b border-gray-100">
                   <div className="p-6 pb-0">
                     <h3 className="text-lg font-medium text-gray-900 mb-2">
@@ -276,8 +319,8 @@ export default function AppleStyleSettings() {
                   </SettingRow>
                 </div>
 
-                {/* Appearance */}
-                <div>
+                {/* Appearance Section */}
+                <div className="border-b border-gray-100">
                   <div className="p-6 pb-0">
                     <h3 className="text-lg font-medium text-gray-900 mb-2">
                       {t("Appearance")}
@@ -287,6 +330,7 @@ export default function AppleStyleSettings() {
                     </p>
                   </div>
 
+                  {/* Language */}
                   <SettingRow
                     icon={Globe}
                     label={t("Language")}
@@ -295,6 +339,16 @@ export default function AppleStyleSettings() {
                     <LanguageToggle />
                   </SettingRow>
 
+                  {/* Dark Mode Toggle */}
+                  <SettingRow
+                    icon={Sun}
+                    label={t("Dark_Mode")}
+                    description={t("Switch_between_light_and_dark_theme")}
+                  >
+                    <Switch checked={isDark} onCheckedChange={setIsDark} />
+                  </SettingRow>
+
+                  {/* Color Theme Selector */}
                   <div className="px-6 py-4 border-b border-gray-100">
                     <div className="flex items-center space-x-4 mb-4">
                       <div className="p-2 bg-gray-100 rounded-lg">
@@ -302,44 +356,34 @@ export default function AppleStyleSettings() {
                       </div>
                       <div className="flex-1">
                         <h3 className="text-sm font-medium text-gray-900">
-                          {t("Theme")}
+                          {t("Color_Theme")}
                         </h3>
                         <p className="text-xs text-gray-500 mt-1">
-                          {t("Choose_your_preferred_theme")}
+                          {t("Choose_your_accent_color")}
                         </p>
                       </div>
                     </div>
-
-                    <div className="flex space-x-4">
-                      {(["light", "dark", "auto"] as const).map(
-                        (themeOption) => (
-                          <button
-                            key={themeOption}
-                            onClick={() => setTheme(themeOption)}
-                            className={`flex items-center space-x-2 px-4 py-3 rounded-lg border transition-all ${
-                              theme === themeOption
-                                ? "border-blue-500 bg-blue-50 text-blue-700"
-                                : "border-gray-200 hover:border-gray-300"
-                            }`}
+                    <Select
+                      value={String(colorHue)}
+                      onValueChange={(value) => setColorHue(Number(value))}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder={t("Select_Color")} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {COLOR_THEMES.map((theme) => (
+                          <SelectItem
+                            key={theme.name}
+                            value={String(theme.hue)}
                           >
-                            {themeOption === "light" && (
-                              <Sun className="w-4 h-4" />
-                            )}
-                            {themeOption === "dark" && (
-                              <Moon className="w-4 h-4" />
-                            )}
-                            {themeOption === "auto" && (
-                              <Smartphone className="w-4 h-4" />
-                            )}
-                            <span className="text-sm capitalize">
-                              {t(themeOption)}
-                            </span>
-                          </button>
-                        )
-                      )}
-                    </div>
+                            {t(theme.name)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
 
+                  {/* Font Size */}
                   <SettingRow
                     icon={User}
                     label={t("Font_Size")}
@@ -357,6 +401,7 @@ export default function AppleStyleSettings() {
                     </Select>
                   </SettingRow>
 
+                  {/* Reduce Motion */}
                   <SettingRow
                     icon={Settings}
                     label={t("Reduce_Motion")}
@@ -387,10 +432,7 @@ export default function AppleStyleSettings() {
                   <h3 className="text-lg font-medium text-gray-900 mb-4">
                     {t("Password")}
                   </h3>
-                  <form
-                    onSubmit={handleChangePassword}
-                    className="space-y-4 max-w-md"
-                  >
+                  <form onSubmit={handleChangePassword} className="space-y-4 max-w-md">
                     <div>
                       <Label className="text-sm font-medium text-gray-700">
                         {t("Current_Password")}
@@ -398,9 +440,7 @@ export default function AppleStyleSettings() {
                       <Input
                         type="password"
                         value={currentPassword}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                          setCurrentPassword(e.target.value)
-                        }
+                        onChange={(e) => setCurrentPassword(e.target.value)}
                         placeholder={t("Enter_current_password")}
                         disabled={passwordLoading}
                         className="mt-1"
@@ -414,9 +454,7 @@ export default function AppleStyleSettings() {
                       <Input
                         type="password"
                         value={newPassword}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                          setNewPassword(e.target.value)
-                        }
+                        onChange={(e) => setNewPassword(e.target.value)}
                         placeholder={t("Enter_new_password")}
                         disabled={passwordLoading}
                         minLength={6}
@@ -431,9 +469,7 @@ export default function AppleStyleSettings() {
                       <Input
                         type="password"
                         value={confirmPassword}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                          setConfirmPassword(e.target.value)
-                        }
+                        onChange={(e) => setConfirmPassword(e.target.value)}
                         placeholder={t("Confirm_new_password")}
                         disabled={passwordLoading}
                         className="mt-1"
@@ -457,15 +493,33 @@ export default function AppleStyleSettings() {
                       className="bg-blue-500 hover:bg-blue-600 text-white"
                       disabled={passwordLoading}
                     >
-                      {passwordLoading
-                        ? t("Updating...")
-                        : t("Update_Password")}
+                      {passwordLoading ? t("Updating...") : t("Update_Password")}
                     </Button>
                   </form>
                 </div>
 
-                {/* Other Security Settings */}
-                {/* Logout */}
+                {/* Two-Factor Auth */}
+                <SettingRow
+                  icon={Shield}
+                  label={t("Two-Factor_Authentication")}
+                  description={t("Add_extra_layer_of_security")}
+                >
+                  <Switch
+                    checked={twoFactorAuth}
+                    onCheckedChange={setTwoFactorAuth}
+                  />
+                </SettingRow>
+
+                {/* Logout Button */}
+                <div className="p-6 pt-4">
+                  <Button
+                    variant="outline"
+                    onClick={handleLogout}
+                    className="text-red-600 border-red-300 hover:bg-red-50"
+                  >
+                    {t("Log_Out")}
+                  </Button>
+                </div>
               </div>
             )}
           </div>

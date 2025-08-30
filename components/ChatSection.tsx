@@ -429,7 +429,7 @@ export default function ChatSection({
                               <img
                                 src={m.url}
                                 alt={m.name}
-                                className="max-w-full rounded-2xl border border-gray-200"
+                                className="max-w-full rounded-2xl "
                               />
                             ) : m.type.startsWith("video/") ? (
                               <video

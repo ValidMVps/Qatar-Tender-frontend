@@ -1,75 +1,107 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 
-export default function DarkFilterController() {
-  const [invert, setInvert] = useState(0.95);
-  const [hue, setHue] = useState(180);
-  const [brightness, setBrightness] = useState(0.92);
-  const [contrast, setContrast] = useState(1);
+const COLOR_THEMES = [
+  { name: "Default", hue: 0 },
+  { name: "Blue", hue: 200 },
+  { name: "Purple", hue: 280 },
+  { name: "Pink", hue: 320 },
+  { name: "Red", hue: 0 },
+  { name: "Orange", hue: 40 },
+  { name: "Yellow", hue: 60 },
+  { name: "Green", hue: 120 },
+  { name: "Teal", hue: 160 },
+  { name: "Cyan", hue: 180 },
+  { name: "Indigo", hue: 250 },
+  { name: "Magenta", hue: 300 },
+  { name: "Warm", hue: 30 },
+  { name: "Cool", hue: 210 },
+  { name: "Custom Blue", hue: 220 },
+];
 
-  // Apply filter whenever values change
+export default function ThemeFilter() {
+  const [isDark, setIsDark] = useState(false);
+  const [color, setColor] = useState(0);
+
   useEffect(() => {
-    document.documentElement.style.filter = `
-      invert(${invert}) hue-rotate(${hue}deg) brightness(${brightness}) contrast(${contrast})
-    `;
-  }, [invert, hue, brightness, contrast]);
+    const invertValue = isDark ? 0.98 : 0;
+    const hueRotateValue = color;
+    const filter = `invert(${invertValue}) hue-rotate(${hueRotateValue}deg) brightness(1) contrast(1)`;
+
+    // Apply main filter to the page (UI, backgrounds, text, etc.)
+    document.documentElement.style.filter = filter;
+
+    // Now define the inverse filter for media elements
+    const inverseInvert = isDark ? 1 - invertValue : 0; // invert(invert(x)) = x
+    const inverseHueRotate = -hueRotateValue; // opposite rotation
+    const inverseFilter = `invert(${invertValue}) hue-rotate(${hueRotateValue}deg)`; // brightness/contrast already 1
+
+    // Apply inverse filter to images, videos, canvas
+    const style = document.getElementById("media-inverse-style");
+    if (!style) {
+      const newStyle = document.createElement("style");
+      newStyle.id = "media-inverse-style";
+      newStyle.textContent = `
+        img, video, canvas {
+          filter: ${filter} !important;
+          /* Ensure it overrides any inline or other styles */
+        }
+      `;
+      document.head.appendChild(newStyle);
+    } else {
+      style.textContent = `
+        img, video, canvas {
+          filter: ${inverseFilter} !important;
+        }
+      `;
+    }
+
+    // Cleanup: remove style on unmount
+    return () => {
+      const existingStyle = document.getElementById("media-inverse-style");
+      if (existingStyle) {
+        existingStyle.remove();
+      }
+    };
+  }, [isDark, color]);
 
   return (
-    <div className="fixed bottom-4 right-4 bg-white/90 shadow-lg rounded-xl p-4 z-50 space-y-3 w-72">
-      <h2 className="text-sm font-semibold">Dark Mode Filter Controls</h2>
+    <div className="p-4 max-w-md mx-auto bg-white dark:bg-gray-900 rounded-xl shadow-md">
+      <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">
+        Theme Settings
+      </h2>
 
-      {/* Invert */}
-      <label className="flex flex-col text-xs">
-        Invert: {invert}
+      {/* Dark / Light toggle */}
+      <div className="flex items-center justify-between mb-4">
+        <label className="text-gray-800 dark:text-gray-200">Dark Mode</label>
         <input
-          type="range"
-          min={0}
-          max={1}
-          step={0.01}
-          value={invert}
-          onChange={(e) => setInvert(Number(e.target.value))}
+          type="checkbox"
+          checked={isDark}
+          onChange={(e) => setIsDark(e.target.checked)}
+          className="w-5 h-5"
         />
-      </label>
+      </div>
 
-      {/* Hue */}
-      <label className="flex flex-col text-xs">
-        Hue: {hue}°
-        <input
-          type="range"
-          min={0}
-          max={360}
-          step={1}
-          value={hue}
-          onChange={(e) => setHue(Number(e.target.value))}
-        />
+      {/* Color Presets */}
+      <label
+        htmlFor="color-select"
+        className="block mb-2 text-gray-800 dark:text-gray-200"
+      >
+        Color Theme
       </label>
-
-      {/* Brightness */}
-      <label className="flex flex-col text-xs">
-        Brightness: {brightness}
-        <input
-          type="range"
-          min={0.5}
-          max={1.5}
-          step={0.01}
-          value={brightness}
-          onChange={(e) => setBrightness(Number(e.target.value))}
-        />
-      </label>
-
-      {/* Contrast */}
-      <label className="flex flex-col text-xs">
-        Contrast: {contrast}
-        <input
-          type="range"
-          min={0.5}
-          max={1.5}
-          step={0.01}
-          value={contrast}
-          onChange={(e) => setContrast(Number(e.target.value))}
-        />
-      </label>
+      <select
+        id="color-select"
+        value={color}
+        onChange={(e) => setColor(Number(e.target.value))}
+        className="w-full p-2 rounded-md border dark:bg-gray-800 dark:text-gray-100"
+      >
+        {COLOR_THEMES.map((theme) => (
+          <option key={theme.name} value={theme.hue}>
+            {theme.name}
+          </option>
+        ))}
+      </select>
     </div>
   );
 }
