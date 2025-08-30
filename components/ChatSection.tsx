@@ -97,17 +97,23 @@ export default function ChatSection({
 
     const loadChatRoom = async () => {
       try {
-        const room = await getChatRoomByTenderId(tenderId);
-        setRoomId(String(room.id));
-        console.log(room);
-        setRoomTitle(room.tenderTitle);
-        profileApi.getProfileById(room.participants[1]).then((data) => {
-          setOtherParticipant(data);
-          console.log(
-            data,
-            "craaaaaaaaaaaaaaaaaaaazzzzzzzzzzzzzzzzzzzzzzyyyyyyyyyyyyyy"
-          );
-        });
+        const room = (await getChatRoomByTenderId(tenderId)) as any;
+
+        // prefer using id or fallback to _id if your backend uses Mongo-style _id
+        setRoomId(String(room.id ?? room._id ?? ""));
+
+        // safe fallback for title
+        setRoomTitle(room.tenderTitle ?? room.title ?? "");
+
+        // safe participant access
+        const participantId =
+          room.participants?.[1] ?? room.participants?.[0] ?? null;
+        if (participantId) {
+          profileApi.getProfileById(participantId).then((data) => {
+            setOtherParticipant(data);
+            console.log(data, "crazy");
+          });
+        }
       } catch (error) {
         console.error("Chat not available:", error);
         setRoomId(null);
@@ -143,25 +149,31 @@ export default function ChatSection({
     socket.emit("joinChatRoom", roomId);
 
     // Listen for new messages
-    socket.on("newMessage", (data: { roomId: string; message: { id: any; }; }) => {
-      if (data.roomId === roomId) {
-        setMessages((prev) => {
-          const exists = prev.some((msg) => msg.id === data.message.id);
-          if (exists) return prev;
-          return [...prev, data.message];
-        });
+    socket.on(
+      "newMessage",
+      (data: { roomId: string; message: { id: any } }) => {
+        if (data.roomId === roomId) {
+          setMessages((prev) => {
+            const exists = prev.some((msg) => msg.id === data.message.id);
+            if (exists) return prev;
+            return [...prev, data.message];
+          });
+        }
       }
-    });
+    );
 
     // Listen for typing
-    socket.on("userTyping", (data: { roomId: string; userId: string; senderName: any; }) => {
-      if (data.roomId === roomId && data.userId !== user._id) {
-        setOtherTyping(true);
-        setTypingUserName(data.senderName || "Someone");
-        const timer = setTimeout(() => setOtherTyping(false), 3000);
-        return () => clearTimeout(timer);
+    socket.on(
+      "userTyping",
+      (data: { roomId: string; userId: string; senderName: any }) => {
+        if (data.roomId === roomId && data.userId !== user._id) {
+          setOtherTyping(true);
+          setTypingUserName(data.senderName || "Someone");
+          const timer = setTimeout(() => setOtherTyping(false), 3000);
+          return () => clearTimeout(timer);
+        }
       }
-    });
+    );
 
     return () => {
       socket.emit("leaveChatRoom", roomId);

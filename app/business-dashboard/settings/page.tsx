@@ -30,8 +30,9 @@ import {
 import { authService } from "@/utils/auth";
 import PageTransitionWrapper from "@/components/animations/PageTransitionWrapper";
 import { LanguageToggle } from "@/components/LanguageToggle";
+import useTranslation from "@/lib/hooks/useTranslation";
 
-// Define props for SettingRow
+// Define props for SettingRow interface
 interface SettingRowProps {
   icon: React.ElementType;
   label: string;
@@ -44,14 +45,17 @@ interface SettingRowProps {
 type TabId = "general" | "security";
 
 export default function AppleStyleSettings() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<TabId>("general");
 
   // General Settings
-  const [companyName, setCompanyName] = useState<string>("Acme Solutions Inc.");
-  const [industry, setIndustry] = useState<string>("Construction");
-  const [contactPerson, setContactPerson] = useState<string>("Jane Doe");
+  const [companyName, setCompanyName] = useState<string>(
+    t("Acme_Solutions_Inc.")
+  );
+  const [industry, setIndustry] = useState<string>(t("Construction"));
+  const [contactPerson, setContactPerson] = useState<string>(t("Jane_Doe"));
   const [companyEmail, setCompanyEmail] = useState<string>(
-    "info@acmesolutions.com"
+    t("info@acmesolutions.com")
   );
   const [companyLogo, setCompanyLogo] = useState<string>(
     "/placeholder.svg?height=100&width=100&text=Company+Logo"
@@ -85,13 +89,13 @@ export default function AppleStyleSettings() {
   const [reducedMotion, setReducedMotion] = useState<boolean>(false);
 
   const tabs = [
-    { id: "general", label: "General", icon: Settings },
-    { id: "security", label: "Security & Privacy", icon: Shield },
+    { id: "general", label: t("General"), icon: Settings },
+    { id: "security", label: t("Security_&_Privacy"), icon: Shield },
   ];
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Saving settings...");
+    console.log(t("Saving_settings..."));
     // Add save logic for general settings if needed
   };
 
@@ -140,19 +144,17 @@ export default function AppleStyleSettings() {
 
     // Validation
     if (!currentPassword || !newPassword || !confirmPassword) {
-      setPasswordError("All fields are required.");
+      setPasswordError(t("All_fields_are_required."));
       setPasswordLoading(false);
       return;
     }
-
     if (newPassword !== confirmPassword) {
-      setPasswordError("New passwords do not match.");
+      setPasswordError(t("New_passwords_do_not_match."));
       setPasswordLoading(false);
       return;
     }
-
     if (newPassword.length < 6) {
-      setPasswordError("New password must be at least 6 characters long.");
+      setPasswordError(t("New_password_must_be_at_least_6_characters_long."));
       setPasswordLoading(false);
       return;
     }
@@ -162,19 +164,16 @@ export default function AppleStyleSettings() {
       currentPassword,
       newPassword
     );
-
     if (result.success) {
-      setPasswordSuccess(result.message);
+      setPasswordSuccess(result.message || t("Password_updated_successfully."));
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
-
       // Auto-clear success message
       setTimeout(() => setPasswordSuccess(""), 5000);
     } else {
-      setPasswordError(result.error);
+      setPasswordError(result.error || t("Unable_to_update_password."));
     }
-
     setPasswordLoading(false);
   };
 
@@ -184,9 +183,11 @@ export default function AppleStyleSettings() {
         <div className="mx-auto py-8 px-14">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Settings</h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              {t("Settings")}
+            </h1>
             <p className="text-gray-600">
-              Manage your account settings and preferences
+              {t("Manage_your_account_settings_and_preferences")}
             </p>
           </div>
 
@@ -217,10 +218,10 @@ export default function AppleStyleSettings() {
               <div>
                 <div className="p-6 border-b border-gray-100">
                   <h2 className="text-xl font-semibold text-gray-900">
-                    General Settings
+                    {t("General_Settings")}
                   </h2>
                   <p className="text-gray-600 mt-1">
-                    Manage your basic account information
+                    {t("Manage_your_basic_account_information")}
                   </p>
                 </div>
 
@@ -228,27 +229,30 @@ export default function AppleStyleSettings() {
                 <div className="border-b border-gray-100">
                   <div className="p-6 pb-0">
                     <h3 className="text-lg font-medium text-gray-900 mb-2">
-                      Notifications
+                      {t("Notifications")}
                     </h3>
                     <p className="text-gray-600 mb-4">
-                      Control how you receive notifications
+                      {t("Control_how_you_receive_notifications")}
                     </p>
                   </div>
 
                   <SettingRow
                     icon={Bell}
-                    label="Enable Notifications"
-                    description="Receive notifications about important updates"
+                    label={t("Enable_Notifications")}
+                    description={t(
+                      "Receive_notifications_about_important_updates"
+                    )}
                   >
                     <Switch
                       checked={notificationsEnabled}
                       onCheckedChange={setNotificationsEnabled}
                     />
                   </SettingRow>
+
                   <SettingRow
                     icon={Volume2}
-                    label="Sound Notifications"
-                    description="Play sound with notifications"
+                    label={t("Sound_Notifications")}
+                    description={t("Play_sound_with_notifications")}
                   >
                     <Switch
                       checked={soundEnabled}
@@ -256,10 +260,13 @@ export default function AppleStyleSettings() {
                       disabled={!notificationsEnabled}
                     />
                   </SettingRow>
+
                   <SettingRow
                     icon={Smartphone}
-                    label="Push Notifications"
-                    description="Receive push notifications on mobile devices"
+                    label={t("Push_Notifications")}
+                    description={t(
+                      "Receive_push_notifications_on_mobile_devices"
+                    )}
                   >
                     <Switch
                       checked={pushNotifications}
@@ -273,17 +280,17 @@ export default function AppleStyleSettings() {
                 <div>
                   <div className="p-6 pb-0">
                     <h3 className="text-lg font-medium text-gray-900 mb-2">
-                      Appearance
+                      {t("Appearance")}
                     </h3>
                     <p className="text-gray-600 mb-4">
-                      Customize how the app looks and feels
+                      {t("Customize_how_the_app_looks_and_feels")}
                     </p>
                   </div>
 
                   <SettingRow
                     icon={Globe}
-                    label="Language"
-                    description="Choose your preferred language"
+                    label={t("Language")}
+                    description={t("Choose_your_preferred_language")}
                   >
                     <LanguageToggle />
                   </SettingRow>
@@ -295,13 +302,14 @@ export default function AppleStyleSettings() {
                       </div>
                       <div className="flex-1">
                         <h3 className="text-sm font-medium text-gray-900">
-                          Theme
+                          {t("Theme")}
                         </h3>
                         <p className="text-xs text-gray-500 mt-1">
-                          Choose your preferred theme
+                          {t("Choose_your_preferred_theme")}
                         </p>
                       </div>
                     </div>
+
                     <div className="flex space-x-4">
                       {(["light", "dark", "auto"] as const).map(
                         (themeOption) => (
@@ -324,7 +332,7 @@ export default function AppleStyleSettings() {
                               <Smartphone className="w-4 h-4" />
                             )}
                             <span className="text-sm capitalize">
-                              {themeOption}
+                              {t(themeOption)}
                             </span>
                           </button>
                         )
@@ -334,25 +342,25 @@ export default function AppleStyleSettings() {
 
                   <SettingRow
                     icon={User}
-                    label="Font Size"
-                    description="Adjust text size for better readability"
+                    label={t("Font_Size")}
+                    description={t("Adjust_text_size_for_better_readability")}
                   >
                     <Select value={fontSize} onValueChange={setFontSize}>
                       <SelectTrigger className="w-32">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="small">Small</SelectItem>
-                        <SelectItem value="medium">Medium</SelectItem>
-                        <SelectItem value="large">Large</SelectItem>
+                        <SelectItem value="small">{t("Small")}</SelectItem>
+                        <SelectItem value="medium">{t("Medium")}</SelectItem>
+                        <SelectItem value="large">{t("Large")}</SelectItem>
                       </SelectContent>
                     </Select>
                   </SettingRow>
 
                   <SettingRow
                     icon={Settings}
-                    label="Reduce Motion"
-                    description="Minimize animations and transitions"
+                    label={t("Reduce_Motion")}
+                    description={t("Minimize_animations_and_transitions")}
                   >
                     <Switch
                       checked={reducedMotion}
@@ -367,24 +375,25 @@ export default function AppleStyleSettings() {
               <div>
                 <div className="p-6 border-b border-gray-100">
                   <h2 className="text-xl font-semibold text-gray-900">
-                    Security & Privacy
+                    {t("Security_&_Privacy")}
                   </h2>
-                  <p className="text-gray-600 mt-1">Keep your account secure</p>
+                  <p className="text-gray-600 mt-1">
+                    {t("Keep_your_account_secure")}
+                  </p>
                 </div>
 
                 {/* Password Change */}
                 <div className="p-6 border-b border-gray-100">
                   <h3 className="text-lg font-medium text-gray-900 mb-4">
-                    Password
+                    {t("Password")}
                   </h3>
-
                   <form
                     onSubmit={handleChangePassword}
                     className="space-y-4 max-w-md"
                   >
                     <div>
                       <Label className="text-sm font-medium text-gray-700">
-                        Current Password
+                        {t("Current_Password")}
                       </Label>
                       <Input
                         type="password"
@@ -392,14 +401,15 @@ export default function AppleStyleSettings() {
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                           setCurrentPassword(e.target.value)
                         }
-                        placeholder="Enter current password"
+                        placeholder={t("Enter_current_password")}
                         disabled={passwordLoading}
                         className="mt-1"
                       />
                     </div>
+
                     <div>
                       <Label className="text-sm font-medium text-gray-700">
-                        New Password
+                        {t("New_Password")}
                       </Label>
                       <Input
                         type="password"
@@ -407,15 +417,16 @@ export default function AppleStyleSettings() {
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                           setNewPassword(e.target.value)
                         }
-                        placeholder="Enter new password"
+                        placeholder={t("Enter_new_password")}
                         disabled={passwordLoading}
                         minLength={6}
                         className="mt-1"
                       />
                     </div>
+
                     <div>
                       <Label className="text-sm font-medium text-gray-700">
-                        Confirm New Password
+                        {t("Confirm_New_Password")}
                       </Label>
                       <Input
                         type="password"
@@ -423,7 +434,7 @@ export default function AppleStyleSettings() {
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                           setConfirmPassword(e.target.value)
                         }
-                        placeholder="Confirm new password"
+                        placeholder={t("Confirm_new_password")}
                         disabled={passwordLoading}
                         className="mt-1"
                       />
@@ -446,13 +457,14 @@ export default function AppleStyleSettings() {
                       className="bg-blue-500 hover:bg-blue-600 text-white"
                       disabled={passwordLoading}
                     >
-                      {passwordLoading ? "Updating..." : "Update Password"}
+                      {passwordLoading
+                        ? t("Updating...")
+                        : t("Update_Password")}
                     </Button>
                   </form>
                 </div>
 
                 {/* Other Security Settings */}
-
                 {/* Logout */}
               </div>
             )}
@@ -464,7 +476,7 @@ export default function AppleStyleSettings() {
               onClick={handleSave}
               className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-xl font-medium"
             >
-              Save Changes
+              {t("Save_Changes")}
             </Button>
           </div>
         </div>
