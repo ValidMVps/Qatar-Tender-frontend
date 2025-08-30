@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 import { authService } from "@/utils/auth";
 import PageTransitionWrapper from "@/components/animations/PageTransitionWrapper";
+import { LanguageToggle } from "@/components/LanguageToggle";
 
 // Define props for SettingRow
 interface SettingRowProps {
@@ -284,18 +285,7 @@ export default function AppleStyleSettings() {
                     label="Language"
                     description="Choose your preferred language"
                   >
-                    <Select value={appLanguage} onValueChange={setAppLanguage}>
-                      <SelectTrigger className="w-32">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="en">English</SelectItem>
-                        <SelectItem value="es">Español</SelectItem>
-                        <SelectItem value="fr">Français</SelectItem>
-                        <SelectItem value="de">Deutsch</SelectItem>
-                        <SelectItem value="zh">中文</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <LanguageToggle />
                   </SettingRow>
 
                   <div className="px-6 py-4 border-b border-gray-100">
@@ -462,48 +452,8 @@ export default function AppleStyleSettings() {
                 </div>
 
                 {/* Other Security Settings */}
-                <div className="border-b border-gray-100">
-                  <SettingRow
-                    icon={Shield}
-                    label="Two-Factor Authentication"
-                    description="Add an extra layer of security"
-                  >
-                    <Switch
-                      checked={twoFactorAuth}
-                      onCheckedChange={setTwoFactorAuth}
-                    />
-                  </SettingRow>
-                  <SettingRow
-                    icon={Smartphone}
-                    label="Auto-lock"
-                    description="Automatically lock after inactivity"
-                  >
-                    <Select value={autoLock} onValueChange={setAutoLock}>
-                      <SelectTrigger className="w-32">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="5">5 minutes</SelectItem>
-                        <SelectItem value="15">15 minutes</SelectItem>
-                        <SelectItem value="30">30 minutes</SelectItem>
-                        <SelectItem value="60">1 hour</SelectItem>
-                        <SelectItem value="never">Never</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </SettingRow>
-                </div>
 
                 {/* Logout */}
-                <div className="p-6">
-                  <Button
-                    onClick={handleLogout}
-                    variant="destructive"
-                    className="bg-red-500 hover:bg-red-600 text-white flex items-center gap-2"
-                  >
-                    <LogOut className="w-4 h-4" />
-                    Sign Out
-                  </Button>
-                </div>
               </div>
             )}
           </div>
