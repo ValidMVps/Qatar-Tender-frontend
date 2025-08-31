@@ -128,11 +128,4 @@
 *::-webkit-scrollbar {
   display: none;
 }
-html.dark {
-  filter: invert(1) hue-rotate(180deg) !important; 
-}
-img,
-video,
-canvas {
-  filter: invert(1) hue-rotate(180deg) !important; /* Fix media colors */
-}
+

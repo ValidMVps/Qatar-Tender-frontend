@@ -44,30 +44,6 @@ interface SettingRowProps {
 // Define tab types
 type TabId = "general" | "security";
 
-// 🔹 Your actual base blue hue (Tailwind blue-500 ≈ 220)
-const BASE_HUE = 220;
-
-// 🔹 Color themes defined in absolute HSL hue degrees
-// These will be adjusted *relative* to your base blue
-const COLOR_THEMES = [
-  { name: "Default", hue: 220 },
-  { name: "Blue", hue: 220 },
-  { name: "Sky", hue: 190 },
-  { name: "Teal", hue: 160 },
-  { name: "Cyan", hue: 180 },
-  { name: "Green", hue: 120 },
-  { name: "Yellow", hue: 60 },
-  { name: "Orange", hue: 30 },
-  { name: "Red", hue: 0 },
-  { name: "Pink", hue: 320 },
-  { name: "Purple", hue: 280 },
-  { name: "Indigo", hue: 250 },
-  { name: "Magenta", hue: 300 },
-  { name: "Warm", hue: 40 },
-  { name: "Cool", hue: 200 },
-  { name: "Custom Blue", hue: 220 },
-] as const;
-
 export default function AppleStyleSettings() {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<TabId>("general");
@@ -89,7 +65,8 @@ export default function AppleStyleSettings() {
   const [offlineMode, setOfflineMode] = useState<boolean>(false);
 
   // Notification Settings
-  const [notificationsEnabled, setNotificationsEnabled] = useState<boolean>(true);
+  const [notificationsEnabled, setNotificationsEnabled] =
+    useState<boolean>(true);
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
   const [pushNotifications, setPushNotifications] = useState<boolean>(true);
 
@@ -109,41 +86,35 @@ export default function AppleStyleSettings() {
   const [fontSize, setFontSize] = useState<string>("medium");
   const [reducedMotion, setReducedMotion] = useState<boolean>(false);
 
-  // Custom Theme Filter Controls
-  const [isDark, setIsDark] = useState(false);
-  const [colorHue, setColorHue] = useState<number>(220); // Start with blue
-
-  // Apply filters based on theme and hue
-  useEffect(() => {
-    // 🔁 Relative hue rotation: how much to shift from your base blue
-    const rotation = colorHue - BASE_HUE;
-    const invertValue = isDark ? 0.98 : 0;
-    const filter = `invert(${invertValue}) hue-rotate(${rotation}deg)`;
-
-    // Apply main filter to the entire document
-    document.documentElement.style.filter = filter;
-
-    // Invert filter for media (so images aren't color-shifted/inverted)
-    const inverseFilter = `invert(${invertValue}) hue-rotate(${rotation}deg)`;
-
-    let style = document.getElementById("media-inverse-style") as HTMLStyleElement | null;
-    if (!style) {
-      style = document.createElement("style");
-      style.id = "media-inverse-style";
-      document.head.appendChild(style);
+  // 🔹 Dark mode state — only manage, don't apply filter
+  const [isDark, setIsDark] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("darkMode");
+      return saved === "true";
     }
+    return false;
+  });
 
-    style.textContent = `
-      img, video, canvas, svg {
-        filter: ${inverseFilter} !important;
+  // Save to localStorage when toggled
+  useEffect(() => {
+    localStorage.setItem("darkMode", isDark.toString());
+
+    // 🔥 Dispatch custom event to notify all listeners
+    const event = new CustomEvent("darkModeChange", {
+      detail: { dark: isDark },
+    });
+    window.dispatchEvent(event);
+  }, [isDark]);
+  // Sync with other tabs
+  useEffect(() => {
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === "darkMode") {
+        setIsDark(e.newValue === "true");
       }
-    `;
-
-    return () => {
-      const el = document.getElementById("media-inverse-style");
-      el?.remove();
     };
-  }, [isDark, colorHue]);
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
+  }, []);
 
   const tabs = [
     { id: "general", label: t("General"), icon: Settings },
@@ -348,41 +319,6 @@ export default function AppleStyleSettings() {
                     <Switch checked={isDark} onCheckedChange={setIsDark} />
                   </SettingRow>
 
-                  {/* Color Theme Selector */}
-                  <div className="px-6 py-4 border-b border-gray-100">
-                    <div className="flex items-center space-x-4 mb-4">
-                      <div className="p-2 bg-gray-100 rounded-lg">
-                        <Palette className="w-5 h-5 text-gray-600" />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-sm font-medium text-gray-900">
-                          {t("Color_Theme")}
-                        </h3>
-                        <p className="text-xs text-gray-500 mt-1">
-                          {t("Choose_your_accent_color")}
-                        </p>
-                      </div>
-                    </div>
-                    <Select
-                      value={String(colorHue)}
-                      onValueChange={(value) => setColorHue(Number(value))}
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder={t("Select_Color")} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {COLOR_THEMES.map((theme) => (
-                          <SelectItem
-                            key={theme.name}
-                            value={String(theme.hue)}
-                          >
-                            {t(theme.name)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
                   {/* Font Size */}
                   <SettingRow
                     icon={User}
@@ -432,7 +368,10 @@ export default function AppleStyleSettings() {
                   <h3 className="text-lg font-medium text-gray-900 mb-4">
                     {t("Password")}
                   </h3>
-                  <form onSubmit={handleChangePassword} className="space-y-4 max-w-md">
+                  <form
+                    onSubmit={handleChangePassword}
+                    className="space-y-4 max-w-md"
+                  >
                     <div>
                       <Label className="text-sm font-medium text-gray-700">
                         {t("Current_Password")}
@@ -493,7 +432,9 @@ export default function AppleStyleSettings() {
                       className="bg-blue-500 hover:bg-blue-600 text-white"
                       disabled={passwordLoading}
                     >
-                      {passwordLoading ? t("Updating...") : t("Update_Password")}
+                      {passwordLoading
+                        ? t("Updating...")
+                        : t("Update_Password")}
                     </Button>
                   </form>
                 </div>

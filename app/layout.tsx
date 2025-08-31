@@ -1,3 +1,4 @@
+// app/layout.tsx
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -5,6 +6,8 @@ import GoogleTranslate from "next-google-translate-widget";
 import Script from "next/script";
 import { LanguageProvider } from "@/components/LanguageProvider";
 import { AuthProvider } from "@/context/AuthContext";
+import { ThemeProvider } from "@/components/DarkFilterController";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -30,9 +33,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <AuthProvider>
-          <LanguageProvider>{children}</LanguageProvider>
-        </AuthProvider>
+        {/* ✅ ThemeProvider is a Client Component */}
+        <ThemeProvider>
+          <AuthProvider>
+            <LanguageProvider>{children}</LanguageProvider>
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

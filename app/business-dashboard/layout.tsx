@@ -25,7 +25,6 @@ import BNavbar from "@/components/Bnavbar";
 import { useTranslation } from "../../lib/hooks/useTranslation";
 import { ProtectedRoute } from "@/components/auth-guard";
 import { NotificationProvider } from "@/context/NotificationContext";
-import DarkFilterController from "@/components/DarkFilterController";
 export default function DashboardLayout({
   children,
 }: {
@@ -162,7 +161,7 @@ export default function DashboardLayout({
               >
                 <div className="flex items-center justify-between px-3 py-4">
                   <div className="flex items-center">
-                    <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center shadow-sm">
+                    <div className="w-8 h-8  bg-blue-500  rounded-lg flex items-center justify-center shadow-sm">
                       <Building2 className="h-5 w-5 text-white" />
                     </div>
                     <span className="ml-2 text-lg font-semibold text-gray-900">
@@ -182,7 +181,7 @@ export default function DashboardLayout({
           <aside className="sticky top-0 h-screen bg-white border-r border-gray-200 hidden lg:flex flex-col w-64">
             <div className="px-4 py-6">
               <div className="flex items-center space-x-3">
-                <div className="w-9 h-9 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-sm">
+                <div className="w-9 h-9 bg-gradient-to-br bg-blue-500  rounded-xl flex items-center justify-center shadow-sm">
                   <Building2 className="h-5 w-5 text-white" />
                 </div>
                 <span className="text-2xl font-semibold text-gray-900">
@@ -205,7 +204,6 @@ export default function DashboardLayout({
             <main className="flex-1 w-full px-2 sm:px-4 py-0 md:mt-0  mt-[70px] bg-neutral-50/30">
               {children}
             </main>
-            <DarkFilterController />
           </div>
         </div>
       </NotificationProvider>
