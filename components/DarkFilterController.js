@@ -4,11 +4,11 @@
 import { useEffect } from "react";
 
 function applyTheme(dark) {
-  const invertValue = dark ? 0.98 : 0;
+  const invertValue = dark ? 1 : 0;
   const filter = `invert(${invertValue}) hue-rotate(${dark ? 180 : 0}deg)`;
   document.documentElement.style.filter = filter;
 
-  let style = document.getElementById("media-inverse-style") ;
+  let style = document.getElementById("media-inverse-style");
   if (!style) {
     style = document.createElement("style");
     style.id = "media-inverse-style";
@@ -16,7 +16,7 @@ function applyTheme(dark) {
   }
 
   style.textContent = `
-    img, video, canvas, svg {
+    img, video {
       filter: invert(${invertValue}) hue-rotate(180deg) !important;
     }
   `;
