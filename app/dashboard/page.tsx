@@ -554,7 +554,7 @@ export default function IndividualDashboardPage() {
                       My Tenders
                     </h3>
                     <Link
-                      href="/individual-dashboard/my-tenders"
+                      href="/dashboard/my-tenders"
                       className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-1 bg-blue-50/80 px-4 py-2 rounded-xl transition-colors"
                     >
                       View All
@@ -607,7 +607,7 @@ export default function IndividualDashboardPage() {
                             >
                               <TableCell>
                                 <Link
-                                  href={`/individual-dashboard/tender/${tender._id}`}
+                                  href={`/dashboard/tender/${tender._id}`}
                                   className="font-medium text-gray-900 hover:text-blue-600 transition-colors"
                                 >
                                   {tender.title}
@@ -725,7 +725,7 @@ export default function IndividualDashboardPage() {
                                     </TableCell>
                                     <TableCell>
                                       <Link
-                                        href={`/individual-dashboard/tender/${tender._id}`}
+                                        href={`/dashboard/tender/${tender._id}`}
                                         className="text-blue-600 hover:text-blue-700 font-medium bg-blue-50/80 px-3 py-1 rounded-lg transition-colors"
                                       >
                                         Review
@@ -747,7 +747,7 @@ export default function IndividualDashboardPage() {
                       Tenders Awaiting Bids
                     </h3>
                     <Link
-                      href="/individual-dashboard/my-tenders?filter=no-bids"
+                      href="/dashboard/my-tenders?filter=no-bids"
                       className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-1 bg-blue-50/80 px-4 py-2 rounded-xl transition-colors"
                     >
                       View All
@@ -799,7 +799,7 @@ export default function IndividualDashboardPage() {
                             >
                               <TableCell>
                                 <Link
-                                  href={`/individual-dashboard/tender/${tender._id}`}
+                                  href={`/dashboard/tender/${tender._id}`}
                                   className="font-medium text-gray-900 hover:text-blue-600 transition-colors"
                                 >
                                   {tender.title}
@@ -904,7 +904,7 @@ export default function IndividualDashboardPage() {
                               </TableCell>
                               <TableCell>
                                 <Link
-                                  href={`/individual-dashboard/chat/${tender._id}`}
+                                  href={`/dashboard/chat/${tender._id}`}
                                   className="text-blue-600 hover:text-blue-700 font-medium bg-blue-50/80 px-3 py-1 rounded-lg transition-colors"
                                 >
                                   Go to Chat

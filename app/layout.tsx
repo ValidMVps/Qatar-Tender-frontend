@@ -7,6 +7,7 @@ import Script from "next/script";
 import { LanguageProvider } from "@/components/LanguageProvider";
 import { AuthProvider } from "@/context/AuthContext";
 import { ThemeProvider } from "@/components/DarkFilterController";
+import { NotificationProvider } from "@/context/NotificationContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,7 +37,9 @@ export default function RootLayout({
         {/* ✅ ThemeProvider is a Client Component */}
         <ThemeProvider>
           <AuthProvider>
-            <LanguageProvider>{children}</LanguageProvider>
+            <NotificationProvider>
+              <LanguageProvider>{children}</LanguageProvider>
+            </NotificationProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>

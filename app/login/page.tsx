@@ -73,7 +73,7 @@ export default function LoginPage() {
                   Enter your credentials to access your dashboard
                 </CardDescription>
               </CardHeader>
-              <CardContent >
+              <CardContent>
                 <LoginForm />
               </CardContent>
             </Card>
