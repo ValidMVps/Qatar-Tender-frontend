@@ -157,7 +157,7 @@ export default function MyTendersPage() {
     setLoading(true);
     try {
       if (!profile?.user) return;
-      const data: ApiTender[] = await getUserTenders(profile.user);
+      const data: ApiTender[] = await getUserTenders(profile.user._id);
       const normalized = Array.isArray(data) ? data.map(normalizeTender) : [];
       setTenders(normalized);
     } catch (err) {
