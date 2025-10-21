@@ -1,9 +1,11 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { CheckCircle2, XCircle, Loader2, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { verifyPaymentStatus } from "@/app/services/paymentService";
 
 export default function PaymentCallbackPage() {
   const router = useRouter();
@@ -51,11 +53,11 @@ export default function PaymentCallbackPage() {
   }, [searchParams]);
 
   const handleBackToDashboard = () => {
-    router.push("/dashboard");
+    router.push("/business-dashboard");
   };
 
   const handleViewBids = () => {
-    router.push("/my-bids");
+    router.push("business-dashboard/bids");
   };
 
   if (verifying) {
@@ -201,90 +203,3 @@ export default function PaymentCallbackPage() {
     </div>
   );
 }
-
-// ============================================
-// 3. UPDATE BID SERVICE
-// ============================================
-// File: services/bidService.ts
-// Add this to your existing bidService.ts
-
-// Update the createBid function return type
-export interface CreateBidResponse {
-  success: boolean;
-  message: string;
-  bid: {
-    _id: string;
-    tender: string;
-    amount: number;
-    description: string;
-    paymentStatus: string;
-    paymentAmount: number;
-  };
-  payment: {
-    _id: string;
-    transactionId: string;
-    amount: number;
-    status: string;
-    paymentUrl: string;
-  };
-}
-
-// The createBid function remains the same, just returns the response as-is
-
-// ============================================
-// 4. CREATE PAYMENT SERVICE
-// ============================================
-// File: services/paymentService.ts
-
-import { api } from "@/lib/apiClient";
-
-export interface PaymentVerificationResponse {
-  success: boolean;
-  message: string;
-  status?: string;
-  payment?: {
-    status: string;
-    amount: number;
-    transactionId: string;
-  };
-  bid?: {
-    _id: string;
-    status: string;
-    paymentStatus: string;
-  };
-}
-
-/**
- * Verify payment status after redirect
- * @param tapId - The Tap charge ID from URL parameter
- */
-export const verifyPaymentStatus = async (
-  tapId: string
-): Promise<PaymentVerificationResponse> => {
-  try {
-    const res = await api.get(`/api/payments/verify?tap_id=${tapId}`);
-    return res.data;
-  } catch (error: any) {
-    console.error(
-      "Error verifying payment:",
-      error.response?.data || error.message
-    );
-    throw error;
-  }
-};
-
-/**
- * Get payment details by ID
- */
-export const getPaymentDetails = async (paymentId: string) => {
-  try {
-    const res = await api.get(`/api/payments/${paymentId}`);
-    return res.data;
-  } catch (error: any) {
-    console.error(
-      "Error fetching payment details:",
-      error.response?.data || error.message
-    );
-    throw error;
-  }
-};
