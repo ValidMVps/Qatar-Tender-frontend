@@ -165,7 +165,7 @@ export default function BidderProfilePage() {
           platformRank: profileData.platformRank || 0,
           projectHistory,
         };
-
+        console.log(transformedData, "secret code");
         setBidder(transformedData);
       } catch (err: any) {
         console.error("Error fetching bidder profile:", err);
@@ -505,7 +505,7 @@ export default function BidderProfilePage() {
                         bidder.isVerified ? "text-green-600" : "text-orange-600"
                       }`}
                     >
-                      {bidder.isVerified ? "Verified" : "Pending"}
+                      {bidder.isVerified}
                     </span>
                   </div>
                 </div>

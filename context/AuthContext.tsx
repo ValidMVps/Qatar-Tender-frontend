@@ -18,7 +18,7 @@ import { getTokenFromCookie } from "@/utils/tokenHelpers";
 // Profile type (based on your backend schema)
 interface Profile {
   _id: string;
-  user: string;
+  user: any;
   phone?: string;
   fullName?: string;
   companyName?: string;
