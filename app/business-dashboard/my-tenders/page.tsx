@@ -438,13 +438,14 @@ export default function MyTendersPage() {
           onValueChange={setActiveTab}
           className="w-full mb-6"
         >
-          <TabsList className="w-full grid grid-cols-3 sm:grid-cols-6 gap-2 md:grid hidden">
+          <TabsList className="w-full grid grid-cols-3 sm:grid-cols-7 gap-2 md:grid hidden">
             <TabsTrigger value="all">{t("all")}</TabsTrigger>
             <TabsTrigger value="active">{t("active")}</TabsTrigger>
             <TabsTrigger value="awarded">{t("awarded")}</TabsTrigger>
             <TabsTrigger value="closed">{t("closed")}</TabsTrigger>
             <TabsTrigger value="rejected">{t("rejected")}</TabsTrigger>
             <TabsTrigger value="completed">{t("completed")}</TabsTrigger>
+            <TabsTrigger value="draft">{t("draft")}</TabsTrigger>
           </TabsList>
 
           <TabsContent value={activeTab} className="mt-4">
