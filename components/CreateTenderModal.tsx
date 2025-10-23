@@ -37,7 +37,7 @@ import {
 } from "lucide-react";
 
 import { useTranslation } from "../lib/hooks/useTranslation";
-import { createTender } from "@/app/services/tenderService";
+import { createTender, createTenderDraft } from "@/app/services/tenderService";
 import { uploadToCloudinary } from "@/utils/uploadToCloudinary";
 import { detectContactInfo, VALIDATION_RULES } from "@/utils/validationcehck";
 import { getCategories } from "@/app/services/categoryService";
@@ -129,6 +129,9 @@ const CreateTenderModal = ({
   const [touchedFields, setTouchedFields] = useState<Set<string>>(new Set());
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
   const [isUploading, setIsUploading] = useState(false);
+  const [submissionType, setSubmissionType] = useState<"post" | "draft" | null>(
+    null
+  );
 
   // Validation functions
   const validateField = useCallback(
@@ -233,7 +236,7 @@ const CreateTenderModal = ({
       }
       return undefined;
     },
-    [t, detectContactInfo]
+    [t]
   );
 
   // Real-time validation
@@ -426,35 +429,40 @@ const CreateTenderModal = ({
     return isValid;
   };
   const { user } = useAuth();
-  const handleSubmit = async (e: { preventDefault: () => void }) => {
-    e.preventDefault();
+
+  const handleSubmission = async (isDraft: boolean) => {
+    setSubmissionType(isDraft ? "draft" : "post");
     setIsSubmitting(true);
     setErrors({});
 
     console.log("🚀 Form submission started");
     console.log("📋 Current formData:", formData);
 
-    // Mark all fields as touched for validation display
-    setTouchedFields(new Set(Object.keys(formData)));
-
-    // Validate form
-    if (!validateForm()) {
-      console.error("❌ Form validation failed");
-      setIsSubmitting(false);
-      return;
+    // For post, mark all fields as touched and validate
+    if (!isDraft) {
+      setTouchedFields(new Set(Object.keys(formData)));
+      if (!validateForm()) {
+        console.error("❌ Form validation failed");
+        setIsSubmitting(false);
+        return;
+      }
     }
 
     try {
-      // Prepare payload
+      // Prepare payload, allowing partial for drafts
       const payload = {
-        title: formData.title.trim(),
-        description: formData.description.trim(),
-        category: formData.category,
-        location: formData.location.trim(),
-        contactEmail: formData.contactEmail.trim(),
-        estimatedBudget: parseFloat(formData.estimatedBudget),
-        deadline: new Date(formData.deadline).toISOString(),
-        image: formData.image || null, // Explicitly handle null/empty
+        title: formData.title.trim() || "",
+        description: formData.description.trim() || "",
+        category: formData.category || null,
+        location: formData.location.trim() || "",
+        contactEmail: formData.contactEmail.trim() || "",
+        estimatedBudget: formData.estimatedBudget
+          ? parseFloat(formData.estimatedBudget)
+          : null,
+        deadline: formData.deadline
+          ? new Date(formData.deadline).toISOString()
+          : null,
+        image: formData.image || null,
       };
 
       console.log("📤 Payload being sent:", payload);
@@ -467,8 +475,10 @@ const CreateTenderModal = ({
         isUndefined: payload.image === undefined,
       });
 
-      // Call the API
-      const result = await createTender(payload);
+      // Call the appropriate API
+      const result = isDraft
+        ? await createTenderDraft(payload)
+        : await createTender(payload);
       console.log("✅ Tender created successfully:", result);
       console.log("🖼️ Created tender image value:", result.image);
 
@@ -492,6 +502,7 @@ const CreateTenderModal = ({
         setCurrentStep(0);
         setCompletedSteps(new Set());
         setShowSuccess(false);
+        setSubmissionType(null);
 
         onOpenChange(false);
         router.push(
@@ -508,7 +519,9 @@ const CreateTenderModal = ({
       }
 
       setShowSuccess(false);
-      let errorMessage = t("failed_to_create_tender_please_try_again");
+      let errorMessage = isDraft
+        ? t("failed_to_save_draft_please_try_again")
+        : t("failed_to_create_tender_please_try_again");
       if (typeof error === "object" && error !== null) {
         if (
           "response" in error &&
@@ -529,6 +542,15 @@ const CreateTenderModal = ({
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleSubmit = (e: { preventDefault: () => void }) => {
+    e.preventDefault();
+    handleSubmission(false);
+  };
+
+  const handleSaveDraft = () => {
+    handleSubmission(true);
   };
 
   // Loading and Success Screen Component
@@ -577,7 +599,9 @@ const CreateTenderModal = ({
                     transition={{ duration: 1.5, repeat: Infinity }}
                     className="text-xl font-semibold text-gray-900 dark:text-white"
                   >
-                    {t("creating_your_tender")}
+                    {submissionType === "draft"
+                      ? t("saving_your_draft")
+                      : t("creating_your_tender")}
                   </motion.h3>
                   <p className="text-gray-600 dark:text-gray-400">
                     {t("please_wait_while_we_process_your_request")}
@@ -668,7 +692,9 @@ const CreateTenderModal = ({
                     transition={{ delay: 0.4 }}
                     className="text-xl font-semibold text-gray-900 dark:text-white"
                   >
-                    {t("tender_created_successfully")}
+                    {submissionType === "draft"
+                      ? t("draft_saved_successfully")
+                      : t("tender_created_successfully")}
                   </motion.h3>
                   <motion.p
                     initial={{ opacity: 0, y: 10 }}
@@ -689,12 +715,16 @@ const CreateTenderModal = ({
                 >
                   <div className="flex items-center justify-center gap-2">
                     <CheckCircle2 className="w-4 h-4" />
-                    {t("tender_information_saved")}
+                    {submissionType === "draft"
+                      ? t("draft_information_saved")
+                      : t("tender_information_saved")}
                   </div>
-                  <div className="flex items-center justify-center gap-2">
-                    <CheckCircle2 className="w-4 h-4" />
-                    {t("notifications_sent_to_relevant_contractors")}
-                  </div>
+                  {submissionType === "post" && (
+                    <div className="flex items-center justify-center gap-2">
+                      <CheckCircle2 className="w-4 h-4" />
+                      {t("notifications_sent_to_relevant_contractors")}
+                    </div>
+                  )}
                 </motion.div>
 
                 {/* Confetti Effect */}
@@ -1248,32 +1278,43 @@ const CreateTenderModal = ({
                           <ArrowRight className="w-4 h-4" />
                         </Button>
                       ) : (
-                        <motion.div
-                          initial={{ opacity: 0, scale: 0.95 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ delay: 0.1 }}
-                        >
+                        <div className="flex gap-3">
                           <Button
-                            type="submit"
-                            className="rounded-full bg-green-600 hover:bg-green-700 text-white flex items-center justify-center gap-2 px-6 py-2 disabled:opacity-50"
-                            disabled={isSubmitting || !isCurrentStepValid}
+                            type="button"
+                            variant="outline"
+                            onClick={handleSaveDraft}
+                            disabled={isSubmitting}
+                            className="rounded-full border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 px-6 py-2 flex items-center gap-2 disabled:opacity-50"
                           >
-                            {isSubmitting ? (
-                              <motion.div
-                                animate={{ rotate: 360 }}
-                                transition={{
-                                  duration: 1,
-                                  repeat: Infinity,
-                                  ease: "linear",
-                                }}
-                                className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
-                              />
-                            ) : (
-                              <CheckCircle2 className="w-4 h-4" />
-                            )}
-                            {isSubmitting ? t("posting") : t("post_tender")}
+                            {t("save_as_draft")}
                           </Button>
-                        </motion.div>
+                          <motion.div
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: 0.1 }}
+                          >
+                            <Button
+                              type="submit"
+                              className="rounded-full bg-green-600 hover:bg-green-700 text-white flex items-center justify-center gap-2 px-6 py-2 disabled:opacity-50"
+                              disabled={isSubmitting || !isCurrentStepValid}
+                            >
+                              {isSubmitting ? (
+                                <motion.div
+                                  animate={{ rotate: 360 }}
+                                  transition={{
+                                    duration: 1,
+                                    repeat: Infinity,
+                                    ease: "linear",
+                                  }}
+                                  className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
+                                />
+                              ) : (
+                                <CheckCircle2 className="w-4 h-4" />
+                              )}
+                              {isSubmitting ? t("posting") : t("post_tender")}
+                            </Button>
+                          </motion.div>
+                        </div>
                       )}
                     </CardFooter>
                   </form>

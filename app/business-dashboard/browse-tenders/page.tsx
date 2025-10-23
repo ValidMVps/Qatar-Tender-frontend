@@ -269,7 +269,8 @@ export default function ServiceProvidingDashboardPage() {
     string[]
   >([]);
   const [selectedBidCounts, setSelectedBidCounts] = useState<string[]>([]);
-  const [selectedLocation, setSelectedLocation] = useState<string>("all");
+  // Location is now an open text input (empty = all locations)
+  const [selectedLocation, setSelectedLocation] = useState<string>("");
   const [selectedDeadlineFilter, setSelectedDeadlineFilter] = useState<
     "any" | "7days" | "30days" | "over30" | "today" | "past"
   >("any");
@@ -379,7 +380,7 @@ export default function ServiceProvidingDashboardPage() {
     tenders.forEach((t) => {
       if (t.location) s.add(t.location);
     });
-    return ["all", ...Array.from(s)];
+    return Array.from(s);
   }, [tenders]);
 
   const categories = useMemo(() => {
@@ -425,8 +426,12 @@ export default function ServiceProvidingDashboardPage() {
         selectedCategories.length === 0 ||
         selectedCategories.includes(resolveCategoryName(tender));
 
-      const matchesLocation =
-        selectedLocation === "all" || tender.location === selectedLocation;
+      // Location matching: open text input. empty => all.
+      let matchesLocation = true;
+      if (selectedLocation && selectedLocation.trim() !== "") {
+        const sl = selectedLocation.trim().toLowerCase();
+        matchesLocation = location.includes(sl);
+      }
 
       const tenderBudget = resolveBudget(tender);
       const matchesBudget =
@@ -935,7 +940,7 @@ export default function ServiceProvidingDashboardPage() {
                       </AccordionContent>
                     </AccordionItem>
 
-                    {/* Location */}
+                    {/* Location (OPEN input, not forced list) */}
                     <AccordionItem
                       value="location"
                       className="border-b border-gray-100"
@@ -944,25 +949,49 @@ export default function ServiceProvidingDashboardPage() {
                         {t("location") || "Location"}
                       </AccordionTrigger>
                       <AccordionContent className="pt-2 pb-4">
-                        <Select
-                          value={selectedLocation}
-                          onValueChange={(v) => onLocationChange(v)}
-                        >
-                          <SelectTrigger className="w-full rounded-xl bg-gray-50 border-gray-200">
-                            <SelectValue
-                              placeholder={
-                                t("select_location") || "Select location"
-                              }
-                            />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {locations.map((loc) => (
-                              <SelectItem key={loc} value={loc}>
-                                {loc === "all" ? "All Locations" : loc}
-                              </SelectItem>
+                        <div className="space-y-3">
+                          <Input
+                            placeholder={
+                              t("enter_location") ||
+                              "Enter location (free text)"
+                            }
+                            value={selectedLocation}
+                            onChange={(e) => onLocationChange(e.target.value)}
+                            className="rounded-xl"
+                          />
+                          <div className="flex flex-wrap gap-2">
+                            {locations.slice(0, 12).map((loc) => (
+                              <button
+                                key={loc}
+                                onClick={() => onLocationChange(loc)}
+                                className={`px-3 py-1 rounded-full text-sm transition-colors duration-200 border ${
+                                  selectedLocation === loc
+                                    ? "bg-blue-500 text-white border-blue-500"
+                                    : "bg-white/50 text-gray-700 border-gray-200 hover:bg-gray-100"
+                                }`}
+                              >
+                                {loc}
+                              </button>
                             ))}
-                          </SelectContent>
-                        </Select>
+                            {locations.length > 12 && (
+                              <span className="text-xs text-gray-400 self-center">
+                                +{locations.length - 12} more
+                              </span>
+                            )}
+                          </div>
+                          {selectedLocation && (
+                            <div className="flex items-center gap-2">
+                              <Button
+                                variant="ghost"
+                                className="text-sm px-3 py-1"
+                                onClick={() => onLocationChange("")}
+                              >
+                                Clear location
+                              </Button>
+                             
+                            </div>
+                          )}
+                        </div>
                       </AccordionContent>
                     </AccordionItem>
 

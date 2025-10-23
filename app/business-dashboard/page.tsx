@@ -43,6 +43,7 @@ import { getActiveTenders } from "../services/tenderService";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { OverviewChart } from "@/components/OverviewChart";
 import PageTransitionWrapper from "@/components/animations/PageTransitionWrapper";
+import { id } from "date-fns/locale";
 
 // Types (unchanged)
 interface Tender {
@@ -194,6 +195,7 @@ export default function DashboardPage() {
   const upcomingDeadlines = recentTenders
     .map((t) => ({
       title: t.title,
+      id: t._id,
       deadline: parseDeadline(t),
     }))
     .filter((item) => item.deadline)
@@ -445,9 +447,10 @@ export default function DashboardPage() {
                   <p className="text-gray-400 text-sm">No deadlines soon</p>
                 ) : (
                   upcomingDeadlines.map((item, i) => (
-                    <div
+                    <Link
                       key={i}
-                      className="flex items-center justify-between py-2 px-3 bg-amber-50/50 rounded-xl border border-amber-100/50"
+                      href={`/business-dashboard/tender/${item.id}`} // adjust path to match your route
+                      className="flex items-center justify-between py-2 px-3 bg-amber-50/50 rounded-xl border border-amber-100/50 hover:bg-amber-100 transition"
                     >
                       <span className="text-sm text-gray-700 truncate max-w-[140px]">
                         {item.title}
@@ -455,7 +458,7 @@ export default function DashboardPage() {
                       <span className="text-xs text-amber-600 font-semibold">
                         {formatShortDate(item.deadline!.toString())}
                       </span>
-                    </div>
+                    </Link>
                   ))
                 )}
               </KpiCard>
@@ -1002,7 +1005,7 @@ export default function DashboardPage() {
                                     </TableCell>
                                     <TableCell>
                                       <Link
-                                        href={`/business-dashboard/chat/${bid.tender._id}`}
+                                        href={`/business-dashboard/projects/`}
                                         className="text-blue-600 hover:text-blue-700 font-medium bg-blue-50/80 px-3 py-1 rounded-lg transition-colors"
                                       >
                                         Go to Chat
@@ -1089,7 +1092,7 @@ export default function DashboardPage() {
                                   </TableCell>
                                   <TableCell>
                                     <Link
-                                      href={`/business-dashboard/chat/${tender._id}`}
+                                      href={`/business-dashboard/projects}`}
                                       className="text-blue-600 hover:text-blue-700 font-medium bg-blue-50/80 px-3 py-1 rounded-lg transition-colors"
                                     >
                                       Go to Chat

@@ -395,7 +395,7 @@ export default function Component() {
   );
 
   return (
-    <div className="flex min-h-screen bg-white container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="flex min-h-screen bg-white container mx-auto px-4 sm:px-6 lg:px-0 py-8">
       <div className="flex-1 flex flex-col">
         {error && (
           <Alert className="mb-4 border-red-200 bg-red-50">

@@ -274,20 +274,6 @@ export default function AppleStyleSettings() {
                       disabled={!notificationsEnabled}
                     />
                   </SettingRow>
-
-                  <SettingRow
-                    icon={Smartphone}
-                    label={t("Push_Notifications")}
-                    description={t(
-                      "Receive_push_notifications_on_mobile_devices"
-                    )}
-                  >
-                    <Switch
-                      checked={pushNotifications}
-                      onCheckedChange={setPushNotifications}
-                      disabled={!notificationsEnabled}
-                    />
-                  </SettingRow>
                 </div>
 
                 {/* Appearance Section */}

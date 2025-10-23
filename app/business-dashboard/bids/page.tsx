@@ -746,16 +746,7 @@ export default function MyBidsPage() {
                             </DropdownMenuItem>
                           )}
 
-                          {/* Show edit option for submitted bids */}
-                          {bid.status === "submitted" && (
-                            <DropdownMenuItem
-                              onClick={() => handleEditBid(bid.id)}
-                              className="rounded-lg"
-                            >
-                              <Pencil className="h-4 w-4 mr-2" />
-                              {t("edit") || "Edit"}
-                            </DropdownMenuItem>
-                          )}
+                          
 
                           {(bid.status === "accepted" ||
                             bid.status === "completed") && (

@@ -222,16 +222,7 @@ export default function ProfileContent() {
                 </div>
                 <Switch defaultChecked />
               </div>
-              <Separator />
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <Label className="text-base">Push Notifications</Label>
-                  <p className="text-muted-foreground text-sm">
-                    Receive push notifications in your browser
-                  </p>
-                </div>
-                <Switch />
-              </div>
+             
               <Separator />
               <div className="flex items-center justify-between">
                 <div className="space-y-1">

@@ -1,7 +1,13 @@
 import { Shield, Key, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
@@ -10,17 +16,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 
-import { useTranslation } from '../../../lib/hooks/useTranslation';
+import { useTranslation } from "../../../lib/hooks/useTranslation";
 export default function ProfileContent() {
-    const { t } = useTranslation();
+  const { t } = useTranslation();
 
   return (
     <Tabs defaultValue="personal" className="space-y-6">
       <TabsList className="grid w-full grid-cols-4">
-        <TabsTrigger value="personal">{t('personal')}</TabsTrigger>
-        <TabsTrigger value="account">{t('account')}</TabsTrigger>
-        <TabsTrigger value="security">{t('security')}</TabsTrigger>
-        <TabsTrigger value="notifications">{t('notifications')}</TabsTrigger>
+        <TabsTrigger value="personal">{t("personal")}</TabsTrigger>
+        <TabsTrigger value="account">{t("account")}</TabsTrigger>
+        <TabsTrigger value="security">{t("security")}</TabsTrigger>
+        <TabsTrigger value="notifications">{t("notifications")}</TabsTrigger>
       </TabsList>
 
       {/* Personal Information */}
@@ -28,7 +34,9 @@ export default function ProfileContent() {
         <Card>
           <CardHeader>
             <CardTitle>Personal Information</CardTitle>
-            <CardDescription>Update your personal details and profile information.</CardDescription>
+            <CardDescription>
+              Update your personal details and profile information.
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -41,11 +49,15 @@ export default function ProfileContent() {
                 <Input id="lastName" defaultValue="Doe" />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="email">{t('email')}</Label>
-                <Input id="email" type="email" defaultValue="john.doe@example.com" />
+                <Label htmlFor="email">{t("email")}</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  defaultValue="john.doe@example.com"
+                />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="phone">{t('phone')}</Label>
+                <Label htmlFor="phone">{t("phone")}</Label>
                 <Input id="phone" defaultValue="+1 (555) 123-4567" />
               </div>
               <div className="space-y-2">
@@ -53,7 +65,7 @@ export default function ProfileContent() {
                 <Input id="jobTitle" defaultValue="Senior Product Designer" />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="company">{t('company')}</Label>
+                <Label htmlFor="company">{t("company")}</Label>
                 <Input id="company" defaultValue="Acme Inc." />
               </div>
             </div>
@@ -67,7 +79,7 @@ export default function ProfileContent() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="location">{t('location')}</Label>
+              <Label htmlFor="location">{t("location")}</Label>
               <Input id="location" defaultValue="San Francisco, CA" />
             </div>
           </CardContent>
@@ -79,23 +91,32 @@ export default function ProfileContent() {
         <Card>
           <CardHeader>
             <CardTitle>Account Settings</CardTitle>
-            <CardDescription>Manage your account preferences and subscription.</CardDescription>
+            <CardDescription>
+              Manage your account preferences and subscription.
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="flex items-center justify-between">
               <div className="space-y-1">
                 <Label className="text-base">Account Status</Label>
-                <p className="text-muted-foreground text-sm">Your account is currently active</p>
+                <p className="text-muted-foreground text-sm">
+                  Your account is currently active
+                </p>
               </div>
-              <Badge variant="outline" className="border-green-200 bg-green-50 text-green-700">
-                {t('active')}
+              <Badge
+                variant="outline"
+                className="border-green-200 bg-green-50 text-green-700"
+              >
+                {t("active")}
               </Badge>
             </div>
             <Separator />
             <div className="flex items-center justify-between">
               <div className="space-y-1">
                 <Label className="text-base">Subscription Plan</Label>
-                <p className="text-muted-foreground text-sm">Pro Plan - $29/month</p>
+                <p className="text-muted-foreground text-sm">
+                  Pro Plan - $29/month
+                </p>
               </div>
               <Button variant="outline">Manage Subscription</Button>
             </div>
@@ -113,7 +134,9 @@ export default function ProfileContent() {
             <div className="flex items-center justify-between">
               <div className="space-y-1">
                 <Label className="text-base">Data Export</Label>
-                <p className="text-muted-foreground text-sm">Download a copy of your data</p>
+                <p className="text-muted-foreground text-sm">
+                  Download a copy of your data
+                </p>
               </div>
               <Button variant="outline">Export Data</Button>
             </div>
@@ -123,7 +146,9 @@ export default function ProfileContent() {
         <Card className="border-destructive/50">
           <CardHeader>
             <CardTitle className="text-destructive">Danger Zone</CardTitle>
-            <CardDescription>Irreversible and destructive actions</CardDescription>
+            <CardDescription>
+              Irreversible and destructive actions
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between">
@@ -147,14 +172,18 @@ export default function ProfileContent() {
         <Card>
           <CardHeader>
             <CardTitle>Security Settings</CardTitle>
-            <CardDescription>Manage your account security and authentication.</CardDescription>
+            <CardDescription>
+              Manage your account security and authentication.
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
-                  <Label className="text-base">{t('password')}</Label>
-                  <p className="text-muted-foreground text-sm">Last changed 3 months ago</p>
+                  <Label className="text-base">{t("password")}</Label>
+                  <p className="text-muted-foreground text-sm">
+                    Last changed 3 months ago
+                  </p>
                 </div>
                 <Button variant="outline">
                   <Key className="mr-2 h-4 w-4" />
@@ -170,11 +199,14 @@ export default function ProfileContent() {
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Badge variant="outline" className="border-green-200 bg-green-50 text-green-700">
-                    {t('enabled')}
+                  <Badge
+                    variant="outline"
+                    className="border-green-200 bg-green-50 text-green-700"
+                  >
+                    {t("enabled")}
                   </Badge>
                   <Button variant="outline" size="sm">
-                    {t('configure')}
+                    {t("configure")}
                   </Button>
                 </div>
               </div>
@@ -211,27 +243,22 @@ export default function ProfileContent() {
         <Card>
           <CardHeader>
             <CardTitle>Notification Preferences</CardTitle>
-            <CardDescription>Choose what notifications you want to receive.</CardDescription>
+            <CardDescription>
+              Choose what notifications you want to receive.
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
                   <Label className="text-base">Email Notifications</Label>
-                  <p className="text-muted-foreground text-sm">Receive notifications via email</p>
+                  <p className="text-muted-foreground text-sm">
+                    Receive notifications via email
+                  </p>
                 </div>
                 <Switch defaultChecked />
               </div>
-              <Separator />
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <Label className="text-base">Push Notifications</Label>
-                  <p className="text-muted-foreground text-sm">
-                    Receive push notifications in your browser
-                  </p>
-                </div>
-                <Switch />
-              </div>
+
               <Separator />
               <div className="flex items-center justify-between">
                 <div className="space-y-1">

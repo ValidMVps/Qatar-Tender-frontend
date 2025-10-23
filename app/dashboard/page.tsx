@@ -274,6 +274,7 @@ export default function IndividualDashboardPage() {
   const upcomingDeadlines = myTenders
     .map((t) => ({
       title: t.title,
+      id: t._id,
       deadline: parseDeadline(t),
     }))
     .filter(
@@ -489,9 +490,10 @@ export default function IndividualDashboardPage() {
                 <p className="text-gray-400 text-sm">No deadlines soon</p>
               ) : (
                 upcomingDeadlines.map((item, i) => (
-                  <div
+                  <Link
                     key={i}
-                    className="flex items-center justify-between py-2 px-3 bg-amber-50/50 rounded-xl border border-amber-100/50"
+                    href={`/dashboard/tender/${item.id}`} // adjust path to match your route
+                    className="flex items-center justify-between py-2 px-3 bg-amber-50/50 rounded-xl border border-amber-100/50 hover:bg-amber-100 transition"
                   >
                     <span className="text-sm text-gray-700 truncate max-w-[140px]">
                       {item.title}
@@ -499,7 +501,7 @@ export default function IndividualDashboardPage() {
                     <span className="text-xs text-amber-600 font-semibold">
                       {formatShortDate(item.deadline!.toString())}
                     </span>
-                  </div>
+                  </Link>
                 ))
               )}
             </KpiCard>
@@ -917,7 +919,7 @@ export default function IndividualDashboardPage() {
                               </TableCell>
                               <TableCell>
                                 <Link
-                                  href={`/dashboard/chat/${tender._id}`}
+                                  href={`/dashboard/projects`}
                                   className="text-blue-600 hover:text-blue-700 font-medium bg-blue-50/80 px-3 py-1 rounded-lg transition-colors"
                                 >
                                   Go to Chat

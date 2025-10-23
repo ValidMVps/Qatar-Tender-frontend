@@ -21,7 +21,7 @@ export default function HelpPage() {
 
   return (
     <PageTransitionWrapper>
-      <div className="container py-1 px-2 md:py-3 md:px-3">
+      <div className="container py-1 px-2 md:py-8 md:px-12">
         <section className="mb-16">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-10">
             {/* FAQ Section */}

@@ -39,6 +39,7 @@ import { createBid, getUserBids } from "@/app/services/BidService";
 import QnaSection from "@/components/QnaSection";
 import PageTransitionWrapper from "@/components/animations/PageTransitionWrapper";
 import BiddingSection from "@/components/BiddingSection";
+import { useAuth } from "@/context/AuthContext";
 
 interface Tender {
   bidCount: string | number;
@@ -115,6 +116,7 @@ export default function TenderDetailsPage({ params }: PageProps) {
   const [hasUserBid, setHasUserBid] = useState(false);
   const { t } = useTranslation();
   const router = useRouter();
+  const { profile } = useAuth();
 
   // Load tender details and check if user has already bid
   useEffect(() => {
@@ -269,6 +271,20 @@ export default function TenderDetailsPage({ params }: PageProps) {
     <PageTransitionWrapper>
       <TooltipProvider>
         <div className="min-h-screen">
+          {" "}
+          <div className="bg-white border-b border-gray-200">
+            <div className="mx-auto px-4 sm:px-6 lg:px-14">
+              <div className="flex items-center justify-between h-16">
+                <Link
+                  href={"/business-dashboard/browse-tenders"}
+                  className="flex items-center text-blue-500 hover:text-blue-600 font-medium transition-colors"
+                >
+                  <ArrowLeft className="h-5 w-5 mr-2" />
+                  Browse Tenders
+                </Link>
+              </div>
+            </div>
+          </div>
           <div className="container mx-auto py-1 lg:px-0">
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
               {/* Main Tender Details */}

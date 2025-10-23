@@ -112,3 +112,19 @@ export const awardTender = async (id: string, bidId: string) => {
 export const getActiveTenders = async () => {
   return getTenders({ status: "active" });
 };
+export const createTenderDraft = async (payload: any) => {
+  try {
+    const response = await api.post("/api/tenders/draft", payload, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data;
+  } catch (error: any) {
+    console.error(
+      "Error creating tender draft:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
