@@ -129,9 +129,16 @@ export const returnBidForRevision = async (bidId: string, reason: string) => {
 };
 
 // Resubmit revised bid
-export const resubmitRevisedBid = async (bidId: string) => {
+export const resubmitRevisedBid = async (
+  bidId: string,
+  amount?: number,
+  description?: string
+) => {
   try {
-    const response = await api.put(`/api/bids/${bidId}/resubmit`);
+    const response = await api.put(`/api/bids/${bidId}/resubmit`, {
+      amount,
+      description,
+    });
     return {
       success: true,
       data: response.data,

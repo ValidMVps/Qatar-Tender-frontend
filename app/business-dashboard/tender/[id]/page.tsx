@@ -258,7 +258,7 @@ export default function TenderDetailPage() {
                     reason: revisionReason,
                     requestedBy: {
                       _id: profile?._id || "",
-                      email: profile?.email || "",
+                      email: (profile as any)?.email || "",
                     },
                   },
                 }

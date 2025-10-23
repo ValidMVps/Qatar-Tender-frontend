@@ -17,7 +17,7 @@ export function setTokenCookie(token: string) {
     const maxAge = Math.floor(expiresIn / 1000);
     document.cookie = `auth_token=${encodeURIComponent(
       token
-    )}; max-age=${maxAge}; path=/; secure; samesite=none`;
+    )}; max-age=${maxAge}; path=/; secure; samesite=strict`;
   } catch (error) {
     console.error("Error setting token cookie:", error);
   }
@@ -36,5 +36,5 @@ export function getTokenFromCookie(): string | null {
 
 export function clearTokens() {
   if (typeof document === "undefined") return;
-  document.cookie = "auth_token=; max-age=0; path=/; secure; samesite=none";
+  document.cookie = "auth_token=; max-age=0; path=/; secure; samesite=strict";
 }
