@@ -4,7 +4,7 @@
 import { useEffect } from "react";
 
 function applyTheme(dark) {
-  const invertValue = dark ? 1 : 0;
+  const invertValue = dark ? 0.98 : 0;
   const filter = `invert(${invertValue}) hue-rotate(${dark ? 180 : 0}deg)`;
   document.documentElement.style.filter = filter;
 

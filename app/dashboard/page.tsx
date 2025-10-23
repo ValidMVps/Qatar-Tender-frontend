@@ -16,6 +16,7 @@ import {
   TrendingUp,
   Timer,
   ClipboardList,
+  RefreshCw,
 } from "lucide-react";
 import type React from "react";
 import Link from "next/link";
@@ -182,34 +183,46 @@ export default function IndividualDashboardPage() {
   }, [user?._id]);
 
   const getBidStatusBadge = (status: string) => {
-    const baseClasses =
-      "inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium";
-
     switch (status) {
-      case "accepted":
+      case "submitted":
         return (
-          <span className={`${baseClasses} bg-blue-50 text-blue-700`}>
-            Accepted
-          </span>
+          <Badge variant="outline" className="bg-blue-50 text-blue-800">
+            {t("submitted")}
+          </Badge>
         );
       case "under_review":
         return (
-          <span className={`${baseClasses} bg-amber-50 text-amber-700`}>
-            Under Review
-          </span>
+          <Badge variant="outline" className="bg-yellow-50 text-yellow-800">
+            {t("under_review")}
+          </Badge>
         );
       case "rejected":
         return (
-          <span className={`${baseClasses} bg-gray-100 text-gray-700`}>
-            Rejected
-          </span>
+          <Badge variant="outline" className="bg-red-100 text-red-800">
+            {t("rejected")}
+          </Badge>
+        );
+      case "accepted":
+        return (
+          <Badge variant="outline" className="bg-green-100 text-green-800">
+            {t("accepted")}
+          </Badge>
+        );
+      case "completed":
+        return (
+          <Badge variant="outline" className="bg-green-100 text-green-800">
+            {t("completed")}
+          </Badge>
+        );
+      case "returned_for_revision":
+        return (
+          <Badge variant="outline" className="bg-cyan-100 text-cyan-800">
+            <RefreshCw className="h-4 w-4 mr-2" />
+            {t("needs_revision")}
+          </Badge>
         );
       default:
-        return (
-          <span className={`${baseClasses} bg-gray-100 text-gray-700`}>
-            {status}
-          </span>
-        );
+        return <Badge variant="outline">{status}</Badge>;
     }
   };
 

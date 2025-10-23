@@ -106,7 +106,44 @@ export const deleteBid = async (bidId: string) => {
     throw error;
   }
 };
+export const returnBidForRevision = async (bidId: string, reason: string) => {
+  try {
+    const response = await api.put(`/api/bids/${bidId}/return-for-revision`, {
+      reason,
+    });
+    return {
+      success: true,
+      data: response.data,
+    };
+  } catch (error: any) {
+    console.error(
+      "Error returning bid for revision:",
+      error.response?.data || error
+    );
+    return {
+      success: false,
+      error:
+        error.response?.data?.message || "Failed to return bid for revision",
+    };
+  }
+};
 
+// Resubmit revised bid
+export const resubmitRevisedBid = async (bidId: string) => {
+  try {
+    const response = await api.put(`/api/bids/${bidId}/resubmit`);
+    return {
+      success: true,
+      data: response.data,
+    };
+  } catch (error: any) {
+    console.error("Error resubmitting bid:", error.response?.data || error);
+    return {
+      success: false,
+      error: error.response?.data?.message || "Failed to resubmit bid",
+    };
+  }
+};
 // Get a specific bid by ID
 export const getBid = async (bidId: string) => {
   try {

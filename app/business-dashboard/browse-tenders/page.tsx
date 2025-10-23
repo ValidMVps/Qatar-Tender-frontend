@@ -38,6 +38,225 @@ import { useTranslation } from "../../../lib/hooks/useTranslation";
 import { getActiveTenders } from "@/app/services/tenderService";
 import { useAuth } from "@/context/AuthContext";
 import PageTransitionWrapper from "@/components/animations/PageTransitionWrapper";
+import {
+  Command,
+  CommandInput,
+  CommandList,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "@/components/ui/popover";
+
+// Utility function to escape regex special characters
+const escapeRegExp = (string: string) => {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+};
+
+// HighlightText component for search term highlighting
+const HighlightText = ({
+  text,
+  searchTerm,
+}: {
+  text: string;
+  searchTerm: string;
+}) => {
+  if (!searchTerm || !text) return <>{text}</>;
+
+  try {
+    // Convert search term to lowercase for case-insensitive matching
+    const searchTermLower = searchTerm.toLowerCase();
+    const textLower = text.toLowerCase();
+
+    // Split the text into parts based on search term matches
+    const parts = [];
+    let index = 0;
+
+    // Find all occurrences of the search term in the text
+    while (index < text.length) {
+      const matchIndex = textLower.indexOf(searchTermLower, index);
+      if (matchIndex === -1) {
+        parts.push({
+          text: text.substring(index),
+          isMatch: false,
+        });
+        break;
+      }
+
+      // Add non-matching text before the match
+      if (matchIndex > index) {
+        parts.push({
+          text: text.substring(index, matchIndex),
+          isMatch: false,
+        });
+      }
+
+      // Add matching text
+      parts.push({
+        text: text.substring(matchIndex, matchIndex + searchTerm.length),
+        isMatch: true,
+      });
+
+      index = matchIndex + searchTerm.length;
+    }
+
+    return (
+      <span className="break-words">
+        {parts.map((part, i) => (
+          <span
+            key={i}
+            className={part.isMatch ? "bg-yellow-200/70 rounded" : ""}
+          >
+            {part.text}
+          </span>
+        ))}
+      </span>
+    );
+  } catch (error) {
+    console.error("Error highlighting text:", error);
+    return <>{text}</>;
+  }
+};
+
+// MultiSelect Component for categories
+const MultiSelectCategories = ({
+  selectedCategories,
+  setSelectedCategories,
+  availableCategories,
+  placeholder,
+}: {
+  selectedCategories: string[];
+  setSelectedCategories: (categories: string[]) => void;
+  availableCategories: string[];
+  placeholder: string;
+}) => {
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
+
+  // Filtered categories based on search
+  const filteredCategories = useMemo(() => {
+    if (!search) return availableCategories;
+    const searchTerm = search.toLowerCase();
+    return availableCategories.filter((category) =>
+      category.toLowerCase().includes(searchTerm)
+    );
+  }, [availableCategories, search]);
+
+  // Toggle category selection
+  const toggleCategory = (category: string) => {
+    if (selectedCategories.includes(category)) {
+      setSelectedCategories(selectedCategories.filter((c) => c !== category));
+    } else {
+      setSelectedCategories([...selectedCategories, category]);
+    }
+  };
+
+  // Remove specific category
+  const removeCategory = (categoryToRemove: string) => {
+    setSelectedCategories(
+      selectedCategories.filter((c) => c !== categoryToRemove)
+    );
+  };
+
+  // Clear all selections
+  const clearAll = () => {
+    setSelectedCategories([]);
+    setSearch("");
+  };
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          className="w-full justify-between bg-white/80 backdrop-blur-sm border border-gray-200/50 hover:border-gray-300 focus:border-blue-500 transition-colors h-auto py-2 px-3"
+        >
+          <div className="flex flex-wrap gap-1 py-1">
+            {selectedCategories.length > 0 ? (
+              <>
+                {selectedCategories.slice(0, 3).map((category) => (
+                  <Badge
+                    key={category}
+                    className="bg-blue-100 text-blue-800 hover:bg-blue-200"
+                  >
+                    {category}
+                    <button
+                      className="ml-1 rounded-full outline-none"
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === "Backspace") {
+                          removeCategory(category);
+                        }
+                      }}
+                      onClick={() => removeCategory(category)}
+                    >
+                      <XCircle className="h-3 w-3 ml-1" />
+                    </button>
+                  </Badge>
+                ))}
+                {selectedCategories.length > 3 && (
+                  <Badge className="bg-gray-100 text-gray-800 hover:bg-gray-200">
+                    +{selectedCategories.length - 3}
+                  </Badge>
+                )}
+              </>
+            ) : (
+              <span className="text-gray-500">{placeholder}</span>
+            )}
+          </div>
+          <Search className="h-4 w-4 text-gray-400" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="p-0 bg-white/90 backdrop-blur-xl rounded-xl border border-gray-100/50 shadow-lg">
+        <Command>
+          <CommandInput
+            placeholder={placeholder}
+            value={search}
+            onValueChange={setSearch}
+            className="border-b border-gray-100/50"
+          />
+          <CommandList>
+            <CommandEmpty>No categories found.</CommandEmpty>
+            <CommandGroup>
+              {filteredCategories.map((category) => (
+                <CommandItem
+                  key={category}
+                  onSelect={() => toggleCategory(category)}
+                  className="cursor-pointer"
+                >
+                  <CheckCircle
+                    className={`mr-2 h-4 w-4 ${
+                      selectedCategories.includes(category)
+                        ? "opacity-100"
+                        : "opacity-0"
+                    }`}
+                  />
+                  {category}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+          {selectedCategories.length > 0 && (
+            <div className="p-2 border-t border-gray-100/50">
+              <Button
+                variant="ghost"
+                className="w-full justify-center text-sm text-gray-600 hover:text-red-600"
+                onClick={clearAll}
+              >
+                Clear All
+              </Button>
+            </div>
+          )}
+        </Command>
+      </PopoverContent>
+    </Popover>
+  );
+};
 
 export default function ServiceProvidingDashboardPage() {
   const { t } = useTranslation();
@@ -90,7 +309,7 @@ export default function ServiceProvidingDashboardPage() {
     { label: t("20_to_50") || "20-50", min: 20, max: 50 },
   ];
 
-  // load tenders
+  // Load tenders
   useEffect(() => {
     const load = async () => {
       setLoading(true);
@@ -108,7 +327,7 @@ export default function ServiceProvidingDashboardPage() {
     load();
   }, []);
 
-  // helpers to normalize fields
+  // Helper functions to normalize fields
   const resolveCategoryName = (tender: any) => {
     if (!tender) return "";
     if (typeof tender.category === "string") return tender.category;
@@ -125,7 +344,7 @@ export default function ServiceProvidingDashboardPage() {
       return match ? parseInt(match[0], 10) : 0;
     }
     if (Array.isArray(tender.bids)) return tender.bids.length;
-    if (typeof tender.proposals === "number") return tender.proposals; // fallback if API uses proposals
+    if (typeof tender.proposals === "number") return tender.proposals;
     if (typeof tender.proposals === "string") {
       const match = tender.proposals.match(/\d+/);
       return match ? parseInt(match[0], 10) : 0;
@@ -140,7 +359,7 @@ export default function ServiceProvidingDashboardPage() {
       return tender.estimatedBudget;
     if (tender.budget && !isNaN(Number(tender.budget)))
       return Number(tender.budget);
-    // try parse from string like "$1,000"
+    // Try parse from string like "$1,000"
     if (typeof tender.budget === "string") {
       const digits = tender.budget.replace(/[^0-9.]/g, "");
       return digits ? Number(digits) : 0;
@@ -154,7 +373,7 @@ export default function ServiceProvidingDashboardPage() {
     return isNaN(d.getTime()) ? null : d;
   };
 
-  // unique locations from API results for location filter
+  // Unique locations and categories from API results for filters
   const locations = useMemo(() => {
     const s = new Set<string>();
     tenders.forEach((t) => {
@@ -163,7 +382,16 @@ export default function ServiceProvidingDashboardPage() {
     return ["all", ...Array.from(s)];
   }, [tenders]);
 
-  // client-side filtering
+  const categories = useMemo(() => {
+    const s = new Set<string>();
+    tenders.forEach((t) => {
+      const categoryName = resolveCategoryName(t);
+      if (categoryName) s.add(categoryName);
+    });
+    return Array.from(s);
+  }, [tenders]);
+
+  // Client-side filtering
   const filteredTenders = useMemo(() => {
     const now = new Date();
 
@@ -176,7 +404,7 @@ export default function ServiceProvidingDashboardPage() {
         tender.postedBy;
 
       if (currentUserId && tenderUserId === currentUserId) {
-        return false; // Skip this tender
+        return false;
       }
 
       // Keep going with the rest of your filters...
@@ -257,10 +485,10 @@ export default function ServiceProvidingDashboardPage() {
     selectedDeadlineFilter,
     fixedPriceRanges,
     bidCounts,
-    currentUserId, // ✅ Add this as a dependency
+    currentUserId,
   ]);
 
-  // sorting
+  // Sorting
   const sortedTenders = useMemo(() => {
     const arr = [...filteredTenders];
     if (sortOption === "newest")
@@ -282,7 +510,7 @@ export default function ServiceProvidingDashboardPage() {
     return arr;
   }, [filteredTenders, sortOption]);
 
-  // pagination
+  // Pagination
   const totalPages = Math.max(
     1,
     Math.ceil(sortedTenders.length / Number.parseInt(jobsPerPage || "6"))
@@ -291,7 +519,7 @@ export default function ServiceProvidingDashboardPage() {
   const endIndex = startIndex + Number.parseInt(jobsPerPage || "6");
   const tendersToDisplay = sortedTenders.slice(startIndex, endIndex);
 
-  // map to TenderCard props
+  // Map to TenderCard props
   const mapTenderForCard = (t: any) => ({
     id: t._id || t.id,
     title: t.title,
@@ -308,16 +536,7 @@ export default function ServiceProvidingDashboardPage() {
     raw: t,
   });
 
-  // handlers
-  const toggleCategory = (category: string) => {
-    setSelectedCategories((prev) =>
-      prev.includes(category)
-        ? prev.filter((c) => c !== category)
-        : [...prev, category]
-    );
-    setCurrentPage(1);
-  };
-
+  // Handlers
   const toggleFixedRange = (label: string) => {
     setSelectedFixedPriceRange((prev) =>
       prev.includes(label) ? prev.filter((l) => l !== label) : [...prev, label]
@@ -389,8 +608,8 @@ export default function ServiceProvidingDashboardPage() {
             </div>
 
             {/* Title */}
-            <h3 className="font-semibold text-gray-900 text-lg group-hover:text-blue-600 transition-colors duration-300 line-clamp-2 mb-3">
-              {tender.title}
+            <h3 className="font-semibold text-gray-900 text-lg group-hover:text-blue-600 transition-colors duration-300 line-clamp-2 mb-3 break-words">
+              <HighlightText text={tender.title} searchTerm={searchTerm} />
             </h3>
 
             {/* User + Rating + Spend + Location */}
@@ -398,11 +617,11 @@ export default function ServiceProvidingDashboardPage() {
               {tender.userVerified && (
                 <span className="flex items-center px-3 py-1 bg-green-50 text-green-600 text-sm font-medium rounded-full">
                   <CheckCircle className="h-3 w-3 mr-1" />
-                  Verified
+                  {t("verified")}
                 </span>
               )}
-              <span className="flex items-center px-3 py-1 bg-blue-50 text-blue-600 text-sm font-medium rounded-full">
-                {tender.category}
+              <span className="flex items-center px-3 py-1 bg-blue-50 text-blue-600 text-sm font-medium rounded-full break-words">
+                <HighlightText text={tender.category} searchTerm={searchTerm} />
               </span>
             </div>
           </div>
@@ -412,29 +631,37 @@ export default function ServiceProvidingDashboardPage() {
         </div>
 
         {/* Description */}
-        <p className="text-gray-600 text-sm mb-4 line-clamp-2 leading-relaxed">
-          {tender.description}
+        <p className="text-gray-600 text-sm mb-4 line-clamp-2 leading-relaxed break-words">
+          <HighlightText text={tender.description} searchTerm={searchTerm} />
         </p>
 
         {/* Job details */}
         <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
           <span className="flex items-center">
             <MapPin className="h-4 w-4 mr-1 text-gray-400" />
-            {tender.location}
+            <span className="break-words">
+              <HighlightText text={tender.location} searchTerm={searchTerm} />
+            </span>
           </span>
-          <span>{tender.bids}</span>
+          <span className="break-words">
+            <HighlightText text={tender.bids} searchTerm={searchTerm} />
+          </span>
         </div>
 
         <div className="flex items-center justify-between pt-4 border-t border-gray-100">
           <div>
-            <span className="text-xl font-bold text-gray-900">
-              {tender.budget}
+            <span className="text-xl font-bold text-gray-900 break-words">
+              <HighlightText text={tender.budget} searchTerm={searchTerm} />
             </span>
             <span className="text-gray-500 text-sm ml-1">fixed</span>
           </div>
           {deadline && (
-            <span className="text-sm text-gray-500">
-              Due {deadline.toLocaleDateString()}
+            <span className="text-sm text-gray-500 break-words">
+              Due{" "}
+              <HighlightText
+                text={deadline.toLocaleDateString()}
+                searchTerm={searchTerm}
+              />
             </span>
           )}
         </div>
@@ -531,7 +758,7 @@ export default function ServiceProvidingDashboardPage() {
 
   return (
     <PageTransitionWrapper>
-      <div className="min-h-screen bg-gradient-to-br pb-10 ">
+      <div className="min-h-screen bg-gradient-to-br pb-10">
         <TooltipProvider>
           {/* Header */}
           <div className="bg-white/80 backdrop-blur-xl border-b border-gray-100/50 sticky top-0 z-50">
@@ -574,7 +801,7 @@ export default function ServiceProvidingDashboardPage() {
                     }`}
                   >
                     <Filter className="h-4 w-4" />
-                    Filters
+                    {t("filters")}
                   </button>
 
                   <div className="flex items-center bg-gray-100 rounded-xl p-1">
@@ -629,7 +856,7 @@ export default function ServiceProvidingDashboardPage() {
 
           <div className="container mx-auto px-0 py-4">
             <div
-              className={!showFilters ? "flex  px-0 gap-2" : "flex  px-0 gap-6"}
+              className={!showFilters ? "flex px-0 gap-2" : "flex px-0 gap-6"}
             >
               {/* Filters Sidebar */}
               <div
@@ -639,9 +866,9 @@ export default function ServiceProvidingDashboardPage() {
                     : "w-0 opacity-0 overflow-hidden"
                 }`}
               >
-                <div className="bg-white/70 backdrop-blur-xl rounded-md p-6  border border-gray-100  top-24">
+                <div className="bg-white/70 backdrop-blur-xl rounded-md p-6 border border-gray-100 top-24">
                   <h2 className="font-bold text-xl text-gray-900 mb-6">
-                    Filters
+                    {t("filters")}
                   </h2>
 
                   <Accordion
@@ -663,22 +890,14 @@ export default function ServiceProvidingDashboardPage() {
                         {t("category") || "Category"}
                       </AccordionTrigger>
                       <AccordionContent className="pt-2 pb-4">
-                        <CheckboxGroup
-                          items={Array.from(
-                            new Set(
-                              tenders
-                                .map((t) => resolveCategoryName(t))
-                                .filter(Boolean)
-                            )
-                          ).slice(0, 50)}
-                          selected={selectedCategories}
-                          onToggle={toggleCategory}
+                        <MultiSelectCategories
+                          selectedCategories={selectedCategories}
+                          setSelectedCategories={setSelectedCategories}
+                          availableCategories={categories}
+                          placeholder={
+                            t("select_categories") || "Select categories"
+                          }
                         />
-                        {tenders.length === 0 && (
-                          <div className="text-sm text-gray-500">
-                            No categories
-                          </div>
-                        )}
                       </AccordionContent>
                     </AccordionItem>
 
@@ -826,14 +1045,14 @@ export default function ServiceProvidingDashboardPage() {
 
                   <div className="pt-4 border-t border-gray-100">
                     <p className="text-sm font-medium text-gray-600">
-                      {sortedTenders.length} results
+                      {sortedTenders.length} {t("results")}
                     </p>
                   </div>
                 </div>
               </div>
 
               {/* Main Content */}
-              <div className="flex-1 ">
+              <div className="flex-1">
                 {/* Tender Listings */}
                 <div
                   className={`${
@@ -845,11 +1064,15 @@ export default function ServiceProvidingDashboardPage() {
                   {loading ? (
                     <div className="col-span-full text-center py-16 bg-white/70 backdrop-blur-xl rounded-2xl border border-gray-100/50">
                       <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-                      <p className="mt-4 text-gray-600">Loading tenders...</p>
+                      <p className="mt-4 text-gray-600">
+                        {t("loading_tenders")}
+                      </p>
                     </div>
                   ) : error ? (
                     <div className="col-span-full text-center py-16 bg-white/70 backdrop-blur-xl rounded-2xl border border-gray-100/50">
-                      <p className="text-red-600 font-medium">Error: {error}</p>
+                      <p className="text-red-600 font-medium">
+                        {t("error")}: {error}
+                      </p>
                     </div>
                   ) : tendersToDisplay.length > 0 ? (
                     tendersToDisplay.map((tender) => (
@@ -862,11 +1085,10 @@ export default function ServiceProvidingDashboardPage() {
                     <div className="col-span-full text-center py-16 bg-white/70 backdrop-blur-xl rounded-2xl border border-gray-100/50">
                       <Search className="h-16 w-16 text-gray-300 mx-auto mb-6" />
                       <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                        {t("no_tenders_found") || "No tenders found"}
+                        {t("no_tenders_found")}
                       </h3>
                       <p className="text-gray-600 mb-8">
-                        {t("adjust_filters_or_try_different_search") ||
-                          "Try adjusting your filters or search terms"}
+                        {t("adjust_filters_or_try_different_search")}
                       </p>
                     </div>
                   )}
@@ -881,7 +1103,7 @@ export default function ServiceProvidingDashboardPage() {
                       variant="outline"
                       className="px-6 py-2 bg-white/70 border border-gray-200/50 rounded-xl disabled:opacity-50 hover:bg-gray-50 transition-all duration-300"
                     >
-                      Prev
+                      {t("prev")}
                     </Button>
 
                     <div className="flex items-center gap-2">
@@ -908,7 +1130,7 @@ export default function ServiceProvidingDashboardPage() {
                         <>
                           <span className="text-gray-400">...</span>
                           <div className="text-sm text-gray-600">
-                            Page {currentPage} / {totalPages}
+                            {t("page")} {currentPage} / {totalPages}
                           </div>
                         </>
                       )}
@@ -922,7 +1144,7 @@ export default function ServiceProvidingDashboardPage() {
                       variant="outline"
                       className="px-6 py-2 bg-white/70 border border-gray-200/50 rounded-xl disabled:opacity-50 hover:bg-gray-50 transition-all duration-300"
                     >
-                      Next
+                      {t("next")}
                     </Button>
                   </div>
                 )}

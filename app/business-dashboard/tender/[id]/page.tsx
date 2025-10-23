@@ -26,6 +26,8 @@ import {
   Loader2,
   Trophy,
   AlertCircle,
+  RefreshCw,
+  AlertTriangle,
 } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
@@ -33,7 +35,7 @@ import useTranslation from "@/lib/hooks/useTranslation";
 
 // Services
 import { getTender } from "@/app/services/tenderService";
-import { getTenderBids } from "@/app/services/BidService";
+import { getTenderBids, returnBidForRevision } from "@/app/services/BidService";
 import {
   getQuestionsForTender,
   answerQuestion,
@@ -44,7 +46,7 @@ import { awardTender } from "@/app/services/tenderService";
 // Utils
 import { getStatusColor, getStatusText } from "@/utils/tenderStatus";
 import { useAuth } from "@/context/AuthContext";
-import { detectContactInfo } from "@/utils/validationcehck"; // Reuse same validation
+import { detectContactInfo } from "@/utils/validationcehck";
 import PageTransitionWrapper from "@/components/animations/PageTransitionWrapper";
 
 // Interfaces
@@ -94,11 +96,25 @@ interface Bid {
   paymentAmount: number;
   paymentId: string;
   paymentStatus: "paid" | "pending";
-  status: "submitted" | "accepted" | "rejected" | "under_review" | "completed";
+  status:
+    | "submitted"
+    | "accepted"
+    | "rejected"
+    | "under_review"
+    | "completed"
+    | "returned_for_revision";
   createdAt: string;
   updatedAt: string;
   v: number;
   tender: string;
+  revisionDetails?: {
+    requestedAt: string;
+    reason: string;
+    requestedBy: {
+      _id: string;
+      email: string;
+    };
+  };
 }
 
 export default function TenderDetailPage() {
@@ -124,6 +140,12 @@ export default function TenderDetailPage() {
   const [updatingBidStatus, setUpdatingBidStatus] = useState<{
     [key: string]: boolean;
   }>({});
+  const [returnForRevision, setReturnForRevision] = useState<{
+    open: boolean;
+    bidId: string | null;
+  }>({ open: false, bidId: null });
+  const [revisionReason, setRevisionReason] = useState("");
+  const [returningBid, setReturningBid] = useState(false);
 
   // Validation function for answer content
   const validateAnswer = (
@@ -137,7 +159,7 @@ export default function TenderDetailPage() {
     const highSeverity = detections.filter((d) => d.severity === "high");
 
     if (highSeverity.length > 0) {
-      const type = highSeverity[0].type; // 'email', 'phone', 'url'
+      const type = highSeverity[0].type;
       return {
         valid: false,
         message: t(`answer_contains_contact_information_${type}`),
@@ -145,6 +167,11 @@ export default function TenderDetailPage() {
     }
 
     return { valid: true };
+  };
+
+  // Check if current user is tender owner
+  const isTenderOwner = () => {
+    return profile?._id === tender?.postedBy._id;
   };
 
   const fetchTenderData = async () => {
@@ -173,32 +200,85 @@ export default function TenderDetailPage() {
     bidId: string,
     status: "accepted" | "rejected"
   ) => {
-    if (status !== "accepted") return;
+    if (status === "accepted") {
+      try {
+        setUpdatingBidStatus((prev) => ({ ...prev, [bidId]: true }));
 
+        await awardTender(tenderId, bidId);
+
+        setBids((prevBids) =>
+          prevBids.map((bid) =>
+            bid._id === bidId
+              ? { ...bid, status: "accepted" }
+              : { ...bid, status: "rejected" }
+          )
+        );
+
+        setTender((prev) => (prev ? { ...prev, status: "awarded" } : null));
+
+        alert("Tender awarded successfully!");
+      } catch (err: any) {
+        console.error("Error awarding tender:", err);
+        const errorMessage =
+          err.response?.data?.message ||
+          "Failed to award tender. Please try again.";
+        setError(errorMessage);
+      } finally {
+        setUpdatingBidStatus((prev) => ({ ...prev, [bidId]: false }));
+      }
+    } else {
+      // For rejected status (which includes returning for revision)
+      setReturnForRevision({ open: true, bidId });
+    }
+  };
+
+  const handleReturnBidForRevision = async () => {
+    if (!returnForRevision.bidId || !revisionReason.trim()) {
+      alert("Please provide a reason for revision");
+      return;
+    }
+
+    setReturningBid(true);
     try {
-      setUpdatingBidStatus((prev) => ({ ...prev, [bidId]: true }));
-
-      await awardTender(tenderId, bidId);
-
-      setBids((prevBids) =>
-        prevBids.map((bid) =>
-          bid._id === bidId
-            ? { ...bid, status: "accepted" }
-            : { ...bid, status: "rejected" }
-        )
+      const result = await returnBidForRevision(
+        returnForRevision.bidId,
+        revisionReason
       );
 
-      setTender((prev) => (prev ? { ...prev, status: "awarded" } : null));
+      if (result.success) {
+        // Update bid status locally
+        setBids((prevBids) =>
+          prevBids.map((bid) =>
+            bid._id === returnForRevision.bidId
+              ? {
+                  ...bid,
+                  status: "returned_for_revision",
+                  revisionDetails: {
+                    requestedAt: new Date().toISOString(),
+                    reason: revisionReason,
+                    requestedBy: {
+                      _id: profile?._id || "",
+                      email: profile?.email || "",
+                    },
+                  },
+                }
+              : bid
+          )
+        );
 
-      alert("Tender awarded successfully!");
+        // Reset dialog
+        setReturnForRevision({ open: false, bidId: null });
+        setRevisionReason("");
+
+        alert("Bid returned for revision successfully");
+      } else {
+        throw new Error(result.error || "Failed to return bid for revision");
+      }
     } catch (err: any) {
-      console.error("Error awarding tender:", err);
-      const errorMessage =
-        err.response?.data?.message ||
-        "Failed to award tender. Please try again.";
-      setError(errorMessage);
+      console.error("Error returning bid for revision:", err);
+      setError(err.message || "Failed to return bid for revision");
     } finally {
-      setUpdatingBidStatus((prev) => ({ ...prev, [bidId]: false }));
+      setReturningBid(false);
     }
   };
 
@@ -207,7 +287,7 @@ export default function TenderDetailPage() {
     const validation = validateAnswer(answer);
 
     if (!validation.valid) {
-      alert(validation.message); // You can replace with toast later
+      alert(validation.message);
       return;
     }
 
@@ -538,6 +618,12 @@ export default function TenderDetailPage() {
                                     Awarded
                                   </div>
                                 )}
+                                {bid.status === "returned_for_revision" && (
+                                  <div className="flex items-center bg-yellow-50 text-yellow-700 px-2 py-1 rounded-full text-xs font-medium">
+                                    <RefreshCw className="h-3 w-3 mr-1" />
+                                    Needs Revision
+                                  </div>
+                                )}
                               </div>
 
                               <div className="flex items-center justify-start gap-6">
@@ -586,21 +672,39 @@ export default function TenderDetailPage() {
 
                             <div className="flex gap-2">
                               {bid.status === "submitted" && !hasAwardedBid && (
-                                <Button
-                                  onClick={() =>
-                                    handleBidStatusUpdate(bid._id, "accepted")
-                                  }
-                                  disabled={updatingBidStatus[bid._id]}
-                                  className="bg-blue-500 hover:bg-blue-600 text-white rounded-full px-4 py-2 h-auto text-sm font-medium"
-                                >
-                                  {updatingBidStatus[bid._id] ? (
-                                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                                  ) : (
-                                    <Award className="h-4 w-4 mr-2" />
-                                  )}
-                                  Accept Bid
-                                </Button>
+                                <div className="flex gap-2">
+                                  <Button
+                                    onClick={() =>
+                                      handleBidStatusUpdate(bid._id, "accepted")
+                                    }
+                                    disabled={updatingBidStatus[bid._id]}
+                                    className="bg-blue-500 hover:bg-blue-600 text-white rounded-full px-4 py-2 h-auto text-sm font-medium"
+                                  >
+                                    {updatingBidStatus[bid._id] ? (
+                                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                                    ) : (
+                                      <Award className="h-4 w-4 mr-2" />
+                                    )}
+                                    Accept Bid
+                                  </Button>
+                                  <Button
+                                    onClick={() =>
+                                      handleBidStatusUpdate(bid._id, "rejected")
+                                    }
+                                    disabled={updatingBidStatus[bid._id]}
+                                    className="bg-gray-50 text-gray-700 rounded-full px-4 py-2 h-auto text-sm font-medium"
+                                  >
+                                    <RefreshCw className="h-4 w-4 mr-2" />
+                                    Return for Revision
+                                  </Button>
+                                </div>
                               )}
+                              {bid.status === "returned_for_revision" &&
+                                isTenderOwner() && (
+                                  <div className="text-sm text-gray-500 italic">
+                                    Bid returned for revision
+                                  </div>
+                                )}
                               {hasAwardedBid && bid.status !== "accepted" && (
                                 <span className="text-sm text-gray-500 italic">
                                   Another bid was accepted
@@ -624,6 +728,74 @@ export default function TenderDetailPage() {
                       </p>
                     </div>
                   )}
+                </div>
+              )}
+
+              {/* Return for Revision Dialog */}
+              {returnForRevision.open && (
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                  <div className="bg-white/90 backdrop-blur-xl rounded-2xl border border-gray-100/50 max-w-md w-full">
+                    <div className="p-6">
+                      <div className="flex items-center justify-between mb-4">
+                        <h2 className="text-xl font-semibold text-gray-900">
+                          Return Bid for Revision
+                        </h2>
+                        <button
+                          onClick={() =>
+                            setReturnForRevision({ open: false, bidId: null })
+                          }
+                          className="p-2 rounded-full hover:bg-gray-100 transition-colors duration-200"
+                        >
+                          <X className="h-4 w-4 text-gray-500" />
+                        </button>
+                      </div>
+                      <div className="space-y-4">
+                        <p className="text-gray-600">
+                          Please provide a reason for returning this bid for
+                          revision.
+                        </p>
+                        <Textarea
+                          placeholder="Enter your revision request..."
+                          value={revisionReason}
+                          onChange={(e) => setRevisionReason(e.target.value)}
+                          className="min-h-[150px] bg-white/80 backdrop-blur-sm border border-gray-200/50"
+                          autoFocus
+                        />
+                        <div className="flex items-center justify-between text-xs text-gray-500 mt-2">
+                          <div className="flex items-center">
+                            <AlertTriangle className="h-4 w-4 text-yellow-500 mr-2" />
+                            <span>
+                              The bidder will be able to edit and resubmit their
+                              bid
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-end gap-3 mt-6">
+                        <Button
+                          variant="outline"
+                          onClick={() =>
+                            setReturnForRevision({ open: false, bidId: null })
+                          }
+                          className="bg-white/80 backdrop-blur-sm border border-gray-200/50 hover:bg-gray-50/80 transition-colors"
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          onClick={handleReturnBidForRevision}
+                          disabled={returningBid || !revisionReason.trim()}
+                          className="bg-blue-600 hover:bg-blue-700 text-white"
+                        >
+                          {returningBid ? (
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          ) : (
+                            <RefreshCw className="h-4 w-4 mr-2" />
+                          )}
+                          Return for Revision
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
 
@@ -834,6 +1006,44 @@ export default function TenderDetailPage() {
               <div className="inline-flex items-center bg-amber-50 text-amber-800 px-4 py-2 rounded-full text-sm font-medium">
                 <Clock className="h-4 w-4 mr-2" />
                 Pending Approval
+              </div>
+            </div>
+          )}
+          {returnForRevision.open && (
+            <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+              <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
+                <h3 className="text-lg font-semibold mb-4">
+                  Return Bid for Revision
+                </h3>
+                <Textarea
+                  placeholder="Enter reason for returning this bid..."
+                  value={revisionReason}
+                  onChange={(e) => setRevisionReason(e.target.value)}
+                />
+                <div className="flex justify-end gap-3 mt-4">
+                  <Button
+                    onClick={() =>
+                      setReturnForRevision({ open: false, bidId: null })
+                    }
+                    variant="outline"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={handleReturnBidForRevision}
+                    disabled={returningBid}
+                    className="bg-yellow-500 hover:bg-yellow-600 text-white"
+                  >
+                    {returningBid ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />{" "}
+                        Returning...
+                      </>
+                    ) : (
+                      "Confirm Return"
+                    )}
+                  </Button>
+                </div>
               </div>
             </div>
           )}
