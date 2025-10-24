@@ -235,7 +235,11 @@ export default function MyBidsPage() {
     // Find the bid to get current details
     const bid = bids.find((b) => b.id === bidId);
     if (!bid) {
-      toast.error(t("bid_not_found") || "Bid not found");
+      toast({
+        title: t("error") || "Error",
+        description: t("bid_not_found") || "Bid not found",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -745,8 +749,6 @@ export default function MyBidsPage() {
                               {t("edit_and_resubmit") || "Edit and Resubmit"}
                             </DropdownMenuItem>
                           )}
-
-                          
 
                           {(bid.status === "accepted" ||
                             bid.status === "completed") && (
