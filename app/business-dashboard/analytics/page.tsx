@@ -206,13 +206,18 @@ export default function page() {
     }
 
     bids.forEach((bid: any) => {
-      if (!bid.createdAt) return;
-      const bidDate = new Date(bid.createdAt).toISOString().split("T")[0];
-      if (dataMap.has(bidDate)) {
-        const existing = dataMap.get(bidDate)!;
-        existing.bidsPlaced += 1;
-        if (bid.status === "accepted" || bid.status === "completed")
-          existing.bidsWon += 1;
+      if (!bid.createdAt || !bid.updatedAt) return;
+      // For bids placed: use createdAt
+      const placedDate = new Date(bid.createdAt).toISOString().split("T")[0];
+      if (dataMap.has(placedDate)) {
+        dataMap.get(placedDate)!.bidsPlaced += 1;
+      }
+      // For bids won: use updatedAt for accepted or completed bids
+      if (bid.status === "accepted" || bid.status === "completed") {
+        const winDate = new Date(bid.updatedAt).toISOString().split("T")[0];
+        if (dataMap.has(winDate)) {
+          dataMap.get(winDate)!.bidsWon += 1;
+        }
       }
     });
 
@@ -307,7 +312,7 @@ export default function page() {
         const existing = dataMap.get(bidDate)!;
         if (bid.status === "submitted") {
           existing.submitted += 1;
-        } else if (bid.status === "accepted" || bid.status == "completed") {
+        } else if (bid.status === "accepted" || bid.status === "completed") {
           existing.accepted += 1;
         } else if (bid.status === "rejected") {
           existing.rejected += 1;
