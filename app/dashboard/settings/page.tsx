@@ -426,16 +426,6 @@ export default function AppleStyleSettings() {
                 </div>
 
                 {/* Two-Factor Auth */}
-                <SettingRow
-                  icon={Shield}
-                  label={t("Two-Factor_Authentication")}
-                  description={t("Add_extra_layer_of_security")}
-                >
-                  <Switch
-                    checked={twoFactorAuth}
-                    onCheckedChange={setTwoFactorAuth}
-                  />
-                </SettingRow>
 
                 {/* Logout Button */}
                 <div className="p-6 pt-4">

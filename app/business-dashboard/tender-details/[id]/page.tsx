@@ -254,12 +254,12 @@ export default function TenderDetailsPage({ params }: PageProps) {
               <p className="text-red-500 font-medium mb-6 text-lg">
                 {error || "Tender not found"}
               </p>
-              <Link href="/business-dashboard/browse-tenders">
+              <div onClick={() => router.back()}>
                 <Button className="bg-blue-500 hover:bg-blue-600 text-white rounded-xl px-6 py-2 font-medium transition-all duration-300">
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Back to Tenders
                 </Button>
-              </Link>
+              </div>
             </div>
           </div>
         </div>
@@ -275,13 +275,13 @@ export default function TenderDetailsPage({ params }: PageProps) {
           <div className="bg-white border-b border-gray-200">
             <div className="mx-auto px-4 sm:px-6 lg:px-14">
               <div className="flex items-center justify-between h-16">
-                <Link
-                  href={"/business-dashboard/browse-tenders"}
+                <div
+                  onClick={() => router.back()}
                   className="flex items-center text-blue-500 hover:text-blue-600 font-medium transition-colors"
                 >
                   <ArrowLeft className="h-5 w-5 mr-2" />
                   Browse Tenders
-                </Link>
+                </div>
               </div>
             </div>
           </div>
@@ -299,7 +299,7 @@ export default function TenderDetailsPage({ params }: PageProps) {
                         <span>•</span>
                         <span>Updated {formatTimeAgo(tender.updatedAt)}</span>
                       </div>
-                      <Link href="/business-dashboard/browse-tenders" passHref>
+                      <div onClick={() => router.back()}>
                         <Button
                           variant="outline"
                           className="text-sm bg-white/60 border-gray-200/50 hover:bg-blue-50 hover:border-blue-200 hover:text-blue-600 rounded-xl transition-all duration-300"
@@ -307,7 +307,7 @@ export default function TenderDetailsPage({ params }: PageProps) {
                           <ArrowLeft className="h-4 w-4 mr-2" />
                           Back to Tenders
                         </Button>
-                      </Link>
+                      </div>
                     </div>
                     <h1 className="text-4xl font-bold text-gray-900 mb-6 leading-tight">
                       {tender.title}

@@ -238,46 +238,6 @@ export default function SignupWizard() {
     if (step === 3) setStep(2);
   };
 
-  const fillRandom = () => {
-    const acct: AccountType = Math.random() > 0.5 ? "individual" : "business";
-    const cc = countries[Math.floor(Math.random() * countries.length)].code;
-    const serial = Math.floor(100 + Math.random() * 899);
-    const phone = String(Math.floor(1000000 + Math.random() * 8999999));
-
-    const companyName = sample([
-      "Doha Build Co.",
-      "Gulf Infra Group",
-      "Desert Star Trading",
-      "Pearl Contracting",
-      "Corniche Holdings",
-    ]);
-    const companyLocal =
-      companyName.toLowerCase().replace(/[^a-z]/g, "") || "company";
-    const domain = sample(["qatartenders.qa", "qtr-mail.com", "example.qa"]);
-
-    const next: FormState = {
-      accountType: acct,
-      fullName: acct === "individual" ? "Ahmed" : "", // Individual → Ahmed, Business → leave empty
-      email: "", // always empty
-      companyName,
-      companyEmail:
-        acct === "business" ? `${companyLocal}${serial}@${domain}` : "",
-      countryCode: cc,
-      phone,
-      password: `P@ssw0rd${serial}`,
-    };
-
-    setForm(next);
-    setErrors({});
-    if (step === 1) setStep(2);
-
-    toast({
-      title: "Demo data filled",
-      description:
-        "Email left blank. Name set to Ahmed for individual accounts.",
-    });
-  };
-
   const resend = async () => {
     if (resendCooldown > 0) return;
 
@@ -348,21 +308,10 @@ export default function SignupWizard() {
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-4 pt-1">
-        {step !== 3 && (
-          <Button
-            variant="outline"
-            onClick={fillRandom}
-            className="px-5 py-2"
-            disabled={isSubmitting}
-          >
-            Fill with random data
-          </Button>
-        )}
-
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 w-full">
           {step > 1 && !registrationSuccess && (
             <Button
-              variant="ghost"
+              variant="outline"
               onClick={onBack}
               className="px-5 py-2"
               disabled={isSubmitting}
@@ -375,7 +324,7 @@ export default function SignupWizard() {
           {step === 1 && (
             <Button
               onClick={onContinue}
-              className="bg-blue-600 text-white px-6 py-2 hover:bg-blue-700"
+              className="bg-blue-600 text-white px-6 w-full py-2 hover:bg-blue-700"
               disabled={isSubmitting}
             >
               {t("continue")} <ArrowRight className="ml-2 h-4 w-4" />
@@ -385,7 +334,7 @@ export default function SignupWizard() {
           {step === 2 && (
             <Button
               onClick={onSubmit}
-              className="bg-blue-600 text-white px-6 py-2 hover:bg-blue-700"
+              className="bg-blue-600 text-white ms-auto px-6 py-2 hover:bg-blue-700"
               disabled={isSubmitting}
             >
               {isSubmitting ? (
@@ -649,9 +598,6 @@ function StepTwo({
         {errors.phone && (
           <p className="text-sm text-red-600 mt-2">{errors.phone}</p>
         )}
-        <p className="text-sm text-muted-foreground mt-2">
-          Include your company&apos;s main line for business accounts.
-        </p>
       </div>
 
       <div className="space-y-3">

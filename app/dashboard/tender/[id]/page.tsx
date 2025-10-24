@@ -357,17 +357,13 @@ export default function TenderDetailPage() {
         <div className="bg-white border-b border-gray-200">
           <div className="mx-auto px-4 sm:px-6 lg:px-14">
             <div className="flex items-center justify-between h-16">
-              <Link
-                href={
-                  profile?.userType !== "business"
-                    ? "/dashboard/my-tenders"
-                    : "/business-dashboard/my-tenders"
-                }
+              <div
+                onClick={() => router.back()}
                 className="flex items-center text-blue-500 hover:text-blue-600 font-medium transition-colors"
               >
                 <ArrowLeft className="h-5 w-5 mr-2" />
                 Tenders
-              </Link>
+              </div>
 
               {/* Make Active Button - Only for draft tenders owned by user */}
               {canBeMadeActive && (

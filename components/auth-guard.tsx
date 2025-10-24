@@ -34,8 +34,6 @@ export function ProtectedRoute({
 
   const getRedirectPath = (userType: string) => {
     switch (userType) {
-      case "admin":
-        return "/admin";
       case "business":
         return "/business-dashboard";
       case "individual":

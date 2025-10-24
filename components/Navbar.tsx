@@ -167,14 +167,22 @@ export default function Navbar({
                 >
                   <div className="py-1">
                     <Link
-                      href="/business-dashboard/profile"
+                      href={
+                        profile?.userType == "business"
+                          ? "/business-dashboard/profile"
+                          : "/dashboard/profile"
+                      }
                       className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     >
                       <UserCircle className="w-4 h-4 text-gray-500" />
                       {t("profile")}
                     </Link>
                     <Link
-                      href="/business-dashboard/settings"
+                      href={
+                        profile?.userType == "business"
+                          ? "/business-dashboard/settings"
+                          : "/dashboard/settings"
+                      }
                       className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     >
                       <Settings className="w-4 h-4 text-gray-500" />

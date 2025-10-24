@@ -48,6 +48,11 @@ export default function DashboardLayout({
           href: "/business-dashboard/analytics",
           icon: BarChart,
         },
+        {
+          name: t("active_projects"),
+          href: "/business-dashboard/projects",
+          icon: Briefcase,
+        },
       ],
     },
     {
@@ -57,11 +62,6 @@ export default function DashboardLayout({
           name: t("my_posted_tenders"),
           href: "/business-dashboard/my-tenders",
           icon: FileText,
-        },
-        {
-          name: t("active_projects"),
-          href: "/business-dashboard/projects",
-          icon: Briefcase,
         },
       ],
     },

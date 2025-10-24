@@ -46,7 +46,6 @@ interface ProfileData {
   contactPersonName: string;
   personalEmail: string;
   companyEmail: string;
-  companyPhoneCountryCode: string;
   companyPhoneNumber: string;
   commercialRegistrationNumber: string;
   companyDescription: string;
@@ -74,13 +73,12 @@ export default function Component() {
   const [verificationStatus, setVerificationStatus] = useState<string | null>(
     null
   );
-
+  const [rejectionreaspm, setrejectionreaspm] = useState("");
   const [profileData, setProfileData] = useState<ProfileData>({
     companyName: "",
     contactPersonName: "",
     personalEmail: "",
     companyEmail: "",
-    companyPhoneCountryCode: "QA",
     companyPhoneNumber: "",
     commercialRegistrationNumber: "",
     companyDescription: "",
@@ -96,13 +94,15 @@ export default function Component() {
   const { user, isLoading, profile } = useAuth();
 
   useEffect(() => {
+    // load both profile and verification status on mount / when auth profile changes
     loadProfile();
     loadVerificationStatus();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile]);
 
   useEffect(() => {
     updateProfileCompletion();
-  }, [profileData]);
+  }, [profileData, documentData]);
 
   const loadProfile = async () => {
     try {
@@ -115,7 +115,6 @@ export default function Component() {
         contactPersonName: profile.contactPersonName || "",
         personalEmail: profile.personalEmail || "",
         companyEmail: profile.companyEmail || "",
-        companyPhoneCountryCode: "QA", // You might want to extract this from phone
         companyPhoneNumber: profile.phone || "",
         commercialRegistrationNumber:
           profile.commercialRegistrationNumber || "",
@@ -130,7 +129,7 @@ export default function Component() {
           profile.commercialRegistrationNumber || "",
       });
     } catch (err: any) {
-      setError(err.message);
+      setError(err?.message || "Failed to load profile");
     } finally {
       setLoading(false);
     }
@@ -138,7 +137,11 @@ export default function Component() {
 
   const loadVerificationStatus = async () => {
     try {
-      const status = user?.isDocumentVerified;
+      // Prefer authoritative source from profile endpoint instead of relying only on `user`
+      const prof = await profileApi.getVerificationStatus();
+      const status = prof?.isDocumentVerified;
+      setrejectionreaspm(prof?.documentRejectionReason);
+
       setVerificationStatus(status || null);
       setIsProfileCompleted(status === "verified" || status === "pending");
     } catch (err: any) {
@@ -154,7 +157,7 @@ export default function Component() {
       setError(null);
 
       // Prepare data for API
-      const updateData = {
+      const updateData: any = {
         companyName: profileData.companyName,
         contactPersonName: profileData.contactPersonName,
         personalEmail: profileData.personalEmail,
@@ -164,21 +167,31 @@ export default function Component() {
         address: profileData.address,
       };
 
+      // If CR number changed locally, include it
+      if (documentData.commercialRegistrationNumber) {
+        updateData.commercialRegistrationNumber =
+          documentData.commercialRegistrationNumber;
+      }
+
       const result = await profileApi.updateProfile(updateData);
 
       setSuccess("Profile updated successfully!");
       setIsEditing(false);
+      await loadProfile();
 
       // If verification is required, update status
-      if (result.requiresReVerification) {
+      if (result?.requiresReVerification) {
         await loadVerificationStatus();
         setIsProfileCompleted(false);
+      } else {
+        // always refresh verification after save to show latest status
+        await loadVerificationStatus();
       }
 
       // Clear success message after 3 seconds
       setTimeout(() => setSuccess(null), 3000);
     } catch (err: any) {
-      setError(err.message);
+      setError(err?.message || "Failed to save profile");
     } finally {
       setSaving(false);
     }
@@ -230,17 +243,69 @@ export default function Component() {
 
       const uploadedUrl = await uploadToCloudinary(file);
 
+      // Update local state
       setDocumentData((prev) => ({
         ...prev,
         commercialRegistrationDoc: uploadedUrl,
       }));
 
+      // Persist to backend immediately so replacement persists across reloads
+      try {
+        await profileApi.updateProfile({
+          commercialRegistrationDoc: uploadedUrl,
+        });
+      } catch (persistErr) {
+        // Non-fatal: keep uploaded url locally but show warning
+        console.warn("Failed to persist document URL to backend:", persistErr);
+      }
+
       setSuccess("Document uploaded successfully!");
+      // refresh verification status (uploading a new document could change pending/required state)
+      await loadVerificationStatus();
+
       setTimeout(() => setSuccess(null), 3000);
     } catch (err: any) {
-      setError("Failed to upload document: " + err.message);
+      setError("Failed to upload document: " + (err?.message || err));
     } finally {
       setUploadingFile(false);
+    }
+  };
+
+  const handleRemoveDocument = async () => {
+    // Confirm removal
+    const ok = window.confirm(
+      "Remove commercial registration document? This will delete the current uploaded document."
+    );
+    if (!ok) return;
+
+    try {
+      setSaving(true);
+      setError(null);
+
+      // Update backend to remove doc (best-effort)
+      try {
+        await profileApi.updateProfile({
+          commercialRegistrationDoc: undefined,
+        });
+      } catch (persistErr) {
+        console.warn("Backend document removal failed:", persistErr);
+        // continue to update local state anyway
+      }
+
+      // Update local state
+      setDocumentData((prev) => ({
+        ...prev,
+        commercialRegistrationDoc: null,
+      }));
+
+      setSuccess("Document removed");
+      // Refresh verification status because removing document might change it
+      await loadVerificationStatus();
+      setTimeout(() => setSuccess(null), 3000);
+    } catch (err: any) {
+      setError(err?.message || "Failed to remove document");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -257,7 +322,8 @@ export default function Component() {
     ];
 
     requiredFields.forEach((field) => {
-      if (profileData[field as keyof ProfileData]?.trim()) completedFields++;
+      if (profileData[field as keyof ProfileData]?.toString().trim())
+        completedFields++;
     });
 
     setProfileCompletion(
@@ -285,12 +351,13 @@ export default function Component() {
       setIsEditing(false);
       setSuccess("Documents submitted for verification successfully!");
 
-      // Reload verification status
+      // Reload verification status and profile after submission
       await loadVerificationStatus();
+      await loadProfile();
 
       setTimeout(() => setSuccess(null), 3000);
     } catch (err: any) {
-      setError(err.message);
+      setError(err?.message || "Failed to submit documents");
     } finally {
       setSaving(false);
     }
@@ -298,7 +365,7 @@ export default function Component() {
 
   const handleCloseModal = () => setShowCompletionModal(false);
 
-  const areInputsDisabled = !isEditing || isProfileCompleted;
+  const areInputsDisabled = !isEditing;
   const canCompleteProfile =
     profileCompletion === 100 &&
     documentData.commercialRegistrationNumber &&
@@ -361,7 +428,6 @@ export default function Component() {
                       <div className="flex items-center gap-2">
                         <Phone className="w-4 h-4 sm:w-5 sm:h-5" />
                         <span>
-                          {profileData.companyPhoneCountryCode}{" "}
                           {profileData.companyPhoneNumber || "Phone number"}
                         </span>
                       </div>
@@ -369,22 +435,32 @@ export default function Component() {
                   </div>
                 </div>
                 <div className="flex items-center gap-4 mt-4 sm:mt-0">
-                  {verificationStatus === "verified" ? (
+                  {/* Verification Status */}
+                  {verificationStatus === "verified" && (
                     <div className="flex items-center gap-2 text-green-600 font-medium">
                       <CheckCircle className="w-5 h-5" />
                       <span>Verified</span>
                     </div>
-                  ) : verificationStatus === "pending" ? (
+                  )}
+
+                  {verificationStatus === "pending" && (
                     <div className="flex items-center gap-2 text-blue-600 font-medium">
                       <Loader2 className="w-5 h-5" />
                       <span>Verification Pending</span>
                     </div>
-                  ) : verificationStatus === "rejected" ? (
-                    <div className="flex items-center gap-2 text-red-600 font-medium">
-                      <AlertCircle className="w-5 h-5" />
-                      <span>Verification Rejected</span>
-                    </div>
-                  ) : !isEditing ? (
+                  )}
+                  {verificationStatus === "rejected" && (
+                    <Alert className="border-red-200 bg-red-50">
+                      <AlertDescription className="text-red-800">
+                        <strong>Verification Rejected:</strong>{" "}
+                        {verificationStatus}
+                        {rejectionreaspm}
+                      </AlertDescription>
+                    </Alert>
+                  )}
+
+                  {/* Action Buttons */}
+                  {!isEditing ? (
                     <Button
                       onClick={handleEditClick}
                       className="bg-[#5A4DFF] hover:bg-[#4a3dff] text-white rounded-md px-4 py-2 sm:px-6 sm:py-2 text-sm sm:text-base"
@@ -532,20 +608,7 @@ export default function Component() {
                       {t("company_phone")} *
                     </Label>
                     <div className="flex gap-2 mt-1">
-                      <Select
-                        value={profileData.companyPhoneCountryCode}
-                        onValueChange={handleSelectChange}
-                        disabled={areInputsDisabled}
-                      >
-                        <SelectTrigger className="w-[100px] sm:w-[120px]">
-                          <SelectValue placeholder={t("country")} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="QA">QA +974</SelectItem>
-                          <SelectItem value="US">US +1</SelectItem>
-                          <SelectItem value="UK">UK +44</SelectItem>
-                        </SelectContent>
-                      </Select>
+          
                       <Input
                         id="companyPhoneNumber"
                         value={profileData.companyPhoneNumber}
@@ -621,6 +684,8 @@ export default function Component() {
                     <Label className="text-gray-700 text-sm sm:text-base">
                       {t("upload_cr_document_pdf_jpg_png")} *
                     </Label>
+
+                    {/* If doc exists show uploaded state + actions (replace/remove when editing) */}
                     {documentData.commercialRegistrationDoc ? (
                       <div className="mt-1 p-4 border-2 border-green-300 rounded-lg bg-green-50">
                         <div className="flex items-center justify-between">
@@ -630,18 +695,49 @@ export default function Component() {
                               Document uploaded successfully
                             </span>
                           </div>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() =>
-                              window.open(
-                                documentData.commercialRegistrationDoc!,
-                                "_blank"
-                              )
-                            }
-                          >
-                            View
-                          </Button>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() =>
+                                window.open(
+                                  documentData.commercialRegistrationDoc!,
+                                  "_blank"
+                                )
+                              }
+                            >
+                              View
+                            </Button>
+
+                            {/* Replace button (visible when editing) */}
+                            {isEditing && (
+                              <>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="relative overflow-hidden"
+                                >
+                                  Replace
+                                  <input
+                                    type="file"
+                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                    accept=".pdf,.jpg,.jpeg,.png"
+                                    onChange={handleFileUpload}
+                                    disabled={uploadingFile}
+                                  />
+                                </Button>
+
+                                <Button
+                                  variant="destructive"
+                                  size="sm"
+                                  onClick={handleRemoveDocument}
+                                  disabled={saving}
+                                >
+                                  Remove
+                                </Button>
+                              </>
+                            )}
+                          </div>
                         </div>
                       </div>
                     ) : (

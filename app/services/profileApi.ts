@@ -27,7 +27,8 @@ interface UpdateProfileResponse {
 }
 
 interface VerificationStatusResponse {
-  status: string;
+  isDocumentVerified: string;
+  documentRejectionReason: string;
   message: string;
 }
 

@@ -257,8 +257,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   const getRedirectPath = (userType: string) => {
     switch (userType) {
-      case "admin":
-        return "/admin";
       case "business":
         return "/business-dashboard";
       case "individual":

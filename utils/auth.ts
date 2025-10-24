@@ -14,6 +14,7 @@ export interface User {
   adminType?: string;
   permissions?: string[];
   isDocumentVerified?: string;
+  documentRejectionReason?: string;
   profile?: any;
 }
 
