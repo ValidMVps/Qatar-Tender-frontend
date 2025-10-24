@@ -50,3 +50,15 @@ export const getPaymentDetails = async (paymentId: string) => {
     throw error;
   }
 };
+export const getMyPayments = async () => {
+  try {
+    const res = await api.get("/api/payments/my-payments");
+    return res.data;
+  } catch (error: any) {
+    console.error(
+      "Error fetching my payments:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
