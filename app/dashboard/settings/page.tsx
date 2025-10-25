@@ -26,11 +26,16 @@ import {
   User,
   Smartphone,
   Volume2,
+  EyeOff,
+  Eye,
+  XCircle,
 } from "lucide-react";
 import { authService } from "@/utils/auth";
 import PageTransitionWrapper from "@/components/animations/PageTransitionWrapper";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import useTranslation from "@/lib/hooks/useTranslation";
+import { profileApi } from "@/app/services/profileApi";
+import { toast } from "sonner";
 
 // Define props for SettingRow interface
 interface SettingRowProps {
@@ -42,27 +47,27 @@ interface SettingRowProps {
 }
 
 // Define tab types
-type TabId = "general" | "security";
+type TabId = "general" | "security" | "privacy";
 
 export default function AppleStyleSettings() {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<TabId>("general");
 
-  // General Settings
-  const [companyName, setCompanyName] = useState<string>(
-    t("Acme_Solutions_Inc.")
-  );
-  const [industry, setIndustry] = useState<string>(t("Construction"));
-  const [contactPerson, setContactPerson] = useState<string>(t("Jane_Doe"));
-  const [companyEmail, setCompanyEmail] = useState<string>(
-    t("info@acmesolutions.com")
-  );
-  const [companyLogo, setCompanyLogo] = useState<string>(
-    "/placeholder.svg?height=100&width=100&text=Company+Logo"
-  );
-  const [autoSave, setAutoSave] = useState<boolean>(true);
-  const [dataSync, setDataSync] = useState<boolean>(true);
-  const [offlineMode, setOfflineMode] = useState<boolean>(false);
+  // General Settings - initialized as empty, will be populated by API
+  const [companyName, setCompanyName] = useState<string>("");
+  const [industry, setIndustry] = useState<string>("");
+  const [contactPerson, setContactPerson] = useState<string>("");
+  const [companyEmail, setCompanyEmail] = useState<string>("");
+  const [personalEmail, setPersonalEmail] = useState<string>("");
+  const [companyDescription, setCompanyDescription] = useState<string>("");
+  const [companyLogo, setCompanyLogo] = useState<string>("");
+
+  // Privacy Settings
+  const [anonymousBidding, setAnonymousBidding] = useState<boolean>(true);
+  const [showPublicProfile, setShowPublicProfile] = useState<boolean>(false);
+  const [profileVisibility, setProfileVisibility] = useState<
+    "public" | "private"
+  >("private");
 
   // Notification Settings
   const [notificationsEnabled, setNotificationsEnabled] =
@@ -86,7 +91,7 @@ export default function AppleStyleSettings() {
   const [fontSize, setFontSize] = useState<string>("medium");
   const [reducedMotion, setReducedMotion] = useState<boolean>(false);
 
-  // 🔹 Dark mode state — only manage, don't apply filter
+  // Dark mode state
   const [isDark, setIsDark] = useState<boolean>(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("darkMode");
@@ -95,16 +100,22 @@ export default function AppleStyleSettings() {
     return false;
   });
 
+  // Load profile data on mount
+  useEffect(() => {
+    loadProfileData();
+  }, []);
+
   // Save to localStorage when toggled
   useEffect(() => {
     localStorage.setItem("darkMode", isDark.toString());
 
-    // 🔥 Dispatch custom event to notify all listeners
+    // Dispatch custom event to notify all listeners
     const event = new CustomEvent("darkModeChange", {
       detail: { dark: isDark },
     });
     window.dispatchEvent(event);
   }, [isDark]);
+
   // Sync with other tabs
   useEffect(() => {
     const handleStorage = (e: StorageEvent) => {
@@ -116,9 +127,134 @@ export default function AppleStyleSettings() {
     return () => window.removeEventListener("storage", handleStorage);
   }, []);
 
+  // Load current profile settings from backend
+  const loadProfileData = async () => {
+    try {
+      const profile = await profileApi.getProfile();
+
+      // Set privacy settings
+      setAnonymousBidding(profile.anonymousBidding ?? true);
+      setShowPublicProfile(profile.showPublicProfile ?? false);
+      setProfileVisibility(profile.profileVisibility || "private");
+
+      // Set company info
+      if (profile.companyName) setCompanyName(profile.companyName);
+      if (profile.contactPersonName)
+        setContactPerson(profile.contactPersonName);
+      if (profile.companyEmail) setCompanyEmail(profile.companyEmail);
+      if (profile.personalEmail) setPersonalEmail(profile.personalEmail);
+      if (profile.companyDesc) setCompanyDescription(profile.companyDesc);
+      if (profile.commercialRegistrationDoc)
+        setCompanyLogo(profile.commercialRegistrationDoc);
+
+      // Set appearance preferences
+      if (profile.themePreference) setTheme(profile.themePreference);
+      if (profile.fontSizePreference) setFontSize(profile.fontSizePreference);
+      if (profile.reducedMotion !== undefined)
+        setReducedMotion(profile.reducedMotion);
+
+      // Set notification preferences
+      if (profile.notificationsEnabled !== undefined)
+        setNotificationsEnabled(profile.notificationsEnabled);
+      if (profile.soundEnabled !== undefined)
+        setSoundEnabled(profile.soundEnabled);
+      if (profile.pushNotifications !== undefined)
+        setPushNotifications(profile.pushNotifications);
+
+      // Set security preferences
+      if (profile.twoFactorAuth !== undefined)
+        setTwoFactorAuth(profile.twoFactorAuth);
+      if (profile.autoLock) setAutoLock(profile.autoLock);
+    } catch (err) {
+      console.error("Failed to load profile:", err);
+      toast.error(
+        t("failed_to_load_profile_settings") ||
+          "Failed to load profile settings"
+      );
+    }
+  };
+
+  // Update profile setting through API
+  const updateProfileSetting = async (
+    field: string,
+    value: any,
+    successMessage: string
+  ) => {
+    try {
+      const result = await profileApi.updateProfile({
+        [field]: value,
+      });
+
+      toast.success(successMessage);
+
+      // Update local state based on field
+      switch (field) {
+        case "anonymousBidding":
+          setAnonymousBidding(value);
+          break;
+        case "showPublicProfile":
+          setShowPublicProfile(value);
+          break;
+        case "profileVisibility":
+          setProfileVisibility(value);
+          break;
+        case "companyName":
+          setCompanyName(value);
+          break;
+        case "contactPersonName":
+          setContactPerson(value);
+          break;
+        case "companyEmail":
+          setCompanyEmail(value);
+          break;
+        case "personalEmail":
+          setPersonalEmail(value);
+          break;
+        case "companyDesc":
+          setCompanyDescription(value);
+          break;
+        case "commercialRegistrationDoc":
+          setCompanyLogo(value);
+          break;
+        case "themePreference":
+          setTheme(value);
+          break;
+        case "fontSizePreference":
+          setFontSize(value);
+          break;
+        case "reducedMotion":
+          setReducedMotion(value);
+          break;
+        case "notificationsEnabled":
+          setNotificationsEnabled(value);
+          break;
+        case "soundEnabled":
+          setSoundEnabled(value);
+          break;
+        case "pushNotifications":
+          setPushNotifications(value);
+          break;
+        case "twoFactorAuth":
+          setTwoFactorAuth(value);
+          break;
+        case "autoLock":
+          setAutoLock(value);
+          break;
+      }
+    } catch (err: any) {
+      console.error(`Failed to update ${field}:`, err);
+      toast.error(
+        err.message ||
+          t("failed_to_update_setting") ||
+          "Failed to update setting"
+      );
+    }
+  };
+
   const tabs = [
     { id: "general", label: t("General"), icon: Settings },
     { id: "security", label: t("Security_&_Privacy"), icon: Shield },
+    { id: "privacy", label: t("Privacy_Settings"), icon: EyeOff },
   ];
 
   const handleSave = (e: React.FormEvent) => {
@@ -130,11 +266,45 @@ export default function AppleStyleSettings() {
     authService.logout();
   };
 
-  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      setCompanyLogo(URL.createObjectURL(file));
+
+      try {
+        // Upload to Cloudinary or your storage service
+        const uploadedUrl = await uploadToCloudinary(file);
+
+        // Update profile with new logo
+        await updateProfileSetting(
+          "commercialRegistrationDoc",
+          uploadedUrl,
+          t("Company_logo_updated_successfully")
+        );
+
+        setCompanyLogo(uploadedUrl);
+      } catch (err: any) {
+        console.error("Failed to upload logo:", err);
+        toast.error(t("Failed_to_upload_company_logo"));
+      }
     }
+  };
+
+  // Helper function to upload files to cloudinary
+  const uploadToCloudinary = async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "your_upload_preset");
+
+    const response = await fetch(
+      `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+
+    const data = await response.json();
+    return data.secure_url;
   };
 
   const SettingRow = ({
@@ -259,7 +429,13 @@ export default function AppleStyleSettings() {
                   >
                     <Switch
                       checked={notificationsEnabled}
-                      onCheckedChange={setNotificationsEnabled}
+                      onCheckedChange={(checked) =>
+                        updateProfileSetting(
+                          "notificationsEnabled",
+                          checked,
+                          t("Notification_settings_updated")
+                        )
+                      }
                     />
                   </SettingRow>
 
@@ -270,7 +446,13 @@ export default function AppleStyleSettings() {
                   >
                     <Switch
                       checked={soundEnabled}
-                      onCheckedChange={setSoundEnabled}
+                      onCheckedChange={(checked) =>
+                        updateProfileSetting(
+                          "soundEnabled",
+                          checked,
+                          t("Sound_settings_updated")
+                        )
+                      }
                       disabled={!notificationsEnabled}
                     />
                   </SettingRow>
@@ -311,7 +493,16 @@ export default function AppleStyleSettings() {
                     label={t("Font_Size")}
                     description={t("Adjust_text_size_for_better_readability")}
                   >
-                    <Select value={fontSize} onValueChange={setFontSize}>
+                    <Select
+                      value={fontSize}
+                      onValueChange={(value) =>
+                        updateProfileSetting(
+                          "fontSizePreference",
+                          value,
+                          t("Font_size_updated")
+                        )
+                      }
+                    >
                       <SelectTrigger className="w-32">
                         <SelectValue />
                       </SelectTrigger>
@@ -331,7 +522,13 @@ export default function AppleStyleSettings() {
                   >
                     <Switch
                       checked={reducedMotion}
-                      onCheckedChange={setReducedMotion}
+                      onCheckedChange={(checked) =>
+                        updateProfileSetting(
+                          "reducedMotion",
+                          checked,
+                          t("Motion_settings_updated")
+                        )
+                      }
                     />
                   </SettingRow>
                 </div>
@@ -425,8 +622,6 @@ export default function AppleStyleSettings() {
                   </form>
                 </div>
 
-                {/* Two-Factor Auth */}
-
                 {/* Logout Button */}
                 <div className="p-6 pt-4">
                   <Button
@@ -436,6 +631,41 @@ export default function AppleStyleSettings() {
                   >
                     {t("Log_Out")}
                   </Button>
+                </div>
+              </div>
+            )}
+
+            {activeTab === "privacy" && (
+              <div>
+                <div className="p-6 border-b border-gray-100">
+                  <h2 className="text-xl font-semibold text-gray-900">
+                    {t("Privacy_Settings")}
+                  </h2>
+                  <p className="text-gray-600 mt-1">
+                    {t("Control_your_profile_privacy_and_visibility")}
+                  </p>
+                </div>
+
+                {/* Anonymous Bidding */}
+                <div className="border-b border-gray-100">
+                  <SettingRow
+                    icon={Eye}
+                    label={t("Show_Public_Profile")}
+                    description={t(
+                      "Allow_others_to_view_your_public_profile_when_they_award_you_projects"
+                    )}
+                  >
+                    <Switch
+                      checked={showPublicProfile}
+                      onCheckedChange={(checked) =>
+                        updateProfileSetting(
+                          "showPublicProfile",
+                          checked,
+                          t("Public_profile_settings_updated")
+                        )
+                      }
+                    />
+                  </SettingRow>
                 </div>
               </div>
             )}

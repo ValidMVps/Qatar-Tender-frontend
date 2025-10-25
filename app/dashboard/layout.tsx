@@ -13,6 +13,7 @@ import {
   Briefcase,
   Star,
   BarChart,
+  User,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { motion } from "framer-motion";
@@ -43,6 +44,7 @@ export default function DashboardLayout({
       icon: Briefcase,
     },
     { name: t("ratings_reviews"), href: "/dashboard/ratings", icon: Star },
+    { name: t("profile"), href: "/dashboard/profile", icon: User },
     { name: t("settings"), href: "/dashboard/settings", icon: Settings },
     { name: t("help_support"), href: "/dashboard/help", icon: HelpCircle },
     { name: t("analytics"), href: "/dashboard/analytics", icon: BarChart },

@@ -38,59 +38,67 @@ import { profileApi } from "@/app/services/profileApi";
 import { toast } from "sonner";
 
 // Define props for SettingRow interface
+interface SettingRowProps {
+  icon: React.ElementType;
+  label: string;
+  description?: string;
+  children: React.ReactNode;
+  className?: string;
+}
+
+// Define tab types
+type TabId = "general" | "security" | "privacy";
 
 export default function AppleStyleSettings() {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState < TabId > "general";
+  const [activeTab, setActiveTab] = useState<TabId>("general");
 
   // General Settings - initialized as empty, will be populated by API
-  const [companyName, setCompanyName] = useState < string > "";
-  const [industry, setIndustry] = useState < string > "";
-  const [contactPerson, setContactPerson] = useState < string > "";
-  const [companyEmail, setCompanyEmail] = useState < string > "";
-  const [personalEmail, setPersonalEmail] = useState < string > "";
-  const [companyDescription, setCompanyDescription] = useState < string > "";
-  const [companyLogo, setCompanyLogo] = useState < string > "";
+  const [companyName, setCompanyName] = useState<string>("");
+  const [industry, setIndustry] = useState<string>("");
+  const [contactPerson, setContactPerson] = useState<string>("");
+  const [companyEmail, setCompanyEmail] = useState<string>("");
+  const [personalEmail, setPersonalEmail] = useState<string>("");
+  const [companyDescription, setCompanyDescription] = useState<string>("");
+  const [companyLogo, setCompanyLogo] = useState<string>("");
 
   // Privacy Settings
-  const [anonymousBidding, setAnonymousBidding] = useState < boolean > true;
-  const [showPublicProfile, setShowPublicProfile] = useState < boolean > false;
-  const [profileVisibility, setProfileVisibility] =
-    (useState < "public") | ("private" > "private");
+  const [anonymousBidding, setAnonymousBidding] = useState<boolean>(true);
+  const [showPublicProfile, setShowPublicProfile] = useState<boolean>(false);
+  const [profileVisibility, setProfileVisibility] = useState<
+    "public" | "private"
+  >("private");
 
   // Notification Settings
   const [notificationsEnabled, setNotificationsEnabled] =
-    useState < boolean > true;
-  const [soundEnabled, setSoundEnabled] = useState < boolean > true;
-  const [pushNotifications, setPushNotifications] = useState < boolean > true;
+    useState<boolean>(true);
+  const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
+  const [pushNotifications, setPushNotifications] = useState<boolean>(true);
 
   // Security Settings
-  const [currentPassword, setCurrentPassword] = useState < string > "";
-  const [newPassword, setNewPassword] = useState < string > "";
-  const [confirmPassword, setConfirmPassword] = useState < string > "";
-  const [passwordError, setPasswordError] = useState < string > "";
-  const [passwordSuccess, setPasswordSuccess] = useState < string > "";
-  const [passwordLoading, setPasswordLoading] = useState < boolean > false;
-  const [twoFactorAuth, setTwoFactorAuth] = useState < boolean > false;
-  const [autoLock, setAutoLock] = useState < string > "15";
+  const [currentPassword, setCurrentPassword] = useState<string>("");
+  const [newPassword, setNewPassword] = useState<string>("");
+  const [confirmPassword, setConfirmPassword] = useState<string>("");
+  const [passwordError, setPasswordError] = useState<string>("");
+  const [passwordSuccess, setPasswordSuccess] = useState<string>("");
+  const [passwordLoading, setPasswordLoading] = useState<boolean>(false);
+  const [twoFactorAuth, setTwoFactorAuth] = useState<boolean>(false);
+  const [autoLock, setAutoLock] = useState<string>("15");
 
   // Appearance & Language
-  const [appLanguage, setAppLanguage] = useState < string > "en";
-  const [theme, setTheme] = (useState < "light") | "dark" | ("auto" > "light");
-  const [fontSize, setFontSize] = useState < string > "medium";
-  const [reducedMotion, setReducedMotion] = useState < boolean > false;
+  const [appLanguage, setAppLanguage] = useState<string>("en");
+  const [theme, setTheme] = useState<"light" | "dark" | "auto">("light");
+  const [fontSize, setFontSize] = useState<string>("medium");
+  const [reducedMotion, setReducedMotion] = useState<boolean>(false);
 
   // Dark mode state
-  const [isDark, setIsDark] =
-    useState <
-    boolean >
-    (() => {
-      if (typeof window !== "undefined") {
-        const saved = localStorage.getItem("darkMode");
-        return saved === "true";
-      }
-      return false;
-    });
+  const [isDark, setIsDark] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("darkMode");
+      return saved === "true";
+    }
+    return false;
+  });
 
   // Load profile data on mount
   useEffect(() => {
@@ -110,7 +118,7 @@ export default function AppleStyleSettings() {
 
   // Sync with other tabs
   useEffect(() => {
-    const handleStorage = () => {
+    const handleStorage = (e: StorageEvent) => {
       if (e.key === "darkMode") {
         setIsDark(e.newValue === "true");
       }
@@ -167,7 +175,11 @@ export default function AppleStyleSettings() {
   };
 
   // Update profile setting through API
-  const updateProfileSetting = async () => {
+  const updateProfileSetting = async (
+    field: string,
+    value: any,
+    successMessage: string
+  ) => {
     try {
       const result = await profileApi.updateProfile({
         [field]: value,
@@ -229,7 +241,7 @@ export default function AppleStyleSettings() {
           setAutoLock(value);
           break;
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(`Failed to update ${field}:`, err);
       toast.error(
         err.message ||
@@ -245,7 +257,7 @@ export default function AppleStyleSettings() {
     { id: "privacy", label: t("Privacy_Settings"), icon: EyeOff },
   ];
 
-  const handleSave = (e) => {
+  const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
     console.log(t("Saving_settings..."));
   };
@@ -254,7 +266,7 @@ export default function AppleStyleSettings() {
     authService.logout();
   };
 
-  const handleLogoUpload = async (e) => {
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
 
@@ -270,7 +282,7 @@ export default function AppleStyleSettings() {
         );
 
         setCompanyLogo(uploadedUrl);
-      } catch (err) {
+      } catch (err: any) {
         console.error("Failed to upload logo:", err);
         toast.error(t("Failed_to_upload_company_logo"));
       }
@@ -278,7 +290,7 @@ export default function AppleStyleSettings() {
   };
 
   // Helper function to upload files to cloudinary
-  const uploadToCloudinary = async (file) => {
+  const uploadToCloudinary = async (file: File): Promise<string> => {
     const formData = new FormData();
     formData.append("file", file);
     formData.append("upload_preset", "your_upload_preset");
@@ -301,7 +313,7 @@ export default function AppleStyleSettings() {
     description,
     children,
     className = "",
-  }) => (
+  }: SettingRowProps) => (
     <div
       className={`flex items-center justify-between py-4 px-6 border-b border-gray-100 last:border-b-0 ${className}`}
     >
@@ -320,7 +332,7 @@ export default function AppleStyleSettings() {
     </div>
   );
 
-  const handleChangePassword = async (e) => {
+  const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setPasswordError("");
     setPasswordSuccess("");
@@ -379,7 +391,7 @@ export default function AppleStyleSettings() {
               return (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
+                  onClick={() => setActiveTab(tab.id as TabId)}
                   className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
                     activeTab === tab.id
                       ? "bg-white text-gray-900 shadow-sm"
@@ -608,38 +620,6 @@ export default function AppleStyleSettings() {
                         : t("Update_Password")}
                     </Button>
                   </form>
-                </div>
-
-                {/* Two-Factor Authentication */}
-                <div className="p-6 border-b border-gray-100">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">
-                    {t("Two_Factor_Authentication")}
-                  </h3>
-                  <div className="max-w-md">
-                    <p className="text-gray-600 mb-4">
-                      {t("Add_an_extra_layer_of_security_to_your_account")}
-                    </p>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium text-gray-900">
-                          {t("Enable_2FA")}
-                        </p>
-                        <p className="text-sm text-gray-500">
-                          {t("Protect_your_account_with_two_factor_auth")}
-                        </p>
-                      </div>
-                      <Switch
-                        checked={twoFactorAuth}
-                        onCheckedChange={(checked) =>
-                          updateProfileSetting(
-                            "twoFactorAuth",
-                            checked,
-                            t("2FA_settings_updated")
-                          )
-                        }
-                      />
-                    </div>
-                  </div>
                 </div>
 
                 {/* Logout Button */}

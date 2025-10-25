@@ -228,11 +228,13 @@ export default function DashboardPage() {
     ...recentTenders.slice(0, 2).map((t) => ({
       type: "tender",
       title: t.title,
+      id: t._id,
       time: formatShortDate(t.createdAt),
     })),
     ...myBids.slice(0, 1).map((b) => ({
       type: "bid",
       title: b.tender.title,
+      id: b._id,
       time: formatShortDate(b.createdAt),
     })),
   ].slice(0, 3);
@@ -242,25 +244,34 @@ export default function DashboardPage() {
     title,
     icon: Icon,
     children,
+    href,
   }: {
     title: string;
     icon: React.ElementType;
     children: React.ReactNode;
-  }) => (
-    <motion.div className="bg-white/90 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-100/50 transition-all duration-300 h-full group">
-      <div className="p-6">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-50 to-blue-100 rounded-full flex items-center justify-center transition-transform duration-300">
-            <Icon className="w-5 h-5 text-blue-600" />
+    href?: string;
+  }) => {
+    const cardContent = (
+      <motion.div
+        whileHover={{ scale: href ? 1.02 : 1 }}
+        className="bg-white/90 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-100/50 transition-all duration-300 h-full group cursor-pointer"
+      >
+        <div className="p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-50 to-blue-100 rounded-full flex items-center justify-center transition-transform duration-300">
+              <Icon className="w-5 h-5 text-blue-600" />
+            </div>
+            <h3 className="text-sm font-medium text-gray-600 tracking-wide">
+              {title}
+            </h3>
           </div>
-          <h3 className="text-sm font-medium text-gray-600 tracking-wide">
-            {title}
-          </h3>
+          <div className="space-y-3">{children}</div>
         </div>
-        <div className="space-y-3">{children}</div>
-      </div>
-    </motion.div>
-  );
+      </motion.div>
+    );
+
+    return href ? <Link href={href}>{cardContent}</Link> : cardContent;
+  };
 
   // Apple-style Badge Component
   const AppleBadge = ({
@@ -357,14 +368,23 @@ export default function DashboardPage() {
               transition={{ duration: 0.6, ease: "easeOut" }}
             >
               {/* Recent Activity */}
-              <KpiCard title="Recent Activity" icon={ClipboardList}>
+              <KpiCard
+                title="Recent Activity"
+                icon={ClipboardList}
+                href="/business-dashboard/my-tenders" // default link
+              >
                 {recentActivity.length === 0 ? (
                   <p className="text-gray-400 text-sm">No recent activity</p>
                 ) : (
                   recentActivity.map((act, i) => (
-                    <div
+                    <Link
                       key={i}
-                      className="flex items-center justify-between py-2 px-3 bg-gray-50/50 rounded-xl"
+                      href={
+                        act.type === "tender"
+                          ? `/business-dashboard/tender/${act.id || "#"}`
+                          : "/business-dashboard/bids"
+                      }
+                      className="flex items-center justify-between py-2 px-3 bg-gray-50/50 rounded-xl hover:bg-gray-100 transition"
                     >
                       <div className="flex items-center gap-3">
                         <div
@@ -382,13 +402,17 @@ export default function DashboardPage() {
                       <span className="text-xs text-gray-500 font-medium">
                         {act.time}
                       </span>
-                    </div>
+                    </Link>
                   ))
                 )}
               </KpiCard>
 
               {/* Bid Summary */}
-              <KpiCard title="Bid Summary" icon={TrendingUp}>
+              <KpiCard
+                title="Bid Summary"
+                icon={TrendingUp}
+                href="/business-dashboard/bids"
+              >
                 {Object.entries(bidStatusSummary).map(([status, count]) => (
                   <div
                     key={status}
@@ -408,7 +432,11 @@ export default function DashboardPage() {
               </KpiCard>
 
               {/* Tender Status */}
-              <KpiCard title="Tender Status" icon={BarChart2}>
+              <KpiCard
+                title="Tender Status"
+                icon={BarChart2}
+                href="/business-dashboard/my-tenders"
+              >
                 {["active", "awarded", "completed", "rejected", "closed"].map(
                   (status) => {
                     const count = tenderStatusSummary[status];
@@ -449,7 +477,7 @@ export default function DashboardPage() {
                   upcomingDeadlines.map((item, i) => (
                     <Link
                       key={i}
-                      href={`/business-dashboard/tender/${item.id}`} // adjust path to match your route
+                      href={`/business-dashboard/tender/${item.id}`}
                       className="flex items-center justify-between py-2 px-3 bg-amber-50/50 rounded-xl border border-amber-100/50 hover:bg-amber-100 transition"
                     >
                       <span className="text-sm text-gray-700 truncate max-w-[140px]">

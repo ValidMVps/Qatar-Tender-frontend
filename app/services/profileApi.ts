@@ -19,6 +19,17 @@ interface ProfileData {
   nationalIdBack?: string;
   commercialRegistrationNumber?: string;
   commercialRegistrationDoc?: string;
+  themePreference: any;
+  anonymousBidding: any;
+  profileVisibility: any;
+  showPublicProfile: any;
+  fontSizePreference: any;
+  notificationsEnabled: any;
+  soundEnabled: any;
+  pushNotifications: any;
+  twoFactorAuth: any;
+  autoLock: any;
+  reducedMotion: any;
 }
 
 interface UpdateProfileResponse {
@@ -77,7 +88,9 @@ export const profileApi = {
   },
 
   // Submit documents for verification
-  submitDocuments: async (documentsData: DocumentSubmissionData): Promise<{ message: string }> => {
+  submitDocuments: async (
+    documentsData: DocumentSubmissionData
+  ): Promise<{ message: string }> => {
     try {
       const response = await api.put(
         "/api/profiles/submit-documents",
