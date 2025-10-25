@@ -26,11 +26,15 @@ import {
   User,
   Smartphone,
   Volume2,
+  EyeOff,
+  Eye,
 } from "lucide-react";
 import { authService } from "@/utils/auth";
 import PageTransitionWrapper from "@/components/animations/PageTransitionWrapper";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import useTranslation from "@/lib/hooks/useTranslation";
+import { profileApi } from "@/app/services/profileApi";
+import { toast } from "@/components/ui/use-toast";
 
 // Define props for SettingRow interface
 interface SettingRowProps {
@@ -42,27 +46,27 @@ interface SettingRowProps {
 }
 
 // Define tab types
-type TabId = "general" | "security";
+type TabId = "general" | "security" | "privacy";
 
 export default function AppleStyleSettings() {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<TabId>("general");
 
-  // General Settings
-  const [companyName, setCompanyName] = useState<string>(
-    t("Acme_Solutions_Inc.")
-  );
-  const [industry, setIndustry] = useState<string>(t("Construction"));
-  const [contactPerson, setContactPerson] = useState<string>(t("Jane_Doe"));
-  const [companyEmail, setCompanyEmail] = useState<string>(
-    t("info@acmesolutions.com")
-  );
-  const [companyLogo, setCompanyLogo] = useState<string>(
-    "/placeholder.svg?height=100&width=100&text=Company+Logo"
-  );
-  const [autoSave, setAutoSave] = useState<boolean>(true);
-  const [dataSync, setDataSync] = useState<boolean>(true);
-  const [offlineMode, setOfflineMode] = useState<boolean>(false);
+  // General Settings - initialized as empty, will be populated by API
+  const [companyName, setCompanyName] = useState<string>("");
+  const [industry, setIndustry] = useState<string>("");
+  const [contactPerson, setContactPerson] = useState<string>("");
+  const [companyEmail, setCompanyEmail] = useState<string>("");
+  const [personalEmail, setPersonalEmail] = useState<string>("");
+  const [companyDescription, setCompanyDescription] = useState<string>("");
+  const [companyLogo, setCompanyLogo] = useState<string>("");
+
+  // Privacy Settings
+  const [anonymousBidding, setAnonymousBidding] = useState<boolean>(true);
+  const [showPublicProfile, setShowPublicProfile] = useState<boolean>(false);
+  const [profileVisibility, setProfileVisibility] = useState<
+    "public" | "private"
+  >("private");
 
   // Notification Settings
   const [notificationsEnabled, setNotificationsEnabled] =
@@ -86,7 +90,7 @@ export default function AppleStyleSettings() {
   const [fontSize, setFontSize] = useState<string>("medium");
   const [reducedMotion, setReducedMotion] = useState<boolean>(false);
 
-  // 🔹 Dark mode state — only manage, don't apply filter
+  // Dark mode state
   const [isDark, setIsDark] = useState<boolean>(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("darkMode");
@@ -95,16 +99,22 @@ export default function AppleStyleSettings() {
     return false;
   });
 
+  // Load profile data on mount
+  useEffect(() => {
+    loadProfileData();
+  }, []);
+
   // Save to localStorage when toggled
   useEffect(() => {
     localStorage.setItem("darkMode", isDark.toString());
 
-    // 🔥 Dispatch custom event to notify all listeners
+    // Dispatch custom event to notify all listeners
     const event = new CustomEvent("darkModeChange", {
       detail: { dark: isDark },
     });
     window.dispatchEvent(event);
   }, [isDark]);
+
   // Sync with other tabs
   useEffect(() => {
     const handleStorage = (e: StorageEvent) => {
@@ -116,9 +126,134 @@ export default function AppleStyleSettings() {
     return () => window.removeEventListener("storage", handleStorage);
   }, []);
 
+  // Load current profile settings from backend
+  const loadProfileData = async () => {
+    try {
+      const profile = await profileApi.getProfile();
+
+      // Set privacy settings
+      setAnonymousBidding(profile.anonymousBidding ?? true);
+      setShowPublicProfile(profile.showPublicProfile ?? false);
+      setProfileVisibility(profile.profileVisibility || "private");
+
+      // Set company info
+      if (profile.companyName) setCompanyName(profile.companyName);
+      if (profile.contactPersonName)
+        setContactPerson(profile.contactPersonName);
+      if (profile.companyEmail) setCompanyEmail(profile.companyEmail);
+      if (profile.personalEmail) setPersonalEmail(profile.personalEmail);
+      if (profile.companyDesc) setCompanyDescription(profile.companyDesc);
+      if (profile.commercialRegistrationDoc)
+        setCompanyLogo(profile.commercialRegistrationDoc);
+
+      // Set appearance preferences
+      if (profile.themePreference) setTheme(profile.themePreference);
+      if (profile.fontSizePreference) setFontSize(profile.fontSizePreference);
+      if (profile.reducedMotion !== undefined)
+        setReducedMotion(profile.reducedMotion);
+
+      // Set notification preferences
+      if (profile.notificationsEnabled !== undefined)
+        setNotificationsEnabled(profile.notificationsEnabled);
+      if (profile.soundEnabled !== undefined)
+        setSoundEnabled(profile.soundEnabled);
+      if (profile.pushNotifications !== undefined)
+        setPushNotifications(profile.pushNotifications);
+
+      // Set security preferences
+      if (profile.twoFactorAuth !== undefined)
+        setTwoFactorAuth(profile.twoFactorAuth);
+      if (profile.autoLock) setAutoLock(profile.autoLock);
+    } catch (err) {
+      console.error("Failed to load profile:", err);
+      toast.error(
+        t("failed_to_load_profile_settings") ||
+          "Failed to load profile settings"
+      );
+    }
+  };
+
+  // Update profile setting through API
+  const updateProfileSetting = async (
+    field: string,
+    value: any,
+    successMessage: string
+  ) => {
+    try {
+      const result = await profileApi.updateProfile({
+        [field]: value,
+      });
+
+      toast.success(successMessage);
+
+      // Update local state based on field
+      switch (field) {
+        case "anonymousBidding":
+          setAnonymousBidding(value);
+          break;
+        case "showPublicProfile":
+          setShowPublicProfile(value);
+          break;
+        case "profileVisibility":
+          setProfileVisibility(value);
+          break;
+        case "companyName":
+          setCompanyName(value);
+          break;
+        case "contactPersonName":
+          setContactPerson(value);
+          break;
+        case "companyEmail":
+          setCompanyEmail(value);
+          break;
+        case "personalEmail":
+          setPersonalEmail(value);
+          break;
+        case "companyDesc":
+          setCompanyDescription(value);
+          break;
+        case "commercialRegistrationDoc":
+          setCompanyLogo(value);
+          break;
+        case "themePreference":
+          setTheme(value);
+          break;
+        case "fontSizePreference":
+          setFontSize(value);
+          break;
+        case "reducedMotion":
+          setReducedMotion(value);
+          break;
+        case "notificationsEnabled":
+          setNotificationsEnabled(value);
+          break;
+        case "soundEnabled":
+          setSoundEnabled(value);
+          break;
+        case "pushNotifications":
+          setPushNotifications(value);
+          break;
+        case "twoFactorAuth":
+          setTwoFactorAuth(value);
+          break;
+        case "autoLock":
+          setAutoLock(value);
+          break;
+      }
+    } catch (err: any) {
+      console.error(`Failed to update ${field}:`, err);
+      toast.error(
+        err.message ||
+          t("failed_to_update_setting") ||
+          "Failed to update setting"
+      );
+    }
+  };
+
   const tabs = [
     { id: "general", label: t("General"), icon: Settings },
     { id: "security", label: t("Security_&_Privacy"), icon: Shield },
+    { id: "privacy", label: t("Privacy_Settings"), icon: EyeOff },
   ];
 
   const handleSave = (e: React.FormEvent) => {
@@ -130,11 +265,45 @@ export default function AppleStyleSettings() {
     authService.logout();
   };
 
-  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      setCompanyLogo(URL.createObjectURL(file));
+
+      try {
+        // Upload to Cloudinary or your storage service
+        const uploadedUrl = await uploadToCloudinary(file);
+
+        // Update profile with new logo
+        await updateProfileSetting(
+          "commercialRegistrationDoc",
+          uploadedUrl,
+          t("Company_logo_updated_successfully")
+        );
+
+        setCompanyLogo(uploadedUrl);
+      } catch (err: any) {
+        console.error("Failed to upload logo:", err);
+        toast.error(t("Failed_to_upload_company_logo"));
+      }
     }
+  };
+
+  // Helper function to upload files to cloudinary
+  const uploadToCloudinary = async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "your_upload_preset");
+
+    const response = await fetch(
+      `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+
+    const data = await response.json();
+    return data.secure_url;
   };
 
   const SettingRow = ({
@@ -259,7 +428,13 @@ export default function AppleStyleSettings() {
                   >
                     <Switch
                       checked={notificationsEnabled}
-                      onCheckedChange={setNotificationsEnabled}
+                      onCheckedChange={(checked) =>
+                        updateProfileSetting(
+                          "notificationsEnabled",
+                          checked,
+                          t("Notification_settings_updated")
+                        )
+                      }
                     />
                   </SettingRow>
 
@@ -270,7 +445,13 @@ export default function AppleStyleSettings() {
                   >
                     <Switch
                       checked={soundEnabled}
-                      onCheckedChange={setSoundEnabled}
+                      onCheckedChange={(checked) =>
+                        updateProfileSetting(
+                          "soundEnabled",
+                          checked,
+                          t("Sound_settings_updated")
+                        )
+                      }
                       disabled={!notificationsEnabled}
                     />
                   </SettingRow>
@@ -311,7 +492,16 @@ export default function AppleStyleSettings() {
                     label={t("Font_Size")}
                     description={t("Adjust_text_size_for_better_readability")}
                   >
-                    <Select value={fontSize} onValueChange={setFontSize}>
+                    <Select
+                      value={fontSize}
+                      onValueChange={(value) =>
+                        updateProfileSetting(
+                          "fontSizePreference",
+                          value,
+                          t("Font_size_updated")
+                        )
+                      }
+                    >
                       <SelectTrigger className="w-32">
                         <SelectValue />
                       </SelectTrigger>
@@ -331,7 +521,13 @@ export default function AppleStyleSettings() {
                   >
                     <Switch
                       checked={reducedMotion}
-                      onCheckedChange={setReducedMotion}
+                      onCheckedChange={(checked) =>
+                        updateProfileSetting(
+                          "reducedMotion",
+                          checked,
+                          t("Motion_settings_updated")
+                        )
+                      }
                     />
                   </SettingRow>
                 </div>
@@ -425,7 +621,37 @@ export default function AppleStyleSettings() {
                   </form>
                 </div>
 
-                {/* Two-Factor Auth */}
+                {/* Two-Factor Authentication */}
+                <div className="p-6 border-b border-gray-100">
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">
+                    {t("Two_Factor_Authentication")}
+                  </h3>
+                  <div className="max-w-md">
+                    <p className="text-gray-600 mb-4">
+                      {t("Add_an_extra_layer_of_security_to_your_account")}
+                    </p>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium text-gray-900">
+                          {t("Enable_2FA")}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          {t("Protect_your_account_with_two_factor_auth")}
+                        </p>
+                      </div>
+                      <Switch
+                        checked={twoFactorAuth}
+                        onCheckedChange={(checked) =>
+                          updateProfileSetting(
+                            "twoFactorAuth",
+                            checked,
+                            t("2FA_settings_updated")
+                          )
+                        }
+                      />
+                    </div>
+                  </div>
+                </div>
 
                 {/* Logout Button */}
                 <div className="p-6 pt-4">
@@ -436,6 +662,293 @@ export default function AppleStyleSettings() {
                   >
                     {t("Log_Out")}
                   </Button>
+                </div>
+              </div>
+            )}
+
+            {activeTab === "privacy" && (
+              <div>
+                <div className="p-6 border-b border-gray-100">
+                  <h2 className="text-xl font-semibold text-gray-900">
+                    {t("Privacy_Settings")}
+                  </h2>
+                  <p className="text-gray-600 mt-1">
+                    {t("Control_your_profile_privacy_and_visibility")}
+                  </p>
+                </div>
+
+                {/* Anonymous Bidding */}
+                <div className="border-b border-gray-100">
+                  <div className="p-6 pb-0">
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">
+                      {t("Bidding_Privacy")}
+                    </h3>
+                    <p className="text-gray-600 mb-4">
+                      {t(
+                        "Control_whether_your_identity_is_shown_when_bidding_on_tenders"
+                      )}
+                    </p>
+                  </div>
+
+                  <SettingRow
+                    icon={EyeOff}
+                    label={t("Bid_Anonymously")}
+                    description={t(
+                      "Your_company_name_will_be_hidden_from_tender_owners_when_you_place_bids"
+                    )}
+                  >
+                    <Switch
+                      checked={anonymousBidding}
+                      onCheckedChange={(checked) =>
+                        updateProfileSetting(
+                          "anonymousBidding",
+                          checked,
+                          t("Bidding_privacy_updated")
+                        )
+                      }
+                    />
+                  </SettingRow>
+
+                  <SettingRow
+                    icon={Eye}
+                    label={t("Show_Public_Profile")}
+                    description={t(
+                      "Allow_others_to_view_your_public_profile_when_they_award_you_projects"
+                    )}
+                  >
+                    <Switch
+                      checked={showPublicProfile}
+                      onCheckedChange={(checked) =>
+                        updateProfileSetting(
+                          "showPublicProfile",
+                          checked,
+                          t("Public_profile_settings_updated")
+                        )
+                      }
+                      disabled={anonymousBidding}
+                    />
+                  </SettingRow>
+                </div>
+
+                {/* Profile Visibility */}
+                <div className="border-b border-gray-100">
+                  <div className="p-6 pb-0">
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">
+                      {t("Profile_Visibility")}
+                    </h3>
+                    <p className="text-gray-600 mb-4">
+                      {t("Control_how_much_information_is_visible_to_others")}
+                    </p>
+                  </div>
+
+                  <SettingRow
+                    icon={User}
+                    label={t("Profile_Preference")}
+                    description={t("Choose_how_your_profile_appears_to_others")}
+                  >
+                    <Select
+                      value={profileVisibility}
+                      onValueChange={(value) =>
+                        updateProfileSetting(
+                          "profileVisibility",
+                          value,
+                          t("Profile_visibility_updated")
+                        )
+                      }
+                    >
+                      <SelectTrigger className="w-40">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="private">
+                          {t("Private")} - {t("Only_admins_can_see_my_info")}
+                        </SelectItem>
+                        <SelectItem value="limited">
+                          {t("Limited")} -{" "}
+                          {t(
+                            "Other_businesses_can_see_my_rating_and_completed_projects"
+                          )}
+                        </SelectItem>
+                        <SelectItem value="public">
+                          {t("Public")} -{" "}
+                          {t("Everyone_can_see_my_profile_details")}
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </SettingRow>
+                </div>
+
+                {/* Company Information */}
+                <div className="border-b border-gray-100">
+                  <div className="p-6 pb-0">
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">
+                      {t("Company_Information")}
+                    </h3>
+                    <p className="text-gray-600 mb-4">
+                      {t("These_details_will_be_used_in_communications")}
+                    </p>
+                  </div>
+
+                  <div className="p-6 border-t border-gray-100">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <Label
+                          htmlFor="companyName"
+                          className="text-sm font-medium text-gray-700"
+                        >
+                          {t("Company_Name")}
+                        </Label>
+                        <Input
+                          id="companyName"
+                          value={companyName}
+                          onChange={(e) => setCompanyName(e.target.value)}
+                          placeholder={t("Enter_company_name")}
+                          disabled={!showPublicProfile}
+                          className="mt-1"
+                        />
+                      </div>
+
+                      <div>
+                        <Label
+                          htmlFor="contactPerson"
+                          className="text-sm font-medium text-gray-700"
+                        >
+                          {t("Contact_Person")}
+                        </Label>
+                        <Input
+                          id="contactPerson"
+                          value={contactPerson}
+                          onChange={(e) => setContactPerson(e.target.value)}
+                          placeholder={t("Enter_contact_person_name")}
+                          disabled={!showPublicProfile}
+                          className="mt-1"
+                        />
+                      </div>
+
+                      <div>
+                        <Label
+                          htmlFor="companyEmail"
+                          className="text-sm font-medium text-gray-700"
+                        >
+                          {t("Company_Email")}
+                        </Label>
+                        <Input
+                          id="companyEmail"
+                          value={companyEmail}
+                          onChange={(e) => setCompanyEmail(e.target.value)}
+                          placeholder={t("Enter_company_email")}
+                          disabled={!showPublicProfile}
+                          className="mt-1"
+                        />
+                      </div>
+
+                      <div>
+                        <Label
+                          htmlFor="personalEmail"
+                          className="text-sm font-medium text-gray-700"
+                        >
+                          {t("Personal_Email")}
+                        </Label>
+                        <Input
+                          id="personalEmail"
+                          value={personalEmail}
+                          onChange={(e) => setPersonalEmail(e.target.value)}
+                          placeholder={t("Enter_personal_email")}
+                          disabled={!showPublicProfile}
+                          className="mt-1"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <Label
+                          htmlFor="companyDescription"
+                          className="text-sm font-medium text-gray-700"
+                        >
+                          {t("Company_Description")}
+                        </Label>
+                        <textarea
+                          id="companyDescription"
+                          value={companyDescription}
+                          onChange={(e) =>
+                            setCompanyDescription(e.target.value)
+                          }
+                          placeholder={t(
+                            "Describe_your_company_services_and_expertise"
+                          )}
+                          rows={4}
+                          disabled={!showPublicProfile}
+                          className="w-full rounded-xl border border-gray-200 p-3 mt-1 min-h-[100px] resize-none"
+                        />
+                      </div>
+
+                      <div>
+                        <Label className="text-sm font-medium text-gray-700">
+                          {t("Company_Logo")}
+                        </Label>
+                        <div className="mt-1">
+                          {companyLogo ? (
+                            <div className="relative rounded-lg border-2 border-dashed border-gray-300 p-4">
+                              <img
+                                src={companyLogo}
+                                alt="Company Logo"
+                                className="max-h-48 object-contain"
+                              />
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => setCompanyLogo("")}
+                                className="absolute top-2 right-2 bg-white/80 hover:bg-white rounded-full"
+                                disabled={!showPublicProfile}
+                              >
+                                <XCircle className="h-4 w-4 text-gray-500" />
+                              </Button>
+                            </div>
+                          ) : (
+                            <div className="flex flex-col items-center justify-center px-6 pt-5 pb-6">
+                              <svg
+                                className="mx-auto h-12 w-12 text-gray-400"
+                                stroke="currentColor"
+                                fill="none"
+                                viewBox="0 0 48 48"
+                                aria-hidden="true"
+                              >
+                                <path
+                                  d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-8m32-12H12m32 0a4 4 0 014 4v6a4 4 0 01-4 4H12a4 4 0 01-4-4v-6a4 4 0 014-4h36z"
+                                  strokeWidth={2}
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                              </svg>
+                              <div className="flex text-sm text-gray-600">
+                                <label
+                                  htmlFor="image-upload"
+                                  className="relative cursor-pointer rounded-md bg-white font-medium text-blue-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 hover:text-blue-500"
+                                >
+                                  <span>{t("upload_a_file")}</span>
+                                  <input
+                                    id="image-upload"
+                                    name="image-upload"
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleLogoUpload}
+                                    className="sr-only"
+                                  />
+                                </label>
+                                <p className="pl-1">{t("or_drag_and_drop")}</p>
+                              </div>
+                              <p className="text-xs text-gray-500">
+                                {t("png_jpg_gif_up_to_10mb")}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}

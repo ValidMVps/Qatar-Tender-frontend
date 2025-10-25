@@ -54,7 +54,7 @@ export const profileApi = {
   },
 
   // Update profile
-  updateProfile: async (profileData: Partial<ProfileData>): Promise<UpdateProfileResponse> => {
+  updateProfile: async (profileData: any) => {
     try {
       const response = await api.put("/api/profiles", profileData);
       return response.data;

@@ -114,6 +114,7 @@ export default function TenderDetailsPage({ params }: PageProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [hasUserBid, setHasUserBid] = useState(false);
+  const [canviewtenderifno, setcanviewtenderifno] = useState(false);
   const { t } = useTranslation();
   const router = useRouter();
   const { profile } = useAuth();
@@ -162,7 +163,13 @@ export default function TenderDetailsPage({ params }: PageProps) {
     };
     if (id) loadTenderDetails();
   }, [id]);
-
+  useEffect(() => {
+    if (userBid) {
+      setcanviewtenderifno(
+        userBid.status === "accepted" || userBid.paymentStatus === "completed"
+      );
+    }
+  }, [userBid]);
   const getCategoryName = (category: any) => {
     if (typeof category === "string") return category;
     if (category?.name) return category.name;
@@ -321,15 +328,17 @@ export default function TenderDetailsPage({ params }: PageProps) {
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
                             <h3 className="font-semibold text-gray-900">
-                              {hasUserBid
+                              {canviewtenderifno
                                 ? tender.postedBy?.name ||
                                   tender.postedBy?.email ||
-                                  "Anonymous Client"
+                                  "Client"
                                 : "Anonymous Client"}
                             </h3>
-                            {tender.postedBy?.isVerified && (
-                              <CheckCircle className="h-4 w-4 text-blue-500" />
-                            )}
+
+                            {tender.postedBy?.isVerified &&
+                              canviewtenderifno && (
+                                <CheckCircle className="h-4 w-4 text-blue-500" />
+                              )}
                           </div>
                           <div className="flex items-center gap-4">
                             <p className="text-sm text-gray-600">
@@ -353,7 +362,7 @@ export default function TenderDetailsPage({ params }: PageProps) {
                         </div>
                       </div>
                       <div className="flex items-center gap-4 text-sm text-gray-600">
-                        {hasUserBid && (
+                        {canviewtenderifno && (
                           <div className="flex items-center gap-1">
                             <Mail className="h-4 w-4" />
                             <span>{tender.contactEmail}</span>
