@@ -64,7 +64,9 @@ interface Tender {
     name?: string;
     isVerified?: boolean;
     rating?: number;
+    profile: any;
     completedProjects?: number;
+    showPublicProfile?: boolean; // 👈 ADD THIS
   };
   createdAt: string;
   updatedAt: string;
@@ -164,12 +166,15 @@ export default function TenderDetailsPage({ params }: PageProps) {
     if (id) loadTenderDetails();
   }, [id]);
   useEffect(() => {
-    if (userBid) {
-      setcanviewtenderifno(
-        userBid.status === "accepted" || userBid.paymentStatus === "completed"
-      );
-    }
-  }, [userBid]);
+    if (!tender && !userBid) return;
+
+    setcanviewtenderifno(
+      (userBid &&
+        (userBid.status === "accepted" ||
+          userBid.paymentStatus === "completed")) ||
+        tender?.postedBy?.profile.showPublicProfile === true
+    );
+  }, [userBid, tender]);
   const getCategoryName = (category: any) => {
     if (typeof category === "string") return category;
     if (category?.name) return category.name;
