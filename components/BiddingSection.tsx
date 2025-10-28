@@ -1,8 +1,3 @@
-// ============================================
-// 1. UPDATE BIDDING SECTION COMPONENT
-// ============================================
-// File: components/BiddingSection.tsx
-
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -102,6 +97,7 @@ export default function BiddingSection({
       setSubmittingBid(false);
     }
   };
+
 
   const handleRedirectToPayment = () => {
     if (paymentUrl) {

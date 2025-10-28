@@ -86,6 +86,7 @@ interface Bid {
       rating?: number;
       ratingCount?: number;
       completedTenders?: number;
+      anonymousBidding?: boolean;
       onTimeDelivery?: number;
       phone?: string;
       address?: string;
@@ -176,6 +177,7 @@ export default function TenderDetailPage() {
       setError(null);
       const tenderData = await getTender(tenderId);
       const bidsData = await getTenderBids(tenderId);
+      console.log(bidsData);
       const questionsData = await getQuestionsForTender(tenderId);
       setTender(tenderData);
       setBids(bidsData);
@@ -631,9 +633,12 @@ export default function TenderDetailPage() {
                             <div className="flex-1">
                               <div className="flex items-center gap-2 mb-6">
                                 <h3 className="font-semibold text-gray-900 text-lg">
-                                  {bid.bidder.profile?.fullName ||
-                                    bid.bidder.profile?.companyName ||
-                                    bid.bidder.email.split("@")[0]}
+                                  {!bid.bidder.profile?.anonymousBidding ||
+                                  bid.status === "accepted"
+                                    ? bid.bidder.profile?.fullName ||
+                                      bid.bidder.profile?.companyName ||
+                                      bid.bidder.email.split("@")[0]
+                                    : "Anonymous Bidder"}
                                 </h3>
                                 {bid.bidder.isVerified && (
                                   <div className="flex items-center bg-blue-50 text-blue-700 px-2 py-1 rounded-full text-xs font-medium">
@@ -655,18 +660,22 @@ export default function TenderDetailPage() {
                                 )}
                               </div>
                               <div className="flex items-center justify-start gap-6">
-                                {bid.bidder.profile?.phone && (
-                                  <div className="flex items-center text-sm text-gray-500">
-                                    <Phone className="h-4 w-4 mr-2" />
-                                    {bid.bidder.profile.phone}
-                                  </div>
-                                )}
-                                {bid.bidder.profile?.address && (
-                                  <div className="flex items-center text-sm text-gray-500">
-                                    <MapPin className="h-4 w-4 mr-2" />
-                                    {bid.bidder.profile.address}
-                                  </div>
-                                )}
+                                {(!bid.bidder.profile?.anonymousBidding ||
+                                  bid.status === "accepted") &&
+                                  bid.bidder.profile?.phone && (
+                                    <div className="flex items-center text-sm text-gray-500">
+                                      <Phone className="h-4 w-4 mr-2" />
+                                      {bid.bidder.profile.phone}
+                                    </div>
+                                  )}
+                                {(!bid.bidder.profile?.anonymousBidding ||
+                                  bid.status === "accepted") &&
+                                  bid.bidder.profile?.address && (
+                                    <div className="flex items-center text-sm text-gray-500">
+                                      <MapPin className="h-4 w-4 mr-2" />
+                                      {bid.bidder.profile.address}
+                                    </div>
+                                  )}
                               </div>
                             </div>
                             <div className="text-right ml-4">
@@ -684,17 +693,21 @@ export default function TenderDetailPage() {
                             </p>
                           </div>
                           <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                            <Link
-                              href={
-                                profile?.userType !== "business"
-                                  ? `/dashboard/my-tenders/bidder-profile/${bid.bidder._id}`
-                                  : `/business-dashboard/my-tenders/bidder-profile/${bid.bidder._id}`
-                              }
-                              className="flex items-center text-blue-500 hover:text-blue-600 font-medium text-sm transition-colors"
-                            >
-                              View Profile
-                              <ExternalLink className="h-4 w-4 ml-1" />
-                            </Link>
+                            {(!bid.bidder.profile?.anonymousBidding ||
+                              bid.status === "accepted" ||
+                              bid.status === "completed") && (
+                              <Link
+                                href={
+                                  profile?.userType !== "business"
+                                    ? `/dashboard/my-tenders/bidder-profile/${bid.bidder._id}`
+                                    : `/business-dashboard/my-tenders/bidder-profile/${bid.bidder._id}`
+                                }
+                                className="flex items-center text-blue-500 hover:text-blue-600 font-medium text-sm transition-colors"
+                              >
+                                View Profile
+                                <ExternalLink className="h-4 w-4 ml-1" />
+                              </Link>
+                            )}
                             <div className="flex gap-2">
                               {bid.status === "submitted" && !hasAwardedBid && (
                                 <div className="flex gap-2">

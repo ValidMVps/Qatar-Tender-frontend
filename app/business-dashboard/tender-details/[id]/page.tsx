@@ -1,5 +1,5 @@
 "use client";
-import { useState, use, useEffect } from "react";
+import { useState, useEffect, use } from "react"; // Remove 'use' since we're not using it
 import Link from "next/link";
 import {
   CheckCircle,
@@ -35,7 +35,7 @@ import useTranslation from "@/lib/hooks/useTranslation";
 import { getTender } from "@/app/services/tenderService";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { createBid, getUserBids } from "@/app/services/BidService";
+import { createBid, getUserBids, deleteBid } from "@/app/services/BidService"; // Import deleteBid
 import QnaSection from "@/components/QnaSection";
 import PageTransitionWrapper from "@/components/animations/PageTransitionWrapper";
 import BiddingSection from "@/components/BiddingSection";
@@ -66,7 +66,7 @@ interface Tender {
     rating?: number;
     profile: any;
     completedProjects?: number;
-    showPublicProfile?: boolean; // 👈 ADD THIS
+    showPublicProfile?: boolean;
   };
   createdAt: string;
   updatedAt: string;
@@ -77,7 +77,6 @@ interface Bid {
   tender: {
     _id: string;
     title?: string;
-    // other fields if needed
   };
   bidder: {
     _id: string;
@@ -86,7 +85,7 @@ interface Bid {
   amount: number;
   description: string;
   paymentStatus: "pending" | "completed" | "failed";
-  status: "pending" | "accepted" | "rejected";
+  status: "pending" | "accepted" | "rejected" | "under_review";
   createdAt: string;
 }
 interface QuestionAnswer {
@@ -95,21 +94,18 @@ interface QuestionAnswer {
   answer: string | null;
   askedTime: string;
 }
-// Updated interface for Next.js 15
 interface PageProps {
   params: Promise<{ id: string }>;
 }
-// Multi-step form steps
 enum BidStep {
   BID_DETAILS = 1,
   REVIEW = 2,
   PAYMENT = 3,
   CONFIRMATION = 4,
 }
-// Mock data for Q&A (will be replaced with real API later)
+
 export default function TenderDetailsPage({ params }: PageProps) {
-  // Use the 'use' hook to unwrap the Promise
-  const { id } = use(params);
+  const { id } = use(params); // Unwrap params
   const [showApplyForm, setShowApplyForm] = useState(false);
   const [tender, setTender] = useState<Tender | null>(null);
   const [userBid, setUserBid] = useState<Bid | null>(null);
@@ -117,27 +113,25 @@ export default function TenderDetailsPage({ params }: PageProps) {
   const [error, setError] = useState<string | null>(null);
   const [hasUserBid, setHasUserBid] = useState(false);
   const [canviewtenderifno, setcanviewtenderifno] = useState(false);
+  const [retryingPayment, setRetryingPayment] = useState(false);
   const { t } = useTranslation();
   const router = useRouter();
   const { profile } = useAuth();
 
-  // Load tender details and check if user has already bid
+  // Load tender details and check user bids
   useEffect(() => {
     const loadTenderDetails = async () => {
       try {
         setLoading(true);
         setError(null);
-        // load tender
         const tenderData = await getTender(id);
         if (tenderData.postedBy) {
           tenderData.postedBy.rating = 4.7;
           tenderData.postedBy.completedProjects = 23;
         }
         setTender(tenderData);
-        // load user bids and check if one matches this tender id
         try {
           const userBids: Bid[] = (await getUserBids()) || [];
-          // normalize comparison
           const existingBid =
             userBids.find((bid: Bid) => {
               const bidTenderId =
@@ -150,7 +144,6 @@ export default function TenderDetailsPage({ params }: PageProps) {
           setHasUserBid(!!existingBid);
         } catch (bidsError) {
           console.error("Error loading user bids:", bidsError);
-          // optional: setHasUserBid(false)
         }
       } catch (err: any) {
         console.error("Error loading tender:", err);
@@ -165,9 +158,9 @@ export default function TenderDetailsPage({ params }: PageProps) {
     };
     if (id) loadTenderDetails();
   }, [id]);
-  useEffect(() => {
-    if (!tender && !userBid) return;
 
+  useEffect(() => {
+    if (!tender || !userBid) return;
     setcanviewtenderifno(
       (userBid &&
         (userBid.status === "accepted" ||
@@ -175,12 +168,41 @@ export default function TenderDetailsPage({ params }: PageProps) {
         tender?.postedBy?.profile.showPublicProfile === true
     );
   }, [userBid, tender]);
+
+  // Handle retry payment
+  const handleRetryPayment = async () => {
+    if (!userBid) return;
+    setRetryingPayment(true);
+    try {
+      // Delete the previous bid
+      await deleteBid(userBid._id);
+      // Create a new bid with the same data
+      const response = await createBid({
+        tender: id,
+        amount: userBid.amount,
+        description: userBid.description,
+      });
+      if (response.success && response.payment?.paymentUrl) {
+        // Redirect to the new payment URL
+        window.location.href = response.payment.paymentUrl;
+      } else {
+        throw new Error("Payment URL not received");
+      }
+    } catch (err: any) {
+      console.error("Error retrying payment:", err);
+      toast.error(err?.message || "Failed to retry payment");
+    } finally {
+      setRetryingPayment(false);
+    }
+  };
+
   const getCategoryName = (category: any) => {
     if (typeof category === "string") return category;
     if (category?.name) return category.name;
     if (category?.title) return category.title;
     return "General";
   };
+
   const getUserTypeLabel = (userType: string) => {
     switch (userType) {
       case "individual":
@@ -283,7 +305,6 @@ export default function TenderDetailsPage({ params }: PageProps) {
     <PageTransitionWrapper>
       <TooltipProvider>
         <div className="min-h-screen">
-          {" "}
           <div className="bg-white border-b border-gray-200">
             <div className="mx-auto px-4 sm:px-6 lg:px-14">
               <div className="flex items-center justify-between h-16">
@@ -299,10 +320,8 @@ export default function TenderDetailsPage({ params }: PageProps) {
           </div>
           <div className="container mx-auto py-1 lg:px-0">
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-              {/* Main Tender Details */}
               <div className="lg:col-span-3">
-                <div className="bg-white/80 backdrop-blur-xl rounded-2xl 5 overflow-hidden">
-                  {/* Header Section */}
+                <div className="bg-white/80 backdrop-blur-xl rounded-2xl overflow-hidden">
                   <div className="p-8 pb-6">
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-3 text-sm text-gray-500">
@@ -324,7 +343,6 @@ export default function TenderDetailsPage({ params }: PageProps) {
                     <h1 className="text-4xl font-bold text-gray-900 mb-6 leading-tight">
                       {tender.title}
                     </h1>
-                    {/* Client Information Card - Enhanced with rating */}
                     <div className="bg-blue-50/50 rounded-xl p-4 mb-6">
                       <div className="flex items-center gap-4 mb-3">
                         <div className="h-12 w-12 bg-blue-500 rounded-full flex items-center justify-center">
@@ -339,7 +357,6 @@ export default function TenderDetailsPage({ params }: PageProps) {
                                   "Client"
                                 : "Anonymous Client"}
                             </h3>
-
                             {tender.postedBy?.isVerified &&
                               canviewtenderifno && (
                                 <CheckCircle className="h-4 w-4 text-blue-500" />
@@ -375,9 +392,7 @@ export default function TenderDetailsPage({ params }: PageProps) {
                         )}
                       </div>
                     </div>
-                    {/* Key Information Grid */}
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                      {/* Budget */}
                       <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-5 border border-green-100">
                         <div className="flex items-center gap-2 mb-2">
                           <DollarSign className="h-5 w-5 text-green-600" />
@@ -389,7 +404,6 @@ export default function TenderDetailsPage({ params }: PageProps) {
                           ${tender.estimatedBudget?.toLocaleString()}
                         </p>
                       </div>
-                      {/* Deadline */}
                       <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-5 border border-blue-100">
                         <div className="flex items-center gap-2 mb-2">
                           <Calendar className="h-5 w-5 text-blue-600" />
@@ -401,7 +415,6 @@ export default function TenderDetailsPage({ params }: PageProps) {
                           {formatDate(tender.deadline)}
                         </p>
                       </div>
-                      {/* Location */}
                       <div className="bg-gradient-to-br from-purple-50 to-violet-50 rounded-xl p-5 border border-purple-100">
                         <div className="flex items-center gap-2 mb-2">
                           <MapPin className="h-5 w-5 text-purple-600" />
@@ -413,7 +426,6 @@ export default function TenderDetailsPage({ params }: PageProps) {
                           {tender.location}
                         </p>
                       </div>
-                      {/* Bids Placed */}
                       <div className="bg-gradient-to-br from-yellow-50 to-amber-50 rounded-xl p-5 border border-yellow-100">
                         <div className="flex items-center gap-2 mb-2">
                           <Star className="h-5 w-5 text-yellow-600" />
@@ -426,7 +438,6 @@ export default function TenderDetailsPage({ params }: PageProps) {
                         </p>
                       </div>
                     </div>
-                    {/* Status and Category */}
                     <div className="flex flex-wrap gap-3 mb-6">
                       <Badge
                         className={`px-4 py-2 rounded-full font-medium text-sm ${
@@ -447,7 +458,6 @@ export default function TenderDetailsPage({ params }: PageProps) {
                         {tender.category?.name}
                       </Badge>
                     </div>
-                    {/* Tender Image */}
                     {tender.image && (
                       <div className="mb-6">
                         <img
@@ -461,7 +471,6 @@ export default function TenderDetailsPage({ params }: PageProps) {
                       </div>
                     )}
                   </div>
-                  {/* Content Section */}
                   <div className="px-8 pb-8">
                     <h2 className="text-2xl font-bold text-gray-900 mb-4">
                       Project Description
@@ -481,12 +490,10 @@ export default function TenderDetailsPage({ params }: PageProps) {
                         </p>
                       </div>
                     )}
-                    {/* Q&A Section */}
                     <QnaSection tenderid={tender._id} />
                   </div>
                 </div>
               </div>
-              {/* Apply to Bid Sidebar */}
               <div className="lg:col-span-1 mt-5">
                 <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-gray-100/50 shadow-lg shadow-blue-500/5 sticky top-6">
                   <div className="p-6">
@@ -513,17 +520,70 @@ export default function TenderDetailsPage({ params }: PageProps) {
                         </span>
                       </div>
                       {userBid && (
-                        <div className="flex justify-between items-center text-sm">
-                          <span className="text-gray-600">Your Bid:</span>
-                          <span className="font-bold text-green-600">
-                            ${userBid.amount.toLocaleString()}
-                          </span>
-                        </div>
+                        <>
+                          <div className="flex justify-between items-center text-sm">
+                            <span className="text-gray-600">Your Bid:</span>
+                            <span className="font-bold text-green-600">
+                              ${userBid.amount.toLocaleString()}
+                            </span>
+                          </div>
+                          <div className="flex justify-between items-center text-sm">
+                            <span className="text-gray-600">Bid Status:</span>
+                            <Badge
+                              className={`px-2 py-1 text-xs ${
+                                userBid.status === "under_review"
+                                  ? "bg-yellow-100 text-yellow-700"
+                                  : userBid.status === "accepted"
+                                  ? "bg-green-100 text-green-700"
+                                  : userBid.status === "rejected"
+                                  ? "bg-red-100 text-red-700"
+                                  : "bg-gray-100 text-gray-700"
+                              }`}
+                            >
+                              {userBid.status}
+                            </Badge>
+                          </div>
+                          <div className="flex justify-between items-center text-sm">
+                            <span className="text-gray-600">
+                              Payment Status:
+                            </span>
+                            <Badge
+                              className={`px-2 py-1 text-xs ${
+                                userBid.paymentStatus === "failed"
+                                  ? "bg-red-100 text-red-700"
+                                  : userBid.paymentStatus === "completed"
+                                  ? "bg-green-100 text-green-700"
+                                  : "bg-gray-100 text-gray-700"
+                              }`}
+                            >
+                              {userBid.paymentStatus}
+                            </Badge>
+                          </div>
+                        </>
                       )}
                     </div>
                     {userBid ? (
-                      // Show My Bids button if user has already bid
                       <div className="space-y-3">
+                        {userBid.status === "under_review" &&
+                          userBid.paymentStatus === "failed" && (
+                            <Button
+                              onClick={handleRetryPayment}
+                              className="w-full bg-red-500 hover:bg-red-600 text-white rounded-xl py-3 font-medium transition-all duration-300 shadow-lg shadow-red-500/25"
+                              disabled={retryingPayment}
+                            >
+                              {retryingPayment ? (
+                                <div className="flex items-center justify-center">
+                                  <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                                  Retrying Payment...
+                                </div>
+                              ) : (
+                                <>
+                                  Retry Payment
+                                  <CreditCard className="h-4 w-4 ml-2" />
+                                </>
+                              )}
+                            </Button>
+                          )}
                         <Button
                           onClick={() =>
                             router.push("/business-dashboard/bids")
@@ -535,7 +595,6 @@ export default function TenderDetailsPage({ params }: PageProps) {
                       </div>
                     ) : tender.status === "active" &&
                       new Date(tender.deadline) > new Date() ? (
-                      // Show Submit Bid button if user hasn't bid and tender is active
                       <div className="space-y-3">
                         <Button
                           onClick={() => setShowApplyForm(true)}
@@ -545,7 +604,6 @@ export default function TenderDetailsPage({ params }: PageProps) {
                         </Button>
                       </div>
                     ) : (
-                      // Show inactive message
                       <div className="text-center py-6 bg-gray-50/50 rounded-xl">
                         <p className="text-gray-500 text-sm font-medium">
                           {tender.status !== "active"
@@ -559,7 +617,6 @@ export default function TenderDetailsPage({ params }: PageProps) {
               </div>
             </div>
           </div>
-          {/* Multi-Step Bid Form Modal */}
           {showApplyForm && (
             <BiddingSection
               tenderId={tender._id}

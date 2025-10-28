@@ -161,3 +161,18 @@ export const getBid = async (bidId: string) => {
     throw error;
   }
 };
+export const retryBidPayment = async (bidId: string) => {
+  try {
+    const res = await api.post(`/api/bids/${bidId}/retry-payment`);
+    return res.data;
+  } catch (error: any) {
+    console.error(
+      "Error retrying bid payment:",
+      error.response?.data || error.message
+    );
+    return {
+      success: false,
+      error: error.response?.data?.message || "Failed to retry bid payment",
+    };
+  }
+};

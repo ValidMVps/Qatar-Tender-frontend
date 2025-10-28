@@ -66,11 +66,13 @@ import {
   updateBidStatus as apiUpdateBidStatus,
   deleteBid,
   resubmitRevisedBid,
+  retryBidPayment,
 } from "@/app/services/BidService";
 import { getTender } from "@/app/services/tenderService";
 import PageTransitionWrapper from "@/components/animations/PageTransitionWrapper";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useRouter } from "next/navigation";
 
 // Types
 interface ApiBid {
@@ -461,6 +463,10 @@ export default function MyBidsPage() {
       setBidToDelete(null);
     }
   };
+  const router = useRouter();
+  const handleRetryPayment = async (bid: any) => {
+    router.push(`/business-dashboard/tender-details/${bid.tenderId}`);
+  };
 
   if (loading) {
     return (
@@ -748,7 +754,10 @@ export default function MyBidsPage() {
                               className="rounded-lg"
                             >
                               <Pencil className="h-4 w-4 mr-2" />
-                              {t("edit_bid") || "Edit Bid"}
+
+                              {bid.status !== "returned_for_revision"
+                                ? t("edit_bid")
+                                : t("resubmit_bid")}
                             </DropdownMenuItem>
                           )}
 
@@ -765,6 +774,15 @@ export default function MyBidsPage() {
                                 <MessageCircle className="h-4 w-4 mr-2" />
                                 {t("go_to_chat") || "Go to Chat"}
                               </Link>
+                            </DropdownMenuItem>
+                          )}
+                          {bid.status === "under_review" && (
+                            <DropdownMenuItem
+                              onClick={() => handleRetryPayment(bid)}
+                              className="rounded-lg text-blue-600"
+                            >
+                              <RefreshCw className="h-4 w-4 mr-2" />
+                              {t("retry_payment") || "Retry Payment"}
                             </DropdownMenuItem>
                           )}
                           {bid.status !== "completed" &&

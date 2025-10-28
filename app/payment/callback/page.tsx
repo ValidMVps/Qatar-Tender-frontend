@@ -57,7 +57,7 @@ function PaymentCallbackContent() {
   };
 
   const handleViewBids = () => {
-    router.push("business-dashboard/bids");
+    router.push("/business-dashboard/bids");
   };
 
   if (verifying) {
