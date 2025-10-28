@@ -19,8 +19,8 @@ interface ContactDetection {
 export const VALIDATION_RULES = {
   title: { min: 10, max: 50 },
   description: { min: 50, max: 500 },
-  estimatedBudget: { min: 1, max: 5000000 },
-  location: { min: 5, max: 100 },
+  estimatedBudget: { min: 2, max: 5000000 },
+  location: { min: 1, max: 100 },
   maxFileSize: 5 * 1024 * 1024,
 };
 

@@ -1,4 +1,3 @@
-// components/ChatSection.tsx
 "use client";
 
 import { useState, useEffect, useRef } from "react";
@@ -12,15 +11,14 @@ import {
 import { format } from "date-fns";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import { Send, Paperclip, X, User, Menu } from "lucide-react";
+import { Send, Paperclip, X, User, Menu, AlertCircle } from "lucide-react";
 import io from "socket.io-client";
 import { profileApi } from "@/app/services/profileApi";
+import { uploadToCloudinary } from "@/utils/uploadToCloudinary"; // Changed to use uploadToCloudinary
+
 // Ensure you have SOCKET_URL in .env.local
 const SOCKET_URL =
   process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:5000";
-
-// Add this import for file upload
-import { uploadMedia } from "@/app/services/uploadService";
 
 interface ChatSectionProps {
   tenderId: string;
@@ -48,7 +46,8 @@ export default function ChatSection({
   >([]);
   const [otherTyping, setOtherTyping] = useState(false);
   const [typingUserName, setTypingUserName] = useState("");
-  const [otherParticipant, setOtherParticipant] = useState<any>(null); // Added for participant info
+  const [otherParticipant, setOtherParticipant] = useState<any>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -58,7 +57,7 @@ export default function ChatSection({
   useEffect(() => {
     if (!user?._id) return;
 
-    const token = localStorage.getItem("accessToken"); // or use auth context
+    const token = localStorage.getItem("accessToken");
 
     socketRef.current = io(SOCKET_URL, {
       auth: { token },
@@ -99,19 +98,15 @@ export default function ChatSection({
       try {
         const room = (await getChatRoomByTenderId(tenderId)) as any;
 
-        // prefer using id or fallback to _id if your backend uses Mongo-style _id
         setRoomId(String(room.id ?? room._id ?? ""));
 
-        // safe fallback for title
         setRoomTitle(room.tenderTitle ?? room.title ?? "");
 
-        // safe participant access
         const participantId =
           room.participants?.[1] ?? room.participants?.[0] ?? null;
-        if (participantId) {
+        if (participantId && participantId !== user?._id) {
           profileApi.getProfileById(participantId).then((data) => {
             setOtherParticipant(data);
-            console.log(data, "crazy");
           });
         }
       } catch (error) {
@@ -121,7 +116,7 @@ export default function ChatSection({
     };
 
     loadChatRoom();
-  }, [tenderId]);
+  }, [tenderId, user?._id]);
 
   // Load messages & join chat room when roomId is ready
   useEffect(() => {
@@ -132,7 +127,6 @@ export default function ChatSection({
         setIsLoading(true);
         const data = await getChatMessages(roomId);
         setMessages(data.messages || []);
-        // Mark as read
         await markMessagesAsRead(roomId);
       } catch (error) {
         console.error("Failed to load messages:", error);
@@ -166,7 +160,7 @@ export default function ChatSection({
     socket.on(
       "userTyping",
       (data: { roomId: string; userId: string; senderName: any }) => {
-        if (data.roomId === roomId && data.userId !== user._id) {
+        if (data.roomId === roomId && data.userId !== user?._id) {
           setOtherTyping(true);
           setTypingUserName(data.senderName || "Someone");
           const timer = setTimeout(() => setOtherTyping(false), 3000);
@@ -188,9 +182,55 @@ export default function ChatSection({
   // Handle file input
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    setSelectedFiles((prev) => [...prev, ...files]);
 
-    const previews = files.map((file) => ({
+    // Validate files before adding
+    const validFiles = [];
+    const invalidFiles = [];
+
+    for (const file of files) {
+      // File size validation (max 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        invalidFiles.push(`${file.name} - Max 10MB`);
+        continue;
+      }
+
+      // Type validation
+      const allowedTypes = [
+        "image/jpeg",
+        "image/jpg",
+        "image/png",
+        "image/gif",
+        "image/webp",
+        "video/mp4",
+        "video/quicktime",
+        "video/x-msvideo",
+        "video/x-matroska",
+        "audio/mpeg",
+        "audio/wav",
+        "audio/aac",
+        "audio/ogg",
+        "application/pdf",
+        "text/plain",
+      ];
+
+      if (!allowedTypes.includes(file.type)) {
+        invalidFiles.push(`${file.name} - Not supported`);
+        continue;
+      }
+
+      validFiles.push(file);
+    }
+
+    // Show error for invalid files
+    if (invalidFiles.length > 0) {
+      setUploadError(`Some files were rejected: ${invalidFiles.join(", ")}`);
+      setTimeout(() => setUploadError(null), 5000);
+    }
+
+    // Update state with valid files only
+    setSelectedFiles((prev) => [...prev, ...validFiles]);
+
+    const previews = validFiles.map((file) => ({
       url: URL.createObjectURL(file),
       name: file.name,
       size: file.size,
@@ -218,16 +258,17 @@ export default function ChatSection({
     });
   };
 
-  // Send message
+  // Send message with Cloudinary upload
   const handleSendMessage = async () => {
     if ((!newMessage.trim() && selectedFiles.length === 0) || !roomId || !user)
       return;
 
     setIsSending(true);
+    setUploadError(null);
 
-    // ✅ Create a temporary message object
+    // Create a temporary message object
     const tempMessage = {
-      id: `temp_${Date.now()}`, // Temporary ID
+      id: `temp_${Date.now()}`,
       senderId: user._id,
       senderName: user.email || "You",
       text: newMessage.trim(),
@@ -235,13 +276,12 @@ export default function ChatSection({
         name: file.name,
         size: file.size,
         type: file.type,
-        // Note: We'll update this with real URLs after upload
       })),
       createdAt: new Date().toISOString(),
-      pending: true, // Optional: show "sending..." indicator
+      pending: true,
     };
 
-    // ✅ Optimistically add to messages list
+    // Optimistically add to messages list
     setMessages((prev) => [...prev, tempMessage]);
 
     // Clear input
@@ -252,32 +292,56 @@ export default function ChatSection({
     try {
       let uploadedMedia = [];
 
-      // ✅ Upload files first if any are selected
+      // Upload files first if any are selected
       if (selectedFiles.length > 0) {
-        uploadedMedia = await uploadMedia(selectedFiles);
+        const uploadPromises = selectedFiles.map(async (file) => {
+          try {
+            const result = await uploadToCloudinary(file);
+            return {
+              url: result,
+              name: file.name,
+              size: file.size,
+              type: file.type,
+            };
+          } catch (uploadError) {
+            console.error(`Failed to upload ${file.name}:`, uploadError);
+            throw new Error(`Failed to upload ${file.name}`);
+          }
+        });
+
+        uploadedMedia = await Promise.all(uploadPromises);
       }
 
-      // ✅ Send via API with the actual URLs
+      // Send via API with the actual URLs
       await sendApiMessage(roomId, {
         text: tempMessage.text,
-        media: uploadedMedia, // Now contains actual URLs
+        media: uploadedMedia,
       });
 
-      // ✅ After success, remove temp message
+      // After success, remove temp message and add real one
       setMessages((prev) =>
         prev.filter((msg) => !(msg.id === tempMessage.id && msg.pending))
       );
     } catch (error) {
       console.error("Failed to send message:", error);
 
-      // ✅ Mark as failed
+      // Mark as failed
       setMessages((prev) =>
         prev.map((msg) =>
           msg.id === tempMessage.id
-            ? { ...msg, error: true, pending: false }
+            ? {
+                ...msg,
+                error: true,
+                pending: false,
+                errorMessage:
+                  error instanceof Error ? error.message : "Upload failed",
+              }
             : msg
         )
       );
+
+      setUploadError("Failed to send message. Please try again.");
+      setTimeout(() => setUploadError(null), 5000);
     } finally {
       setIsSending(false);
     }
@@ -342,7 +406,7 @@ export default function ChatSection({
           <Menu className="w-5 h-5 text-gray-600" />
         </button>
 
-        {/* Updated to show first letter of participant's name */}
+        {/* Participant avatar */}
         <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center text-white font-semibold text-sm shadow-sm">
           {otherParticipant?.name?.charAt(0) ||
             otherParticipant?.fullName?.charAt(0) ||
@@ -350,7 +414,7 @@ export default function ChatSection({
             "U"}
         </div>
 
-        {/* Updated to show participant name and tender title */}
+        {/* Participant info */}
         <div className="flex-1 min-w-0">
           <h3 className="font-semibold text-gray-900 truncate text-base">
             {otherParticipant?.companyName ||
@@ -370,9 +434,9 @@ export default function ChatSection({
         </button>
       </div>
 
-      {/* Messages Container - Apple style scrolling */}
+      {/* Messages Container */}
       <div className="flex-1 overflow-y-auto bg-gray-50/50">
-        <div className="p-6 space-y-6 h-10">
+        <div className="p-6 space-y-6">
           {isLoading ? (
             <div className="flex items-center justify-center h-48">
               <div className="text-center">
@@ -416,11 +480,13 @@ export default function ChatSection({
                         <User className="w-3 h-3 mr-1.5" /> {senderName}
                       </div>
                     )}
+
                     {msg.text && (
                       <div className="whitespace-pre-wrap break-words leading-relaxed">
                         {msg.text}
                       </div>
                     )}
+
                     {msg.media && msg.media.length > 0 && (
                       <div className="mt-3 space-y-2">
                         {msg.media.map((m: any, i: number) => (
@@ -429,7 +495,7 @@ export default function ChatSection({
                               <img
                                 src={m.url}
                                 alt={m.name}
-                                className="max-w-full rounded-2xl "
+                                className="max-w-full rounded-2xl shadow-md"
                               />
                             ) : m.type.startsWith("video/") ? (
                               <video
@@ -437,6 +503,14 @@ export default function ChatSection({
                                 controls
                                 className="max-w-full rounded-2xl border border-gray-200"
                               />
+                            ) : m.type.startsWith("audio/") ? (
+                              <div className="mt-2">
+                                <audio
+                                  src={m.url}
+                                  controls
+                                  className="w-full"
+                                />
+                              </div>
                             ) : (
                               <a
                                 href={m.url}
@@ -459,6 +533,7 @@ export default function ChatSection({
                         ))}
                       </div>
                     )}
+
                     <div
                       className={`text-xs mt-2 font-medium ${
                         isMe ? "text-blue-100" : "text-gray-400"
@@ -466,13 +541,20 @@ export default function ChatSection({
                     >
                       {format(new Date(msg.createdAt), "HH:mm")}
                     </div>
+
+                    {msg.error && (
+                      <div className="flex items-center gap-1 mt-2 text-red-100">
+                        <AlertCircle className="h-3 w-3" />
+                        <span className="text-xs">{msg.errorMessage}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
               );
             })
           )}
 
-          {/* Typing Indicator - Apple style */}
+          {/* Typing Indicator */}
           {otherTyping && (
             <div className="flex justify-start">
               <div className="bg-white px-4 py-3 rounded-3xl rounded-bl-lg border border-gray-100 max-w-xs">
@@ -500,9 +582,19 @@ export default function ChatSection({
         </div>
       </div>
 
-      {/* Input Area - Apple style with clean design */}
+      {/* Input Area */}
       <div className="border-t border-gray-100 bg-white/80 backdrop-blur-md p-4">
-        {/* File Previews - Apple style */}
+        {/* Upload Error Message */}
+        {uploadError && (
+          <div className="mb-3 p-3 bg-red-50 border border-red-200 rounded-xl">
+            <div className="flex items-center gap-2 text-red-700">
+              <AlertCircle className="h-4 w-4" />
+              <span className="text-sm">{uploadError}</span>
+            </div>
+          </div>
+        )}
+
+        {/* File Previews */}
         {mediaPreview.length > 0 && (
           <div className="mb-4">
             <div className="flex flex-wrap gap-2">
@@ -516,6 +608,8 @@ export default function ChatSection({
                       ? "🖼️"
                       : preview.type.startsWith("video/")
                       ? "🎥"
+                      : preview.type.startsWith("audio/")
+                      ? "🎵"
                       : "📄"}
                   </span>
                   <span className="truncate max-w-32 md:max-w-xs font-medium">
@@ -533,7 +627,7 @@ export default function ChatSection({
           </div>
         )}
 
-        {/* Input Controls - Apple style */}
+        {/* Input Controls */}
         <div className="flex gap-3 items-end">
           <input
             type="file"
@@ -541,7 +635,7 @@ export default function ChatSection({
             onChange={handleFileChange}
             className="hidden"
             multiple
-            accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.txt,.zip,.rar"
+            accept="image/*"
           />
 
           <button
@@ -580,6 +674,11 @@ export default function ChatSection({
               <Send className="w-5 h-5" />
             )}
           </button>
+        </div>
+
+        {/* Instructions */}
+        <div className="mt-2 text-xs text-gray-500 text-center">
+          Supports images, videos, documents up to 10MB
         </div>
       </div>
     </div>
