@@ -4,6 +4,12 @@ export interface CreateBidPayload {
   tender: string;
   amount: number;
   description: string;
+  image?: {
+    url: string;
+    filename: string;
+    contentType: string;
+    size: number;
+  };
 }
 
 export interface Bid {
@@ -15,6 +21,13 @@ export interface Bid {
   paymentStatus: "pending" | "completed" | "failed";
   paymentAmount: number;
   paymentId?: string;
+  image: {
+    url: string;
+    filename: string;
+    contentType: string;
+    size: number;
+    uploadedAt: string;
+  } | null;
   status:
     | "pending"
     | "accepted"
@@ -132,12 +145,19 @@ export const returnBidForRevision = async (bidId: string, reason: string) => {
 export const resubmitRevisedBid = async (
   bidId: string,
   amount?: number,
-  description?: string
+  description?: string,
+  image?: {
+    url: string;
+    filename: string;
+    contentType: string;
+    size: number;
+  } | null
 ) => {
   try {
     const response = await api.put(`/api/bids/${bidId}/resubmit`, {
       amount,
       description,
+      image,
     });
     return {
       success: true,

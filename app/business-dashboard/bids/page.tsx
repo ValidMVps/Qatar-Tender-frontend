@@ -73,6 +73,7 @@ import PageTransitionWrapper from "@/components/animations/PageTransitionWrapper
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "next/navigation";
+import { uploadToCloudinary } from "@/utils/uploadToCloudinary";
 
 // Types
 interface ApiBid {
@@ -101,6 +102,13 @@ interface ApiBid {
       email: string;
     };
   };
+  image?: {
+    url: string;
+    filename: string;
+    contentType: string;
+    size: number;
+    uploadedAt: string;
+  };
 }
 
 type BidUI = {
@@ -127,6 +135,7 @@ type BidUI = {
       email: string;
     };
   };
+  image?: ApiBid["image"];
 };
 
 export default function MyBidsPage() {
@@ -150,6 +159,12 @@ export default function MyBidsPage() {
   const [editingBidId, setEditingBidId] = useState<string | null>(null);
   const [amountError, setAmountError] = useState("");
   const [descriptionError, setDescriptionError] = useState("");
+
+  // States for image upload
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imageError, setImageError] = useState("");
+  const [hasExistingImage, setHasExistingImage] = useState(false);
 
   // Fetch bids and enrich with tender details
   const fetchBids = async () => {
@@ -209,6 +224,7 @@ export default function MyBidsPage() {
                   ).toLocaleString(),
                 }
               : undefined,
+            image: b.image,
           } as BidUI;
         })
       );
@@ -251,6 +267,10 @@ export default function MyBidsPage() {
     setEditBidDescription(bid.description);
     setAmountError("");
     setDescriptionError("");
+    setImageError("");
+    setSelectedFile(null);
+    setImagePreview(bid.image?.url || null);
+    setHasExistingImage(!!bid.image?.url);
 
     // Show the edit modal
     setShowEditResubmitModal(true);
@@ -281,12 +301,31 @@ export default function MyBidsPage() {
       return;
     }
 
+    if (imageError) return;
+
     setResubmitLoading(true);
     try {
+      let imageObj: any = undefined;
+
+      if (selectedFile) {
+        const result = await uploadToCloudinary(selectedFile);
+        imageObj = {
+          url: result,
+          filename: selectedFile.name,
+          contentType: selectedFile.type,
+          size: selectedFile.size,
+          uploadedAt: new Date().toISOString(),
+        };
+      } else if (!imagePreview && hasExistingImage) {
+        // Image was removed
+        imageObj = null;
+      }
+
       const result = await resubmitRevisedBid(
         editingBidId,
         Number(editBidAmount),
-        editBidDescription
+        editBidDescription,
+        imageObj
       );
 
       if (result.success) {
@@ -299,11 +338,12 @@ export default function MyBidsPage() {
                   status: "submitted",
                   amount: Number(editBidAmount),
                   description: editBidDescription,
+                  image: imageObj === null ? undefined : imageObj || bid.image,
                 }
               : bid
           )
         );
-
+        console.log(result, "hello");
         // Close modals
         setShowEditResubmitModal(false);
         setShowBidDetailsModal(false);
@@ -852,6 +892,34 @@ export default function MyBidsPage() {
                 </DialogHeader>
 
                 <div className="p-8 space-y-8">
+                  {selectedBidForDetails.status === "returned_for_revision" &&
+                    selectedBidForDetails.revisionDetails && (
+                      <div className="p-6 bg-yellow-50 border border-yellow-100 rounded-2xl">
+                        <div className="flex items-start">
+                          <AlertTriangle className="h-5 w-5 text-yellow-600 mr-3 mt-0.5" />
+                          <div>
+                            <h3 className="font-semibold text-yellow-800 mb-2">
+                              Revision Requested
+                            </h3>
+                            <p className="text-yellow-700 mb-2">
+                              {selectedBidForDetails.revisionDetails.reason}
+                            </p>
+                            <p className="text-sm text-yellow-600">
+                              Requested by:{" "}
+                              {
+                                selectedBidForDetails.revisionDetails
+                                  .requestedBy.email
+                              }{" "}
+                              on{" "}
+                              {
+                                selectedBidForDetails.revisionDetails
+                                  .requestedAt
+                              }
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div className="space-y-6">
                       <h3 className="font-semibold text-xl text-gray-900">
@@ -918,6 +986,18 @@ export default function MyBidsPage() {
                         <p className="text-gray-700 leading-relaxed">
                           {selectedBidForDetails.description}
                         </p>
+                        {selectedBidForDetails.image?.url && (
+                          <div className="mt-6">
+                            <h4 className="font-semibold mb-3 text-gray-900">
+                              Attached Image
+                            </h4>
+                            <img
+                              src={selectedBidForDetails.image.url}
+                              alt="Bid image"
+                              className="rounded-md max-h-64 w-full object-contain border border-gray-200"
+                            />
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -978,23 +1058,6 @@ export default function MyBidsPage() {
                       </div>
                     </div>
                   </div>
-
-                  {/* Rejected Bid Details */}
-                  {selectedBidForDetails.status === "rejected" && (
-                    <div className="p-6 bg-red-50 border border-red-100 rounded-2xl">
-                      <div className="flex items-center">
-                        <div className="bg-red-100 rounded-xl mr-4 shrink-0">
-                          <Info className="h-5 w-5 text-red-600" />
-                        </div>
-                        <div>
-                          <h3 className="font-semibold text-red-800">
-                            {t("another_bid_was_accepted") ||
-                              "Another bid was accepted"}
-                          </h3>
-                        </div>
-                      </div>
-                    </div>
-                  )}
                 </div>
 
                 <DialogFooter className="flex flex-wrap gap-3 p-8 pt-0 border-t border-gray-100">
@@ -1081,7 +1144,7 @@ export default function MyBidsPage() {
                           setAmountError("");
                         }
                       }}
-                      className={`p bg-white/80 backdrop-blur-sm border border-gray-200/50 ${
+                      className={`pl-10 bg-white/80 backdrop-blur-sm border border-gray-200/50 ${
                         amountError ? "border-red-300" : ""
                       }`}
                       min="0"
@@ -1132,6 +1195,86 @@ export default function MyBidsPage() {
                     </div>
                   )}
                 </div>
+
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-gray-700">
+                    {t("bid_image") || "Bid Image (Optional)"}
+                  </Label>
+                  {imagePreview && (
+                    <div className="relative mb-4">
+                      <img
+                        src={imagePreview}
+                        alt="Preview"
+                        className="w-full max-h-48 object-contain rounded-md border border-gray-200"
+                      />
+                      <button
+                        onClick={() => {
+                          setImagePreview(null);
+                          setSelectedFile(null);
+                        }}
+                        className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full shadow-md hover:bg-red-600"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  )}
+                  {!imagePreview && (
+                    <div className="border-2 border-dashed border-gray-300 rounded-md p-6 text-center hover:border-blue-500 transition-colors">
+                      <Input
+                        type="file"
+                        accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            if (file.size > 10 * 1024 * 1024) {
+                              setImageError(
+                                t("image_must_be_less_than_10mb") ||
+                                  "Image must be less than 10MB"
+                              );
+                              return;
+                            }
+                            if (
+                              ![
+                                "image/jpeg",
+                                "image/jpg",
+                                "image/png",
+                                "image/gif",
+                                "image/webp",
+                              ].includes(file.type)
+                            ) {
+                              setImageError(
+                                t("invalid_image_type") || "Invalid image type"
+                              );
+                              return;
+                            }
+                            setSelectedFile(file);
+                            setImagePreview(URL.createObjectURL(file));
+                            setImageError("");
+                          }
+                        }}
+                        className="hidden"
+                        id="image-upload"
+                      />
+                      <label
+                        htmlFor="image-upload"
+                        className="cursor-pointer block"
+                      >
+                        <div className="text-blue-600 font-medium mb-2">
+                          {t("upload_image") || "Upload Image"}
+                        </div>
+                        <p className="text-sm text-gray-500">
+                          JPEG, JPG, PNG, GIF, WEBP up to 10MB
+                        </p>
+                      </label>
+                    </div>
+                  )}
+                  {imageError && (
+                    <div className="text-red-500 text-sm mt-1 flex items-center">
+                      <AlertCircle className="h-4 w-4 mr-2" />
+                      {imageError}
+                    </div>
+                  )}
+                </div>
               </div>
               <DialogFooter className="pt-4 border-t border-gray-100/50">
                 <Button
@@ -1143,6 +1286,10 @@ export default function MyBidsPage() {
                     setEditBidDescription("");
                     setAmountError("");
                     setDescriptionError("");
+                    setImageError("");
+                    setSelectedFile(null);
+                    setImagePreview(null);
+                    setHasExistingImage(false);
                   }}
                   className="bg-white/80 backdrop-blur-sm border border-gray-200/50 hover:bg-gray-50/80 transition-colors"
                 >
@@ -1150,6 +1297,7 @@ export default function MyBidsPage() {
                 </Button>
                 <Button
                   onClick={handleEditResubmit}
+                  disabled={resubmitLoading}
                   className="bg-blue-600 hover:bg-blue-700 text-white"
                 >
                   {resubmitLoading ? (
