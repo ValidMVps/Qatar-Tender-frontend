@@ -5,12 +5,10 @@ until the bid is awarded they can edit anf sendnotification to tender ()low prio
 check revesion ubtton in tender details
 sub cetagroy for later
 optio to resubmit bid if payment failed
-contact from need to be cehcked
 
 Admin dashboard, Support Ticket Management tab [v2]
 The response generates an in-app message and an email to the user, along with a notification. [v2]
 Admin control over landing page content, FAQs, terms, banners, and email templates. [v2]
-
 admin can’t add users or assign roles. (cehck)
 
 

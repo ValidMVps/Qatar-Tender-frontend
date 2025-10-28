@@ -740,13 +740,15 @@ export default function MyBidsPage() {
                           </DropdownMenuItem>
 
                           {/* Show edit option only for revision bids */}
-                          {bid.status === "returned_for_revision" && (
+                          {["submitted", "returned_for_revision"].includes(
+                            bid.status
+                          ) && (
                             <DropdownMenuItem
                               onClick={() => handleResubmitBid(bid.id)}
                               className="rounded-lg"
                             >
-                              <RefreshCw className="h-4 w-4 mr-2" />
-                              {t("edit_and_resubmit") || "Edit and Resubmit"}
+                              <Pencil className="h-4 w-4 mr-2" />
+                              {t("edit_bid") || "Edit Bid"}
                             </DropdownMenuItem>
                           )}
 

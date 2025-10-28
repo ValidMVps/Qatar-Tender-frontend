@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Accordion,
@@ -12,12 +13,52 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Mail, Phone, MapPin } from "lucide-react";
-
 import { useTranslation } from "../../../lib/hooks/useTranslation";
 import PageTransitionWrapper from "@/components/animations/PageTransitionWrapper";
 
 export default function HelpPage() {
   const { t } = useTranslation();
+
+  // Form state
+  const [form, setForm] = useState({ name: "", email: "", message: "" });
+  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
+
+  // Handle input change
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setForm({ ...form, [e.target.id]: e.target.value });
+  };
+
+  // Handle form submit
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setStatus("idle");
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        setStatus("success");
+        setForm({ name: "", email: "", message: "" });
+      } else {
+        setStatus("error");
+      }
+    } catch (error) {
+      console.error("Error sending message:", error);
+      setStatus("error");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <PageTransitionWrapper>
@@ -92,39 +133,74 @@ export default function HelpPage() {
                     {t("send_us_a_message")}
                   </CardTitle>
                 </CardHeader>
+
+                {/* ✅ Integrated Form */}
                 <CardContent className="space-y-5 px-0 md:px-7">
-                  <div>
-                    <Label htmlFor="name" className="mb-1">
-                      {t("your_name")}
-                    </Label>
-                    <Input id="name" placeholder={t("john_doe")} />
-                  </div>
-                  <div>
-                    <Label htmlFor="email" className="mb-1">
-                      {t("your_email")}
-                    </Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder={t("john_doe@example_com")}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="message" className="mb-1">
-                      {t("message")}
-                    </Label>
-                    <Textarea
-                      id="message"
-                      rows={5}
-                      placeholder={t("type_your_message_here")}
-                    />
-                  </div>
-                  <Button className="w-full bg-blue-600 text-white rounded-sm">
-                    {t("send_message")}
-                  </Button>
+                  <form onSubmit={handleSubmit} className="space-y-5">
+                    <div>
+                      <Label htmlFor="name" className="mb-1">
+                        {t("your_name")}
+                      </Label>
+                      <Input
+                        id="name"
+                        placeholder={t("john_doe")}
+                        value={form.name}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="email" className="mb-1">
+                        {t("your_email")}
+                      </Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder={t("john_doe@example_com")}
+                        value={form.email}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="message" className="mb-1">
+                        {t("message")}
+                      </Label>
+                      <Textarea
+                        id="message"
+                        rows={5}
+                        placeholder={t("type_your_message_here")}
+                        value={form.message}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
+
+                    <Button
+                      type="submit"
+                      className="w-full bg-blue-600 text-white rounded-sm"
+                      disabled={loading}
+                    >
+                      {loading ? t("sending") : t("send_message")}
+                    </Button>
+
+                    {status === "success" && (
+                      <p className="text-green-600 text-sm">
+                        ✅ {t("message_sent_successfully")}
+                      </p>
+                    )}
+                    {status === "error" && (
+                      <p className="text-red-600 text-sm">
+                        ❌ {t("failed_to_send_message")}
+                      </p>
+                    )}
+                  </form>
                 </CardContent>
               </Card>
 
+              {/* Contact Info */}
               <Card className="rounded-md border-neutral-200/70">
                 <CardHeader>
                   <CardTitle className="text-lg font-semibold">

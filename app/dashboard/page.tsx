@@ -291,6 +291,7 @@ export default function IndividualDashboardPage() {
       type: "tender",
       title: t.title,
       time: formatShortDate(t.createdAt),
+      id: t._id,
     })),
     ...(Object.values(bidsReceived).flat().slice(0, 1) as Bid[]).map((b) => ({
       type: "bid-received",
@@ -304,26 +305,34 @@ export default function IndividualDashboardPage() {
     title,
     icon: Icon,
     children,
+    href,
   }: {
     title: string;
     icon: React.ElementType;
     children: React.ReactNode;
-  }) => (
-    <motion.div className="bg-white/90 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-100/50 transition-all duration-300 h-full group">
-      <div className="p-6">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-50 to-blue-100 rounded-full flex items-center justify-center transition-transform duration-300">
-            <Icon className="w-5 h-5 text-blue-600" />
+    href?: string;
+  }) => {
+    const cardContent = (
+      <motion.div
+        whileHover={{ scale: href ? 1.02 : 1 }}
+        className="bg-white/90 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-100/50 transition-all duration-300 h-full group cursor-pointer"
+      >
+        <div className="p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-50 to-blue-100 rounded-full flex items-center justify-center transition-transform duration-300">
+              <Icon className="w-5 h-5 text-blue-600" />
+            </div>
+            <h3 className="text-sm font-medium text-gray-600 tracking-wide">
+              {title}
+            </h3>
           </div>
-          <h3 className="text-sm font-medium text-gray-600 tracking-wide">
-            {title}
-          </h3>
+          <div className="space-y-3">{children}</div>
         </div>
-        <div className="space-y-3">{children}</div>
-      </div>
-    </motion.div>
-  );
+      </motion.div>
+    );
 
+    return href ? <Link href={href}>{cardContent}</Link> : cardContent;
+  };
   // Apple-style Badge Component
   const AppleBadge = ({
     variant,
@@ -395,7 +404,6 @@ export default function IndividualDashboardPage() {
             </div>
           </motion.div>
 
-          {/* Apple-style KPI Cards */}
           <motion.div
             className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6"
             initial={{ opacity: 0, y: 5 }}
@@ -403,14 +411,23 @@ export default function IndividualDashboardPage() {
             transition={{ duration: 0.6, ease: "easeOut" }}
           >
             {/* Recent Activity */}
-            <KpiCard title="Recent Activity" icon={ClipboardList}>
+            <KpiCard
+              title="Recent Activity"
+              icon={ClipboardList}
+              href="/dashboard/my-tenders"
+            >
               {recentActivity.length === 0 ? (
                 <p className="text-gray-400 text-sm">No recent activity</p>
               ) : (
                 recentActivity.map((act, i) => (
-                  <div
+                  <Link
                     key={i}
-                    className="flex items-center justify-between py-2 px-3 bg-gray-50/50 rounded-xl"
+                    href={
+                      act.type === "tender"
+                        ? `/dashboard/tender/${(act as any).id || "#"}`
+                        : "/dashboard/my-tenders"
+                    }
+                    className="flex items-center justify-between py-2 px-3 bg-gray-50/50 rounded-xl hover:bg-gray-100 transition"
                   >
                     <div className="flex items-center gap-3">
                       <div
@@ -426,13 +443,17 @@ export default function IndividualDashboardPage() {
                     <span className="text-xs text-gray-500 font-medium">
                       {act.time}
                     </span>
-                  </div>
+                  </Link>
                 ))
               )}
             </KpiCard>
 
-            {/* Bids Received Summary */}
-            <KpiCard title="Bids Received" icon={Users}>
+            {/* Bids Received */}
+            <KpiCard
+              title="Bids Received"
+              icon={Users}
+              href="/dashboard/my-tenders"
+            >
               <div className="flex items-center justify-between py-2 px-3 bg-gray-50/50 rounded-xl">
                 <span className="text-sm text-gray-700 font-medium">
                   Total Bids
@@ -454,7 +475,11 @@ export default function IndividualDashboardPage() {
             </KpiCard>
 
             {/* Tender Status */}
-            <KpiCard title="Tender Status" icon={BarChart2}>
+            <KpiCard
+              title="Tender Status"
+              icon={BarChart2}
+              href="/dashboard/my-tenders"
+            >
               {Object.entries(tenderStatusSummary).map(([status, count]) => {
                 if (count === 0) return null;
                 return (
@@ -485,14 +510,18 @@ export default function IndividualDashboardPage() {
             </KpiCard>
 
             {/* Upcoming Deadlines */}
-            <KpiCard title="Upcoming Deadlines" icon={Timer}>
+            <KpiCard
+              title="Upcoming Deadlines"
+              icon={Timer}
+              href="/dashboard/my-tenders"
+            >
               {upcomingDeadlines.length === 0 ? (
                 <p className="text-gray-400 text-sm">No deadlines soon</p>
               ) : (
                 upcomingDeadlines.map((item, i) => (
                   <Link
                     key={i}
-                    href={`/dashboard/tender/${item.id}`} // adjust path to match your route
+                    href={`/dashboard/tender/${item.id}`}
                     className="flex items-center justify-between py-2 px-3 bg-amber-50/50 rounded-xl border border-amber-100/50 hover:bg-amber-100 transition"
                   >
                     <span className="text-sm text-gray-700 truncate max-w-[140px]">
