@@ -65,7 +65,7 @@ interface Tender {
     isVerified?: boolean;
     rating?: number;
     profile: any;
-    completedProjects?: number;
+    completedTenders?: number;
     showPublicProfile?: boolean;
   };
   createdAt: string;
@@ -125,10 +125,7 @@ export default function TenderDetailsPage({ params }: PageProps) {
         setLoading(true);
         setError(null);
         const tenderData = await getTender(id);
-        if (tenderData.postedBy) {
-          tenderData.postedBy.rating = 4.7;
-          tenderData.postedBy.completedProjects = 23;
-        }
+
         setTender(tenderData);
         try {
           const userBids: Bid[] = (await getUserBids()) || [];
@@ -374,10 +371,10 @@ export default function TenderDetailsPage({ params }: PageProps) {
                                 </span>
                               </div>
                             )}
-                            {tender.postedBy?.completedProjects && (
+                            {tender.postedBy?.profile.completedTenders && (
                               <span className="text-sm text-gray-600">
-                                {tender.postedBy.completedProjects} projects
-                                completed
+                                {tender.postedBy.profile.completedTenders}{" "}
+                                projects completed
                               </span>
                             )}
                           </div>
