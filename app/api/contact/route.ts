@@ -26,7 +26,7 @@ export async function POST(req: Request) {
     // Send email
     await transporter.sendMail({
       from: `"TenderHub Contact" <${process.env.SMTP_USER}>`,
-      to: "support@tenderhub.qa", // your support email
+      to: `${process.env.SMTP_USER}`, // your support email
       subject: `Message from ${name}`,
       text: message,
       html: `

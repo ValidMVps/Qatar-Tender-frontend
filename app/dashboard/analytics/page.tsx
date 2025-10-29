@@ -29,6 +29,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getUserTenders } from "@/app/services/tenderService";
+import { getTenderBids } from "@/app/services/BidService"; // New service to fetch bids for a tender (implement as Bid.find({ tender: tenderId }))
 import {
   Loader2,
   TrendingUp,
@@ -37,6 +38,7 @@ import {
   Users,
   Eye,
   CheckCircle,
+  DollarSign,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -93,17 +95,17 @@ export default function IndividualDashboard() {
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
   const [stats, setStats] = React.useState({
-    totalTenders: 0,
-    activeTenders: 0,
-    completedTenders: 0,
-    closedTenders: 0,
-    totalBidsReceived: 0,
-    avgBidsPerProject: 0,
-    projectsWithNoBids: 0,
+    tendersPosted: 0,
+    bidsReceived: 0,
+    avgTenderValue: 0,
+    avgBidValue: 0,
+    openProjects: 0,
+    closedProjects: 0,
+    completedProjects: 0,
   });
   const { user } = useAuth();
 
-  const processDataForChart = (tenders: any[]) => {
+  const processDataForChart = (tenders: any[], bids: any[]) => {
     const dataMap = new Map<string, ChartDataPoint>();
     const days = timeRange === "4d" ? 4 : timeRange === "7d" ? 7 : 90;
     const endDate = new Date();
@@ -130,7 +132,16 @@ export default function IndividualDashboard() {
       if (dataMap.has(tenderDate)) {
         const existing = dataMap.get(tenderDate)!;
         existing.tendersPosted += 1;
-        if (tender.bidCount) existing.bidsReceived += tender.bidCount;
+      }
+    });
+
+    bids.forEach((bid: any) => {
+      const bidDate = new Date(bid.createdAt).toISOString().split("T")[0];
+      if (dataMap.has(bidDate)) {
+        const existing = dataMap.get(bidDate)!;
+        existing.bidsReceived += 1;
+        existing.totalBidValue += parseFloat(bid.amount || 0);
+        existing.bidCount += 1;
       }
     });
 
@@ -203,32 +214,70 @@ export default function IndividualDashboard() {
     }));
   };
 
-  const calculateStats = (tenders: any[]) => {
-    const activeTenders = tenders.filter((t) => t.status === "active").length;
-    const completedTenders = tenders.filter(
-      (t) => t.status === "completed"
-    ).length;
-    const closedTenders = tenders.filter((t) => t.status === "closed").length;
-    const totalBidsReceived = tenders.reduce(
-      (sum, tender) => sum + (tender.bidCount || 0),
+  const calculateStats = (tenders: any[], bids: any[], timeRange: string) => {
+    const days = timeRange === "4d" ? 4 : timeRange === "7d" ? 7 : 90;
+    const endDate = new Date();
+    const startDate = new Date(endDate);
+    startDate.setDate(startDate.getDate() - days);
+
+    const filteredTenders = tenders.filter(
+      (t) =>
+        t.status !== "draft" &&
+        t.status !== "rejected" &&
+        new Date(t.createdAt) >= startDate &&
+        new Date(t.createdAt) <= endDate
+    );
+    const filteredBids = bids.filter(
+      (b) =>
+        [
+          "submitted",
+          "under_review",
+          "rejected",
+          "accepted",
+          "completed",
+        ].includes(b.status) &&
+        b.paymentStatus === "paid" &&
+        new Date(b.createdAt) >= startDate &&
+        new Date(b.createdAt) <= endDate
+    );
+
+    const tendersPosted = filteredTenders.length;
+    const bidsReceived = filteredBids.length; // Accurate count based on fetched bids
+
+    const totalTenderValue = filteredTenders.reduce(
+      (sum, tender) => sum + (parseFloat(tender.estimatedBudget || 0) || 0),
       0
     );
-    const projectsWithNoBids = tenders.filter(
-      (t) => !t.bidCount || t.bidCount === 0
+    const avgTenderValue = tendersPosted
+      ? parseFloat((totalTenderValue / tendersPosted).toFixed(2))
+      : 0;
+
+    const totalBidValue = filteredBids.reduce(
+      (sum, bid) => sum + (parseFloat(bid.amount || 0) || 0),
+      0
+    );
+    const avgBidValue = filteredBids.length
+      ? parseFloat((totalBidValue / filteredBids.length).toFixed(2))
+      : 0;
+
+    const openProjects = filteredTenders.filter(
+      (t) => t.status === "active"
     ).length;
-    const avgBidsPerProject =
-      tenders.length > 0
-        ? parseFloat((totalBidsReceived / tenders.length).toFixed(1))
-        : 0;
+    const closedProjects = filteredTenders.filter(
+      (t) => t.status === "closed"
+    ).length;
+    const completedProjects = filteredTenders.filter(
+      (t) => t.status === "completed"
+    ).length;
 
     return {
-      totalTenders: tenders.length,
-      activeTenders,
-      completedTenders,
-      closedTenders,
-      totalBidsReceived,
-      avgBidsPerProject,
-      projectsWithNoBids,
+      tendersPosted,
+      bidsReceived,
+      avgTenderValue,
+      avgBidValue,
+      openProjects,
+      closedProjects,
+      completedProjects,
     };
   };
 
@@ -240,12 +289,17 @@ export default function IndividualDashboard() {
       setError(null);
       try {
         const userId = user?._id;
-        if (!userId) throw new Error("User not found. Please log in again.");
+        if (!userId) throw new Error(t("user_not_found_please_log_in_again"));
 
-        const tendersResponse = await getUserTenders(userId);
-        const tenders = tendersResponse || [];
+        const tenders = await getUserTenders(userId);
 
-        const processedChartData = processDataForChart(tenders);
+        const receivedBids: any[] = [];
+        for (const tender of tenders) {
+          const tenderBids = await getTenderBids(tender._id);
+          receivedBids.push(...tenderBids);
+        }
+
+        const processedChartData = processDataForChart(tenders, receivedBids);
         const processedTopTenders = processTopTendersByBids(tenders);
         const processedTenderStatusTimelineData =
           processTenderStatusTimelineData(tenders);
@@ -255,22 +309,22 @@ export default function IndividualDashboard() {
         setTopTendersByBids(processedTopTenders);
         setTenderStatusTimelineData(processedTenderStatusTimelineData);
         setTenderStatusData(processedTenderStatusData);
-        setStats(calculateStats(tenders));
+        setStats(calculateStats(tenders, receivedBids, timeRange));
       } catch (err) {
-        console.error("Failed to fetch ", err);
-        setError(err instanceof Error ? err.message : "Failed to load data");
+        console.error(t("failed_to_fetch"), err);
+        setError(err instanceof Error ? err.message : t("failed_to_load_data"));
         setChartData([]);
         setTopTendersByBids([]);
         setTenderStatusTimelineData([]);
         setTenderStatusData([]);
         setStats({
-          totalTenders: 0,
-          activeTenders: 0,
-          completedTenders: 0,
-          closedTenders: 0,
-          totalBidsReceived: 0,
-          avgBidsPerProject: 0,
-          projectsWithNoBids: 0,
+          tendersPosted: 0,
+          bidsReceived: 0,
+          avgTenderValue: 0,
+          avgBidValue: 0,
+          openProjects: 0,
+          closedProjects: 0,
+          completedProjects: 0,
         });
       } finally {
         setLoading(false);
@@ -278,7 +332,7 @@ export default function IndividualDashboard() {
     };
 
     fetchData();
-  }, [timeRange]);
+  }, [timeRange, t]);
 
   const filteredData = React.useMemo(() => {
     if (!chartData.length) return [];
@@ -291,7 +345,7 @@ export default function IndividualDashboard() {
       <div className="w-full h-full flex items-center justify-center h-[400px]">
         <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
         <span className="ml-2 text-sm text-gray-500">
-          Loading dashboard data...
+          {t("loading_dashboard_data")}
         </span>
       </div>
     );
@@ -303,21 +357,21 @@ export default function IndividualDashboard() {
       <div className="flex items-center justify-between border-b pb-4">
         <div className="grid flex-1 gap-1">
           <h3 className="text-xl font-semibold text-gray-900">
-            Tender Dashboard
+            {t("tender_dashboard")}
           </h3>
           <p className="text-sm text-gray-500">
             {error
-              ? "Error loading data - please check your connection"
-              : "Your tender posting and bid analytics"}
+              ? t("error_loading_data_please_check_your_connection")
+              : t("your_tender_and_bidding_activity")}
           </p>
         </div>
         <Select value={timeRange} onValueChange={setTimeRange}>
           <SelectTrigger className="w-[160px] rounded-full bg-gray-100 border-0">
-            <SelectValue placeholder="Last 3 months" />
+            <SelectValue placeholder={t("last_7_days")} />
           </SelectTrigger>
           <SelectContent className="rounded-xl">
-            <SelectItem value="4d">Last 4 days</SelectItem>
-            <SelectItem value="7d">Last 7 days</SelectItem>
+            <SelectItem value="4d">{t("last_4_days")}</SelectItem>
+            <SelectItem value="7d">{t("last_7_days")}</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -329,75 +383,59 @@ export default function IndividualDashboard() {
       )}
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Tenders Posted */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {/* Tenders Posted and Bids Received */}
         <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-blue-800">
-              Tenders Posted
+              {t("tenders_and_bids")}
             </CardTitle>
             <Calendar className="h-5 w-5 text-blue-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-blue-900">
-              {stats.totalTenders}
+              {stats.tendersPosted}/{stats.bidsReceived}
             </div>
             <p className="text-xs text-blue-700 mt-1">
-              {stats.activeTenders} active
+              {t("tenders_posted")} / {t("bids_received")}
             </p>
           </CardContent>
         </Card>
 
-        {/* Bids Received */}
-        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-green-800">
-              Bids Received
-            </CardTitle>
-            <Users className="h-5 w-5 text-green-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-900">
-              {stats.totalBidsReceived}
-            </div>
-            <p className="text-xs text-green-700 mt-1">
-              {stats.projectsWithNoBids} projects with no bids
-            </p>
-          </CardContent>
-        </Card>
-
-        {/* Avg Bids Per Project */}
+        {/* Average Tender and Bid Value */}
         <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-purple-800">
-              Avg Bids/Project
+              {t("avg_tender_bid_value")}
             </CardTitle>
-            <TrendingUp className="h-5 w-5 text-purple-600" />
+            <DollarSign className="h-5 w-5 text-purple-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-purple-900">
-              {stats.avgBidsPerProject}
+              ₹{stats.avgTenderValue.toLocaleString()}/₹
+              {stats.avgBidValue.toLocaleString()}
             </div>
-            <p className="text-xs text-purple-700 mt-1">Overall average</p>
+            <p className="text-xs text-purple-700 mt-1">
+              {t("avg_tender")} / {t("avg_bid")}
+            </p>
           </CardContent>
         </Card>
 
-        {/* Top Performing Tender */}
-        <Card className="bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200">
+        {/* Open, Closed, and Completed Projects */}
+        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-amber-800">
-              Top Tender
+            <CardTitle className="text-sm font-medium text-green-800">
+              {t("project_status")}
             </CardTitle>
-            <Award className="h-5 w-5 text-amber-600" />
+            <CheckCircle className="h-5 w-5 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-amber-900">
-              {topTendersByBids.length > 0 ? topTendersByBids[0].bids : 0}
+            <div className="text-2xl font-bold text-green-900">
+              {stats.openProjects}/{stats.closedProjects}/
+              {stats.completedProjects}
             </div>
-            <p className="text-xs text-amber-700 mt-1">
-              {topTendersByBids.length > 0
-                ? topTendersByBids[0].name
-                : "No tenders yet"}
+            <p className="text-xs text-green-700 mt-1">
+              {t("open")} / {t("closed")} / {t("completed")}
             </p>
           </CardContent>
         </Card>
@@ -408,7 +446,7 @@ export default function IndividualDashboard() {
         {/* Tender Activity Timeline */}
         <div className="bg-white p-4 rounded-2xl shadow-sm">
           <h4 className="text-md font-semibold mb-4 text-gray-900 px-2">
-            Tender Activity Timeline
+            {t("tender_activity_timeline")}
           </h4>
           <ChartContainer config={chartConfig} className="w-full h-[280px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -500,7 +538,7 @@ export default function IndividualDashboard() {
         {/* Tender Status Distribution (Area Chart - Linear) */}
         <div className="bg-white p-4 rounded-2xl shadow-sm">
           <h4 className="text-md font-semibold mb-4 text-gray-900 px-2">
-            Tender Status Distribution
+            {t("tender_status_distribution")}
           </h4>
           <ChartContainer config={chartConfig} className="w-full h-[280px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -598,7 +636,7 @@ export default function IndividualDashboard() {
         {/* Tender Status Timeline */}
         <div className="bg-white p-4 rounded-2xl shadow-sm">
           <h4 className="text-md font-semibold mb-4 text-gray-900 px-2">
-            Tender Status Timeline
+            {t("tender_status_timeline")}
           </h4>
           <ChartContainer config={chartConfig} className="w-full h-[280px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -676,7 +714,7 @@ export default function IndividualDashboard() {
         {/* Top Performing Tenders (Area Chart - Step) */}
         <div className="bg-white p-4 rounded-2xl shadow-sm">
           <h4 className="text-md font-semibold mb-4 text-gray-900 px-2">
-            Top Performing Tenders
+            {t("top_performing_tenders")}
           </h4>
           <ChartContainer config={chartConfig} className="w-full h-[280px]">
             <ResponsiveContainer width="100%" height="100%">

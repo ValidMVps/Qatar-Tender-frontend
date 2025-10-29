@@ -3,14 +3,9 @@ import * as React from "react";
 import {
   Area,
   AreaChart,
-  Bar,
-  BarChart,
   CartesianGrid,
-  Cell,
   Line,
   LineChart,
-  Pie,
-  PieChart,
   ResponsiveContainer,
   XAxis,
   YAxis,
@@ -34,17 +29,12 @@ import {
   Loader2,
   TrendingUp,
   Calendar,
-  Award,
-  ArrowUpRight,
-  ArrowDownLeft,
-  Users,
   DollarSign,
   CheckCircle,
+  Award,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
 import useTranslation from "@/lib/hooks/useTranslation";
 import PageTransitionWrapper from "@/components/animations/PageTransitionWrapper";
 
@@ -61,8 +51,6 @@ const chartConfig = {
   accepted: { label: "Accepted", color: "#34C759" },
   rejected: { label: "Rejected", color: "#FF3B30" },
 } satisfies ChartConfig;
-
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884d8"];
 
 interface ChartDataPoint {
   date: string;
@@ -127,16 +115,18 @@ export default function page() {
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
   const [stats, setStats] = React.useState({
-    totalTenders: 0,
+    tendersPosted: 0,
+    bidsReceived: 0,
+    avgTenderValue: 0,
+    avgBidValue: 0,
+    openProjects: 0,
+    closedProjects: 0,
+    completedProjects: 0,
+    successfulBids: 0,
     totalBids: 0,
-    activeTenders: 0,
-    completedTenders: 0,
-    pendingBids: 0,
-    acceptedBids: 0,
-    completedBids: 0,
-    avgBidsPerProject: 0,
-    projectsWithNoBids: 0,
-    totalBidsReceived: 0,
+    awardedTenderValue: 0,
+    bidWinRate: 0,
+    categoryAvgWinRate: 0,
   });
   const { user } = useAuth();
 
@@ -207,12 +197,10 @@ export default function page() {
 
     bids.forEach((bid: any) => {
       if (!bid.createdAt || !bid.updatedAt) return;
-      // For bids placed: use createdAt
       const placedDate = new Date(bid.createdAt).toISOString().split("T")[0];
       if (dataMap.has(placedDate)) {
         dataMap.get(placedDate)!.bidsPlaced += 1;
       }
-      // For bids won: use updatedAt for accepted or completed bids
       if (bid.status === "accepted" || bid.status === "completed") {
         const winDate = new Date(bid.updatedAt).toISOString().split("T")[0];
         if (dataMap.has(winDate)) {
@@ -330,39 +318,124 @@ export default function page() {
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
   };
 
-  const calculateStats = (tenders: any[], bids: any[]) => {
-    const activeTenders = tenders.filter((t) => t.status === "active").length;
-    const completedTenders = tenders.filter(
-      (t) => t.status === "completed"
-    ).length;
-    const pendingBids = bids.filter((b) => b.status === "submitted").length;
-    const acceptedBids = bids.filter(
-      (b) => b.status === "accepted" || b.status === "completed"
-    ).length;
-    const completedBids = bids.filter((b) => b.status === "completed").length;
-    const totalBidsReceived = tenders.reduce(
+  const calculateStats = (tenders: any[], bids: any[], timeRange: string) => {
+    const days = timeRange === "4d" ? 4 : timeRange === "7d" ? 7 : 90;
+    const endDate = new Date();
+    const startDate = new Date(endDate);
+    startDate.setDate(startDate.getDate() - days);
+
+    // Filter tenders and bids by time range and valid statuses
+    const filteredTenders = tenders.filter(
+      (t) =>
+        t.status !== "draft" &&
+        t.status !== "rejected" &&
+        new Date(t.createdAt) >= startDate &&
+        new Date(t.createdAt) <= endDate
+    );
+    const filteredBids = bids.filter(
+      (b) =>
+        ["submitted", "accepted", "completed", "rejected"].includes(b.status) &&
+        b.paymentStatus === "paid" &&
+        new Date(b.createdAt) >= startDate &&
+        new Date(b.createdAt) <= endDate
+    );
+
+    const tendersPosted = filteredTenders.length;
+    const bidsReceived = filteredTenders.reduce(
       (sum, tender) => sum + (tender.bidCount || 0),
       0
     );
-    const projectsWithNoBids = tenders.filter(
-      (t) => !t.bidCount || t.bidCount === 0
+
+    const totalTenderValue = filteredTenders.reduce(
+      (sum, tender) => sum + (parseFloat(tender.estimatedBudget || 0) || 0),
+      0
+    );
+    const avgTenderValue = tendersPosted
+      ? parseFloat((totalTenderValue / tendersPosted).toFixed(2))
+      : 0;
+
+    const totalBidValue = filteredBids.reduce(
+      (sum, bid) => sum + (parseFloat(bid.amount || 0) || 0),
+      0
+    );
+    const avgBidValue = filteredBids.length
+      ? parseFloat((totalBidValue / filteredBids.length).toFixed(2))
+      : 0;
+
+    const openProjects = filteredTenders.filter(
+      (t) => t.status === "active"
     ).length;
-    const avgBidsPerProject =
-      tenders.length > 0
-        ? parseFloat((totalBidsReceived / tenders.length).toFixed(1))
-        : 0;
+    const closedProjects = filteredTenders.filter(
+      (t) => t.status === "closed"
+    ).length;
+    const completedProjects = filteredTenders.filter(
+      (t) => t.status === "completed"
+    ).length;
+
+    const successfulBids = filteredBids.filter(
+      (b) => b.status === "accepted" || b.status === "completed"
+    ).length;
+    const totalBids = filteredBids.length;
+
+    const awardedTenders = filteredTenders.filter(
+      (t) => t.status === "awarded" || t.status === "completed"
+    );
+    const awardedTenderValue = awardedTenders.reduce(
+      (sum, tender) => sum + (parseFloat(tender.estimatedBudget || 0) || 0),
+      0
+    );
+
+    const bidWinRate = totalBids
+      ? parseFloat(((successfulBids / totalBids) * 100).toFixed(1))
+      : 0;
+
+    // Calculate category average win rate
+    const categoryWinRates: Record<string, { wins: number; total: number }> =
+      {};
+    filteredBids.forEach((bid) => {
+      const tender = filteredTenders.find(
+        (t) => t._id.toString() === bid.tender.toString()
+      );
+      if (tender && tender.category) {
+        const catId = tender.category.toString();
+        if (!categoryWinRates[catId]) {
+          categoryWinRates[catId] = { wins: 0, total: 0 };
+        }
+        categoryWinRates[catId].total += 1;
+        if (bid.status === "accepted" || bid.status === "completed") {
+          categoryWinRates[catId].wins += 1;
+        }
+      }
+    });
+    const userCategories = filteredTenders
+      .filter((t) => t.postedBy.toString() === user?._id)
+      .map((t) => t.category?.toString())
+      .filter((c) => c);
+    const categoryAvgWinRate =
+      userCategories.length && Object.keys(categoryWinRates).length
+        ? parseFloat(
+            (
+              Object.values(categoryWinRates)
+                .filter((c) => userCategories.includes(c.toString()))
+                .reduce((sum, c) => sum + (c.total ? c.wins / c.total : 0), 0) /
+              userCategories.length
+            ).toFixed(1)
+          ) * 100
+        : 15.0; // Fallback if no category data
 
     return {
-      totalTenders: tenders.length,
-      totalBids: bids.length,
-      activeTenders,
-      completedTenders,
-      pendingBids,
-      acceptedBids,
-      completedBids,
-      avgBidsPerProject,
-      projectsWithNoBids,
-      totalBidsReceived,
+      tendersPosted,
+      bidsReceived,
+      avgTenderValue,
+      avgBidValue,
+      openProjects,
+      closedProjects,
+      completedProjects,
+      successfulBids,
+      totalBids,
+      awardedTenderValue,
+      bidWinRate,
+      categoryAvgWinRate,
     };
   };
 
@@ -405,7 +478,7 @@ export default function page() {
         setEngagementData(processedEngagementData);
         setBidByDayData(processedBidByDayData);
         setBidStatusTimelineData(processedBidStatusTimelineData);
-        setStats(calculateStats(tenders, bids));
+        setStats(calculateStats(tenders, bids, timeRange));
       } catch (err) {
         console.error(t("failed_to_fetch"), err);
         setError(err instanceof Error ? err.message : t("failed_to_load_data"));
@@ -419,16 +492,18 @@ export default function page() {
         setBidByDayData([]);
         setBidStatusTimelineData([]);
         setStats({
-          totalTenders: 0,
+          tendersPosted: 0,
+          bidsReceived: 0,
+          avgTenderValue: 0,
+          avgBidValue: 0,
+          openProjects: 0,
+          closedProjects: 0,
+          completedProjects: 0,
+          successfulBids: 0,
           totalBids: 0,
-          activeTenders: 0,
-          completedTenders: 0,
-          pendingBids: 0,
-          completedBids: 0,
-          acceptedBids: 0,
-          avgBidsPerProject: 0,
-          projectsWithNoBids: 0,
-          totalBidsReceived: 0,
+          awardedTenderValue: 0,
+          bidWinRate: 0,
+          categoryAvgWinRate: 0,
         });
       } finally {
         setLoading(false);
@@ -488,83 +563,105 @@ export default function page() {
         )}
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* Tenders Posted */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-blue-800">
-                {t("tenders_posted")}
+                {t("tenders_and_bids")}
               </CardTitle>
               <Calendar className="h-5 w-5 text-blue-600" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-blue-900">
-                {stats.totalTenders}
+                {stats.tendersPosted}/{stats.bidsReceived}
               </div>
               <p className="text-xs text-blue-700 mt-1">
-                {stats.activeTenders} {t("active")}
+                {t("tenders_posted")} / {t("bids_received")}
               </p>
             </CardContent>
           </Card>
 
-          {/* Bids Placed */}
           <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-purple-800">
-                {t("bids_placed")}
+                {t("avg_tender_bid_value")}
               </CardTitle>
-              <TrendingUp className="h-5 w-5 text-purple-600" />
+              <DollarSign className="h-5 w-5 text-purple-600" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-purple-900">
-                {stats.totalBids}
+                ₹{stats.avgTenderValue.toLocaleString()}/₹
+                {stats.avgBidValue.toLocaleString()}
               </div>
               <p className="text-xs text-purple-700 mt-1">
-                {stats.pendingBids} {t("not_accepted_yet")}
+                {t("avg_tender")} / {t("avg_bid")}
               </p>
             </CardContent>
           </Card>
 
-          {/* Bids Won */}
           <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-green-800">
-                {t("bids_won")}
+                {t("project_status")}
               </CardTitle>
-              <Award className="h-5 w-5 text-green-600" />
+              <CheckCircle className="h-5 w-5 text-green-600" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-green-900">
-                {stats.acceptedBids + stats.completedBids}
+                {stats.openProjects}/{stats.closedProjects}/
+                {stats.completedProjects}
               </div>
               <p className="text-xs text-green-700 mt-1">
-                {t("win_rate")}:{" "}
-                {stats.totalBids > 0
-                  ? Math.round(
-                      ((stats.acceptedBids + stats.completedBids) /
-                        stats.totalBids) *
-                        100
-                    )
-                  : 0}
-                %
+                {t("open")} / {t("closed")} / {t("completed")}
               </p>
             </CardContent>
           </Card>
 
-          {/* Avg Bids Per Project */}
           <Card className="bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-amber-800">
-                {t("avg_bids_per_project")}
+                {t("successful_bids")}
               </CardTitle>
-              <CheckCircle className="h-5 w-5 text-amber-600" />
+              <Award className="h-5 w-5 text-amber-600" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-amber-900">
-                {stats.avgBidsPerProject}
+                {stats.successfulBids}/{stats.totalBids}
               </div>
               <p className="text-xs text-amber-700 mt-1">
-                {stats.projectsWithNoBids} {t("projects_with_no_bids")}
+                {t("successful")} / {t("total_bids")}
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-teal-50 to-teal-100 border-teal-200">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-teal-800">
+                {t("tenders_awarded_value")}
+              </CardTitle>
+              <DollarSign className="h-5 w-5 text-teal-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-teal-900">
+                ₹{stats.awardedTenderValue.toLocaleString()}
+              </div>
+              <p className="text-xs text-teal-700 mt-1">{t("total_value")}</p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-orange-800">
+                {t("bid_win_rate")}
+              </CardTitle>
+              <TrendingUp className="h-5 w-5 text-orange-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-orange-900">
+                {stats.bidWinRate}% / {stats.categoryAvgWinRate}%
+              </div>
+              <p className="text-xs text-orange-700 mt-1">
+                {t("your_win_rate")} / {t("category_avg")}
               </p>
             </CardContent>
           </Card>
