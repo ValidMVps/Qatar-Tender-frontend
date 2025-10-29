@@ -77,6 +77,18 @@ interface Bid {
     _id: string;
     email: string;
     userType: string;
+    image?: {
+      url?: string | null;
+      filename?: string;
+      contentType?:
+        | "image/jpeg"
+        | "image/jpg"
+        | "image/png"
+        | "image/gif"
+        | "image/webp";
+      size?: number;
+      uploadedAt?: Date;
+    };
     isVerified: boolean;
     profile: {
       fullName?: string;
@@ -151,11 +163,11 @@ export default function TenderDetailPage() {
   const [returningBid, setReturningBid] = useState(false);
   const [showActivateModal, setShowActivateModal] = useState(false);
   const [activating, setActivating] = useState(false);
-  // ✅ New state for image modal
   const [imageModal, setImageModal] = useState<{
     open: boolean;
     imageUrl: string | null;
-  }>({ open: false, imageUrl: null });
+    type?: "bid" | "tender";
+  }>({ open: false, imageUrl: null, type: undefined });
 
   const validateAnswer = (
     text: string
@@ -354,7 +366,7 @@ export default function TenderDetailPage() {
     return (
       <div className="min-h-screen bg-gray-50">
         <div className="flex flex-col items-center justify-center min-h-screen px-4">
-          <div className="bg-white rounded-md shadow-0 border border-gray-100 p-8 text-center max-w-md w-full">
+          <div className="bg-white rounded-md shadow-none border border-gray-100 p-8 text-center max-w-md w-full">
             <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
               <AlertCircle className="h-8 w-8 text-red-500" />
             </div>
@@ -378,7 +390,7 @@ export default function TenderDetailPage() {
     return (
       <div className="min-h-screen bg-gray-50">
         <div className="flex flex-col items-center justify-center min-h-screen px-4">
-          <div className="bg-white rounded-md shadow-0 border border-gray-100 p-8 text-center max-w-md w-full">
+          <div className="bg-white rounded-md shadow-none border border-gray-100 p-8 text-center max-w-md w-full">
             <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
               <AlertCircle className="h-8 w-8 text-gray-400" />
             </div>
@@ -456,29 +468,49 @@ export default function TenderDetailPage() {
               </div>
             </div>
           )}
-          <div className="bg-white rounded-md shadow-0 border border-gray-100 p-8 mb-8">
+          <div className="bg-white rounded-md shadow-none border border-gray-100 p-8 mb-8">
             <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between">
               <div className="flex-1">
-                <div className="flex items-center gap-3 mb-4">
-                  <h1 className="text-3xl font-bold text-gray-900 leading-tight">
-                    {tender.title}
-                  </h1>
-                  <Badge
-                    className={`px-3 py-1 rounded-full text-xs font-medium border ${
-                      tender.status === "active"
-                        ? "bg-green-50 text-green-700 border-green-200"
-                        : tender.status === "awarded"
-                        ? "bg-blue-50 text-blue-700 border-blue-200"
-                        : tender.status === "completed"
-                        ? "bg-purple-50 text-purple-700 border-purple-200"
-                        : tender.status === "closed"
-                        ? "bg-gray-50 text-gray-700 border-gray-200"
-                        : "bg-yellow-50 text-yellow-700 border-yellow-200"
-                    }`}
-                  >
-                    {tender.status.charAt(0).toUpperCase() +
-                      tender.status.slice(1)}
-                  </Badge>
+                <div className="flex w-full  justify-between mb-4">
+                  {" "}
+                  <div className="flex items-center gap-3 mb-4">
+                    <h1 className="text-3xl font-bold text-gray-900 leading-tight">
+                      {tender.title}
+                    </h1>
+                    <Badge
+                      className={`px-3 py-1 rounded-full text-xs font-medium border ${
+                        tender.status === "active"
+                          ? "bg-green-50 text-green-700 border-green-200"
+                          : tender.status === "awarded"
+                          ? "bg-blue-50 text-blue-700 border-blue-200"
+                          : tender.status === "completed"
+                          ? "bg-purple-50 text-purple-700 border-purple-200"
+                          : tender.status === "closed"
+                          ? "bg-gray-50 text-gray-700 border-gray-200"
+                          : "bg-yellow-50 text-yellow-700 border-yellow-200"
+                      }`}
+                    >
+                      {tender.status.charAt(0).toUpperCase() +
+                        tender.status.slice(1)}
+                    </Badge>
+                  </div>
+                  {tender.image && (
+                    <div className="mb-6">
+                      <Button
+                        onClick={() =>
+                          setImageModal({
+                            open: true,
+                            imageUrl: tender.image,
+                            type: "tender",
+                          })
+                        }
+                        className="bg-white text-blue-500 shadow-none border border-blue-500 rounded-md px-4 py-2 h-auto text-sm font-medium flex items-center mb-4"
+                      >
+                        <ImageIcon className="h-4 w-4 mr-2" />
+                        View Tender Image
+                      </Button>
+                    </div>
+                  )}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                   <div className="flex items-center text-gray-600">
@@ -554,7 +586,7 @@ export default function TenderDetailPage() {
           </div>
           {!isPendingApproval ? (
             <>
-              <div className="bg-white rounded-md shadow-0 border border-gray-100 mb-6">
+              <div className="bg-white rounded-md shadow-none border border-gray-100 mb-6">
                 <div className="flex border-b border-gray-100">
                   <button
                     onClick={() => setActiveTab("bids")}
@@ -611,7 +643,7 @@ export default function TenderDetailPage() {
                     bids.map((bid) => (
                       <div
                         key={bid._id}
-                        className="bg-white rounded-md shadow-0 border border-gray-100 overflow-hidden hover:shadow-md transition-shadow"
+                        className="bg-white rounded-md shadow-none border border-gray-100 overflow-hidden hover:shadow-md transition-shadow"
                       >
                         <div className="p-6">
                           <div className="flex items-start justify-between mb-4">
@@ -683,10 +715,11 @@ export default function TenderDetailPage() {
                                 onClick={() =>
                                   setImageModal({
                                     open: true,
-                                    imageUrl: bid.image.url,
+                                    imageUrl: bid.image?.url || null,
+                                    type: "bid",
                                   })
                                 }
-                                className="bg-white text-blue-500 shaodw-0 shadow-none border border-blue-500 rounded-md mb-5 px-4 py-2 h-auto text-sm font-medium flex items-center"
+                                className="bg-white text-blue-500 shadow-none border border-blue-500 rounded-md mb-5 px-4 py-2 h-auto text-sm font-medium flex items-center"
                               >
                                 <ImageIcon className="h-4 w-4 mr-2" />
                                 View Bid Image
@@ -695,7 +728,6 @@ export default function TenderDetailPage() {
                           )}
                           <div className="flex items-center justify-between pt-4 border-t border-gray-100">
                             <div>
-                              {" "}
                               {(!bid.bidder.profile?.anonymousBidding ||
                                 bid.status === "accepted" ||
                                 bid.status === "completed") && (
@@ -756,7 +788,7 @@ export default function TenderDetailPage() {
                       </div>
                     ))
                   ) : (
-                    <div className="col-span-2 bg-white rounded-md shadow-0 border border-gray-100 p-12 text-center">
+                    <div className="col-span-2 bg-white rounded-md shadow-none border border-gray-100 p-12 text-center">
                       <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
                         <Building2 className="h-8 w-8 text-gray-300" />
                       </div>
@@ -776,7 +808,7 @@ export default function TenderDetailPage() {
                     questions.map((question) => (
                       <div
                         key={question._id}
-                        className="bg-white rounded-md shadow-0 border border-gray-100 overflow-hidden"
+                        className="bg-white rounded-md shadow-none border border-gray-100 overflow-hidden"
                       >
                         <div className="p-6">
                           <div className="flex items-start mb-6">
@@ -860,7 +892,11 @@ export default function TenderDetailPage() {
                                 className="bg-blue-500 hover:bg-blue-600 text-white rounded-full px-6 py-2 h-auto font-medium"
                               >
                                 {submittingAnswer[question._id] ? (
-                                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                                  <Loader2
+                                    className="h-4 w-4
+
+ animate-spin mr-2"
+                                  />
                                 ) : (
                                   <Send className="h-4 w-4 mr-2" />
                                 )}
@@ -872,7 +908,7 @@ export default function TenderDetailPage() {
                       </div>
                     ))
                   ) : (
-                    <div className="bg-white rounded-md shadow-0 border border-gray-100 p-12 text-center">
+                    <div className="bg-white rounded-md shadow-none border border-gray-100 p-12 text-center">
                       <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
                         <MessageSquare className="h-8 w-8 text-gray-300" />
                       </div>
@@ -887,7 +923,7 @@ export default function TenderDetailPage() {
                 </div>
               )}
               {activeTab === "reviews" && hasAwardedBid && (
-                <div className="bg-white rounded-md shadow-0 border border-gray-100 p-6">
+                <div className="bg-white rounded-md shadow-none border border-gray-100 p-6">
                   <h2 className="text-xl font-bold text-gray-900 mb-6">
                     Reviews
                   </h2>
@@ -956,7 +992,7 @@ export default function TenderDetailPage() {
               )}
             </>
           ) : (
-            <div className="bg-white rounded-md shadow-0 border border-gray-100 p-12 text-center">
+            <div className="bg-white rounded-md shadow-none border border-gray-100 p-12 text-center">
               <div className="w-16 h-16 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-6">
                 <LockIcon className="h-8 w-8 text-amber-500" />
               </div>
@@ -1098,18 +1134,23 @@ export default function TenderDetailPage() {
             </div>
           </div>
         )}
-        {/* ✅ Image Modal */}
         {imageModal.open && imageModal.imageUrl && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
             <div className="bg-white/90 backdrop-blur-xl rounded-2xl border border-gray-100/50 max-w-3xl w-full">
               <div className="p-4">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-lg font-semibold text-gray-900">
-                    Bid Image
+                    {imageModal.type === "tender"
+                      ? "Tender Image"
+                      : "Bid Image"}
                   </h2>
                   <button
                     onClick={() =>
-                      setImageModal({ open: false, imageUrl: null })
+                      setImageModal({
+                        open: false,
+                        imageUrl: null,
+                        type: undefined,
+                      })
                     }
                     className="p-2 rounded-full hover:bg-gray-100 transition-colors duration-200"
                   >
@@ -1119,7 +1160,11 @@ export default function TenderDetailPage() {
                 <div className="flex justify-center">
                   <img
                     src={imageModal.imageUrl}
-                    alt="Bid supporting image"
+                    alt={
+                      imageModal.type === "tender"
+                        ? tender.title
+                        : "Bid supporting image"
+                    }
                     className="rounded-md max-h-[70vh] w-full object-contain"
                   />
                 </div>

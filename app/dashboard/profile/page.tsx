@@ -585,7 +585,7 @@ export default function Component() {
                     onClick={handleCompleteProfileClick}
                     className="mt-4 bg-blue-600 hover:bg-blue-700 text-white rounded-md px-4 py-2 sm:px-6 sm:py-2 text-sm sm:text-base"
                   >
-                    {t("complete_profile")}
+                    {t("Send Profile For Verification")}
                   </Button>
                 )}
               </div>

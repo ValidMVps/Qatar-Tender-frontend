@@ -28,27 +28,25 @@ import {
   RefreshCw,
   AlertTriangle,
   Play,
+  Image as ImageIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import useTranslation from "@/lib/hooks/useTranslation";
-// Services
 import { getTender } from "@/app/services/tenderService";
-import { getTenderBids, returnBidForRevision } from "@/app/services/BidService"; // ✅ Added returnBidForRevision
+import { getTenderBids, returnBidForRevision } from "@/app/services/BidService";
 import {
   getQuestionsForTender,
   answerQuestion,
   Question,
 } from "@/app/services/QnaService";
 import { awardTender, updateTenderStatus } from "@/app/services/tenderService";
-// Utils
 import { getStatusColor, getStatusText } from "@/utils/tenderStatus";
 import { useAuth } from "@/context/AuthContext";
 import { detectContactInfo } from "@/utils/validationcehck";
 import PageTransitionWrapper from "@/components/animations/PageTransitionWrapper";
 import { toast } from "sonner";
 
-// Interfaces
 interface Tender {
   _id: string;
   title: string;
@@ -79,6 +77,18 @@ interface Bid {
     _id: string;
     email: string;
     userType: string;
+    image?: {
+      url?: string | null;
+      filename?: string;
+      contentType?:
+        | "image/jpeg"
+        | "image/jpg"
+        | "image/png"
+        | "image/gif"
+        | "image/webp";
+      size?: number;
+      uploadedAt?: Date;
+    };
     isVerified: boolean;
     profile: {
       fullName?: string;
@@ -102,7 +112,7 @@ interface Bid {
     | "rejected"
     | "under_review"
     | "completed"
-    | "returned_for_revision"; // ✅ Added new status
+    | "returned_for_revision";
   createdAt: string;
   updatedAt: string;
   v: number;
@@ -114,6 +124,13 @@ interface Bid {
       _id: string;
     };
   };
+  image?: {
+    url: string;
+    filename: string;
+    contentType: string;
+    size: number;
+    uploadedAt: string;
+  } | null;
 }
 
 export default function TenderDetailPage() {
@@ -122,7 +139,6 @@ export default function TenderDetailPage() {
   const params = useParams();
   const router = useRouter();
   const tenderId = params.id as string;
-
   const [tender, setTender] = useState<Tender | null>(null);
   const [bids, setBids] = useState<Bid[]>([]);
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -139,20 +155,20 @@ export default function TenderDetailPage() {
   const [updatingBidStatus, setUpdatingBidStatus] = useState<{
     [key: string]: boolean;
   }>({});
-
-  // ✅ Return for revision states
   const [returnForRevision, setReturnForRevision] = useState<{
     open: boolean;
     bidId: string | null;
   }>({ open: false, bidId: null });
   const [revisionReason, setRevisionReason] = useState("");
   const [returningBid, setReturningBid] = useState(false);
-
-  // ✅ Activate modal states (from your original)
   const [showActivateModal, setShowActivateModal] = useState(false);
   const [activating, setActivating] = useState(false);
+  const [imageModal, setImageModal] = useState<{
+    open: boolean;
+    imageUrl: string | null;
+    type?: "bid" | "tender";
+  }>({ open: false, imageUrl: null, type: undefined });
 
-  // Validation function
   const validateAnswer = (
     text: string
   ): { valid: boolean; message?: string } => {
@@ -177,7 +193,6 @@ export default function TenderDetailPage() {
       setError(null);
       const tenderData = await getTender(tenderId);
       const bidsData = await getTenderBids(tenderId);
-      console.log(bidsData);
       const questionsData = await getQuestionsForTender(tenderId);
       setTender(tenderData);
       setBids(bidsData);
@@ -194,7 +209,6 @@ export default function TenderDetailPage() {
     if (tenderId) fetchTenderData();
   }, [tenderId]);
 
-  // ✅ Updated to handle both accept and reject (open return dialog on reject)
   const handleBidStatusUpdate = async (
     bidId: string,
     status: "accepted" | "rejected"
@@ -222,12 +236,10 @@ export default function TenderDetailPage() {
         setUpdatingBidStatus((prev) => ({ ...prev, [bidId]: false }));
       }
     } else {
-      // Open return-for-revision dialog
       setReturnForRevision({ open: true, bidId });
     }
   };
 
-  // ✅ Handle returning bid for revision
   const handleReturnBidForRevision = async () => {
     if (!returnForRevision.bidId || !revisionReason.trim()) {
       alert("Please provide a reason for revision");
@@ -249,9 +261,7 @@ export default function TenderDetailPage() {
                   revisionDetails: {
                     requestedAt: new Date().toISOString(),
                     reason: revisionReason,
-                    requestedBy: {
-                      _id: profile?._id || "",
-                    },
+                    requestedBy: { _id: profile?._id || "" },
                   },
                 }
               : bid
@@ -335,14 +345,11 @@ export default function TenderDetailPage() {
   const deadline = tender?.deadline ? new Date(tender.deadline) : null;
   const isDeadlinePassed = deadline ? deadline < new Date() : false;
   const canBeMadeActive = tender?.status === "draft" && !isDeadlinePassed;
-
   const awardedBid = bids.find((bid) => bid.status === "accepted");
   const hasAwardedBid = !!awardedBid;
   const isPendingApproval = tender?.status === "pending_approval";
   const isAwarded = tender?.status === "awarded";
   const isCompleted = tender?.status === "completed";
-
-  // --- Render logic remains exactly as in your original version ---
 
   if (loading) {
     return (
@@ -359,7 +366,7 @@ export default function TenderDetailPage() {
     return (
       <div className="min-h-screen bg-gray-50">
         <div className="flex flex-col items-center justify-center min-h-screen px-4">
-          <div className="bg-white rounded-md shadow-0 border border-gray-100 p-8 text-center max-w-md w-full">
+          <div className="bg-white rounded-md shadow-none border border-gray-100 p-8 text-center max-w-md w-full">
             <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
               <AlertCircle className="h-8 w-8 text-red-500" />
             </div>
@@ -383,7 +390,7 @@ export default function TenderDetailPage() {
     return (
       <div className="min-h-screen bg-gray-50">
         <div className="flex flex-col items-center justify-center min-h-screen px-4">
-          <div className="bg-white rounded-md shadow-0 border border-gray-100 p-8 text-center max-w-md w-full">
+          <div className="bg-white rounded-md shadow-none border border-gray-100 p-8 text-center max-w-md w-full">
             <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
               <AlertCircle className="h-8 w-8 text-gray-400" />
             </div>
@@ -402,7 +409,6 @@ export default function TenderDetailPage() {
   return (
     <PageTransitionWrapper>
       <div className="min-h-screen">
-        {/* Navigation Bar */}
         <div className="bg-white border-b border-gray-200">
           <div className="mx-auto px-4 sm:px-6 lg:px-14">
             <div className="flex items-center justify-between h-16">
@@ -425,8 +431,6 @@ export default function TenderDetailPage() {
             </div>
           </div>
         </div>
-
-        {/* Main Content */}
         <div className="mx-auto px-4 sm:px-6 lg:px-14 py-8">
           {isPendingApproval && (
             <div className="mb-6 bg-amber-50 border border-amber-200 rounded-md p-6">
@@ -446,7 +450,6 @@ export default function TenderDetailPage() {
               </div>
             </div>
           )}
-
           {tender.status === "draft" && (
             <div className="mb-6 bg-yellow-50 border border-yellow-200 rounded-md p-6">
               <div className="flex items-start">
@@ -465,31 +468,49 @@ export default function TenderDetailPage() {
               </div>
             </div>
           )}
-
-          {/* Hero Card */}
-          <div className="bg-white rounded-md shadow-0 border border-gray-100 p-8 mb-8">
+          <div className="bg-white rounded-md shadow-none border border-gray-100 p-8 mb-8">
             <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between">
               <div className="flex-1">
-                <div className="flex items-center gap-3 mb-4">
-                  <h1 className="text-3xl font-bold text-gray-900 leading-tight">
-                    {tender.title}
-                  </h1>
-                  <Badge
-                    className={`px-3 py-1 rounded-full text-xs font-medium border ${
-                      tender.status === "active"
-                        ? "bg-green-50 text-green-700 border-green-200"
-                        : tender.status === "awarded"
-                        ? "bg-blue-50 text-blue-700 border-blue-200"
-                        : tender.status === "completed"
-                        ? "bg-purple-50 text-purple-700 border-purple-200"
-                        : tender.status === "closed"
-                        ? "bg-gray-50 text-gray-700 border-gray-200"
-                        : "bg-yellow-50 text-yellow-700 border-yellow-200"
-                    }`}
-                  >
-                    {tender.status.charAt(0).toUpperCase() +
-                      tender.status.slice(1)}
-                  </Badge>
+                <div className="flex w-full  justify-between mb-4">
+                  {" "}
+                  <div className="flex items-center gap-3 mb-4">
+                    <h1 className="text-3xl font-bold text-gray-900 leading-tight">
+                      {tender.title}
+                    </h1>
+                    <Badge
+                      className={`px-3 py-1 rounded-full text-xs font-medium border ${
+                        tender.status === "active"
+                          ? "bg-green-50 text-green-700 border-green-200"
+                          : tender.status === "awarded"
+                          ? "bg-blue-50 text-blue-700 border-blue-200"
+                          : tender.status === "completed"
+                          ? "bg-purple-50 text-purple-700 border-purple-200"
+                          : tender.status === "closed"
+                          ? "bg-gray-50 text-gray-700 border-gray-200"
+                          : "bg-yellow-50 text-yellow-700 border-yellow-200"
+                      }`}
+                    >
+                      {tender.status.charAt(0).toUpperCase() +
+                        tender.status.slice(1)}
+                    </Badge>
+                  </div>
+                  {tender.image && (
+                    <div className="mb-6">
+                      <Button
+                        onClick={() =>
+                          setImageModal({
+                            open: true,
+                            imageUrl: tender.image,
+                            type: "tender",
+                          })
+                        }
+                        className="bg-white text-blue-500 shadow-none border border-blue-500 rounded-md px-4 py-2 h-auto text-sm font-medium flex items-center mb-4"
+                      >
+                        <ImageIcon className="h-4 w-4 mr-2" />
+                        View Tender Image
+                      </Button>
+                    </div>
+                  )}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                   <div className="flex items-center text-gray-600">
@@ -544,7 +565,6 @@ export default function TenderDetailPage() {
                   </div>
                 </div>
               </div>
-
               {isAwarded && (
                 <div className="mt-6 lg:mt-0 lg:ml-8">
                   <Button
@@ -564,10 +584,9 @@ export default function TenderDetailPage() {
               )}
             </div>
           </div>
-
           {!isPendingApproval ? (
             <>
-              <div className="bg-white rounded-md shadow-0 border border-gray-100 mb-6">
+              <div className="bg-white rounded-md shadow-none border border-gray-100 mb-6">
                 <div className="flex border-b border-gray-100">
                   <button
                     onClick={() => setActiveTab("bids")}
@@ -603,7 +622,6 @@ export default function TenderDetailPage() {
                   )}
                 </div>
               </div>
-
               {activeTab === "bids" && (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
                   {hasAwardedBid && (
@@ -621,12 +639,11 @@ export default function TenderDetailPage() {
                       </div>
                     </div>
                   )}
-
                   {bids.length > 0 ? (
                     bids.map((bid) => (
                       <div
                         key={bid._id}
-                        className="bg-white rounded-md shadow-0 border border-gray-100 overflow-hidden hover:shadow-md transition-shadow"
+                        className="bg-white rounded-md shadow-none border border-gray-100 overflow-hidden hover:shadow-md transition-shadow"
                       >
                         <div className="p-6">
                           <div className="flex items-start justify-between mb-4">
@@ -692,22 +709,41 @@ export default function TenderDetailPage() {
                               {bid.description}
                             </p>
                           </div>
-                          <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                            {(!bid.bidder.profile?.anonymousBidding ||
-                              bid.status === "accepted" ||
-                              bid.status === "completed") && (
-                              <Link
-                                href={
-                                  profile?.userType !== "business"
-                                    ? `/dashboard/my-tenders/bidder-profile/${bid.bidder._id}`
-                                    : `/business-dashboard/my-tenders/bidder-profile/${bid.bidder._id}`
+                          {bid.image?.url && (
+                            <div className="mt-4">
+                              <Button
+                                onClick={() =>
+                                  setImageModal({
+                                    open: true,
+                                    imageUrl: bid.image?.url || null,
+                                    type: "bid",
+                                  })
                                 }
-                                className="flex items-center text-blue-500 hover:text-blue-600 font-medium text-sm transition-colors"
+                                className="bg-white text-blue-500 shadow-none border border-blue-500 rounded-md mb-5 px-4 py-2 h-auto text-sm font-medium flex items-center"
                               >
-                                View Profile
-                                <ExternalLink className="h-4 w-4 ml-1" />
-                              </Link>
-                            )}
+                                <ImageIcon className="h-4 w-4 mr-2" />
+                                View Bid Image
+                              </Button>
+                            </div>
+                          )}
+                          <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                            <div>
+                              {(!bid.bidder.profile?.anonymousBidding ||
+                                bid.status === "accepted" ||
+                                bid.status === "completed") && (
+                                <Link
+                                  href={
+                                    profile?.userType !== "business"
+                                      ? `/dashboard/my-tenders/bidder-profile/${bid.bidder._id}`
+                                      : `/business-dashboard/my-tenders/bidder-profile/${bid.bidder._id}`
+                                  }
+                                  className="flex items-center text-blue-500 hover:text-blue-600 font-medium text-sm transition-colors"
+                                >
+                                  View Profile
+                                  <ExternalLink className="h-4 w-4 ml-1" />
+                                </Link>
+                              )}
+                            </div>
                             <div className="flex gap-2">
                               {bid.status === "submitted" && !hasAwardedBid && (
                                 <div className="flex gap-2">
@@ -752,7 +788,7 @@ export default function TenderDetailPage() {
                       </div>
                     ))
                   ) : (
-                    <div className="col-span-2 bg-white rounded-md shadow-0 border border-gray-100 p-12 text-center">
+                    <div className="col-span-2 bg-white rounded-md shadow-none border border-gray-100 p-12 text-center">
                       <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
                         <Building2 className="h-8 w-8 text-gray-300" />
                       </div>
@@ -766,14 +802,13 @@ export default function TenderDetailPage() {
                   )}
                 </div>
               )}
-
               {activeTab === "qa" && (
                 <div className="space-y-6">
                   {questions.length > 0 ? (
                     questions.map((question) => (
                       <div
                         key={question._id}
-                        className="bg-white rounded-md shadow-0 border border-gray-100 overflow-hidden"
+                        className="bg-white rounded-md shadow-none border border-gray-100 overflow-hidden"
                       >
                         <div className="p-6">
                           <div className="flex items-start mb-6">
@@ -857,7 +892,11 @@ export default function TenderDetailPage() {
                                 className="bg-blue-500 hover:bg-blue-600 text-white rounded-full px-6 py-2 h-auto font-medium"
                               >
                                 {submittingAnswer[question._id] ? (
-                                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                                  <Loader2
+                                    className="h-4 w-4
+
+ animate-spin mr-2"
+                                  />
                                 ) : (
                                   <Send className="h-4 w-4 mr-2" />
                                 )}
@@ -869,7 +908,7 @@ export default function TenderDetailPage() {
                       </div>
                     ))
                   ) : (
-                    <div className="bg-white rounded-md shadow-0 border border-gray-100 p-12 text-center">
+                    <div className="bg-white rounded-md shadow-none border border-gray-100 p-12 text-center">
                       <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
                         <MessageSquare className="h-8 w-8 text-gray-300" />
                       </div>
@@ -883,9 +922,8 @@ export default function TenderDetailPage() {
                   )}
                 </div>
               )}
-
               {activeTab === "reviews" && hasAwardedBid && (
-                <div className="bg-white rounded-md shadow-0 border border-gray-100 p-6">
+                <div className="bg-white rounded-md shadow-none border border-gray-100 p-6">
                   <h2 className="text-xl font-bold text-gray-900 mb-6">
                     Reviews
                   </h2>
@@ -954,7 +992,7 @@ export default function TenderDetailPage() {
               )}
             </>
           ) : (
-            <div className="bg-white rounded-md shadow-0 border border-gray-100 p-12 text-center">
+            <div className="bg-white rounded-md shadow-none border border-gray-100 p-12 text-center">
               <div className="w-16 h-16 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-6">
                 <LockIcon className="h-8 w-8 text-amber-500" />
               </div>
@@ -972,8 +1010,6 @@ export default function TenderDetailPage() {
             </div>
           )}
         </div>
-
-        {/* Make Active Confirmation Modal (your original) */}
         {showActivateModal && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
             <div className="bg-white/90 backdrop-blur-xl rounded-2xl border border-gray-100/50 max-w-md w-full">
@@ -1034,8 +1070,6 @@ export default function TenderDetailPage() {
             </div>
           </div>
         )}
-
-        {/* ✅ Return for Revision Modal (from Version 2) */}
         {returnForRevision.open && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
             <div className="bg-white/90 backdrop-blur-xl rounded-2xl border border-gray-100/50 max-w-md w-full">
@@ -1095,6 +1129,44 @@ export default function TenderDetailPage() {
                     )}
                     Return for Revision
                   </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        {imageModal.open && imageModal.imageUrl && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div className="bg-white/90 backdrop-blur-xl rounded-2xl border border-gray-100/50 max-w-3xl w-full">
+              <div className="p-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-semibold text-gray-900">
+                    {imageModal.type === "tender"
+                      ? "Tender Image"
+                      : "Bid Image"}
+                  </h2>
+                  <button
+                    onClick={() =>
+                      setImageModal({
+                        open: false,
+                        imageUrl: null,
+                        type: undefined,
+                      })
+                    }
+                    className="p-2 rounded-full hover:bg-gray-100 transition-colors duration-200"
+                  >
+                    <X className="h-5 w-5 text-gray-500" />
+                  </button>
+                </div>
+                <div className="flex justify-center">
+                  <img
+                    src={imageModal.imageUrl}
+                    alt={
+                      imageModal.type === "tender"
+                        ? tender.title
+                        : "Bid supporting image"
+                    }
+                    className="rounded-md max-h-[70vh] w-full object-contain"
+                  />
                 </div>
               </div>
             </div>

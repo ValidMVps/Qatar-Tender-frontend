@@ -23,6 +23,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { createBid } from "@/app/services/BidService";
 import { uploadToCloudinary } from "@/utils/uploadToCloudinary";
+import { useAuth } from "@/context/AuthContext";
 
 enum BidStep {
   BID_DETAILS = 1,
@@ -57,9 +58,30 @@ export default function BiddingSection({
     size: number;
   } | null>(null);
   const [uploading, setUploading] = useState(false);
+  const { user } = useAuth();
   const [uploadError, setUploadError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
+  if (user?.isDocumentVerified) {
+    return (
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 text-center">
+          <Shield className="h-12 w-12 mx-auto text-red-500 mb-4" />
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            Account Not Verified
+          </h2>
+          <p className="text-gray-600 mb-6">
+            You need to verify your account before submitting a bid.
+          </p>
+          <Button
+            onClick={onCancel}
+            className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-xl py-3 font-medium transition-all duration-300"
+          >
+            Close
+          </Button>
+        </div>
+      </div>
+    );
+  }
   const handleNextStep = () => {
     if (currentStep === BidStep.BID_DETAILS) {
       if (!bidAmount || !bidDescription.trim()) {
@@ -227,7 +249,7 @@ export default function BiddingSection({
                 className="w-full rounded-xl border-gray-200 focus:border-blue-400 focus:ring-blue-400/20 transition-all duration-300"
               />
               <p className="text-sm text-gray-500 mt-2">
-                {bidDescription.length}/1500 characters
+                {bidDescription.length}/5000 characters
               </p>
             </div>
 

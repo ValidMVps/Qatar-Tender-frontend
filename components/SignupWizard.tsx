@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -26,7 +27,6 @@ import {
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
-
 import { useTranslation } from "../lib/hooks/useTranslation";
 import { useAuth } from "@/context/AuthContext";
 
@@ -42,6 +42,8 @@ type FormState = {
   countryCode: string;
   phone: string;
   password: string;
+  dateOfBirth: string;
+  agreeToTerms: boolean;
 };
 
 const initialState: FormState = {
@@ -53,6 +55,8 @@ const initialState: FormState = {
   countryCode: "+974",
   phone: "",
   password: "",
+  dateOfBirth: "",
+  agreeToTerms: false,
 };
 
 const countries = [
@@ -99,6 +103,20 @@ export default function SignupWizard() {
     });
   };
 
+  const calculateAge = (dob: string): number => {
+    const birthDate = new Date(dob);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birthDate.getDate())
+    ) {
+      age--;
+    }
+    return age;
+  };
+
   const validateStep = (s: Step): boolean => {
     const nextErrors: Record<string, string> = {};
 
@@ -143,6 +161,18 @@ export default function SignupWizard() {
       } else if (!/[^a-zA-Z0-9]/.test(form.password)) {
         nextErrors.password = "Include at least one special character.";
       }
+
+      if (!form.dateOfBirth) {
+        nextErrors.dateOfBirth = "Date of birth is required.";
+      } else if (calculateAge(form.dateOfBirth) < 18) {
+        nextErrors.dateOfBirth =
+          "You must be at least 18 years old to register.";
+      }
+
+      if (!form.agreeToTerms) {
+        nextErrors.agreeToTerms =
+          "You must agree to the Terms of Service and Privacy Policy.";
+      }
     }
 
     setErrors(nextErrors);
@@ -181,6 +211,8 @@ export default function SignupWizard() {
         password: form.password,
         userType: form.accountType!,
         phone: `${form.countryCode}${form.phone}`,
+        dateOfBirth: form.dateOfBirth,
+        agreeToTerms: form.agreeToTerms, // Added
         ...(form.accountType === "individual"
           ? { fullName: form.fullName }
           : { companyName: form.companyName }),
@@ -189,9 +221,8 @@ export default function SignupWizard() {
       const result = await register(registrationData);
 
       if (result.success) {
-        // Registration successful - user created but not verified yet
         setRegistrationSuccess(true);
-        setStep(3); // Show verification step
+        setStep(3);
         setResendCooldown(30);
         toast({
           title: "Registration successful!",
@@ -200,7 +231,6 @@ export default function SignupWizard() {
             `We've sent a verification email to ${currentEmail}. Please check your email and click the verification link.`,
         });
       } else {
-        // Handle specific errors
         if (result.error?.includes("already exists")) {
           setErrors({
             email: "This email is already registered. Try logging in instead.",
@@ -561,6 +591,26 @@ function StepTwo({
       )}
 
       <div className="space-y-3">
+        <Label htmlFor="dateOfBirth" className="text-base font-medium">
+          Date of Birth
+        </Label>
+        <Input
+          id="dateOfBirth"
+          type="date"
+          value={form.dateOfBirth}
+          onChange={(e) => onChange({ dateOfBirth: e.target.value })}
+          className={cn(
+            "py-3 mt-2 text-base",
+            errors.dateOfBirth && "border-red-500"
+          )}
+          max={new Date().toISOString().split("T")[0]}
+        />
+        {errors.dateOfBirth && (
+          <p className="text-sm text-red-600 mt-2">{errors.dateOfBirth}</p>
+        )}
+      </div>
+
+      <div className="space-y-3">
         <Label htmlFor="phone" className="text-base font-medium">
           {t("phone")}
         </Label>
@@ -625,6 +675,37 @@ function StepTwo({
           special characters.
         </p>
       </div>
+
+      <div className="space-y-3">
+        <div className="flex items-start space-x-2">
+          <Checkbox
+            id="agreeToTerms"
+            checked={form.agreeToTerms}
+            onCheckedChange={(checked) => onChange({ agreeToTerms: !!checked })}
+          />
+          <Label htmlFor="agreeToTerms" className="text-sm font-medium">
+            By continuing, you confirm authority to bind your organization and
+            agree to the
+            <Link href="/terms" className="text-blue-600 hover:underline">
+              Terms of Service
+            </Link>{" "}
+            and acknowledge the{" "}
+            <Link href="/privacy" className="text-blue-600 hover:underline">
+              Privacy Policy
+            </Link>
+            {" , "}
+            You consent to electronic communications and e-signatures.
+          </Label>
+        </div>
+        {errors.agreeToTerms && (
+          <p className="text-sm text-red-600 mt-2">{errors.agreeToTerms}</p>
+        )}
+        <p className="text-xs text-foreground mt-2">
+          By signing up, you confirm you are 18 or older and agree to comply
+          with all applicable laws, including procurement, anti-bribery, and
+          data protection regulations.
+        </p>
+      </div>
     </div>
   );
 }
@@ -678,10 +759,6 @@ function StepThree({
       </div>
     </div>
   );
-}
-
-function sample<T>(arr: T[]): T {
-  return arr[Math.floor(Math.random() * arr.length)];
 }
 
 function StepHeader({ current }: { current: Step }) {

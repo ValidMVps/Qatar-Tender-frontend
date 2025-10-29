@@ -44,7 +44,7 @@ class AuthService {
     try {
       const response = await api.post("/api/users/login", { email, password });
       const { accessToken, ...userData } = response.data;
-
+      console.log("📦 Login Response:", response.data);
       if (accessToken) {
         setTokenCookie(accessToken);
         return { success: true, user: userData };
