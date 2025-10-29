@@ -125,7 +125,7 @@ export default function TenderDetailsPage({ params }: PageProps) {
         setLoading(true);
         setError(null);
         const tenderData = await getTender(id);
-
+        console.log(tenderData);
         setTender(tenderData);
         try {
           const userBids: Bid[] = (await getUserBids()) || [];
@@ -363,19 +363,33 @@ export default function TenderDetailsPage({ params }: PageProps) {
                             <p className="text-sm text-gray-600">
                               {getUserTypeLabel(tender.postedBy?.userType)}
                             </p>
-                            {tender.postedBy?.rating && (
-                              <div className="flex items-center gap-1">
-                                {renderStars(tender.postedBy.rating)}
-                                <span className="text-sm font-medium text-gray-700 ml-1">
-                                  {tender.postedBy.rating}
+                            {tender.postedBy?.profile && (
+                              <>
+                                {/* ✅ Rating */}
+                                <div className="flex items-center gap-1">
+                                  {tender.postedBy.profile.rating > 0 ? (
+                                    <>
+                                      {renderStars(
+                                        tender.postedBy.profile.rating
+                                      )}
+                                      <span className="text-sm font-medium text-gray-700 ml-1">
+                                        {tender.postedBy.profile.rating} Rating
+                                      </span>
+                                    </>
+                                  ) : (
+                                    <span className="text-sm text-gray-500">
+                                      No ratings yet
+                                    </span>
+                                  )}
+                                </div>
+
+                                {/* ✅ Completed Tenders */}
+                                <span className="text-sm text-gray-600">
+                                  {tender.postedBy.profile.completedTenders > 0
+                                    ? `${tender.postedBy.profile.completedTenders} projects completed`
+                                    : "No projects completed yet"}
                                 </span>
-                              </div>
-                            )}
-                            {tender.postedBy?.profile.completedTenders && (
-                              <span className="text-sm text-gray-600">
-                                {tender.postedBy.profile.completedTenders}{" "}
-                                projects completed
-                              </span>
+                              </>
                             )}
                           </div>
                         </div>
