@@ -1030,14 +1030,16 @@ export default function TenderDetailPage() {
                     <X className="h-5 w-5 text-gray-500" />
                   </button>
                 </div>
-                <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4 mb-6">
-                  <div className="flex items-start gap-2">
-                    <AlertTriangle className="h-5 w-5 text-yellow-600 mt-0.5" />
-                    <div>
-                      <h3 className="font-semibold text-yellow-800 mb-1">
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6 shadow-sm">
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0">
+                      <AlertTriangle className="h-5 w-5 text-yellow-600 mt-0.5" />
+                    </div>
+                    <div className="flex flex-col min-w-0">
+                      <h3 className="font-semibold text-yellow-800 text-base leading-snug break-words">
                         {t("tender_will_be_public")}
                       </h3>
-                      <p className="text-yellow-700 text-sm">
+                      <p className="text-yellow-700 text-sm mt-1 leading-relaxed break-words whitespace-pre-wrap">
                         {t(
                           "once_published_all_businesses_can_see_and_bid_on_this_tender"
                         )}

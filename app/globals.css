@@ -129,3 +129,9 @@
   display: none;
 }
 
+.g-recaptcha {
+  z-index: 1000;
+  position: relative;
+  opacity: 1;
+  visibility: visible;
+}
