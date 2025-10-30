@@ -28,7 +28,7 @@ import {
   RefreshCw,
   AlertTriangle,
   Play,
-  Image as ImageIcon,
+  ImageIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
@@ -354,9 +354,11 @@ export default function TenderDetailPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <div className="flex flex-col items-center justify-center min-h-screen space-y-4">
+        <div className="flex flex-col items-center justify-center min-h-screen space-y-4 p-4">
           <div className="w-8 h-8 border-2 border-gray-300 border-t-blue-500 rounded-full animate-spin"></div>
-          <p className="text-gray-600 font-medium">Loading tender details...</p>
+          <p className="text-gray-600 font-medium text-center">
+            Loading tender details...
+          </p>
         </div>
       </div>
     );
@@ -366,17 +368,17 @@ export default function TenderDetailPage() {
     return (
       <div className="min-h-screen bg-gray-50">
         <div className="flex flex-col items-center justify-center min-h-screen px-4">
-          <div className="bg-white rounded-md shadow-none border border-gray-100 p-8 text-center max-w-md w-full">
+          <div className="bg-white rounded-md shadow-none border border-gray-100 p-6 sm:p-8 text-center max-w-md w-full">
             <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
               <AlertCircle className="h-8 w-8 text-red-500" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
               Something went wrong
             </h3>
             <p className="text-gray-600 mb-6 leading-relaxed">{error}</p>
             <Button
               onClick={() => window.location.reload()}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-full font-medium transition-all"
+              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 sm:px-6 sm:py-2.5 rounded-full font-medium transition-all text-sm sm:text-base"
             >
               Try Again
             </Button>
@@ -390,11 +392,11 @@ export default function TenderDetailPage() {
     return (
       <div className="min-h-screen bg-gray-50">
         <div className="flex flex-col items-center justify-center min-h-screen px-4">
-          <div className="bg-white rounded-md shadow-none border border-gray-100 p-8 text-center max-w-md w-full">
+          <div className="bg-white rounded-md shadow-none border border-gray-100 p-6 sm:p-8 text-center max-w-md w-full">
             <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
               <AlertCircle className="h-8 w-8 text-gray-400" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
               Tender Not Found
             </h3>
             <p className="text-gray-600 leading-relaxed">
@@ -414,35 +416,38 @@ export default function TenderDetailPage() {
             <div className="flex items-center justify-between h-16">
               <div
                 onClick={() => router.back()}
-                className="flex items-center text-blue-500 hover:text-blue-600 font-medium transition-colors"
+                className="flex items-center text-blue-500 hover:text-blue-600 font-medium transition-colors text-sm sm:text-base"
               >
-                <ArrowLeft className="h-5 w-5 mr-2" />
+                <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5 sm:mr-2" />
                 Tenders
               </div>
               {canBeMadeActive && (
                 <Button
                   onClick={() => setShowActivateModal(true)}
-                  className="bg-green-500 hover:bg-green-600 text-white rounded-full px-6 py-3 h-auto font-medium flex items-center"
+                  className="bg-green-500 hover:bg-green-600 text-white rounded-full px-4 py-2 sm:px-6 sm:py-3 h-auto font-medium flex items-center text-sm sm:text-base"
                 >
-                  <Play className="h-5 w-5 mr-2" />
+                  <Play className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5 sm:mr-2" />
                   {t("make_active")}
                 </Button>
               )}
             </div>
           </div>
         </div>
-        <div className="mx-auto px-4 sm:px-6 lg:px-14 py-8">
+
+        <div className="mx-auto px-4 sm:px-6 lg:px-14 py-6 sm:py-8">
           {isPendingApproval && (
-            <div className="mb-6 bg-amber-50 border border-amber-200 rounded-md p-6">
-              <div className="flex items-start">
-                <div className="flex-shrink-0">
+            <div className="mb-6 bg-amber-50 border border-amber-200 rounded-md p-4 sm:p-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center">
+                <div className="flex-shrink-0 mb-3 sm:mb-0">
                   <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center">
                     <Clock className="h-5 w-5 text-amber-600" />
                   </div>
                 </div>
-                <div className="ml-4">
-                  <h3 className="text-amber-900 font-semibold">Under Review</h3>
-                  <p className="text-amber-800 mt-1 leading-relaxed">
+                <div className="ml-0 sm:ml-4">
+                  <h3 className="text-amber-900 font-semibold text-sm sm:text-base">
+                    Under Review
+                  </h3>
+                  <p className="text-amber-800 mt-1 leading-relaxed text-xs sm:text-sm">
                     This tender is currently being reviewed. Bids and Q&A will
                     be available once approved.
                   </p>
@@ -450,17 +455,20 @@ export default function TenderDetailPage() {
               </div>
             </div>
           )}
+
           {tender.status === "draft" && (
-            <div className="mb-6 bg-yellow-50 border border-yellow-200 rounded-md p-6">
-              <div className="flex items-start">
-                <div className="flex-shrink-0">
+            <div className="mb-6 bg-yellow-50 border border-yellow-200 rounded-md p-4 sm:p-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center">
+                <div className="flex-shrink-0 mb-3 sm:mb-0">
                   <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
                     <AlertTriangle className="h-5 w-5 text-yellow-600" />
                   </div>
                 </div>
-                <div className="ml-4">
-                  <h3 className="text-yellow-900 font-semibold">Draft Mode</h3>
-                  <p className="text-yellow-800 mt-1 leading-relaxed">
+                <div className="ml-0 sm:ml-4">
+                  <h3 className="text-yellow-900 font-semibold text-sm sm:text-base">
+                    Draft Mode
+                  </h3>
+                  <p className="text-yellow-800 mt-1 leading-relaxed text-xs sm:text-sm">
                     This tender is in draft mode. Click "Make Active" to publish
                     it and start receiving bids.
                   </p>
@@ -468,17 +476,17 @@ export default function TenderDetailPage() {
               </div>
             </div>
           )}
-          <div className="bg-white rounded-md shadow-none border border-gray-100 p-8 mb-8">
-            <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between">
+
+          <div className="bg-white rounded-md shadow-none border border-gray-100 p-6 sm:p-8 mb-8">
+            <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
               <div className="flex-1">
-                <div className="flex w-full  justify-between mb-4">
-                  {" "}
-                  <div className="flex items-center gap-3 mb-4">
-                    <h1 className="text-3xl font-bold text-gray-900 leading-tight">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 gap-4">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 leading-tight">
                       {tender.title}
                     </h1>
                     <Badge
-                      className={`px-3 py-1 rounded-full text-xs font-medium border ${
+                      className={`px-2 py-1 sm:px-3 sm:py-1 rounded-full text-xs sm:text-sm font-medium border ${
                         tender.status === "active"
                           ? "bg-green-50 text-green-700 border-green-200"
                           : tender.status === "awarded"
@@ -495,31 +503,30 @@ export default function TenderDetailPage() {
                     </Badge>
                   </div>
                   {tender.image && (
-                    <div className="mb-6">
-                      <Button
-                        onClick={() =>
-                          setImageModal({
-                            open: true,
-                            imageUrl: tender.image,
-                            type: "tender",
-                          })
-                        }
-                        className="bg-white text-blue-500 shadow-none border border-blue-500 rounded-md px-4 py-2 h-auto text-sm font-medium flex items-center mb-4"
-                      >
-                        <ImageIcon className="h-4 w-4 mr-2" />
-                        View Tender Image
-                      </Button>
-                    </div>
+                    <Button
+                      onClick={() =>
+                        setImageModal({
+                          open: true,
+                          imageUrl: tender.image,
+                          type: "tender",
+                        })
+                      }
+                      className="bg-white text-blue-500 shadow-none border border-blue-500 rounded-md px-3 py-1.5 sm:px-4 sm:py-2 h-auto text-xs sm:text-sm font-medium flex items-center"
+                    >
+                      <ImageIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
+                      View Tender Image
+                    </Button>
                   )}
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
                   <div className="flex items-center text-gray-600">
                     <div className="w-8 h-8 bg-blue-50 rounded-full flex items-center justify-center mr-3">
                       <Calendar className="h-4 w-4 text-blue-500" />
                     </div>
                     <div>
-                      <p className="text-sm text-gray-500">Posted</p>
-                      <p className="font-medium">
+                      <p className="text-xs sm:text-sm text-gray-500">Posted</p>
+                      <p className="font-medium text-sm sm:text-base">
                         {formatDate(tender.createdAt)}
                       </p>
                     </div>
@@ -529,8 +536,12 @@ export default function TenderDetailPage() {
                       <MapPin className="h-4 w-4 text-green-500" />
                     </div>
                     <div>
-                      <p className="text-sm text-gray-500">Location</p>
-                      <p className="font-medium">{tender.location}</p>
+                      <p className="text-xs sm:text-sm text-gray-500">
+                        Location
+                      </p>
+                      <p className="font-medium text-sm sm:text-base">
+                        {tender.location}
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-center text-gray-600">
@@ -538,17 +549,18 @@ export default function TenderDetailPage() {
                       <DollarSign className="h-4 w-4 text-emerald-500" />
                     </div>
                     <div>
-                      <p className="text-sm text-gray-500">Budget</p>
-                      <p className="font-semibold text-emerald-600">
+                      <p className="text-xs sm:text-sm text-gray-500">Budget</p>
+                      <p className="font-semibold text-emerald-600 text-sm sm:text-base">
                         {formatCurrency(tender.estimatedBudget)}
                       </p>
                     </div>
                   </div>
                 </div>
-                <p className="text-gray-700 leading-relaxed mb-6 text-lg">
+
+                <p className="text-gray-700 leading-relaxed mb-6 text-base sm:text-lg whitespace-pre-wrap break-words">
                   {tender.description}
                 </p>
-                <div className="flex flex-wrap gap-6 text-sm">
+                <div className="flex flex-wrap gap-4 text-sm">
                   <div className="flex items-center text-gray-600">
                     <Trophy className="h-4 w-4 mr-2 text-purple-500" />
                     <span className="text-gray-500 mr-1">Category:</span>
@@ -556,15 +568,16 @@ export default function TenderDetailPage() {
                       {tender.category.name}
                     </span>
                   </div>
-                  <div className="flex items-center text-gray-600">
-                    <User className="h-4 w-4 mr-2 text-gray-400" />
+                  <div className="flex flex-wrap items-center text-gray-600 break-all">
+                    <User className="h-4 w-4 mr-2 text-gray-400 shrink-0" />
                     <span className="text-gray-500 mr-1">Contact:</span>
-                    <span className="font-medium text-gray-900">
+                    <span className="font-medium text-gray-900 break-all">
                       {tender.contactEmail}
                     </span>
                   </div>
                 </div>
               </div>
+
               {isAwarded && (
                 <div className="mt-6 lg:mt-0 lg:ml-8">
                   <Button
@@ -575,22 +588,23 @@ export default function TenderDetailPage() {
                           : "/dashboard/projects"
                       )
                     }
-                    className="bg-blue-500 hover:bg-blue-600 text-white rounded-full px-6 py-3 h-auto font-medium flex items-center"
+                    className="bg-blue-500 hover:bg-blue-600 text-white rounded-full px-4 py-2 sm:px-6 sm:py-3 h-auto font-medium flex items-center text-sm sm:text-base"
                   >
-                    <MessageSquare className="h-5 w-5 mr-2" />
+                    <MessageSquare className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5 sm:mr-2" />
                     Chat with Bidder
                   </Button>
                 </div>
               )}
             </div>
           </div>
+
           {!isPendingApproval ? (
             <>
               <div className="bg-white rounded-md shadow-none border border-gray-100 mb-6">
-                <div className="flex border-b border-gray-100">
+                <div className="flex flex-wrap border-b border-gray-100">
                   <button
                     onClick={() => setActiveTab("bids")}
-                    className={`flex-1 py-4 px-6 font-semibold text-center transition-all relative ${
+                    className={`flex-1 py-3 px-4 sm:py-4 sm:px-6 font-semibold text-center transition-all relative text-sm sm:text-base ${
                       activeTab === "bids"
                         ? "text-blue-600 bg-blue-50"
                         : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
@@ -600,7 +614,7 @@ export default function TenderDetailPage() {
                   </button>
                   <button
                     onClick={() => setActiveTab("qa")}
-                    className={`flex-1 py-4 px-6 font-semibold text-center transition-all relative ${
+                    className={`flex-1 py-3 px-4 sm:py-4 sm:px-6 font-semibold text-center transition-all relative text-sm sm:text-base ${
                       activeTab === "qa"
                         ? "text-blue-600 bg-blue-50"
                         : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
@@ -611,7 +625,7 @@ export default function TenderDetailPage() {
                   {hasAwardedBid && (
                     <button
                       onClick={() => setActiveTab("reviews")}
-                      className={`flex-1 py-4 px-6 font-semibold text-center transition-all relative ${
+                      className={`flex-1 py-3 px-4 sm:py-4 sm:px-6 font-semibold text-center transition-all relative text-sm sm:text-base ${
                         activeTab === "reviews"
                           ? "text-blue-600 bg-blue-50"
                           : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
@@ -622,13 +636,14 @@ export default function TenderDetailPage() {
                   )}
                 </div>
               </div>
+
               {activeTab === "bids" && (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
+                <div className="grid grid-cols-1 gap-6 mb-10">
                   {hasAwardedBid && (
-                    <div className="col-span-2 bg-green-50 border border-green-200 rounded-md p-4 mb-4">
+                    <div className="bg-green-50 border border-green-200 rounded-md p-4">
                       <div className="flex items-center">
-                        <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
-                        <p className="text-green-800 font-medium">
+                        <CheckCircle className="h-5 w-5 text-green-600 mr-2 flex-shrink-0" />
+                        <p className="text-green-800 font-medium text-sm sm:text-base">
                           Tender awarded to{" "}
                           <span className="font-semibold">
                             {awardedBid.bidder.profile?.fullName ||
@@ -639,169 +654,188 @@ export default function TenderDetailPage() {
                       </div>
                     </div>
                   )}
+
                   {bids.length > 0 ? (
-                    bids.map((bid) => (
-                      <div
-                        key={bid._id}
-                        className="bg-white rounded-md shadow-none border border-gray-100 overflow-hidden hover:shadow-md transition-shadow"
-                      >
-                        <div className="p-6">
-                          <div className="flex items-start justify-between mb-4">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-6">
-                                <h3 className="font-semibold text-gray-900 text-lg">
-                                  {!bid.bidder.profile?.anonymousBidding ||
-                                  bid.status === "accepted"
-                                    ? bid.bidder.profile?.fullName ||
-                                      bid.bidder.profile?.companyName ||
-                                      bid.bidder.email.split("@")[0]
-                                    : "Anonymous Bidder"}
-                                </h3>
-                                {bid.bidder.isVerified && (
-                                  <div className="flex items-center bg-blue-50 text-blue-700 px-2 py-1 rounded-full text-xs font-medium">
-                                    <Shield className="h-3 w-3 mr-1" />
-                                    Verified
-                                  </div>
-                                )}
-                                {bid.status === "accepted" && (
-                                  <div className="flex items-center bg-green-50 text-green-700 px-2 py-1 rounded-full text-xs font-medium">
-                                    <CheckCircle className="h-3 w-3 mr-1" />
-                                    Awarded
-                                  </div>
-                                )}
-                                {bid.status === "returned_for_revision" && (
-                                  <div className="flex items-center bg-yellow-50 text-yellow-700 px-2 py-1 rounded-full text-xs font-medium">
-                                    <RefreshCw className="h-3 w-3 mr-1" />
-                                    Needs Revision
-                                  </div>
-                                )}
-                              </div>
-                              <div className="flex items-center justify-start gap-6">
-                                {(!bid.bidder.profile?.anonymousBidding ||
-                                  bid.status === "accepted") &&
-                                  bid.bidder.profile?.phone && (
-                                    <div className="flex items-center text-sm text-gray-500">
-                                      <Phone className="h-4 w-4 mr-2" />
-                                      {bid.bidder.profile.phone}
-                                    </div>
-                                  )}
-                                {(!bid.bidder.profile?.anonymousBidding ||
-                                  bid.status === "accepted") &&
-                                  bid.bidder.profile?.address && (
-                                    <div className="flex items-center text-sm text-gray-500">
-                                      <MapPin className="h-4 w-4 mr-2" />
-                                      {bid.bidder.profile.address}
-                                    </div>
-                                  )}
-                              </div>
-                            </div>
-                            <div className="text-right ml-4">
-                              <div className="text-2xl font-bold text-gray-900 mb-1">
-                                {formatCurrency(bid.amount)}
-                              </div>
-                              <div className="text-sm text-gray-500">
-                                {formatDate(bid.createdAt)}
-                              </div>
-                            </div>
-                          </div>
-                          <div className="bg-gray-50 rounded-md p-4 mb-4">
-                            <p className="text-gray-700 leading-relaxed">
-                              {bid.description}
-                            </p>
-                          </div>
-                          {bid.image?.url && (
-                            <div className="mt-4">
-                              <Button
-                                onClick={() =>
-                                  setImageModal({
-                                    open: true,
-                                    imageUrl: bid.image?.url || null,
-                                    type: "bid",
-                                  })
-                                }
-                                className="bg-white text-blue-500 shadow-none border border-blue-500 rounded-md mb-5 px-4 py-2 h-auto text-sm font-medium flex items-center"
-                              >
-                                <ImageIcon className="h-4 w-4 mr-2" />
-                                View Bid Image
-                              </Button>
-                            </div>
-                          )}
-                          <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                            <div>
-                              {(!bid.bidder.profile?.anonymousBidding ||
-                                bid.status === "accepted" ||
-                                bid.status === "completed") && (
-                                <Link
-                                  href={
-                                    profile?.userType !== "business"
-                                      ? `/dashboard/my-tenders/bidder-profile/${bid.bidder._id}`
-                                      : `/business-dashboard/my-tenders/bidder-profile/${bid.bidder._id}`
-                                  }
-                                  className="flex items-center text-blue-500 hover:text-blue-600 font-medium text-sm transition-colors"
-                                >
-                                  View Profile
-                                  <ExternalLink className="h-4 w-4 ml-1" />
-                                </Link>
-                              )}
-                            </div>
-                            <div className="flex gap-2">
-                              {bid.status === "submitted" && !hasAwardedBid && (
-                                <div className="flex gap-2">
-                                  <Button
-                                    onClick={() =>
-                                      handleBidStatusUpdate(bid._id, "accepted")
-                                    }
-                                    disabled={updatingBidStatus[bid._id]}
-                                    className="bg-blue-500 hover:bg-blue-600 text-white rounded-full px-4 py-2 h-auto text-sm font-medium"
-                                  >
-                                    {updatingBidStatus[bid._id] ? (
-                                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                                    ) : (
-                                      <Award className="h-4 w-4 mr-2" />
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      {bids.map((bid) => (
+                        <div
+                          key={bid._id}
+                          className="bg-white rounded-md shadow-none border border-gray-100 overflow-hidden hover:shadow-md transition-shadow"
+                        >
+                          <div className="p-4 sm:p-6">
+                            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 gap-4">
+                              <div className="flex-1 min-w-0">
+                                <div className="flex flex-wrap items-center gap-2 mb-4">
+                                  <h3 className="font-semibold text-gray-900 text-base sm:text-lg truncate">
+                                    {(!bid.bidder.profile?.anonymousBidding ||
+                                      bid.status === "accepted" ||
+                                      bid.status === "completed") && (
+                                      <>
+                                        {bid.bidder.profile?.fullName ||
+                                          bid.bidder.profile?.companyName ||
+                                          bid.bidder.email.split("@")[0]}
+                                      </>
                                     )}
-                                    Accept Bid
-                                  </Button>
-                                  <Button
-                                    onClick={() =>
-                                      handleBidStatusUpdate(bid._id, "rejected")
-                                    }
-                                    className="bg-gray-50 text-gray-700 rounded-full px-4 py-2 h-auto text-sm font-medium"
-                                  >
-                                    <RefreshCw className="h-4 w-4 mr-2" />
-                                    Return for Revision
-                                  </Button>
+                                  </h3>
+                                  {bid.bidder.isVerified && (
+                                    <div className="flex items-center bg-blue-50 text-blue-700 px-2 py-1 rounded-full text-xs font-medium">
+                                      <Shield className="h-3 w-3 mr-1" />
+                                      Verified
+                                    </div>
+                                  )}
+                                  {bid.status === "accepted" && (
+                                    <div className="flex items-center bg-green-50 text-green-700 px-2 py-1 rounded-full text-xs font-medium">
+                                      <CheckCircle className="h-3 w-3 mr-1" />
+                                      Awarded
+                                    </div>
+                                  )}
+                                  {bid.status === "returned_for_revision" && (
+                                    <div className="flex items-center bg-yellow-50 text-yellow-700 px-2 py-1 rounded-full text-xs font-medium">
+                                      <RefreshCw className="h-3 w-3 mr-1" />
+                                      Needs Revision
+                                    </div>
+                                  )}
                                 </div>
-                              )}
-                              {bid.status === "returned_for_revision" && (
-                                <span className="text-sm text-gray-500 italic">
-                                  Bid returned for revision
-                                </span>
-                              )}
-                              {hasAwardedBid && bid.status !== "accepted" && (
-                                <span className="text-sm text-gray-500 italic">
-                                  Another bid was accepted
-                                </span>
-                              )}
+
+                                <div className="flex flex-wrap items-center gap-4 mb-2 lg:mb-4">
+                                  {(!bid.bidder.profile?.anonymousBidding ||
+                                    bid.status === "accepted") &&
+                                    bid.bidder.profile?.phone && (
+                                      <div className="flex items-center text-sm text-gray-500">
+                                        <Phone className="h-4 w-4 mr-2" />
+                                        {bid.bidder.profile.phone}
+                                      </div>
+                                    )}
+                                  {(!bid.bidder.profile?.anonymousBidding ||
+                                    bid.status === "accepted") &&
+                                    bid.bidder.profile?.address && (
+                                      <div className="flex items-center text-sm text-gray-500">
+                                        <MapPin className="h-4 w-4 mr-2" />
+                                        {bid.bidder.profile.address}
+                                      </div>
+                                    )}
+                                </div>
+                              </div>
+
+                              <div className="text-center sm:text-left sm:ml-4 flex-shrink-0">
+                                <div className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">
+                                  {formatCurrency(bid.amount)}
+                                </div>
+                                <div className="text-xs sm:text-sm text-gray-500">
+                                  {formatDate(bid.createdAt)}
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="bg-gray-50 rounded-md p-3 sm:p-4 mb-4">
+                              <p className="text-gray-700 leading-relaxed text-sm sm:text-base">
+                                {bid.description}
+                              </p>
+                            </div>
+
+                            {bid.image?.url && (
+                              <div className="mt-4">
+                                <Button
+                                  onClick={() =>
+                                    setImageModal({
+                                      open: true,
+                                      imageUrl: bid.image?.url || null,
+                                      type: "bid",
+                                    })
+                                  }
+                                  className="bg-white text-blue-500 shadow-none border border-blue-500 rounded-md px-3 py-1.5 sm:px-4 sm:py-2 h-auto text-xs sm:text-sm font-medium flex items-center"
+                                >
+                                  <ImageIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
+                                  View Bid Image
+                                </Button>
+                              </div>
+                            )}
+
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-4 border-t border-gray-100 gap-3">
+                              <div>
+                                {(!bid.bidder.profile?.anonymousBidding ||
+                                  bid.status === "accepted" ||
+                                  bid.status === "completed") && (
+                                  <Link
+                                    href={
+                                      profile?.userType !== "business"
+                                        ? `/dashboard/my-tenders/bidder-profile/${bid.bidder._id}`
+                                        : `/business-dashboard/my-tenders/bidder-profile/${bid.bidder._id}`
+                                    }
+                                    className="flex items-center text-blue-500 hover:text-blue-600 font-medium text-xs sm:text-sm transition-colors"
+                                  >
+                                    View Profile
+                                    <ExternalLink className="h-3.5 w-3.5 sm:h-4 sm:w-4 ml-1" />
+                                  </Link>
+                                )}
+                              </div>
+                              <div className="flex flex-wrap gap-2">
+                                {bid.status === "submitted" &&
+                                  !hasAwardedBid && (
+                                    <div className="flex flex-wrap gap-2">
+                                      <Button
+                                        onClick={() =>
+                                          handleBidStatusUpdate(
+                                            bid._id,
+                                            "accepted"
+                                          )
+                                        }
+                                        disabled={updatingBidStatus[bid._id]}
+                                        className="bg-blue-500 hover:bg-blue-600 text-white rounded-full px-3 py-2.5 sm:px-4 sm:py-2 h-auto text-xs sm:text-sm font-medium"
+                                      >
+                                        {updatingBidStatus[bid._id] ? (
+                                          <Loader2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 animate-spin mr-1.5 sm:mr-2" />
+                                        ) : (
+                                          <Award className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
+                                        )}
+                                        Accept Bid
+                                      </Button>
+                                      <Button
+                                        onClick={() =>
+                                          handleBidStatusUpdate(
+                                            bid._id,
+                                            "rejected"
+                                          )
+                                        }
+                                        className="bg-gray-50 text-gray-700 rounded-full px-3 py-2.5 sm:px-4 sm:py-2 h-auto text-xs sm:text-sm font-medium"
+                                      >
+                                        <RefreshCw className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
+                                        Return for Revision
+                                      </Button>
+                                    </div>
+                                  )}
+                                {bid.status === "returned_for_revision" && (
+                                  <span className="text-xs sm:text-sm text-gray-500 italic">
+                                    Bid returned for revision
+                                  </span>
+                                )}
+                                {hasAwardedBid && bid.status !== "accepted" && (
+                                  <span className="text-xs sm:text-sm text-gray-500 italic">
+                                    Another bid was accepted
+                                  </span>
+                                )}
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    ))
+                      ))}
+                    </div>
                   ) : (
-                    <div className="col-span-2 bg-white rounded-md shadow-none border border-gray-100 p-12 text-center">
-                      <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <Building2 className="h-8 w-8 text-gray-300" />
+                    <div className="bg-white rounded-md shadow-none border border-gray-100 p-8 sm:p-12 text-center">
+                      <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Building2 className="h-7 w-7 sm:h-8 sm:w-8 text-gray-300" />
                       </div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                      <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
                         No Bids Received
                       </h3>
-                      <p className="text-gray-600">
+                      <p className="text-gray-600 text-sm sm:text-base">
                         No providers have submitted bids for this tender yet.
                       </p>
                     </div>
                   )}
                 </div>
               )}
+
               {activeTab === "qa" && (
                 <div className="space-y-6">
                   {questions.length > 0 ? (
@@ -810,41 +844,42 @@ export default function TenderDetailPage() {
                         key={question._id}
                         className="bg-white rounded-md shadow-none border border-gray-100 overflow-hidden"
                       >
-                        <div className="p-6">
-                          <div className="flex items-start mb-6">
-                            <div className="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
+                        <div className="p-4 sm:p-6">
+                          <div className="flex flex-col sm:flex-row sm:items-start mb-6 gap-4">
+                            <div className="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center flex-shrink-0">
                               <MessageSquare className="h-5 w-5 text-blue-500" />
                             </div>
-                            <div className="flex-1">
-                              <div className="flex items-center gap-3 mb-2">
-                                <span className="font-semibold text-gray-900">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex flex-wrap items-center gap-2 mb-2">
+                                <span className="font-semibold text-gray-900 text-sm sm:text-base">
                                   Anonymous
                                 </span>
-                                <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                                <span className="text-xs sm:text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
                                   {formatDate(question.createdAt)}
                                 </span>
                               </div>
-                              <p className="text-gray-700 leading-relaxed text-lg">
+                              <p className="text-gray-700 leading-relaxed text-base sm:text-lg">
                                 {question.question}
                               </p>
                             </div>
                           </div>
+
                           {question.answer ? (
-                            <div className="ml-14 bg-green-50 rounded-md p-4 border-l-4 border-green-400">
-                              <div className="flex items-center gap-2 mb-2">
-                                <span className="font-semibold text-green-800">
+                            <div className="ml-0 sm:ml-14 bg-green-50 rounded-md p-3 sm:p-4 border-l-4 border-green-400">
+                              <div className="flex flex-wrap items-center gap-2 mb-2">
+                                <span className="font-semibold text-green-800 text-sm sm:text-base">
                                   Your Response
                                 </span>
-                                <span className="text-sm text-green-600">
+                                <span className="text-xs sm:text-sm text-green-600">
                                   {formatDate(question.updatedAt)}
                                 </span>
                               </div>
-                              <p className="text-green-900 leading-relaxed">
+                              <p className="text-green-900 leading-relaxed text-sm sm:text-base">
                                 {question.answer}
                               </p>
                             </div>
                           ) : (
-                            <div className="ml-14">
+                            <div className="ml-0 sm:ml-14">
                               <p className="text-xs text-gray-500 mb-2 flex items-center gap-1">
                                 <AlertCircle className="h-3 w-3" />
                                 {t(
@@ -868,15 +903,15 @@ export default function TenderDetailPage() {
                                       : validation.message ?? "",
                                   }));
                                 }}
-                                className={`rounded-md border-gray-200 focus:border-blue-500 focus:ring-blue-500 mb-2 min-h-[100px] resize-none ${
+                                className={`rounded-md border-gray-200 focus:border-blue-500 focus:ring-blue-500 mb-2 min-h-[100px] resize-none text-sm ${
                                   answerErrors[question._id]
                                     ? "border-red-300 focus:border-red-500"
                                     : ""
                                 }`}
                               />
                               {answerErrors[question._id] && (
-                                <p className="text-red-500 text-sm mb-4 flex items-center gap-1">
-                                  <AlertCircle className="h-4 w-4" />
+                                <p className="text-red-500 text-xs mb-4 flex items-center gap-1">
+                                  <AlertCircle className="h-3 w-3" />
                                   {answerErrors[question._id]}
                                 </p>
                               )}
@@ -889,16 +924,12 @@ export default function TenderDetailPage() {
                                   submittingAnswer[question._id] ||
                                   !!answerErrors[question._id]
                                 }
-                                className="bg-blue-500 hover:bg-blue-600 text-white rounded-full px-6 py-2 h-auto font-medium"
+                                className="bg-blue-500 hover:bg-blue-600 text-white rounded-full px-4 py-2 h-auto font-medium text-sm"
                               >
                                 {submittingAnswer[question._id] ? (
-                                  <Loader2
-                                    className="h-4 w-4
-
- animate-spin mr-2"
-                                  />
+                                  <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
                                 ) : (
-                                  <Send className="h-4 w-4 mr-2" />
+                                  <Send className="h-3.5 w-3.5 mr-1.5" />
                                 )}
                                 Send Response
                               </Button>
@@ -908,71 +939,72 @@ export default function TenderDetailPage() {
                       </div>
                     ))
                   ) : (
-                    <div className="bg-white rounded-md shadow-none border border-gray-100 p-12 text-center">
-                      <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <MessageSquare className="h-8 w-8 text-gray-300" />
+                    <div className="bg-white rounded-md shadow-none border border-gray-100 p-8 sm:p-12 text-center">
+                      <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <MessageSquare className="h-7 w-7 sm:h-8 sm:w-8 text-gray-300" />
                       </div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                      <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
                         No Questions Yet
                       </h3>
-                      <p className="text-gray-600">
+                      <p className="text-gray-600 text-sm sm:text-base">
                         No questions have been asked about this tender.
                       </p>
                     </div>
                   )}
                 </div>
               )}
+
               {activeTab === "reviews" && hasAwardedBid && (
                 <div className="bg-white rounded-md shadow-none border border-gray-100 p-6">
-                  <h2 className="text-xl font-bold text-gray-900 mb-6">
+                  <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-6">
                     Reviews
                   </h2>
                   {isCompleted ? (
                     <div className="space-y-6">
-                      <div className="border border-gray-200 rounded-md p-6">
-                        <h3 className="font-semibold text-gray-900 mb-4">
+                      <div className="border border-gray-200 rounded-md p-4 sm:p-6">
+                        <h3 className="font-semibold text-gray-900 mb-4 text-sm sm:text-base">
                           Your Review
                         </h3>
                         <div className="flex items-center mb-4">
                           {[1, 2, 3, 4, 5].map((star) => (
                             <Star
                               key={star}
-                              className="h-6 w-6 text-yellow-400 fill-current"
+                              className="h-5 w-5 sm:h-6 sm:w-6 text-yellow-400 fill-current"
                             />
                           ))}
                         </div>
-                        <p className="text-gray-700">
+                        <p className="text-gray-700 text-sm sm:text-base">
                           Great work! The project was completed on time and
                           exceeded expectations.
                         </p>
                       </div>
-                      <div className="border border-gray-200 rounded-md p-6">
-                        <h3 className="font-semibold text-gray-900 mb-4">
+                      <div className="border border-gray-200 rounded-md p-4 sm:p-6">
+                        <h3 className="font-semibold text-gray-900 mb-4 text-sm sm:text-base">
                           Bidder's Review
                         </h3>
                         <div className="flex items-center mb-4">
                           {[1, 2, 3, 4, 5].map((star) => (
                             <Star
                               key={star}
-                              className="h-6 w-6 text-yellow-400 fill-current"
+                              className="h-5 w-5 sm:h-6 sm:w-6 text-yellow-400 fill-current"
                             />
                           ))}
                         </div>
-                        <p className="text-gray-700">
+                        <p className="text-gray-700 text-sm sm:text-base">
                           Professional client, clear requirements, and prompt
                           payments.
                         </p>
                       </div>
                     </div>
                   ) : (
-                    <div className="text-center py-12">
-                      <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <Star className="h-8 w-8 text-blue-500" />
+                    <div className="text-center py-8 sm:py-12">
+                      <div className="w-14 h-14 sm:w-16 sm:h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Star className="h-7 w-7 sm:h-8 sm:w-8 text-blue-500" />
                       </div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                      <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
                         Reviews Not Available Yet
                       </h3>
-                      <p className="text-gray-600 mb-6">
+                      <p className="text-gray-600 mb-6 text-sm sm:text-base">
                         Reviews will be available once the project is completed.
                       </p>
                       {isAwarded && (
@@ -980,9 +1012,9 @@ export default function TenderDetailPage() {
                           onClick={() =>
                             router.push(`/chat/${awardedBid.bidder._id}`)
                           }
-                          className="bg-blue-500 hover:bg-blue-600 text-white rounded-full px-6 py-2 h-auto font-medium"
+                          className="bg-blue-500 hover:bg-blue-600 text-white rounded-full px-4 py-2 h-auto font-medium text-sm sm:text-base"
                         >
-                          <MessageSquare className="h-4 w-4 mr-2" />
+                          <MessageSquare className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
                           Chat with Bidder
                         </Button>
                       )}
@@ -992,54 +1024,56 @@ export default function TenderDetailPage() {
               )}
             </>
           ) : (
-            <div className="bg-white rounded-md shadow-none border border-gray-100 p-12 text-center">
-              <div className="w-16 h-16 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                <LockIcon className="h-8 w-8 text-amber-500" />
+            <div className="bg-white rounded-md shadow-none border border-gray-100 p-8 sm:p-12 text-center">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                <LockIcon className="h-7 w-7 sm:h-8 sm:w-8 text-amber-500" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
                 Content Under Review
               </h3>
-              <p className="text-gray-600 mb-6 leading-relaxed max-w-md mx-auto">
+              <p className="text-gray-600 mb-6 leading-relaxed max-w-md mx-auto text-sm sm:text-base">
                 Bids and questions are hidden while this tender undergoes our
                 approval process.
               </p>
-              <div className="inline-flex items-center bg-amber-50 text-amber-800 px-4 py-2 rounded-full text-sm font-medium">
-                <Clock className="h-4 w-4 mr-2" />
+              <div className="inline-flex items-center bg-amber-50 text-amber-800 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-medium">
+                <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
                 Pending Approval
               </div>
             </div>
           )}
         </div>
+
+        {/* Modals */}
         {showActivateModal && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="bg-white/90 backdrop-blur-xl rounded-2xl border border-gray-100/50 max-w-md w-full">
-              <div className="p-6">
+            <div className="bg-white/90 backdrop-blur-xl rounded-2xl border border-gray-100/50 w-full max-w-md">
+              <div className="p-5 sm:p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <h2 className="text-xl font-semibold text-gray-900">
+                    <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
                       {t("publish_tender")}
                     </h2>
-                    <p className="text-gray-600">
+                    <p className="text-gray-600 text-sm">
                       {t("confirm_publish_tender_description")}
                     </p>
                   </div>
                   <button
                     onClick={() => setShowActivateModal(false)}
-                    className="p-2 rounded-full hover:bg-gray-100 transition-colors duration-200"
+                    className="p-1.5 rounded-full hover:bg-gray-100 transition-colors duration-200"
                   >
-                    <X className="h-5 w-5 text-gray-500" />
+                    <X className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500" />
                   </button>
                 </div>
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6 shadow-sm">
-                  <div className="flex items-start gap-3">
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 sm:p-4 mb-6 shadow-sm">
+                  <div className="flex flex-col sm:flex-row sm:items-start gap-3">
                     <div className="flex-shrink-0">
-                      <AlertTriangle className="h-5 w-5 text-yellow-600 mt-0.5" />
+                      <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-600 mt-0.5" />
                     </div>
                     <div className="flex flex-col min-w-0">
-                      <h3 className="font-semibold text-yellow-800 text-base leading-snug break-words">
+                      <h3 className="font-semibold text-yellow-800 text-sm sm:text-base leading-snug break-words">
                         {t("tender_will_be_public")}
                       </h3>
-                      <p className="text-yellow-700 text-sm mt-1 leading-relaxed break-words whitespace-pre-wrap">
+                      <p className="text-yellow-700 text-xs sm:text-sm mt-1 leading-relaxed break-words whitespace-pre-wrap">
                         {t(
                           "once_published_all_businesses_can_see_and_bid_on_this_tender"
                         )}
@@ -1047,23 +1081,23 @@ export default function TenderDetailPage() {
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center justify-end gap-3">
+                <div className="flex flex-col sm:flex-row items-center justify-end gap-2 sm:gap-3">
                   <Button
                     variant="outline"
                     onClick={() => setShowActivateModal(false)}
-                    className="bg-white/80 backdrop-blur-sm border border-gray-200/50 hover:bg-gray-50/80 transition-colors"
+                    className="bg-white/80 backdrop-blur-sm border border-gray-200/50 hover:bg-gray-50/80 transition-colors text-xs sm:text-sm"
                   >
                     {t("cancel")}
                   </Button>
                   <Button
                     onClick={handleMakeActive}
                     disabled={activating}
-                    className="bg-green-500 hover:bg-green-600 text-white"
+                    className="bg-green-500 hover:bg-green-600 text-white text-xs sm:text-sm"
                   >
                     {activating ? (
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      <Loader2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 animate-spin" />
                     ) : (
-                      <Play className="h-4 w-4 mr-2" />
+                      <Play className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
                     )}
                     {t("make_active")}
                   </Button>
@@ -1072,62 +1106,61 @@ export default function TenderDetailPage() {
             </div>
           </div>
         )}
+
         {returnForRevision.open && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="bg-white/90 backdrop-blur-xl rounded-2xl border border-gray-100/50 max-w-md w-full">
-              <div className="p-6">
+            <div className="bg-white/90 backdrop-blur-xl rounded-2xl border border-gray-100/50 w-full max-w-md">
+              <div className="p-5 sm:p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-semibold text-gray-900">
+                  <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
                     Return Bid for Revision
                   </h2>
                   <button
                     onClick={() =>
                       setReturnForRevision({ open: false, bidId: null })
                     }
-                    className="p-2 rounded-full hover:bg-gray-100 transition-colors duration-200"
+                    className="p-1.5 rounded-full hover:bg-gray-100 transition-colors duration-200"
                   >
-                    <X className="h-4 w-4 text-gray-500" />
+                    <X className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500" />
                   </button>
                 </div>
                 <div className="space-y-4">
-                  <p className="text-gray-600">
+                  <p className="text-gray-600 text-sm">
                     Please provide a reason for returning this bid for revision.
                   </p>
                   <Textarea
                     placeholder="Enter your revision request..."
                     value={revisionReason}
                     onChange={(e) => setRevisionReason(e.target.value)}
-                    className="min-h-[150px] bg-white/80 backdrop-blur-sm border border-gray-200/50"
+                    className="min-h-[120px] sm:min-h-[150px] bg-white/80 backdrop-blur-sm border border-gray-200/50 text-sm"
                     autoFocus
                   />
-                  <div className="flex items-center justify-between text-xs text-gray-500 mt-2">
-                    <div className="flex items-center">
-                      <AlertTriangle className="h-4 w-4 text-yellow-500 mr-2" />
-                      <span>
-                        The bidder will be able to edit and resubmit their bid
-                      </span>
-                    </div>
+                  <div className="flex items-start gap-2 text-xs text-gray-500 mt-2">
+                    <AlertTriangle className="h-3.5 w-3.5 text-yellow-500 mt-0.5 flex-shrink-0" />
+                    <span>
+                      The bidder will be able to edit and resubmit their bid
+                    </span>
                   </div>
                 </div>
-                <div className="flex items-center justify-end gap-3 mt-6">
+                <div className="flex flex-col sm:flex-row items-center justify-end gap-2 sm:gap-3 mt-6">
                   <Button
                     variant="outline"
                     onClick={() =>
                       setReturnForRevision({ open: false, bidId: null })
                     }
-                    className="bg-white/80 backdrop-blur-sm border border-gray-200/50 hover:bg-gray-50/80 transition-colors"
+                    className="bg-white/80 backdrop-blur-sm border border-gray-200/50 hover:bg-gray-50/80 transition-colors text-xs sm:text-sm"
                   >
                     Cancel
                   </Button>
                   <Button
                     onClick={handleReturnBidForRevision}
                     disabled={returningBid || !revisionReason.trim()}
-                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                    className="bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm"
                   >
                     {returningBid ? (
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      <Loader2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 animate-spin" />
                     ) : (
-                      <RefreshCw className="h-4 w-4 mr-2" />
+                      <RefreshCw className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
                     )}
                     Return for Revision
                   </Button>
@@ -1136,12 +1169,13 @@ export default function TenderDetailPage() {
             </div>
           </div>
         )}
+
         {imageModal.open && imageModal.imageUrl && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="bg-white/90 backdrop-blur-xl rounded-2xl border border-gray-100/50 max-w-3xl w-full">
+            <div className="bg-white/90 backdrop-blur-xl rounded-2xl border border-gray-100/50 w-full max-w-3xl">
               <div className="p-4">
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-lg font-semibold text-gray-900">
+                  <h2 className="text-base sm:text-lg font-semibold text-gray-900">
                     {imageModal.type === "tender"
                       ? "Tender Image"
                       : "Bid Image"}
@@ -1154,9 +1188,9 @@ export default function TenderDetailPage() {
                         type: undefined,
                       })
                     }
-                    className="p-2 rounded-full hover:bg-gray-100 transition-colors duration-200"
+                    className="p-1.5 rounded-full hover:bg-gray-100 transition-colors duration-200"
                   >
-                    <X className="h-5 w-5 text-gray-500" />
+                    <X className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500" />
                   </button>
                 </div>
                 <div className="flex justify-center">

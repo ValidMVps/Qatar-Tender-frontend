@@ -14,25 +14,12 @@ import {
   UserCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { AnimatePresence, motion } from "framer-motion";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "./ui/breadcrumb";
 import CreateTenderModal from "./CreateTenderModal";
-
 import { useTranslation } from "../lib/hooks/useTranslation";
-import { LanguageToggle } from "./LanguageToggle";
 import { useAuth } from "@/context/AuthContext";
 import { useNotifications } from "@/context/NotificationContext";
+
 // Utility to capitalize and space hyphenated words
 const toTitleCase = (str: string) =>
   str.replace(/-/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
@@ -59,25 +46,24 @@ export default function BNavbar({
   const pathname = usePathname();
   const { t } = useTranslation();
   const { logout, profile } = useAuth();
+  const { notifications, unreadCount } = useNotifications();
+
   const currentUser = {
     name: "Ahmed Al-Mahmoud",
     email: "ahmed@example.com",
-    avatar: "", // fallback to initials
+    avatar: "",
     company: "Al-Mahmoud Enterprises",
   };
 
   const pathSegments = pathname.split("/").filter(Boolean);
-  const { notifications, unreadCount, isLoading } = useNotifications();
   const pageName =
     pathSegments.length > 0
       ? toTitleCase(pathSegments[pathSegments.length - 1])
       : "Business Dashboard";
 
-  const [open, setOpen] = useState(false);
   const [openTenderModal, setOpenTenderModal] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
 
-  // Show "New Tender" button only in Project Posting section
   const showNewTenderButton = [
     "/business-dashboard/post-tender",
     "/business-dashboard/my-posted-tenders",
@@ -88,31 +74,34 @@ export default function BNavbar({
     setProfileDropdownOpen(false);
     logout();
   };
+
   return (
-    <header className=" sticky top-0 w-full z-10 border-b flex bg-white/40 backdrop-blur-md px-4 py-3 md:px-0">
-      {/* Sidebar toggle */}
-      <button
-        onClick={() => setSidebarOpen(!sidebarOpen)}
-        className="md:pe-3 pe-2 py-2 md:py-4 border-r border-gray-200 lg:hidden focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-600"
-        aria-label="Toggle sidebar"
-      >
-        {sidebarOpen ? (
-          <PanelLeft className="h-5 w-5 text-gray-700" />
-        ) : (
-          <PanelRight className="h-5 w-5 text-gray-700" />
-        )}
-      </button>
+    <header className="sticky top-0 w-full z-10 border-b bg-white/40 backdrop-blur-md">
+      <div className="flex items-center justify-between px-4 py-3 sm:px-6 md:px-8">
+        {/* Left: Sidebar toggle + Page title */}
+        <div className="flex items-center space-x-3 sm:space-x-4">
+          {/* Sidebar toggle (mobile only) */}
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="block lg:hidden border border-gray-200 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-600"
+            aria-label="Toggle sidebar"
+          >
+            {sidebarOpen ? (
+              <PanelLeft className="h-5 w-5 text-gray-700" />
+            ) : (
+              <PanelRight className="h-5 w-5 text-gray-700" />
+            )}
+          </button>
 
-      <div className="container py-2 mx-auto flex items-center">
-        {/* Breadcrumb (Desktop) */}
+          {/* Page Name */}
+          <nav className="text-sm sm:text-base md:text-lg font-medium text-neutral-900 truncate max-w-[150px] sm:max-w-none">
+            {pageName}
+          </nav>
+        </div>
 
-        {/* Page Title (Mobile) */}
-        <nav className="px-4  text-sm sm:text-lg font-medium text-neutral-900">
-          {pageName}
-        </nav>
-
-        {/* Actions */}
-        <div className="flex items-center space-x-2 sm:space-x-4 ml-auto">
+        {/* Right: Actions */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          {/* New Tender Button (hidden on mobile) */}
           {showNewTenderButton && (
             <Button
               variant="default"
@@ -123,10 +112,12 @@ export default function BNavbar({
               New Tender
             </Button>
           )}
+
+          {/* Bell Icon */}
           <div className="relative">
             <Link
               href={
-                profile?.userType == "business"
+                profile?.userType === "business"
                   ? "/business-dashboard/notification"
                   : "/dashboard/notification"
               }
@@ -136,9 +127,9 @@ export default function BNavbar({
                 size="icon"
                 className="relative p-2 text-gray-600 hover:text-gray-900"
               >
-                <Bell className="h-7 w-7" />
+                <Bell className="h-6 w-6 sm:h-7 sm:w-7" />
                 {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white  text-[9px] font-semibold rounded-full h-5 w-5 flex items-center justify-center">
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-semibold rounded-full h-4 w-4 sm:h-5 sm:w-5 flex items-center justify-center">
                     {unreadCount > 99 ? "99+" : unreadCount}
                   </span>
                 )}
@@ -146,7 +137,7 @@ export default function BNavbar({
             </Link>
           </div>
 
-          {/* Profile Menu */}
+          {/* Profile Dropdown */}
           <div className="relative">
             <button
               onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
@@ -156,6 +147,7 @@ export default function BNavbar({
                 {currentUser.avatar || getInitials(currentUser.name)}
               </div>
             </button>
+
             <AnimatePresence>
               {profileDropdownOpen && (
                 <motion.div
@@ -163,7 +155,7 @@ export default function BNavbar({
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -5 }}
                   transition={{ duration: 0.15 }}
-                  className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-200 z-50 overflow-hidden"
+                  className="absolute right-0 mt-2 w-48 sm:w-56 bg-white rounded-xl shadow-xl border border-gray-200 z-50 overflow-hidden"
                 >
                   <div className="py-1">
                     <Link
@@ -190,7 +182,7 @@ export default function BNavbar({
                     <div className="border-t border-gray-200 my-1" />
                     <div
                       onClick={logoutfunction}
-                      className="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-gray-100 cursor-pointer"
                     >
                       <LogOut className="w-4 h-4 text-red-500" />
                       Sign out
@@ -199,13 +191,29 @@ export default function BNavbar({
                 </motion.div>
               )}
             </AnimatePresence>
-            <CreateTenderModal
-              open={openTenderModal}
-              onOpenChange={setOpenTenderModal}
-            />
           </div>
         </div>
       </div>
+
+      {/* Mobile New Tender Button (visible on small screens) */}
+      {showNewTenderButton && (
+        <div className="sm:hidden px-4 pb-2">
+          <Button
+            variant="default"
+            className="w-full flex items-center justify-center"
+            onClick={() => setOpenTenderModal(true)}
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            New Tender
+          </Button>
+        </div>
+      )}
+
+      {/* Tender Modal */}
+      <CreateTenderModal
+        open={openTenderModal}
+        onOpenChange={setOpenTenderModal}
+      />
     </header>
   );
 }

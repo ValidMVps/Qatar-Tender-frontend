@@ -184,7 +184,7 @@ export default function ChatSection({
     const files = Array.from(e.target.files || []);
 
     // Validate files before adding
-    const validFiles = [];
+    const validFiles: File[] = [];
     const invalidFiles = [];
 
     for (const file of files) {
@@ -290,7 +290,12 @@ export default function ChatSection({
     setMediaPreview([]);
 
     try {
-      let uploadedMedia = [];
+      let uploadedMedia: Array<{
+        url: string;
+        name: string;
+        size: number;
+        type: string;
+      }> = [];
 
       // Upload files first if any are selected
       if (selectedFiles.length > 0) {
@@ -315,7 +320,7 @@ export default function ChatSection({
       // Send via API with the actual URLs
       await sendApiMessage(roomId, {
         text: tempMessage.text,
-        media: uploadedMedia,
+        media: uploadedMedia[0].url,
       });
 
       // After success, remove temp message and add real one
