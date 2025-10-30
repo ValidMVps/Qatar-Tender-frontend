@@ -205,14 +205,13 @@ export default function SignupWizard() {
     setErrors({});
 
     try {
-      // Prepare registration data
       const registrationData = {
         email: currentEmail,
         password: form.password,
         userType: form.accountType!,
         phone: `${form.countryCode}${form.phone}`,
         dateOfBirth: form.dateOfBirth,
-        agreeToTerms: form.agreeToTerms, // Added
+        agreeToTerms: form.agreeToTerms,
         ...(form.accountType === "individual"
           ? { fullName: form.fullName }
           : { companyName: form.companyName }),
@@ -304,16 +303,16 @@ export default function SignupWizard() {
   };
 
   return (
-    <div className="space-y-8 w-xl rounded-2xl p-8 bg-white border border-gray-100">
+    <div className="w-full max-w-2xl mx-auto rounded-2xl p-4 sm:p-6 md:p-8 bg-white border border-gray-100 shadow-sm">
       <StepHeader current={step} />
 
       {errors.general && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+        <div className="p-3 sm:p-4 bg-red-50 border border-red-200 rounded-lg">
           <p className="text-sm text-red-600">{errors.general}</p>
         </div>
       )}
 
-      <div className="space-y-8">
+      <div className="space-y-6 sm:space-y-8">
         {step === 1 && (
           <StepOne
             selected={form.accountType}
@@ -337,13 +336,13 @@ export default function SignupWizard() {
         )}
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-4 pt-1">
-        <div className="flex items-center gap-3 w-full">
+      <div className="pt-4 sm:pt-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           {step > 1 && !registrationSuccess && (
             <Button
               variant="outline"
               onClick={onBack}
-              className="px-5 py-2"
+              className="px-4 py-2 sm:px-5 sm:py-2.5 w-full sm:w-auto"
               disabled={isSubmitting}
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
@@ -351,57 +350,59 @@ export default function SignupWizard() {
             </Button>
           )}
 
-          {step === 1 && (
-            <Button
-              onClick={onContinue}
-              className="bg-blue-600 text-white px-6 w-full py-2 hover:bg-blue-700"
-              disabled={isSubmitting}
-            >
-              {t("continue")} <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          )}
-
-          {step === 2 && (
-            <Button
-              onClick={onSubmit}
-              className="bg-blue-600 text-white ms-auto px-6 py-2 hover:bg-blue-700"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Creating account...
-                </>
-              ) : (
-                <>
-                  {t("submit")} <MailCheck className="ml-2 h-4 w-4" />
-                </>
-              )}
-            </Button>
-          )}
-
-          {step === 3 && (
-            <div className="flex gap-3">
+          <div className="flex ms-auto flex-row sm:flex-row gap-3 w-full  sm:w-auto">
+            {step === 1 && (
               <Button
-                variant="secondary"
-                onClick={() => setStep(2)}
-                className="px-5 py-2"
+                onClick={onContinue}
+                className="bg-blue-600 ms-auto text-white px-4 py-2 sm:px-6 sm:py-2.5 w-full sm:w-auto hover:bg-blue-700"
                 disabled={isSubmitting}
               >
-                Edit details
+                {t("continue")} <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
+            )}
+
+            {step === 2 && (
               <Button
-                onClick={() => router.push("/login")}
-                className="bg-green-600 text-white px-6 py-2 hover:bg-green-700"
+                onClick={onSubmit}
+                className="bg-blue-600 text-white px-4 py-2 sm:px-6 sm:py-2.5 w-full sm:w-auto hover:bg-blue-700"
+                disabled={isSubmitting}
               >
-                Continue to Login
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Creating account...
+                  </>
+                ) : (
+                  <>
+                    {t("submit")} <MailCheck className="ml-2 h-4 w-4" />
+                  </>
+                )}
               </Button>
-            </div>
-          )}
+            )}
+
+            {step === 3 && (
+              <>
+                <Button
+                  variant="secondary"
+                  onClick={() => setStep(2)}
+                  className="px-4 py-2 sm:px-5 sm:py-2.5 w-full sm:w-auto"
+                  disabled={isSubmitting}
+                >
+                  Edit details
+                </Button>
+                <Button
+                  onClick={() => router.push("/login")}
+                  className="bg-green-600 text-white px-4 py-2 sm:px-6 sm:py-2.5 w-full sm:w-auto hover:bg-green-700"
+                >
+                  Continue to Login
+                </Button>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
-      <div className="mt-4 text-center text-sm text-muted-foreground">
+      <div className="mt-6 text-center text-sm text-muted-foreground">
         Already have an account?{" "}
         <Link
           href="/login"
@@ -426,10 +427,10 @@ function StepOne({
   const { t } = useTranslation();
   return (
     <div>
-      <div className="mb-8 text-base text-muted-foreground">
+      <div className="mb-6 text-base text-muted-foreground">
         Choose the type of account
       </div>
-      <div className="grid gap-3 sm:grid-cols-1">
+      <div className="grid gap-4 sm:grid-cols-1">
         <SelectableCard
           title={t("individual")}
           description="For contractors, consultants, and freelancers."
@@ -469,15 +470,15 @@ function SelectableCard({
       onClick={onClick}
       aria-pressed={selected}
       className={cn(
-        "group flex gap-6 relative text-left",
-        "rounded-xl border bg-white p-5 transition-all",
+        "group flex gap-4 sm:gap-6 relative text-left",
+        "rounded-xl border bg-white p-4 sm:p-5 transition-all",
         "hover:shadow-xs focus-visible:outline-none",
         selected ? "border-blue-400" : "border-neutral-200"
       )}
     >
       <div
         className={cn(
-          "flex h-12 w-12 items-center justify-center rounded-full transition-colors",
+          "flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full transition-colors",
           selected
             ? "bg-blue-600 text-white"
             : "bg-blue-50 text-blue-700 group-hover:bg-blue-100"
@@ -486,8 +487,8 @@ function SelectableCard({
         {icon}
         <span className="sr-only">{title} account</span>
       </div>
-      <div className="space-y-2">
-        <div className="text-lg font-semibold">{title}</div>
+      <div className="space-y-1 sm:space-y-2">
+        <div className="text-base sm:text-lg font-semibold">{title}</div>
         <p className="text-sm text-muted-foreground">{description}</p>
       </div>
     </button>
@@ -510,7 +511,7 @@ function StepTwo({
     <div className="space-y-5">
       {isBiz ? (
         <>
-          <div className="space-y-3">
+          <div className="space-y-2">
             <Label htmlFor="companyName" className="text-base font-medium">
               Company name
             </Label>
@@ -520,15 +521,15 @@ function StepTwo({
               value={form.companyName}
               onChange={(e) => onChange({ companyName: e.target.value })}
               className={cn(
-                "py-3 mt-2 text-base",
+                "py-2.5 sm:py-3 mt-1 text-base",
                 errors.name && "border-red-500"
               )}
             />
             {errors.name && (
-              <p className="text-sm text-red-600 mt-2">{errors.name}</p>
+              <p className="text-sm text-red-600 mt-1">{errors.name}</p>
             )}
           </div>
-          <div className="space-y-3">
+          <div className="space-y-2">
             <Label htmlFor="companyEmail" className="text-base font-medium">
               Company email
             </Label>
@@ -539,18 +540,18 @@ function StepTwo({
               value={form.companyEmail}
               onChange={(e) => onChange({ companyEmail: e.target.value })}
               className={cn(
-                "py-3 mt-2 text-base",
+                "py-2.5 sm:py-3 mt-1 text-base",
                 errors.email && "border-red-500"
               )}
             />
             {errors.email && (
-              <p className="text-sm text-red-600 mt-2">{errors.email}</p>
+              <p className="text-sm text-red-600 mt-1">{errors.email}</p>
             )}
           </div>
         </>
       ) : (
         <>
-          <div className="space-y-3">
+          <div className="space-y-2">
             <Label htmlFor="fullName" className="text-base font-medium">
               Full name
             </Label>
@@ -560,15 +561,15 @@ function StepTwo({
               value={form.fullName}
               onChange={(e) => onChange({ fullName: e.target.value })}
               className={cn(
-                "py-3 mt-2 text-base",
+                "py-2.5 sm:py-3 mt-1 text-base",
                 errors.name && "border-red-500"
               )}
             />
             {errors.name && (
-              <p className="text-sm text-red-600 mt-2">{errors.name}</p>
+              <p className="text-sm text-red-600 mt-1">{errors.name}</p>
             )}
           </div>
-          <div className="space-y-3">
+          <div className="space-y-2">
             <Label htmlFor="email" className="text-base font-medium">
               {t("email")}
             </Label>
@@ -579,18 +580,18 @@ function StepTwo({
               value={form.email}
               onChange={(e) => onChange({ email: e.target.value })}
               className={cn(
-                "py-3 mt-2 text-base",
+                "py-2.5 sm:py-3 mt-1 text-base",
                 errors.email && "border-red-500"
               )}
             />
             {errors.email && (
-              <p className="text-sm text-red-600 mt-2">{errors.email}</p>
+              <p className="text-sm text-red-600 mt-1">{errors.email}</p>
             )}
           </div>
         </>
       )}
 
-      <div className="space-y-3">
+      <div className="space-y-2">
         <Label htmlFor="dateOfBirth" className="text-base font-medium">
           Date of Birth
         </Label>
@@ -600,26 +601,26 @@ function StepTwo({
           value={form.dateOfBirth}
           onChange={(e) => onChange({ dateOfBirth: e.target.value })}
           className={cn(
-            "py-3 mt-2 text-base",
+            "py-2.5 sm:py-3 mt-1 text-base",
             errors.dateOfBirth && "border-red-500"
           )}
           max={new Date().toISOString().split("T")[0]}
         />
         {errors.dateOfBirth && (
-          <p className="text-sm text-red-600 mt-2">{errors.dateOfBirth}</p>
+          <p className="text-sm text-red-600 mt-1">{errors.dateOfBirth}</p>
         )}
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-2">
         <Label htmlFor="phone" className="text-base font-medium">
           {t("phone")}
         </Label>
-        <div className="flex gap-3 mt-2">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-1">
           <Select
             value={form.countryCode}
             onValueChange={(v) => onChange({ countryCode: v })}
           >
-            <SelectTrigger className="w-[160px] py-3">
+            <SelectTrigger className="w-full sm:w-[140px] py-2.5 sm:py-3">
               <SelectValue placeholder={t("code")} />
             </SelectTrigger>
             <SelectContent>
@@ -635,7 +636,7 @@ function StepTwo({
             inputMode="numeric"
             placeholder="Phone number"
             className={cn(
-              "flex-1 py-3 text-base",
+              "flex-1 py-2.5 sm:py-3 text-base",
               errors.phone && "border-red-500"
             )}
             value={form.phone}
@@ -646,11 +647,11 @@ function StepTwo({
           />
         </div>
         {errors.phone && (
-          <p className="text-sm text-red-600 mt-2">{errors.phone}</p>
+          <p className="text-sm text-red-600 mt-1">{errors.phone}</p>
         )}
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-2">
         <Label htmlFor="password" className="text-base font-medium">
           {t("password")}
         </Label>
@@ -661,31 +662,34 @@ function StepTwo({
           value={form.password}
           onChange={(e) => onChange({ password: e.target.value })}
           className={cn(
-            "py-3 text-base mt-2",
+            "py-2.5 sm:py-3 text-base mt-1",
             errors.password && "border-red-500"
           )}
         />
         {errors.password && (
-          <div className="text-sm text-red-600 mt-2">
+          <div className="text-sm text-red-600 mt-1">
             <p>{errors.password}</p>
           </div>
         )}
-        <p className="text-xs text-muted-foreground mt-2">
+        <p className="text-xs text-muted-foreground mt-1">
           Password must be at least 8 characters with letters, numbers, and
           special characters.
         </p>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-2">
         <div className="flex items-start space-x-2">
           <Checkbox
             id="agreeToTerms"
             checked={form.agreeToTerms}
             onCheckedChange={(checked) => onChange({ agreeToTerms: !!checked })}
           />
-          <Label htmlFor="agreeToTerms" className="text-sm font-medium">
+          <Label
+            htmlFor="agreeToTerms"
+            className="text-sm font-medium leading-relaxed"
+          >
             By continuing, you confirm authority to bind your organization and
-            agree to the
+            agree to the{" "}
             <Link href="/terms" className="text-blue-600 hover:underline">
               Terms of Service
             </Link>{" "}
@@ -693,14 +697,13 @@ function StepTwo({
             <Link href="/privacy" className="text-blue-600 hover:underline">
               Privacy Policy
             </Link>
-            {" , "}
-            You consent to electronic communications and e-signatures.
+            . You consent to electronic communications and e-signatures.
           </Label>
         </div>
         {errors.agreeToTerms && (
-          <p className="text-sm text-red-600 mt-2">{errors.agreeToTerms}</p>
+          <p className="text-sm text-red-600 mt-1">{errors.agreeToTerms}</p>
         )}
-        <p className="text-xs text-foreground mt-2">
+        <p className="text-xs text-foreground mt-1">
           By signing up, you confirm you are 18 or older and agree to comply
           with all applicable laws, including procurement, anti-bribery, and
           data protection regulations.
@@ -720,10 +723,12 @@ function StepThree({
   onResend: () => void;
 }) {
   return (
-    <div className="space-y-8">
-      <div className="flex items-start gap-6">
-        <div className="space-y-6">
-          <h3 className="text-xl font-semibold">Verify your email address</h3>
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row items-start gap-6">
+        <div className="space-y-4">
+          <h3 className="text-lg sm:text-xl font-semibold">
+            Verify your email address
+          </h3>
           <p className="text-base text-muted-foreground leading-relaxed">
             We&apos;ve sent a verification link to{" "}
             <span className="font-medium text-foreground">
@@ -732,7 +737,7 @@ function StepThree({
             . Please check your email and click the verification link to
             activate your account.
           </p>
-          <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <div className="p-3 sm:p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
             <p className="text-sm text-yellow-800">
               <strong>Important:</strong> You must verify your email before you
               can log in to your account.
@@ -740,20 +745,20 @@ function StepThree({
           </div>
         </div>
       </div>
-      <div className="flex items-center gap-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
         <Button
           type="button"
           variant="outline"
           onClick={onResend}
           disabled={cooldown > 0}
-          className="px-6 py-3"
+          className="px-4 py-2.5 sm:px-6 sm:py-3 w-full sm:w-auto"
         >
           <RefreshCw className="mr-2 h-4 w-4" />
           {cooldown > 0
             ? `Resend in ${cooldown}s`
             : "Resend verification email"}
         </Button>
-        <span className="text-sm text-muted-foreground">
+        <span className="text-sm text-muted-foreground text-center sm:text-left">
           Didn&apos;t receive it? Check your spam folder or try again.
         </span>
       </div>
@@ -769,7 +774,7 @@ function StepHeader({ current }: { current: Step }) {
   ] as const;
 
   return (
-    <div className="w-full">
+    <div className="w-full mb-6 sm:mb-8">
       <ol className="flex items-center justify-between w-full relative">
         {steps.map((s, i) => {
           const isActive = current === s.id;
@@ -781,12 +786,12 @@ function StepHeader({ current }: { current: Step }) {
               className="flex flex-col items-center relative flex-1"
             >
               {i < steps.length - 1 && (
-                <div className="absolute top-5 left-1/2 w-full h-px bg-neutral-200 z-0" />
+                <div className="absolute top-5 left-1/2 w-full h-px bg-neutral-200 z-0 hidden sm:block" />
               )}
 
               <div
                 className={cn(
-                  "flex h-10 w-10 items-center justify-center rounded-full text-sm font-medium transition-colors relative z-10 bg-white",
+                  "flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full text-xs sm:text-sm font-medium transition-colors relative z-10 bg-white",
                   isComplete
                     ? "bg-blue-600 text-white"
                     : isActive
@@ -795,12 +800,16 @@ function StepHeader({ current }: { current: Step }) {
                 )}
                 aria-current={isActive ? "step" : undefined}
               >
-                {isComplete ? <CheckCircle2 className="h-5 w-5" /> : s.id}
+                {isComplete ? (
+                  <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5" />
+                ) : (
+                  s.id
+                )}
               </div>
 
               <span
                 className={cn(
-                  "text-sm font-medium mt-2 text-center",
+                  "text-xs sm:text-sm font-medium mt-2 text-center px-1",
                   isActive
                     ? "font-semibold text-foreground"
                     : "text-muted-foreground"

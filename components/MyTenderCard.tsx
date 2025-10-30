@@ -73,11 +73,11 @@ export default function MyTenderCard({
   const { profile } = useAuth();
   return (
     <>
-      <div className="bg-white/80 backdrop-blur-lg rounded-lg border border-gray-200 shadow-0 overflow-hidden transition-all hover:shadow-0">
-        <div className="p-6">
+      <div className="bg-white/80 backdrop-blur-lg rounded-lg sm:rounded-xl border border-gray-200 shadow-sm overflow-hidden transition-all hover:shadow-md">
+        <div className="p-4 sm:p-6">
           {/* Header */}
-          <div className="flex items-start justify-between mb-5">
-            <div className="flex-1">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 sm:mb-5 gap-3">
+            <div className="flex-1 min-w-0">
               <Link
                 href={
                   profile?.userType == "business"
@@ -85,7 +85,7 @@ export default function MyTenderCard({
                     : `/dashboard/tender/${tender.id}`
                 }
                 onClick={(e) => e.stopPropagation()}
-                className="text-xl font-medium text-gray-900 line-clamp-1 hover:text-blue-600 transition-colors"
+                className="text-lg sm:text-xl font-medium text-gray-900 line-clamp-1 hover:text-blue-600 transition-colors"
               >
                 {tender.title}
               </Link>
@@ -98,17 +98,15 @@ export default function MyTenderCard({
                   {tender.category}
                 </Badge>
                 {tender.location && (
-                  <div className="flex items-center gap-1 text-sm text-gray-500">
-                    <MapPin className="h-4 w-4 text-gray-400" />
+                  <div className="flex items-center gap-1 text-xs sm:text-sm text-gray-500">
+                    <MapPin className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-400" />
                     <span>{tender.location}</span>
                   </div>
                 )}
               </div>
             </div>
 
-            <Badge
-              className={`rounded-full px-3 py-1.5 text-xs font-medium flex items-center gap-1.5 bg-blue-50 text-blue-700 shadow-0`}
-            >
+            <Badge className="rounded-full px-3 py-1.5 text-xs sm:text-sm font-medium flex items-center gap-1.5 bg-blue-50 text-blue-700">
               {getStatusIcon(tender)}
               <span>{getStatusText(tender)}</span>
             </Badge>
@@ -116,7 +114,7 @@ export default function MyTenderCard({
 
           {/* Description */}
           <p
-            className="text-gray-700 text-base leading-relaxed mb-6 line-clamp-2"
+            className="text-gray-700 text-sm sm:text-base leading-relaxed mb-5 sm:mb-6 line-clamp-2"
             style={{
               display: "-webkit-box",
               WebkitLineClamp: 2,
@@ -127,29 +125,35 @@ export default function MyTenderCard({
           </p>
 
           {/* Stats Grid */}
-          <div className="grid grid-cols-3 gap-4 py-5 border-t border-b border-gray-100">
-            <div className="text-center py-2">
-              <p className="text-lg font-semibold text-gray-900">
+          <div className="grid grid-cols-3 sm:grid-cols-3 gap-3 sm:gap-4 py-4 sm:py-5 border-t border-b border-gray-100 text-center">
+            <div className="py-2">
+              <p className="text-base sm:text-lg font-semibold text-gray-900">
                 {tender.budget.toLocaleString()}
               </p>
-              <p className="text-xs text-gray-500 font-medium">QAR Budget</p>
+              <p className="text-xs sm:text-sm text-gray-500 font-medium">
+                QAR Budget
+              </p>
             </div>
-            <div className="text-center py-2">
-              <p className="text-lg font-semibold text-gray-900">
+            <div className="py-2">
+              <p className="text-base sm:text-lg font-semibold text-gray-900">
                 {tender.bidCount}
               </p>
-              <p className="text-xs text-gray-500 font-medium">Bids Received</p>
+              <p className="text-xs sm:text-sm text-gray-500 font-medium">
+                Bids Received
+              </p>
             </div>
-            <div className="text-center py-2">
-              <p className="text-lg font-semibold text-gray-900">
+            <div className="py-2">
+              <p className="text-base sm:text-lg font-semibold text-gray-900">
                 {tender.deadlineDate}
               </p>
-              <p className="text-xs text-gray-500 font-medium">Deadline</p>
+              <p className="text-xs sm:text-sm text-gray-500 font-medium">
+                Deadline
+              </p>
             </div>
           </div>
 
           {/* Actions */}
-          <div className="flex items-center justify-between pt-5">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 pt-5">
             <div className="flex items-center gap-2">
               <button className="p-2.5 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 active:bg-gray-300 transition-all">
                 <Eye className="h-4 w-4" />
@@ -185,7 +189,7 @@ export default function MyTenderCard({
                   : `/dashboard/tender/${tender.id}`
               }
             >
-              <button className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-blue-50 text-blue-700 hover:bg-blue-100 active:bg-blue-200 transition-all text-sm font-medium">
+              <button className="flex items-center justify-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-blue-50 text-blue-700 hover:bg-blue-100 active:bg-blue-200 transition-all text-sm font-medium w-full sm:w-auto">
                 <span>View Details</span>
                 <ChevronRightIcon className="h-4 w-4" />
               </button>
@@ -193,7 +197,7 @@ export default function MyTenderCard({
           </div>
         </div>
 
-        {/* Edit Modal */}
+        {/* Modals */}
         <EditTenderModal
           open={openTenderModal}
           onOpenChange={setOpenTenderModal}
@@ -205,7 +209,6 @@ export default function MyTenderCard({
           }}
         />
 
-        {/* Reopen Modal */}
         <ReopenTenderModal
           open={isReopening}
           onOpenChange={setIsReopening}
@@ -217,10 +220,10 @@ export default function MyTenderCard({
           }}
         />
 
-        {/* Confirm Close Dialog (Apple-style Sheet) */}
+        {/* Confirm Close Dialog */}
         {confirmClose && (
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn">
-            <div className="bg-white rounded-2xl shadow-0 w-full max-w-sm overflow-hidden border border-gray-200">
+            <div className="bg-white rounded-2xl shadow-lg w-full max-w-sm overflow-hidden border border-gray-200">
               <div className="p-6 text-center">
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">
                   Close Tender

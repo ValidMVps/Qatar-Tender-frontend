@@ -32,7 +32,6 @@ export default function LoginForm() {
           description: "Login successful! Redirecting...",
           variant: "default",
         });
-        // Redirect handled in AuthContext.login
       } else {
         toast({
           title: "❌ Error",
@@ -41,7 +40,6 @@ export default function LoginForm() {
         });
       }
     } catch (err: any) {
-      // Fallback if something unexpected bubbles up
       console.error("LoginForm error:", err);
       toast({
         title: "Unexpected Error",
@@ -54,61 +52,70 @@ export default function LoginForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 w-full">
-      <div className="space-y-2">
-        <Label htmlFor="email">{t("email")}</Label>
-        <Input
-          id="email"
-          name="email"
-          type="email"
-          placeholder="you@example.com"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          disabled={isPending}
-        />
-      </div>
+    <div className="w-full flex justify-center items-center">
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-6 w-full max-w-md bg-white rounded-xl p-4 pt-0 sm:p-4"
+      >
+        {/* Email Field */}
+        <div className="space-y-2">
+          <Label htmlFor="email">{t("email")}</Label>
+          <Input
+            id="email"
+            name="email"
+            type="email"
+            placeholder="you@example.com"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            disabled={isPending}
+          />
+        </div>
 
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <Label htmlFor="password">{t("password")}</Label>
+        {/* Password Field */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <Label htmlFor="password">{t("password")}</Label>
+            <Link
+              href="/forgot-password"
+              className="text-sm font-medium text-blue-600 hover:underline"
+            >
+              Forgot password?
+            </Link>
+          </div>
+          <Input
+            id="password"
+            name="password"
+            type="password"
+            placeholder="••••••••"
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            disabled={isPending}
+          />
+        </div>
+
+        {/* Submit Button */}
+        <Button
+          type="submit"
+          className="w-full bg-blue-600 text-white hover:bg-blue-700 rounded-md"
+          disabled={isPending}
+        >
+          {isPending ? "Logging in..." : "Login"}
+          {!isPending && <MailCheck className="ml-2 h-4 w-4" />}
+        </Button>
+
+        {/* Signup Redirect */}
+        <div className="mt-4 text-center text-sm text-gray-600">
+          Don&apos;t have an account?{" "}
           <Link
-            href="/forgot-password"
-            className="text-sm font-medium text-blue-600 hover:underline"
+            href="/signup"
+            className="font-medium text-blue-600 hover:underline"
           >
-            Forgot password?
+            Sign up
           </Link>
         </div>
-        <Input
-          id="password"
-          name="password"
-          type="password"
-          placeholder="••••••••"
-          required
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          disabled={isPending}
-        />
-      </div>
-
-      <Button
-        type="submit"
-        className="w-full bg-blue-600 text-white hover:bg-blue-700 rounded-md"
-        disabled={isPending}
-      >
-        {isPending ? "Logging in..." : "Login"}
-        {!isPending && <MailCheck className="ml-2 h-4 w-4" />}
-      </Button>
-
-      <div className="mt-4 text-center text-sm text-muted-foreground">
-        Don&apos;t have an account?{" "}
-        <Link
-          href="/signup"
-          className="font-medium text-blue-600 hover:underline"
-        >
-          Sign up
-        </Link>
-      </div>
-    </form>
+      </form>
+    </div>
   );
 }

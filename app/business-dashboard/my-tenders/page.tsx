@@ -267,7 +267,7 @@ export default function MyTendersPage() {
 
   return (
     <PageTransitionWrapper>
-      <div className="container mx-auto py-1 px-1 md:py-8 md:px-3">
+      <div className="container mx-auto py-3 px-1 md:py-8 md:px-3">
         {/* Stats Cards */}
         <div className="mb-6 space-y-2 md:space-y-4 w-full">
           <div className="xl:grid hidden grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 mb-6">
@@ -438,15 +438,17 @@ export default function MyTendersPage() {
           onValueChange={setActiveTab}
           className="w-full mb-6"
         >
-          <TabsList className="w-full grid grid-cols-3 sm:grid-cols-7 gap-2 md:grid hidden">
-            <TabsTrigger value="all">{t("all")}</TabsTrigger>
-            <TabsTrigger value="active">{t("active")}</TabsTrigger>
-            <TabsTrigger value="awarded">{t("awarded")}</TabsTrigger>
-            <TabsTrigger value="closed">{t("closed")}</TabsTrigger>
-            <TabsTrigger value="rejected">{t("rejected")}</TabsTrigger>
-            <TabsTrigger value="completed">{t("completed")}</TabsTrigger>
-            <TabsTrigger value="draft">{t("draft")}</TabsTrigger>
-          </TabsList>
+          <div className="w-full overflow-x-auto sm:overflow-visible">
+            <TabsList className="flex sm:grid sm:grid-cols-7 gap-2 w-max sm:w-full md:grid hidden-scrollbar">
+              <TabsTrigger value="all">{t("all")}</TabsTrigger>
+              <TabsTrigger value="active">{t("active")}</TabsTrigger>
+              <TabsTrigger value="awarded">{t("awarded")}</TabsTrigger>
+              <TabsTrigger value="closed">{t("closed")}</TabsTrigger>
+              <TabsTrigger value="rejected">{t("rejected")}</TabsTrigger>
+              <TabsTrigger value="completed">{t("completed")}</TabsTrigger>
+              <TabsTrigger value="draft">{t("draft")}</TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value={activeTab} className="mt-4">
             <div className="space-y-2 md:space-y-2 grid grid-cols-1 md:grid-cols-2 gap-4">

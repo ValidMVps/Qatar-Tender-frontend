@@ -529,9 +529,9 @@ export default function MyBidsPage() {
 
   return (
     <PageTransitionWrapper>
-      <div className="container mx-auto px-6 py-8 space-y-8 bg-gray-50 min-h-screen">
+      <div className="container mx-auto px-3 py-3 lg:px-6 lg:py-8 space-y-2 lg:space-y-8 bg-gray-50 min-h-screen">
         {/* Analytics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+        <div className="hidden lg:grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
           <Card className="bg-white border-0 shadow-sm hover:shadow-md transition-all duration-200 rounded-2xl backdrop-blur-sm">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
               <CardTitle className="text-sm font-semibold text-gray-700">
@@ -629,22 +629,25 @@ export default function MyBidsPage() {
         </div>
 
         {/* Filters */}
-        <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-center justify-between w-full">
+          {/* Search Input */}
           <div className="relative flex-1 min-w-0">
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
               placeholder={t("search_bids_placeholder") || "Search bids..."}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-11 h-12 border-0 bg-white shadow-sm rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="pl-11 h-12 border-0 bg-white shadow-sm rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full"
             />
           </div>
-          <div className="flex items-center gap-3">
+
+          {/* Category Select */}
+          <div className="w-full sm:w-auto flex-shrink-0">
             <Select
               value={selectedCategory}
               onValueChange={setSelectedCategory}
             >
-              <SelectTrigger className="w-48 h-12 border-0 bg-white shadow-sm rounded-2xl">
+              <SelectTrigger className="w-full sm:w-48 h-12 border-0 bg-white shadow-sm rounded-2xl">
                 <SelectValue
                   placeholder={t("select_category") || "Select category"}
                 />
@@ -663,10 +666,10 @@ export default function MyBidsPage() {
           </div>
         </div>
 
-        {/* Tabs + Table */}
         <div className="bg-white rounded-2xl shadow-sm border-0 overflow-hidden">
-          <div className="border-b border-gray-100 p-6">
-            <div className="flex flex-wrap gap-2">
+          {/* Tabs (scrollable on mobile) */}
+          <div className="border-b border-gray-100 p-4 sm:p-6 overflow-x-auto">
+            <div className="flex gap-2 sm:gap-3 min-w-max sm:min-w-0">
               {[
                 { key: "all", label: t("all") || "All" },
                 { key: "accepted", label: t("accepted") || "Accepted" },
@@ -680,7 +683,7 @@ export default function MyBidsPage() {
               ].map((tab) => (
                 <button
                   key={tab.key}
-                  className={`py-3 px-6 rounded-xl text-sm font-medium transition-all duration-200 ${
+                  className={`py-2.5 px-5 sm:py-3 sm:px-6 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-200 ${
                     activeTab === tab.key
                       ? "bg-blue-100 text-blue-700 shadow-sm"
                       : "text-gray-600 hover:bg-gray-50"
@@ -693,178 +696,180 @@ export default function MyBidsPage() {
             </div>
           </div>
 
-          <Table>
-            <TableHeader className="bg-gray-50/50">
-              <TableRow className="border-none">
-                <TableHead className="px-6 py-4 font-semibold text-gray-700">
-                  {t("tender_title") || "Tender Title"}
-                </TableHead>
-                <TableHead className="px-6 py-4 font-semibold text-gray-700">
-                  {t("category") || "Category"}
-                </TableHead>
-                <TableHead className="px-6 py-4 font-semibold text-gray-700">
-                  {t("your_bid") || "Your Bid"}
-                </TableHead>
-                <TableHead className="px-6 py-4 font-semibold text-gray-700">
-                  {t("submitted") || "Submitted"}
-                </TableHead>
-                <TableHead className="px-6 py-4 font-semibold text-gray-700">
-                  {t("status") || "Status"}
-                </TableHead>
-                <TableHead className="px-6 py-4 text-right font-semibold text-gray-700">
-                  {t("actions") || "Actions"}
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredBids.length > 0 ? (
-                filteredBids.map((bid) => (
-                  <TableRow
-                    key={bid.id}
-                    className="border-none hover:bg-gray-50/50 transition-colors"
-                  >
-                    <TableCell className="px-6 py-5">
-                      <div>
-                        <div className="font-semibold text-gray-900 mb-1">
-                          {bid.tenderTitle}
+          {/* Table (scrollable horizontally on mobile) */}
+          <div className="overflow-x-auto">
+            <Table className="min-w-[800px] sm:min-w-0">
+              <TableHeader className="bg-gray-50/50">
+                <TableRow className="border-none">
+                  <TableHead className="px-6 py-4 font-semibold text-gray-700">
+                    {t("tender_title") || "Tender Title"}
+                  </TableHead>
+                  <TableHead className="px-6 py-4 font-semibold text-gray-700">
+                    {t("category") || "Category"}
+                  </TableHead>
+                  <TableHead className="px-6 py-4 font-semibold text-gray-700">
+                    {t("your_bid") || "Your Bid"}
+                  </TableHead>
+                  <TableHead className="px-6 py-4 font-semibold text-gray-700">
+                    {t("submitted") || "Submitted"}
+                  </TableHead>
+                  <TableHead className="px-6 py-4 font-semibold text-gray-700">
+                    {t("status") || "Status"}
+                  </TableHead>
+                  <TableHead className="px-6 py-4 text-right font-semibold text-gray-700">
+                    {t("actions") || "Actions"}
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+
+              <TableBody>
+                {filteredBids.length > 0 ? (
+                  filteredBids.map((bid) => (
+                    <TableRow
+                      key={bid.id}
+                      className="border-none hover:bg-gray-50/50 transition-colors"
+                    >
+                      <TableCell className="px-6 py-5">
+                        <div>
+                          <div className="font-semibold text-gray-900 mb-1">
+                            {bid.tenderTitle}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {bid.clientName}
+                          </div>
                         </div>
-                        <div className="text-sm text-gray-500">
-                          {bid.clientName}
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell className="px-6 py-5">
-                      <Badge
-                        variant="outline"
-                        className="text-xs bg-gray-50 border-gray-200 text-gray-700 rounded-lg"
-                      >
-                        {bid.category || "-"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="px-6 py-5">
-                      <div className="font-semibold text-gray-900">
-                        {bid.amount} QAR
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        {t("budget") || "Budget"}: {bid.budget ?? "-"} QAR
-                      </div>
-                    </TableCell>
-                    <TableCell className="px-6 py-5 text-gray-600">
-                      {new Date(bid.submittedAt).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell className="px-6 py-5">
-                      <Badge
-                        className={`text-xs border flex items-center gap-1 w-fit rounded-lg font-medium ${getStatusColor(
-                          bid.status
-                        )}`}
-                      >
-                        {getStatusIcon(bid.status)}
-                        {getStatusText(bid.status)}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="px-6 py-5 text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-10 w-10 rounded-xl"
-                          >
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent
-                          align="end"
-                          className="rounded-xl border-0 shadow-lg"
+                      </TableCell>
+                      <TableCell className="px-6 py-5">
+                        <Badge
+                          variant="outline"
+                          className="text-xs bg-gray-50 border-gray-200 text-gray-700 rounded-lg"
                         >
-                          <DropdownMenuItem
-                            onClick={() => handleViewBidDetails(bid)}
-                            className="rounded-lg"
-                          >
-                            <Eye className="h-4 w-4 mr-2" />
-                            {t("view") || "View"}
-                          </DropdownMenuItem>
-
-                          {/* Show edit option only for revision bids */}
-                          {["submitted", "returned_for_revision"].includes(
+                          {bid.category || "-"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="px-6 py-5">
+                        <div className="font-semibold text-gray-900">
+                          {bid.amount} QAR
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {t("budget") || "Budget"}: {bid.budget ?? "-"} QAR
+                        </div>
+                      </TableCell>
+                      <TableCell className="px-6 py-5 text-gray-600">
+                        {new Date(bid.submittedAt).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell className="px-6 py-5">
+                        <Badge
+                          className={`text-xs border flex items-center gap-1 w-fit rounded-lg font-medium ${getStatusColor(
                             bid.status
-                          ) && (
+                          )}`}
+                        >
+                          {getStatusIcon(bid.status)}
+                          {getStatusText(bid.status)}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="px-6 py-5 text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-10 w-10 rounded-xl"
+                            >
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent
+                            align="end"
+                            className="rounded-xl border-0 shadow-lg"
+                          >
                             <DropdownMenuItem
-                              onClick={() => handleResubmitBid(bid.id)}
+                              onClick={() => handleViewBidDetails(bid)}
                               className="rounded-lg"
                             >
-                              <Pencil className="h-4 w-4 mr-2" />
-
-                              {bid.status !== "returned_for_revision"
-                                ? t("edit_bid")
-                                : t("resubmit_bid")}
+                              <Eye className="h-4 w-4 mr-2" />
+                              {t("view") || "View"}
                             </DropdownMenuItem>
-                          )}
 
-                          {(bid.status === "accepted" ||
-                            bid.status === "completed") && (
-                            <DropdownMenuItem
-                              onClick={() => handleGoToChat(bid.id)}
-                              className="rounded-lg"
-                            >
-                              <Link
-                                href={`/business-dashboard/projects`}
-                                className="flex"
+                            {["submitted", "returned_for_revision"].includes(
+                              bid.status
+                            ) && (
+                              <DropdownMenuItem
+                                onClick={() => handleResubmitBid(bid.id)}
+                                className="rounded-lg"
                               >
-                                <MessageCircle className="h-4 w-4 mr-2" />
-                                {t("go_to_chat") || "Go to Chat"}
-                              </Link>
-                            </DropdownMenuItem>
-                          )}
-                          {bid.status === "under_review" && (
-                            <DropdownMenuItem
-                              onClick={() => handleRetryPayment(bid)}
-                              className="rounded-lg text-blue-600"
-                            >
-                              <RefreshCw className="h-4 w-4 mr-2" />
-                              {t("retry_payment") || "Retry Payment"}
-                            </DropdownMenuItem>
-                          )}
-                          {bid.status !== "completed" &&
-                            bid.status !== "accepted" &&
-                            bid.status !== "returned_for_revision" && (
-                              <>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem
-                                  onClick={() => setBidToDelete(bid.id)}
-                                  className="text-red-600 rounded-lg"
-                                >
-                                  <X className="h-4 w-4 mr-2" />
-                                  {t("delete_bid") || "Delete Bid"}
-                                </DropdownMenuItem>
-                              </>
+                                <Pencil className="h-4 w-4 mr-2" />
+                                {bid.status !== "returned_for_revision"
+                                  ? t("edit_bid")
+                                  : t("resubmit_bid")}
+                              </DropdownMenuItem>
                             )}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+
+                            {(bid.status === "accepted" ||
+                              bid.status === "completed") && (
+                              <DropdownMenuItem
+                                onClick={() => handleGoToChat(bid.id)}
+                                className="rounded-lg"
+                              >
+                                <Link
+                                  href={`/business-dashboard/projects`}
+                                  className="flex"
+                                >
+                                  <MessageCircle className="h-4 w-4 mr-2" />
+                                  {t("go_to_chat") || "Go to Chat"}
+                                </Link>
+                              </DropdownMenuItem>
+                            )}
+                            {bid.status === "under_review" && (
+                              <DropdownMenuItem
+                                onClick={() => handleRetryPayment(bid)}
+                                className="rounded-lg text-blue-600"
+                              >
+                                <RefreshCw className="h-4 w-4 mr-2" />
+                                {t("retry_payment") || "Retry Payment"}
+                              </DropdownMenuItem>
+                            )}
+                            {bid.status !== "completed" &&
+                              bid.status !== "accepted" &&
+                              bid.status !== "returned_for_revision" && (
+                                <>
+                                  <DropdownMenuSeparator />
+                                  <DropdownMenuItem
+                                    onClick={() => setBidToDelete(bid.id)}
+                                    className="text-red-600 rounded-lg"
+                                  >
+                                    <X className="h-4 w-4 mr-2" />
+                                    {t("delete_bid") || "Delete Bid"}
+                                  </DropdownMenuItem>
+                                </>
+                              )}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell
+                      colSpan={6}
+                      className="text-center py-16 text-gray-500"
+                    >
+                      <div className="flex flex-col items-center gap-3">
+                        <Search className="h-12 w-12 text-gray-300" />
+                        <p className="text-lg font-medium">
+                          {t("no_bids_found") || "No bids found"}
+                        </p>
+                        <p className="text-sm">
+                          {t("try_adjusting_search_filters") ||
+                            "Try adjusting your search filters"}
+                        </p>
+                      </div>
                     </TableCell>
                   </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={6}
-                    className="text-center py-16 text-gray-500"
-                  >
-                    <div className="flex flex-col items-center gap-3">
-                      <Search className="h-12 w-12 text-gray-300" />
-                      <p className="text-lg font-medium">
-                        {t("no_bids_found") || "No bids found"}
-                      </p>
-                      <p className="text-sm">
-                        {t("try_adjusting_search_filters") ||
-                          "Try adjusting your search filters"}
-                      </p>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </div>
 
         {/* Bid Details Modal */}

@@ -122,13 +122,11 @@ export default function IndividualDashboardPage() {
       if (!user?._id) return;
       setLoading(true);
       try {
-        // Fetch user's tenders
         const tendersRes = await getUserTenders(user._id);
         const tenders = Array.isArray(tendersRes) ? tendersRes : [];
 
         setMyTenders(tenders);
 
-        // Compute status summary
         const statusSummary = tenders.reduce(
           (acc, t) => {
             const now = new Date();
@@ -150,7 +148,6 @@ export default function IndividualDashboardPage() {
         );
         setTenderStatusSummary(statusSummary);
 
-        // Set other states
         setTendersWithNoBids(
           tenders.filter((t) => !t.bidCount || t.bidCount === 0)
         );
@@ -160,7 +157,6 @@ export default function IndividualDashboardPage() {
           )
         );
 
-        // Fetch bids for each tender
         const bidsMap: Record<string, Bid[]> = {};
         for (const tender of tenders) {
           try {
@@ -265,12 +261,10 @@ export default function IndividualDashboardPage() {
     }
   };
 
-  // KPI Data
   const totalTenders = myTenders.length;
   const totalBidsReceived = Object.values(bidsReceived).flat().length;
   const awardedCount = awardedProjects.length;
 
-  // Upcoming deadlines
   const upcomingDeadlines = myTenders
     .map((t) => ({
       title: t.title,
@@ -285,7 +279,6 @@ export default function IndividualDashboardPage() {
     )
     .slice(0, 3);
 
-  // Recent activity
   const recentActivity = [
     ...myTenders.slice(0, 2).map((t) => ({
       type: "tender",
@@ -300,7 +293,6 @@ export default function IndividualDashboardPage() {
     })),
   ].slice(0, 3);
 
-  // Apple-style KPI Card
   const KpiCard = ({
     title,
     icon: Icon,
@@ -317,23 +309,23 @@ export default function IndividualDashboardPage() {
         whileHover={{ scale: href ? 1.02 : 1 }}
         className="bg-white/90 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-100/50 transition-all duration-300 h-full group cursor-pointer"
       >
-        <div className="p-6">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-50 to-blue-100 rounded-full flex items-center justify-center transition-transform duration-300">
-              <Icon className="w-5 h-5 text-blue-600" />
+        <div className="p-4 sm:p-6">
+          <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-50 to-blue-100 rounded-full flex items-center justify-center">
+              <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
             </div>
-            <h3 className="text-sm font-medium text-gray-600 tracking-wide">
+            <h3 className="text-xs sm:text-sm font-medium text-gray-600 tracking-wide">
               {title}
             </h3>
           </div>
-          <div className="space-y-3">{children}</div>
+          <div className="space-y-2 sm:space-y-3">{children}</div>
         </div>
       </motion.div>
     );
 
     return href ? <Link href={href}>{cardContent}</Link> : cardContent;
   };
-  // Apple-style Badge Component
+
   const AppleBadge = ({
     variant,
     className,
@@ -344,11 +336,11 @@ export default function IndividualDashboardPage() {
     children: React.ReactNode;
   }) => {
     const baseClasses =
-      "inline-flex items-center px-3 py-1 rounded-full text-xs font-medium transition-all duration-200";
+      "inline-flex items-center px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-xs font-medium";
     if (variant === "outline") {
       return (
         <span
-          className={`${baseClasses} bg-gray-50/80 text-gray-600 border border-gray-200/60 hover:bg-gray-100/80 ${className}`}
+          className={`${baseClasses} bg-gray-50/80 text-gray-600 border border-gray-200/60 ${className}`}
         >
           {children}
         </span>
@@ -365,59 +357,62 @@ export default function IndividualDashboardPage() {
         variants={{ show: { transition: { staggerChildren: 0.01 } } }}
         className="min-h-screen bg-gradient-to-br from-gray-50/50 via-white to-blue-50/30"
       >
-        <div className="mx-auto px-6 sm:px-8 lg:px-12 py-8 space-y-8">
-          {/* Apple-style Welcome Header */}
+        <div className="mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8">
+          {/* Welcome Header */}
           <motion.div
             initial={{ opacity: 0, y: 5 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
             className="relative overflow-hidden"
           >
-            <div className="bg-white/70 backdrop-blur-2xl rounded-3xl p-8 md:p-10 shadow-sm border border-gray-100/50 relative">
-              {/* Subtle gradient overlay */}
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-purple-500/5 rounded-3xl"></div>
-              <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-blue-100/30 to-transparent rounded-full blur-3xl"></div>
-              <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
-                <div className="space-y-3">
-                  <h1 className="text-3xl md:text-4xl font-semibold text-gray-900 tracking-tight">
+            <div className="bg-white/70 backdrop-blur-2xl rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-10 shadow-sm border border-gray-100/50 relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-purple-500/5 rounded-2xl sm:rounded-3xl"></div>
+              <div className="absolute top-0 right-0 w-64 h-64 sm:w-96 sm:h-96 bg-gradient-to-bl from-blue-100/30 to-transparent rounded-full blur-3xl"></div>
+              <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 sm:gap-6">
+                <div className="space-y-2 sm:space-y-3">
+                  <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-gray-900 tracking-tight">
                     {t("welcome_back")}{" "}
                     <span className="text-blue-600">
                       {profile?.fullName || profile?.companyName}
                     </span>
                   </h1>
-                  <p className="text-lg text-gray-600 font-normal max-w-2xl leading-relaxed">
+                  <p className="text-base sm:text-lg text-gray-600 font-normal max-w-2xl leading-relaxed">
                     Manage your tenders and review contractor bids.
                   </p>
                 </div>
-                <div className="flex flex-col sm:flex-row gap-3">
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => setOpenTenderModal(true)}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-2xl font-medium shadow-lg shadow-blue-600/25 transition-all duration-200 flex items-center gap-2"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 sm:px-6 sm:py-3 rounded-xl sm:rounded-2xl font-medium shadow-lg shadow-blue-600/25 transition-all duration-200 flex items-center justify-center gap-1.5 sm:gap-2 w-full sm:w-auto"
                   >
-                    <Plus className="w-5 h-5" />
-                    Post New Tender
+                    <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
+                    <span className="text-sm sm:text-base">
+                      Post New Tender
+                    </span>
                   </motion.button>
                 </div>
               </div>
             </div>
           </motion.div>
 
+          {/* KPI Cards */}
           <motion.div
-            className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6"
             initial={{ opacity: 0, y: 5 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
           >
-            {/* Recent Activity */}
             <KpiCard
               title="Recent Activity"
               icon={ClipboardList}
               href="/dashboard/my-tenders"
             >
               {recentActivity.length === 0 ? (
-                <p className="text-gray-400 text-sm">No recent activity</p>
+                <p className="text-gray-400 text-xs sm:text-sm">
+                  No recent activity
+                </p>
               ) : (
                 recentActivity.map((act, i) => (
                   <Link
@@ -427,20 +422,20 @@ export default function IndividualDashboardPage() {
                         ? `/dashboard/tender/${(act as any).id || "#"}`
                         : "/dashboard/my-tenders"
                     }
-                    className="flex items-center justify-between py-2 px-3 bg-gray-50/50 rounded-xl hover:bg-gray-100 transition"
+                    className="flex items-center justify-between py-1.5 px-2.5 sm:py-2 sm:px-3 bg-gray-50/50 rounded-lg sm:rounded-xl hover:bg-gray-100 transition text-xs sm:text-sm"
                   >
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 sm:gap-3">
                       <div
-                        className={`w-2 h-2 rounded-full ${
+                        className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${
                           act.type === "tender" ? "bg-blue-500" : "bg-green-500"
                         }`}
                       ></div>
-                      <span className="text-sm text-gray-700 truncate max-w-[140px]">
+                      <span className="text-gray-700 truncate max-w-[120px] sm:max-w-[140px]">
                         {act.type === "tender" ? "Posted: " : "Bid received: "}
                         {act.title}
                       </span>
                     </div>
-                    <span className="text-xs text-gray-500 font-medium">
+                    <span className="text-gray-500 font-medium">
                       {act.time}
                     </span>
                   </Link>
@@ -448,25 +443,24 @@ export default function IndividualDashboardPage() {
               )}
             </KpiCard>
 
-            {/* Bids Received */}
             <KpiCard
               title="Bids Received"
               icon={Users}
               href="/dashboard/my-tenders"
             >
-              <div className="flex items-center justify-between py-2 px-3 bg-gray-50/50 rounded-xl">
-                <span className="text-sm text-gray-700 font-medium">
+              <div className="flex items-center justify-between py-1.5 px-2.5 sm:py-2 sm:px-3 bg-gray-50/50 rounded-lg sm:rounded-xl">
+                <span className="text-gray-700 font-medium text-xs sm:text-sm">
                   Total Bids
                 </span>
-                <AppleBadge className="bg-blue-100/80 text-blue-700 min-w-[24px] text-center">
+                <AppleBadge className="bg-blue-100/80 text-blue-700 min-w-[20px] sm:min-w-[24px] text-center">
                   {totalBidsReceived}
                 </AppleBadge>
               </div>
-              <div className="flex items-center justify-between py-2 px-3 bg-gray-50/50 rounded-xl">
-                <span className="text-sm text-gray-700 font-medium">
+              <div className="flex items-center justify-between py-1.5 px-2.5 sm:py-2 sm:px-3 bg-gray-50/50 rounded-lg sm:rounded-xl">
+                <span className="text-gray-700 font-medium text-xs sm:text-sm">
                   Avg per Tender
                 </span>
-                <AppleBadge className="bg-purple-100/80 text-purple-700 min-w-[24px] text-center">
+                <AppleBadge className="bg-purple-100/80 text-purple-700 min-w-[20px] sm:min-w-[24px] text-center">
                   {myTenders.length > 0
                     ? (totalBidsReceived / myTenders.length).toFixed(1)
                     : "0"}
@@ -474,7 +468,6 @@ export default function IndividualDashboardPage() {
               </div>
             </KpiCard>
 
-            {/* Tender Status */}
             <KpiCard
               title="Tender Status"
               icon={BarChart2}
@@ -485,13 +478,13 @@ export default function IndividualDashboardPage() {
                 return (
                   <div
                     key={status}
-                    className="flex items-center justify-between py-2 px-3 bg-gray-50/50 rounded-xl"
+                    className="flex items-center justify-between py-1.5 px-2.5 sm:py-2 sm:px-3 bg-gray-50/50 rounded-lg sm:rounded-xl"
                   >
-                    <span className="capitalize text-sm text-gray-700 font-medium">
+                    <span className="capitalize text-gray-700 font-medium text-xs sm:text-sm">
                       {status}
                     </span>
                     <AppleBadge
-                      className={`min-w-[24px] text-center ${
+                      className={`min-w-[20px] sm:min-w-[24px] text-center ${
                         status === "awarded"
                           ? "bg-green-100/80 text-green-700"
                           : status === "open"
@@ -505,29 +498,30 @@ export default function IndividualDashboardPage() {
                 );
               })}
               {Object.values(tenderStatusSummary).every((v) => v === 0) && (
-                <p className="text-gray-400 text-sm">No tenders</p>
+                <p className="text-gray-400 text-xs sm:text-sm">No tenders</p>
               )}
             </KpiCard>
 
-            {/* Upcoming Deadlines */}
             <KpiCard
               title="Upcoming Deadlines"
               icon={Timer}
               href="/dashboard/my-tenders"
             >
               {upcomingDeadlines.length === 0 ? (
-                <p className="text-gray-400 text-sm">No deadlines soon</p>
+                <p className="text-gray-400 text-xs sm:text-sm">
+                  No deadlines soon
+                </p>
               ) : (
                 upcomingDeadlines.map((item, i) => (
                   <Link
                     key={i}
                     href={`/dashboard/tender/${item.id}`}
-                    className="flex items-center justify-between py-2 px-3 bg-amber-50/50 rounded-xl border border-amber-100/50 hover:bg-amber-100 transition"
+                    className="flex items-center justify-between py-1.5 px-2.5 sm:py-2 sm:px-3 bg-amber-50/50 rounded-lg sm:rounded-xl border border-amber-100/50 hover:bg-amber-100 transition text-xs sm:text-sm"
                   >
-                    <span className="text-sm text-gray-700 truncate max-w-[140px]">
+                    <span className="text-gray-700 truncate max-w-[120px] sm:max-w-[140px]">
                       {item.title}
                     </span>
-                    <span className="text-xs text-amber-600 font-semibold">
+                    <span className="text-amber-600 font-semibold">
                       {formatShortDate(item.deadline!.toString())}
                     </span>
                   </Link>
@@ -536,98 +530,111 @@ export default function IndividualDashboardPage() {
             </KpiCard>
           </motion.div>
 
-          {/* Apple-style Tabs */}
+          {/* Tabs Section */}
           <motion.div
             initial={{ opacity: 0, y: 5 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="bg-white/70 backdrop-blur-2xl rounded-3xl shadow-sm border border-gray-100/50 overflow-hidden"
+            className="bg-white/70 backdrop-blur-2xl rounded-2xl sm:rounded-3xl shadow-sm border border-gray-100/50 overflow-hidden"
           >
-            {/* Tab Navigation */}
-            <div className="border-b border-gray-100/50 p-6 pb-0">
-              <nav className="flex space-x-1 bg-gray-100/50 rounded-2xl p-1">
-                {[
-                  { id: "my-tenders", label: "My Tenders", icon: FileText },
-                  { id: "bids-received", label: "Bids Received", icon: Users },
-                  { id: "awaiting", label: "Awaiting Bids", icon: Clock },
-                  {
-                    id: "awarded",
-                    label: "Awarded Projects",
-                    icon: MessageSquare,
-                  },
-                ].map((tab) => {
-                  const Icon = tab.icon;
-                  return (
-                    <motion.button
-                      key={tab.id}
-                      onClick={() => setActiveTab(tab.id as any)}
-                      className={`flex items-center space-x-2 px-4 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 whitespace-nowrap ${
-                        activeTab === tab.id
-                          ? "bg-white text-blue-600 shadow-sm"
-                          : "text-gray-600 hover:text-gray-800 hover:bg-white/50"
-                      }`}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      <Icon className="w-4 h-4" />
-                      <span>{tab.label}</span>
-                    </motion.button>
-                  );
-                })}
+            <div className="border-b border-gray-100/50 p-4 sm:p-6 pb-0">
+              <nav
+                className="
+      flex gap-1 sm:gap-2 bg-gray-100/50 rounded-xl sm:rounded-2xl p-1 
+      overflow-x-auto sm:overflow-x-visible scrollbar-hide
+    "
+              >
+                <div className="flex flex-nowrap min-w-max">
+                  {[
+                    { id: "my-tenders", label: "My Tenders", icon: FileText },
+                    {
+                      id: "bids-received",
+                      label: "Bids Received",
+                      icon: Users,
+                    },
+                    { id: "awaiting", label: "Awaiting Bids", icon: Clock },
+                    {
+                      id: "awarded",
+                      label: "Awarded Projects",
+                      icon: MessageSquare,
+                    },
+                  ].map((tab) => {
+                    const Icon = tab.icon;
+                    return (
+                      <motion.button
+                        key={tab.id}
+                        onClick={() => setActiveTab(tab.id as any)}
+                        className={`flex items-center space-x-1.5 sm:space-x-2 px-3 py-2 sm:px-4 sm:py-2.5 
+              rounded-lg sm:rounded-xl font-medium text-xs sm:text-sm 
+              transition-all duration-200 whitespace-nowrap mr-1 sm:mr-2
+              ${
+                activeTab === tab.id
+                  ? "bg-white text-blue-600 shadow-sm"
+                  : "text-gray-600 hover:text-gray-800 hover:bg-white/50"
+              }`}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                        <span>{tab.label}</span>
+                      </motion.button>
+                    );
+                  })}
+                </div>
               </nav>
             </div>
-
-            {/* Tab Content */}
             <motion.div
               key={activeTab}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.3 }}
-              className="p-8"
+              className="p-4 sm:p-6 md:p-8"
             >
               {loading ? (
-                <div className="text-center py-16">
-                  <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
-                  <p className="text-gray-500 mt-4 text-lg">Loading...</p>
+                <div className="text-center py-12 sm:py-16">
+                  <div className="inline-block animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-b-2 border-blue-500 mx-auto"></div>
+                  <p className="text-gray-500 mt-3 sm:mt-4 text-base sm:text-lg">
+                    Loading...
+                  </p>
                 </div>
               ) : activeTab === "my-tenders" ? (
                 <div>
-                  <div className="flex items-center justify-between mb-8">
-                    <h3 className="text-2xl font-semibold text-gray-900">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 sm:mb-6 gap-3">
+                    <h3 className="text-xl sm:text-2xl font-semibold text-gray-900">
                       My Tenders
                     </h3>
                     <Link
                       href="/dashboard/my-tenders"
-                      className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-1 bg-blue-50/80 px-4 py-2 rounded-xl transition-colors"
+                      className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-1 bg-blue-50/80 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg sm:rounded-xl transition-colors w-full sm:w-auto justify-center sm:justify-start"
                     >
                       View All
-                      <ChevronRight className="w-4 h-4" />
+                      <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     </Link>
                   </div>
-                  <div className="bg-white/90 rounded-2xl border border-gray-100/60 overflow-hidden">
+                  <div className="overflow-x-auto rounded-xl sm:rounded-2xl border border-gray-100/60">
                     <Table>
                       <TableHeader>
                         <TableRow className="border-gray-100/60 bg-gray-50/50">
-                          <TableHead className="font-semibold text-gray-700">
+                          <TableHead className="font-semibold text-gray-700 whitespace-nowrap">
                             Title
                           </TableHead>
-                          <TableHead className="font-semibold text-gray-700">
+                          <TableHead className="font-semibold text-gray-700 whitespace-nowrap">
                             Category
                           </TableHead>
-                          <TableHead className="font-semibold text-gray-700">
+                          <TableHead className="font-semibold text-gray-700 whitespace-nowrap">
                             Location
                           </TableHead>
-                          <TableHead className="font-semibold text-gray-700">
+                          <TableHead className="font-semibold text-gray-700 whitespace-nowrap">
                             Budget
                           </TableHead>
-                          <TableHead className="font-semibold text-gray-700">
+                          <TableHead className="font-semibold text-gray-700 whitespace-nowrap">
                             Bids
                           </TableHead>
-                          <TableHead className="font-semibold text-gray-700">
+                          <TableHead className="font-semibold text-gray-700 whitespace-nowrap">
                             Status
                           </TableHead>
-                          <TableHead className="font-semibold text-gray-700">
+                          <TableHead className="font-semibold text-gray-700 whitespace-nowrap">
                             Deadline
                           </TableHead>
                         </TableRow>
@@ -637,10 +644,12 @@ export default function IndividualDashboardPage() {
                           <TableRow>
                             <TableCell
                               colSpan={7}
-                              className="text-center py-12 text-gray-500"
+                              className="text-center py-10 sm:py-12 text-gray-500"
                             >
-                              <FileText className="w-12 h-12 mx-auto text-gray-300 mb-4" />
-                              <p className="text-lg">No tenders posted yet.</p>
+                              <FileText className="w-10 h-10 sm:w-12 sm:h-12 mx-auto text-gray-300 mb-3 sm:mb-4" />
+                              <p className="text-base sm:text-lg">
+                                No tenders posted yet.
+                              </p>
                             </TableCell>
                           </TableRow>
                         ) : (
@@ -691,18 +700,16 @@ export default function IndividualDashboardPage() {
                 </div>
               ) : activeTab === "bids-received" ? (
                 <div>
-                  <div className="flex items-center justify-between mb-8">
-                    <h3 className="text-2xl font-semibold text-gray-900">
-                      Bids Received on Your Tenders
-                    </h3>
-                  </div>
-                  <div className="space-y-8">
+                  <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-4 sm:mb-6">
+                    Bids Received on Your Tenders
+                  </h3>
+                  <div className="space-y-6">
                     {myTenders.length === 0 ? (
-                      <p className="text-gray-500 text-center py-6">
+                      <p className="text-gray-500 text-center py-4 sm:py-6">
                         No tenders posted.
                       </p>
                     ) : Object.values(bidsReceived).flat().length === 0 ? (
-                      <p className="text-gray-500 text-center py-6">
+                      <p className="text-gray-500 text-center py-4 sm:py-6">
                         No bids received yet.
                       </p>
                     ) : (
@@ -711,9 +718,9 @@ export default function IndividualDashboardPage() {
                         .map((tender) => (
                           <div
                             key={tender._id}
-                            className="bg-white/90 rounded-2xl border border-gray-100/60 overflow-hidden"
+                            className="overflow-x-auto rounded-xl sm:rounded-2xl border border-gray-100/60"
                           >
-                            <div className="p-4 border-b border-gray-100/60">
+                            <div className="p-3 sm:p-4 border-b border-gray-100/60">
                               <h4 className="font-semibold text-gray-900">
                                 {tender.title}
                               </h4>
@@ -721,22 +728,22 @@ export default function IndividualDashboardPage() {
                             <Table>
                               <TableHeader>
                                 <TableRow className="border-gray-100/60 bg-gray-50/50">
-                                  <TableHead className="font-semibold text-gray-700">
+                                  <TableHead className="font-semibold text-gray-700 whitespace-nowrap">
                                     Contractor
                                   </TableHead>
-                                  <TableHead className="font-semibold text-gray-700">
+                                  <TableHead className="font-semibold text-gray-700 whitespace-nowrap">
                                     Proposal
                                   </TableHead>
-                                  <TableHead className="font-semibold text-gray-700">
+                                  <TableHead className="font-semibold text-gray-700 whitespace-nowrap">
                                     Amount
                                   </TableHead>
-                                  <TableHead className="font-semibold text-gray-700">
+                                  <TableHead className="font-semibold text-gray-700 whitespace-nowrap">
                                     Status
                                   </TableHead>
-                                  <TableHead className="font-semibold text-gray-700">
+                                  <TableHead className="font-semibold text-gray-700 whitespace-nowrap">
                                     Submitted
                                   </TableHead>
-                                  <TableHead className="font-semibold text-gray-700">
+                                  <TableHead className="font-semibold text-gray-700 whitespace-nowrap">
                                     Action
                                   </TableHead>
                                 </TableRow>
@@ -750,7 +757,7 @@ export default function IndividualDashboardPage() {
                                     <TableCell className="font-medium text-gray-900">
                                       {bid.contractor?.companyName}
                                     </TableCell>
-                                    <TableCell className="text-gray-600 text-sm max-w-xs line-clamp-1">
+                                    <TableCell className="text-gray-600 text-sm max-w-[120px] sm:max-w-xs line-clamp-1">
                                       {bid.description || "No details"}
                                     </TableCell>
                                     <TableCell className="font-semibold text-gray-900">
@@ -770,7 +777,7 @@ export default function IndividualDashboardPage() {
                                     <TableCell>
                                       <Link
                                         href={`/dashboard/tender/${tender._id}`}
-                                        className="text-blue-600 hover:text-blue-700 font-medium bg-blue-50/80 px-3 py-1 rounded-lg transition-colors"
+                                        className="text-blue-600 hover:text-blue-700 font-medium bg-blue-50/80 px-2 py-1 sm:px-3 sm:py-1 rounded-md sm:rounded-lg transition-colors text-xs sm:text-sm"
                                       >
                                         Review
                                       </Link>
@@ -786,38 +793,38 @@ export default function IndividualDashboardPage() {
                 </div>
               ) : activeTab === "awaiting" ? (
                 <div>
-                  <div className="flex items-center justify-between mb-8">
-                    <h3 className="text-2xl font-semibold text-gray-900">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 sm:mb-6 gap-3">
+                    <h3 className="text-xl sm:text-2xl font-semibold text-gray-900">
                       Tenders Awaiting Bids
                     </h3>
                     <Link
                       href="/dashboard/my-tenders?filter=no-bids"
-                      className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-1 bg-blue-50/80 px-4 py-2 rounded-xl transition-colors"
+                      className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-1 bg-blue-50/80 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg sm:rounded-xl transition-colors w-full sm:w-auto justify-center sm:justify-start"
                     >
                       View All
-                      <ChevronRight className="w-4 h-4" />
+                      <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     </Link>
                   </div>
-                  <div className="bg-white/90 rounded-2xl border border-gray-100/60 overflow-hidden">
+                  <div className="overflow-x-auto rounded-xl sm:rounded-2xl border border-gray-100/60">
                     <Table>
                       <TableHeader>
                         <TableRow className="border-gray-100/60 bg-gray-50/50">
-                          <TableHead className="font-semibold text-gray-700">
+                          <TableHead className="font-semibold text-gray-700 whitespace-nowrap">
                             Title
                           </TableHead>
-                          <TableHead className="font-semibold text-gray-700">
+                          <TableHead className="font-semibold text-gray-700 whitespace-nowrap">
                             Category
                           </TableHead>
-                          <TableHead className="font-semibold text-gray-700">
+                          <TableHead className="font-semibold text-gray-700 whitespace-nowrap">
                             Location
                           </TableHead>
-                          <TableHead className="font-semibold text-gray-700">
+                          <TableHead className="font-semibold text-gray-700 whitespace-nowrap">
                             Budget
                           </TableHead>
-                          <TableHead className="font-semibold text-gray-700">
+                          <TableHead className="font-semibold text-gray-700 whitespace-nowrap">
                             Description
                           </TableHead>
-                          <TableHead className="font-semibold text-gray-700">
+                          <TableHead className="font-semibold text-gray-700 whitespace-nowrap">
                             Deadline
                           </TableHead>
                         </TableRow>
@@ -827,10 +834,10 @@ export default function IndividualDashboardPage() {
                           <TableRow>
                             <TableCell
                               colSpan={6}
-                              className="text-center py-12 text-gray-500"
+                              className="text-center py-10 sm:py-12 text-gray-500"
                             >
-                              <CheckCircle className="w-12 h-12 mx-auto text-green-300 mb-4" />
-                              <p className="text-lg">
+                              <CheckCircle className="w-10 h-10 sm:w-12 sm:h-12 mx-auto text-green-300 mb-3 sm:mb-4" />
+                              <p className="text-base sm:text-lg">
                                 All tenders have received bids!
                               </p>
                             </TableCell>
@@ -862,7 +869,7 @@ export default function IndividualDashboardPage() {
                                     )} ${t("QAR")}`
                                   : "Not specified"}
                               </TableCell>
-                              <TableCell className="text-gray-600 text-sm line-clamp-1 max-w-xs">
+                              <TableCell className="text-gray-600 text-sm max-w-[120px] sm:max-w-xs line-clamp-1">
                                 {tender.description || "No description."}
                               </TableCell>
                               <TableCell className="text-gray-600">
@@ -878,31 +885,29 @@ export default function IndividualDashboardPage() {
                 </div>
               ) : activeTab === "awarded" ? (
                 <div>
-                  <div className="flex items-center justify-between mb-8">
-                    <h3 className="text-2xl font-semibold text-gray-900">
-                      Awarded Projects
-                    </h3>
-                  </div>
-                  <div className="bg-white/90 rounded-2xl border border-gray-100/60 overflow-hidden">
+                  <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-4 sm:mb-6">
+                    Awarded Projects
+                  </h3>
+                  <div className="overflow-x-auto rounded-xl sm:rounded-2xl border border-gray-100/60">
                     <Table>
                       <TableHeader>
                         <TableRow className="border-gray-100/60 bg-gray-50/50">
-                          <TableHead className="font-semibold text-gray-700">
+                          <TableHead className="font-semibold text-gray-700 whitespace-nowrap">
                             Project
                           </TableHead>
-                          <TableHead className="font-semibold text-gray-700">
+                          <TableHead className="font-semibold text-gray-700 whitespace-nowrap">
                             Contractor
                           </TableHead>
-                          <TableHead className="font-semibold text-gray-700">
+                          <TableHead className="font-semibold text-gray-700 whitespace-nowrap">
                             Budget
                           </TableHead>
-                          <TableHead className="font-semibold text-gray-700">
+                          <TableHead className="font-semibold text-gray-700 whitespace-nowrap">
                             Status
                           </TableHead>
-                          <TableHead className="font-semibold text-gray-700">
+                          <TableHead className="font-semibold text-gray-700 whitespace-nowrap">
                             Deadline
                           </TableHead>
-                          <TableHead className="font-semibold text-gray-700">
+                          <TableHead className="font-semibold text-gray-700 whitespace-nowrap">
                             Action
                           </TableHead>
                         </TableRow>
@@ -912,10 +917,10 @@ export default function IndividualDashboardPage() {
                           <TableRow>
                             <TableCell
                               colSpan={6}
-                              className="text-center py-12 text-gray-500"
+                              className="text-center py-10 sm:py-12 text-gray-500"
                             >
-                              <FileText className="w-12 h-12 mx-auto text-gray-300 mb-4" />
-                              <p className="text-lg">
+                              <FileText className="w-10 h-10 sm:w-12 sm:h-12 mx-auto text-gray-300 mb-3 sm:mb-4" />
+                              <p className="text-base sm:text-lg">
                                 No projects awarded yet.
                               </p>
                             </TableCell>
@@ -949,7 +954,7 @@ export default function IndividualDashboardPage() {
                               <TableCell>
                                 <Link
                                   href={`/dashboard/projects`}
-                                  className="text-blue-600 hover:text-blue-700 font-medium bg-blue-50/80 px-3 py-1 rounded-lg transition-colors"
+                                  className="text-blue-600 hover:text-blue-700 font-medium bg-blue-50/80 px-2 py-1 sm:px-3 sm:py-1 rounded-md sm:rounded-lg transition-colors text-xs sm:text-sm"
                                 >
                                   Go to Chat
                                 </Link>
