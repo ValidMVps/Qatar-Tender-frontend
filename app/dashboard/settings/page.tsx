@@ -86,7 +86,6 @@ export default function AppleStyleSettings() {
   const [autoLock, setAutoLock] = useState<string>("15");
 
   // Appearance & Language
-  const [appLanguage, setAppLanguage] = useState<string>("en");
   const [theme, setTheme] = useState<"light" | "dark" | "auto">("light");
   const [fontSize, setFontSize] = useState<string>("medium");
   const [reducedMotion, setReducedMotion] = useState<boolean>(false);
@@ -266,47 +265,6 @@ export default function AppleStyleSettings() {
     authService.logout();
   };
 
-  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-
-      try {
-        // Upload to Cloudinary or your storage service
-        const uploadedUrl = await uploadToCloudinary(file);
-
-        // Update profile with new logo
-        await updateProfileSetting(
-          "commercialRegistrationDoc",
-          uploadedUrl,
-          t("Company_logo_updated_successfully")
-        );
-
-        setCompanyLogo(uploadedUrl);
-      } catch (err: any) {
-        console.error("Failed to upload logo:", err);
-        toast.error(t("Failed_to_upload_company_logo"));
-      }
-    }
-  };
-
-  // Helper function to upload files to cloudinary
-  const uploadToCloudinary = async (file: File): Promise<string> => {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", "your_upload_preset");
-
-    const response = await fetch(
-      `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
-      {
-        method: "POST",
-        body: formData,
-      }
-    );
-
-    const data = await response.json();
-    return data.secure_url;
-  };
-
   const SettingRow = ({
     icon: Icon,
     label,
@@ -315,14 +273,16 @@ export default function AppleStyleSettings() {
     className = "",
   }: SettingRowProps) => (
     <div
-      className={`flex items-center justify-between py-4 px-6 border-b border-gray-100 last:border-b-0 ${className}`}
+      className={`flex flex-col sm:flex-row sm:items-center justify-between py-4 px-4 sm:px-6 border-b border-gray-100 last:border-b-0 ${className}`}
     >
-      <div className="flex items-start space-x-4 flex-1">
+      <div className="flex items-start space-x-3 sm:space-x-4 flex-1 mb-3 sm:mb-0">
         <div className="p-2 bg-gray-100 rounded-lg">
           <Icon className="w-5 h-5 text-gray-600" />
         </div>
-        <div className="flex-1">
-          <h3 className="text-sm font-medium text-gray-900">{label}</h3>
+        <div className="flex-1 min-w-0">
+          <h3 className="text-sm font-medium text-gray-900 truncate">
+            {label}
+          </h3>
           {description && (
             <p className="text-xs text-gray-500 mt-1">{description}</p>
           )}
@@ -373,26 +333,26 @@ export default function AppleStyleSettings() {
   return (
     <PageTransitionWrapper>
       <div className="min-h-screen bg-gray-50">
-        <div className="mx-auto py-8 px-14">
+        <div className="mx-auto py-6 px-4 sm:px-6 lg:px-8 ">
           {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <div className="mb-6 sm:mb-8">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
               {t("Settings")}
             </h1>
-            <p className="text-gray-600">
+            <p className="text-gray-600 text-sm sm:text-base">
               {t("Manage_your_account_settings_and_preferences")}
             </p>
           </div>
 
           {/* Tab Navigation */}
-          <div className="flex space-x-1 bg-gray-200 p-1 rounded-xl mb-8 overflow-x-auto">
+          <div className="flex space-x-1 bg-gray-200 p-1 rounded-xl mb-6 sm:mb-8 overflow-x-auto scrollbar-hide">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               return (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as TabId)}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
+                  className={`flex items-center space-x-2 px-3 py-2 sm:px-4 sm:py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap flex-shrink-0 ${
                     activeTab === tab.id
                       ? "bg-white text-gray-900 shadow-sm"
                       : "text-gray-600 hover:text-gray-900"
@@ -406,16 +366,16 @@ export default function AppleStyleSettings() {
           </div>
 
           {/* Tab Content */}
-          <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+          <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm overflow-hidden">
             {activeTab === "general" && (
               <div>
                 {/* Notifications Section */}
                 <div className="border-b border-gray-100">
-                  <div className="p-6 pb-0">
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  <div className="p-4 sm:p-6 pb-0">
+                    <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-2">
                       {t("Notifications")}
                     </h3>
-                    <p className="text-gray-600 mb-4">
+                    <p className="text-gray-600 text-sm mb-4">
                       {t("Control_how_you_receive_notifications")}
                     </p>
                   </div>
@@ -460,11 +420,11 @@ export default function AppleStyleSettings() {
 
                 {/* Appearance Section */}
                 <div className="border-b border-gray-100">
-                  <div className="p-6 pb-0">
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  <div className="p-4 sm:p-6 pb-0">
+                    <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-2">
                       {t("Appearance")}
                     </h3>
-                    <p className="text-gray-600 mb-4">
+                    <p className="text-gray-600 text-sm mb-4">
                       {t("Customize_how_the_app_looks_and_feels")}
                     </p>
                   </div>
@@ -503,7 +463,7 @@ export default function AppleStyleSettings() {
                         )
                       }
                     >
-                      <SelectTrigger className="w-32">
+                      <SelectTrigger className="w-28 sm:w-32">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -537,18 +497,18 @@ export default function AppleStyleSettings() {
 
             {activeTab === "security" && (
               <div>
-                <div className="p-6 border-b border-gray-100">
-                  <h2 className="text-xl font-semibold text-gray-900">
+                <div className="p-4 sm:p-6 border-b border-gray-100">
+                  <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
                     {t("Security_&_Privacy")}
                   </h2>
-                  <p className="text-gray-600 mt-1">
+                  <p className="text-gray-600 text-sm mt-1">
                     {t("Keep_your_account_secure")}
                   </p>
                 </div>
 
                 {/* Password Change */}
-                <div className="p-6 border-b border-gray-100">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">
+                <div className="p-4 sm:p-6 border-b border-gray-100">
+                  <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-4">
                     {t("Password")}
                   </h3>
                   <form
@@ -612,7 +572,7 @@ export default function AppleStyleSettings() {
 
                     <Button
                       type="submit"
-                      className="bg-blue-500 hover:bg-blue-600 text-white"
+                      className="bg-blue-500 hover:bg-blue-600 text-white w-full sm:w-auto"
                       disabled={passwordLoading}
                     >
                       {passwordLoading
@@ -623,11 +583,11 @@ export default function AppleStyleSettings() {
                 </div>
 
                 {/* Logout Button */}
-                <div className="p-6 pt-4">
+                <div className="p-4 sm:p-6 pt-2 sm:pt-4">
                   <Button
                     variant="outline"
                     onClick={handleLogout}
-                    className="text-red-600 border-red-300 hover:bg-red-50"
+                    className="w-full sm:w-auto text-red-600 border-red-300 hover:bg-red-50"
                   >
                     {t("Log_Out")}
                   </Button>
@@ -637,17 +597,28 @@ export default function AppleStyleSettings() {
 
             {activeTab === "privacy" && (
               <div>
-                <div className="p-6 border-b border-gray-100">
-                  <h2 className="text-xl font-semibold text-gray-900">
+                <div className="p-4 sm:p-6 border-b border-gray-100">
+                  <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
                     {t("Privacy_Settings")}
                   </h2>
-                  <p className="text-gray-600 mt-1">
+                  <p className="text-gray-600 text-sm mt-1">
                     {t("Control_your_profile_privacy_and_visibility")}
                   </p>
                 </div>
 
                 {/* Anonymous Bidding */}
                 <div className="border-b border-gray-100">
+                  <div className="p-4 sm:p-6 pb-0">
+                    <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-2">
+                      {t("Bidding_Privacy")}
+                    </h3>
+                    <p className="text-gray-600 text-sm mb-4">
+                      {t(
+                        "Control_whether_your_identity_is_shown_when_bidding_on_tenders"
+                      )}
+                    </p>
+                  </div>
+
                   <SettingRow
                     icon={Eye}
                     label={t("Show_Public_Profile")}
@@ -672,10 +643,10 @@ export default function AppleStyleSettings() {
           </div>
 
           {/* Save Button */}
-          <div className="mt-8 flex justify-end">
+          <div className="mt-6 sm:mt-8 flex justify-end">
             <Button
               onClick={handleSave}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-xl font-medium"
+              className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2.5 sm:px-8 sm:py-3 rounded-xl font-medium w-full sm:w-auto"
             >
               {t("Save_Changes")}
             </Button>

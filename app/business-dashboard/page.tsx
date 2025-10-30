@@ -299,12 +299,12 @@ export default function DashboardPage() {
               transition={{ duration: 0.6, ease: "easeOut" }}
               className="relative overflow-hidden"
             >
-              <div className="bg-white/70 backdrop-blur-2xl rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-10 shadow-sm border border-gray-100/50 relative">
+              <div className="bg-white/70 backdrop-blur-2xl rounded-2xl sm:rounded-3xl p-5 sm:p-8 md:p-10 shadow-sm border border-gray-100/50 relative">
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-purple-500/5 rounded-2xl sm:rounded-3xl"></div>
                 <div className="absolute top-0 right-0 w-64 h-64 sm:w-96 sm:h-96 bg-gradient-to-bl from-blue-100/30 to-transparent rounded-full blur-3xl"></div>
                 <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 sm:gap-6">
                   <div className="space-y-2 sm:space-y-3">
-                    <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-gray-900 tracking-tight">
+                    <h1 className="text-xl sm:text-3xl md:text-4xl font-semibold text-gray-900 tracking-tight">
                       {t("welcome_back")}{" "}
                       <span className="text-blue-600">
                         {profile?.companyName}
@@ -319,7 +319,7 @@ export default function DashboardPage() {
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => setOpenTenderModal(true)}
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 sm:px-6 sm:py-3 rounded-xl sm:rounded-2xl font-medium shadow-lg shadow-blue-600/25 transition-all duration-200 flex items-center justify-center gap-2 w-full sm:w-auto"
+                      className="bg-blue-600 hover:bg-blue-700 text-xs lg:text-lg text-white px-4 py-2.5 sm:px-6 sm:py-3 rounded-xl sm:rounded-2xl font-medium shadow-lg shadow-blue-600/25 transition-all duration-200 flex items-center justify-center gap-2 w-full sm:w-auto"
                     >
                       <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
                       {t("post_new_tender")}
@@ -328,7 +328,7 @@ export default function DashboardPage() {
                       <motion.button
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
-                        className="bg-gray-100/80 hover:bg-gray-200/80 text-gray-700 px-4 py-2.5 sm:px-6 sm:py-3 rounded-xl sm:rounded-2xl font-medium backdrop-blur-xl transition-all duration-200 flex items-center justify-center gap-2 border border-gray-200/50 w-full sm:w-auto"
+                        className="bg-gray-100/80 hover:bg-gray-200/80 text-xs lg:text-lg text-gray-700 px-4 py-2.5 sm:px-6 sm:py-3 rounded-xl sm:rounded-2xl font-medium backdrop-blur-xl transition-all duration-200 flex items-center justify-center gap-2 border border-gray-200/50 w-full sm:w-auto"
                       >
                         <Search className="w-4 h-4 sm:w-5 sm:h-5" />
                         {t("browse_tenders")}

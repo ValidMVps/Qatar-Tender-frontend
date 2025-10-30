@@ -55,8 +55,8 @@ interface ReviewGiven {
   id: string;
   projectOwnerName: string;
   projectOwnerEmail: string;
-  userId: string; // ID of the user reviewed (contractor)
-  tenderId: string; // ID of the project/tender
+  userId: string;
+  tenderId: string;
   rating: number;
   comment: string;
   projectName: string;
@@ -69,14 +69,12 @@ interface AnalyticsSummary {
   totalReviews: number;
   fiveStarPercentage: number;
   topProject: string;
-  mostFrequentTag?: string; // optional: compute if you have tags
+  mostFrequentTag?: string;
 }
 
-// Transform API review to UI review (reviews you received)
-// For received reviews: reviewer is the person who gave you the review
 const transformApiReviewToReview = (apiReview: ApiReview): Review => ({
   id: apiReview._id,
-  contractorEmail: apiReview.reviewer.email || "Unknown Reviewer", // <- use reviewer email
+  contractorEmail: apiReview.reviewer.email || "Unknown Reviewer",
   contractorId: apiReview.reviewer._id || "",
   rating: apiReview.rating,
   comment: apiReview.comment || "",
@@ -85,8 +83,7 @@ const transformApiReviewToReview = (apiReview: ApiReview): Review => ({
   tags: [],
   tenderId: apiReview.tender._id,
 });
-// Transform API review to UI review (reviews you gave)
-// For given reviews: reviewedUser is the person you reviewed
+
 const transformApiReviewToReviewGiven = (apiReview: ApiReview): ReviewGiven => {
   let userId = "";
   let email = "Unknown User";
@@ -115,7 +112,6 @@ const transformApiReviewToReviewGiven = (apiReview: ApiReview): ReviewGiven => {
   };
 };
 
-// Star Rating Component
 const StarRating: React.FC<{ rating: number; size?: "sm" | "md" | "lg" }> = ({
   rating,
   size = "md",
@@ -142,7 +138,6 @@ const StarRating: React.FC<{ rating: number; size?: "sm" | "md" | "lg" }> = ({
   );
 };
 
-// Editable Star Rating
 const EditableStarRating: React.FC<{
   rating: number;
   onRatingChange: (rating: number) => void;
@@ -175,7 +170,6 @@ const EditableStarRating: React.FC<{
   );
 };
 
-// Analytics Card Component
 const AnalyticsCard: React.FC<{
   title: string;
   value: string | number;
@@ -192,13 +186,16 @@ const AnalyticsCard: React.FC<{
       </div>
     </CardHeader>
     <CardContent>
-      <div className="text-3xl font-bold text-gray-900 mb-1">{value}</div>
-      {description && <p className="text-sm text-gray-500">{description}</p>}
+      <div className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">
+        {value}
+      </div>
+      {description && (
+        <p className="text-xs sm:text-sm text-gray-500">{description}</p>
+      )}
     </CardContent>
   </Card>
 );
 
-// Review Card (Received Reviews)
 const ReviewCard: React.FC<{ review: Review }> = ({ review }) => {
   const { t } = useTranslation();
   const router = useRouter();
@@ -206,8 +203,8 @@ const ReviewCard: React.FC<{ review: Review }> = ({ review }) => {
     <Card className="bg-white border-0 shadow-sm hover:shadow-md transition-all duration-200 rounded-2xl overflow-hidden">
       <CardHeader className="bg-gradient-to-br from-gray-50 to-gray-100/50 pb-4">
         <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <h3 className="font-semibold text-gray-900 text-lg mb-1">
+          <div className="flex-1 min-w-0">
+            <h3 className="font-semibold text-gray-900 text-base sm:text-lg mb-1 truncate">
               {review.contractorEmail}
             </h3>
 
@@ -218,16 +215,18 @@ const ReviewCard: React.FC<{ review: Review }> = ({ review }) => {
               </span>
             </div>
           </div>
-          <span className="text-xs text-gray-400 bg-white rounded-lg px-2 py-1">
+          <span className="text-xs text-gray-400 bg-white rounded-lg px-2 py-1 whitespace-nowrap">
             {new Date(review.date).toLocaleDateString()}
           </span>
         </div>
       </CardHeader>
-      <CardContent className="p-6">
-        <p className="text-gray-700 leading-relaxed mb-6">{review.comment}</p>
+      <CardContent className="p-4 sm:p-6">
+        <p className="text-gray-700 leading-relaxed mb-4 sm:mb-6">
+          {review.comment}
+        </p>
 
-        <div className="space-y-4">
-          <div className="p-4 bg-gray-50 rounded-xl">
+        <div className="space-y-3 sm:space-y-4">
+          <div className="p-3 sm:p-4 bg-gray-50 rounded-xl">
             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
               {t("project") || "Project"}
             </span>
@@ -236,24 +235,25 @@ const ReviewCard: React.FC<{ review: Review }> = ({ review }) => {
             </p>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex gap-3 pt-2">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-2">
             <Button
               size="sm"
               variant="outline"
               className="flex-1 rounded-xl border-gray-200 hover:bg-gray-50 transition-colors"
               onClick={() => router.push(`/chat/${review.contractorId}`)}
             >
-              <MessageCircle className="h-4 w-4 mr-2" />
-              {t("chat") || "Chat"}
+              <MessageCircle className="h-3.5 w-3.5 mr-1.5 sm:h-4 sm:w-4 sm:mr-2" />
+              <span className="text-xs sm:text-sm">{t("chat") || "Chat"}</span>
             </Button>
             <Button
               size="sm"
-              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors"
+              className="flex-1 bg-blue-600 hover:bg-blue-700  text-white rounded-xl transition-colors"
               onClick={() => router.push(`/projects/${review.tenderId}`)}
             >
-              <FileText className="h-4 w-4 mr-2" />
-              {t("view_project") || "View Project"}
+              <FileText className="h-3.5 w-3.5 mr-1.5 sm:h-4 sm:w-4 sm:mr-2" />
+              <span className="text-xs sm:text-sm">
+                {t("view_project") || "View Project"}
+              </span>
             </Button>
           </div>
         </div>
@@ -262,7 +262,6 @@ const ReviewCard: React.FC<{ review: Review }> = ({ review }) => {
   );
 };
 
-// Editable Review Card (Reviews You Gave)
 const EditableReviewCard: React.FC<{
   review: ReviewGiven;
   onUpdate: (updatedReview: ReviewGiven) => void;
@@ -276,7 +275,6 @@ const EditableReviewCard: React.FC<{
   const handleSave = async () => {
     setIsUpdating(true);
     try {
-      // Call the API to update the review
       const updatedData = {
         rating: editedReview.rating,
         comment: editedReview.comment,
@@ -284,7 +282,6 @@ const EditableReviewCard: React.FC<{
 
       await updateReview(review.id, updatedData);
 
-      // Update local state
       onUpdate(editedReview);
       setIsEditing(false);
 
@@ -303,7 +300,6 @@ const EditableReviewCard: React.FC<{
           "Failed to update review. Please try again.",
         variant: "destructive",
       });
-      // Reset to original values on error
       setEditedReview(review);
     } finally {
       setIsUpdating(false);
@@ -318,8 +314,8 @@ const EditableReviewCard: React.FC<{
     <Card className="bg-white border-0 shadow-sm hover:shadow-md transition-all duration-200 rounded-2xl overflow-hidden">
       <CardHeader className="bg-gradient-to-br from-blue-50 to-blue-100/50 pb-4">
         <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <h3 className="font-semibold text-gray-900 text-lg mb-1">
+          <div className="flex-1 min-w-0">
+            <h3 className="font-semibold text-gray-900 text-base sm:text-lg mb-1 truncate">
               {user?.email}
             </h3>
             <div className="flex items-center gap-2">
@@ -339,8 +335,8 @@ const EditableReviewCard: React.FC<{
               </span>
             </div>
           </div>
-          <div className="flex flex-col items-end gap-2">
-            <span className="text-xs text-gray-400 bg-white rounded-lg px-2 py-1">
+          <div className="flex flex-col items-end gap-1 sm:gap-2">
+            <span className="text-xs text-gray-400 bg-white rounded-lg px-2 py-1 whitespace-nowrap">
               {new Date(review.date).toLocaleDateString()}
             </span>
             {!isEditing && (
@@ -348,42 +344,44 @@ const EditableReviewCard: React.FC<{
                 variant="ghost"
                 size="sm"
                 onClick={() => setIsEditing(true)}
-                className="h-8 rounded-xl hover:bg-white/80 transition-colors"
+                className="h-8 rounded-xl hover:bg-white/80 transition-colors p-0"
               >
-                <Edit className="h-4 w-4 mr-1" />
-                {t("edit") || "Edit"}
+                <Edit className="h-3.5 w-3.5 mr-1 sm:h-4 sm:w-4 sm:mr-1.5" />
+                <span className="text-xs sm:text-sm">
+                  {t("edit") || "Edit"}
+                </span>
               </Button>
             )}
           </div>
         </div>
       </CardHeader>
-      <CardContent className="p-6 space-y-6">
+      <CardContent className="p-4 sm:p-6 space-y-4 sm:space-y-6">
         {isEditing ? (
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             <Textarea
               value={editedReview.comment}
               onChange={(e) =>
                 setEditedReview({ ...editedReview, comment: e.target.value })
               }
-              className="min-h-[120px] border-0 bg-gray-50 rounded-xl focus:ring-2 focus:ring-blue-500"
+              className="min-h-[100px] sm:min-h-[120px] border-0 bg-gray-50 rounded-xl focus:ring-2 focus:ring-blue-500 text-sm"
               placeholder={t("write_your_review") || "Write your review..."}
               disabled={isUpdating}
             />
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
               <Button
                 onClick={handleSave}
                 size="sm"
-                className="rounded-xl bg-green-600 hover:bg-green-700"
+                className="rounded-xl bg-green-600 hover:bg-green-700 text-xs sm:text-sm"
                 disabled={isUpdating}
               >
                 {isUpdating ? (
                   <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" />
+                    <div className="animate-spin rounded-full h-3.5 w-3.5 sm:h-4 sm:w-4 border-2 border-white border-t-transparent mr-1.5 sm:mr-2" />
                     {t("saving") || "Saving..."}
                   </>
                 ) : (
                   <>
-                    <Save className="h-4 w-4 mr-2" />
+                    <Save className="h-3.5 w-3.5 mr-1.5 sm:h-4 sm:w-4 sm:mr-2" />
                     {t("save") || "Save"}
                   </>
                 )}
@@ -392,20 +390,22 @@ const EditableReviewCard: React.FC<{
                 onClick={handleCancel}
                 variant="outline"
                 size="sm"
-                className="rounded-xl"
+                className="rounded-xl text-xs sm:text-sm"
                 disabled={isUpdating}
               >
-                <X className="h-4 w-4 mr-2" />
+                <X className="h-3.5 w-3.5 mr-1.5 sm:h-4 sm:w-4 sm:mr-2" />
                 {t("cancel") || "Cancel"}
               </Button>
             </div>
           </div>
         ) : (
-          <p className="text-gray-700 leading-relaxed">{review.comment}</p>
+          <p className="text-gray-700 leading-relaxed text-sm">
+            {review.comment}
+          </p>
         )}
 
-        <div className="space-y-4">
-          <div className="p-4 bg-gray-50 rounded-xl">
+        <div className="space-y-3 sm:space-y-4">
+          <div className="p-3 sm:p-4 bg-gray-50 rounded-xl">
             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
               {t("project") || "Project"}
             </span>
@@ -414,24 +414,23 @@ const EditableReviewCard: React.FC<{
             </p>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex gap-3 pt-2">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-2">
             <Button
-              size="sm"
               variant="outline"
               className="flex-1 rounded-xl border-gray-200 hover:bg-gray-50 transition-colors"
               onClick={() => router.push(`/chat/${review.userId}`)}
             >
-              <MessageCircle className="h-4 w-4 mr-2" />
-              {t("chat") || "Chat"}
+              <MessageCircle className="h-3.5 w-3.5 mr-1.5 sm:h-4 sm:w-4 sm:mr-2" />
+              <span className="text-xs sm:text-sm">{t("chat") || "Chat"}</span>
             </Button>
             <Button
-              size="sm"
               className="flex-1 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors"
               onClick={() => router.push(`/projects/${review.tenderId}`)}
             >
-              <FileText className="h-4 w-4 mr-2" />
-              {t("view_project") || "View Project"}
+              <FileText className="h-3.5 w-3.5 mr-1.5 sm:h-4 sm:w-4 sm:mr-2" />
+              <span className="text-xs sm:text-sm">
+                {t("view_project") || "View Project"}
+              </span>
             </Button>
           </div>
         </div>
@@ -440,7 +439,6 @@ const EditableReviewCard: React.FC<{
   );
 };
 
-// Main Component
 const ReviewsRatingsPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [ratingFilter, setRatingFilter] = useState<string>("all");
@@ -452,7 +450,6 @@ const ReviewsRatingsPage: React.FC = () => {
   const { profile } = useAuth();
   const analytics = useMemo<AnalyticsSummary>(() => {
     const total = reviews.length;
-    // averageRating: prefer profile.rating (backend truth) else compute from reviews
     const avgFromProfile = Number(profile?.rating ?? 0);
     const averageRating =
       total === 0
@@ -461,10 +458,8 @@ const ReviewsRatingsPage: React.FC = () => {
             (reviews.reduce((s, r) => s + r.rating, 0) / total).toFixed(1)
           );
 
-    // totalReviews: prefer profile count else reviews length
     const totalReviews = Number(profile?.ratingCount ?? total);
 
-    // fiveStarPercentage: exact from reviews if available, else approximate from profile
     const fiveStarPercentage =
       total === 0
         ? Math.round((Number(profile?.rating ?? 0) / 5) * 100)
@@ -472,7 +467,6 @@ const ReviewsRatingsPage: React.FC = () => {
             (reviews.filter((r) => r.rating === 5).length / total) * 100
           );
 
-    // topProject: find tenderId with highest count in reviews
     let topProject = "N/A";
     if (total > 0) {
       const counts: Record<string, { name: string; count: number }> = {};
@@ -555,22 +549,17 @@ const ReviewsRatingsPage: React.FC = () => {
     );
   };
 
-  const mockAnalytics = {
-    averageRating: 4.3,
-    totalReviews: reviews.length,
-    fiveStarPercentage: 50,
-    mostFrequentTag: "Professional",
-  };
+  const { t } = useTranslation();
 
   const EmptyState = ({ type }: { type: "received" | "given" }) => (
-    <div className="col-span-full flex flex-col items-center justify-center py-16 text-center">
-      <div className="w-32 h-32 bg-gradient-to-br from-gray-100 to-gray-200 rounded-3xl flex items-center justify-center mb-6 shadow-sm">
-        <MessageSquare className="w-16 h-16 text-gray-400" />
+    <div className="col-span-full flex flex-col items-center justify-center py-12 sm:py-16 text-center px-4">
+      <div className="w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl sm:rounded-3xl flex items-center justify-center mb-4 sm:mb-6 shadow-sm">
+        <MessageSquare className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400" />
       </div>
-      <h3 className="text-xl font-bold text-gray-900 mb-3">
+      <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-3">
         {t("no_reviews_found") || "No Reviews Found"}
       </h3>
-      <p className="text-gray-500 max-w-md leading-relaxed">
+      <p className="text-gray-500 max-w-md leading-relaxed text-sm sm:text-base">
         {searchTerm || ratingFilter !== "all"
           ? t("try_adjusting_filters") ||
             "Try adjusting your filters to see more reviews."
@@ -583,14 +572,12 @@ const ReviewsRatingsPage: React.FC = () => {
     </div>
   );
 
-  const { t } = useTranslation();
-
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="flex flex-col items-center space-y-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
-          <p className="text-gray-600 font-medium">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="flex flex-col items-center space-y-3 sm:space-y-4">
+          <div className="animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-3 sm:border-4 border-blue-500 border-t-transparent"></div>
+          <p className="text-gray-600 font-medium text-sm sm:text-base">
             {t("loading_reviews") || "Loading reviews..."}
           </p>
         </div>
@@ -600,9 +587,11 @@ const ReviewsRatingsPage: React.FC = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="bg-red-50 border border-red-200 rounded-2xl p-8 text-center max-w-md">
-          <div className="text-red-500 text-lg font-semibold">{error}</div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="bg-red-50 border border-red-200 rounded-2xl p-6 sm:p-8 text-center max-w-md">
+          <div className="text-red-500 text-base sm:text-lg font-semibold">
+            {error}
+          </div>
         </div>
       </div>
     );
@@ -610,9 +599,9 @@ const ReviewsRatingsPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-6 py-8 space-y-8">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8">
         {/* Analytics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="lg:grid hidden grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           <AnalyticsCard
             title={t("average_rating") || "Average Rating"}
             value={analytics?.averageRating}
@@ -648,28 +637,31 @@ const ReviewsRatingsPage: React.FC = () => {
             onValueChange={(v) => setActiveTab(v as any)}
             className="w-full"
           >
-            <div className="border-b border-gray-100 p-6">
-              <TabsList className="grid w-full max-w-md grid-cols-2 bg-gray-100 rounded-xl p-1">
+            <div className="border-b border-gray-100 p-4 sm:p-6">
+              <TabsList className="flex w-full max-w-md mx-auto bg-gray-100 rounded-xl p-1 overflow-x-auto no-scrollbar sm:grid sm:grid-cols-2 sm:overflow-visible">
                 <TabsTrigger
                   value="received"
-                  className="rounded-xl font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                  className="flex-shrink-0 rounded-xl font-medium text-sm sm:text-base data-[state=active]:bg-white data-[state=active]:shadow-sm px-4 py-2 text-center"
                 >
                   {t("reviews_received") || "Reviews Received"}
                 </TabsTrigger>
                 <TabsTrigger
                   value="given"
-                  className="rounded-xl font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                  className="flex-shrink-0 rounded-xl font-medium text-sm sm:text-base data-[state=active]:bg-white data-[state=active]:shadow-sm px-4 py-2 text-center"
                 >
                   {t("reviews_given_by_me") || "Reviews Given by Me"}
                 </TabsTrigger>
               </TabsList>
             </div>
 
-            <div className="p-6">
-              <TabsContent value="received" className="space-y-8 mt-0">
-                <div className="flex flex-col sm:flex-row gap-4">
+            <div className="p-4 sm:p-6">
+              <TabsContent
+                value="received"
+                className="space-y-6 sm:space-y-8 mt-0"
+              >
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                   <div className="relative flex-1 max-w-md">
-                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <Search className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                     <Input
                       placeholder={
                         t(
@@ -678,11 +670,11 @@ const ReviewsRatingsPage: React.FC = () => {
                       }
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-11 h-12 border-0 bg-gray-50 rounded-2xl focus:ring-2 focus:ring-blue-500"
+                      className="pl-10 h-11 sm:h-12 border-0 bg-gray-50 rounded-2xl focus:ring-2 focus:ring-blue-500 text-sm"
                     />
                   </div>
                   <Select value={ratingFilter} onValueChange={setRatingFilter}>
-                    <SelectTrigger className="w-full sm:w-48 h-12 border-0 bg-gray-50 rounded-2xl">
+                    <SelectTrigger className="w-full sm:w-48 h-11 sm:h-12 border-0 bg-gray-50 rounded-2xl text-sm">
                       <SelectValue
                         placeholder={
                           t("filter_by_rating") || "Filter by rating"
@@ -710,7 +702,7 @@ const ReviewsRatingsPage: React.FC = () => {
                   </Select>
                 </div>
 
-                <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
                   {filteredReviews.length > 0 ? (
                     filteredReviews.map((review) => (
                       <ReviewCard key={review.id} review={review} />
@@ -721,10 +713,13 @@ const ReviewsRatingsPage: React.FC = () => {
                 </div>
               </TabsContent>
 
-              <TabsContent value="given" className="space-y-8 mt-0">
-                <div className="flex flex-col sm:flex-row gap-4">
+              <TabsContent
+                value="given"
+                className="space-y-6 sm:space-y-8 mt-0"
+              >
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                   <div className="relative flex-1 max-w-md">
-                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <Search className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                     <Input
                       placeholder={
                         t(
@@ -733,11 +728,11 @@ const ReviewsRatingsPage: React.FC = () => {
                       }
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-11 h-12 border-0 bg-gray-50 rounded-2xl focus:ring-2 focus:ring-blue-500"
+                      className="pl-10 h-11 sm:h-12 border-0 bg-gray-50 rounded-2xl focus:ring-2 focus:ring-blue-500 text-sm"
                     />
                   </div>
                   <Select value={ratingFilter} onValueChange={setRatingFilter}>
-                    <SelectTrigger className="w-full sm:w-48 h-12 border-0 bg-gray-50 rounded-2xl">
+                    <SelectTrigger className="w-full sm:w-48 h-11 sm:h-12 border-0 bg-gray-50 rounded-2xl text-sm">
                       <SelectValue
                         placeholder={
                           t("filter_by_rating") || "Filter by rating"
@@ -765,7 +760,7 @@ const ReviewsRatingsPage: React.FC = () => {
                   </Select>
                 </div>
 
-                <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
                   {filteredReviewsGiven.length > 0 ? (
                     filteredReviewsGiven.map((review) => (
                       <EditableReviewCard

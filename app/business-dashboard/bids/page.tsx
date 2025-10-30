@@ -873,503 +873,547 @@ export default function MyBidsPage() {
         </div>
 
         {/* Bid Details Modal */}
-        {selectedBidForDetails && (
-          <Dialog
-            open={showBidDetailsModal}
-            onOpenChange={setShowBidDetailsModal}
-          >
-            <DialogContent className="sm:max-w-7xl max-h-[90vh] overflow-y-auto p-0 border-0 shadow-2xl rounded-3xl bg-white backdrop-blur-xl animate-in zoom-in-95 duration-200">
-              <div className="relative">
-                <DialogHeader className="p-8 pb-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-t-3xl">
-                  <button
-                    onClick={() => setShowBidDetailsModal(false)}
-                    className="absolute top-6 right-6 p-2 hover:bg-white/50 rounded-full transition-colors"
-                  >
-                    <X className="h-5 w-5 text-gray-500" />
-                  </button>
-                  <DialogTitle className="text-2xl font-bold text-gray-900 mb-2">
-                    {selectedBidForDetails.tenderTitle}
-                  </DialogTitle>
-                  <DialogDescription className="text-gray-600">
-                    {t("bid_details_description") ||
-                      "Detailed information about your bid"}
-                  </DialogDescription>
-                </DialogHeader>
+        <>
+          {/* Bid Details Modal */}
+          {selectedBidForDetails && (
+            <Dialog
+              open={showBidDetailsModal}
+              onOpenChange={setShowBidDetailsModal}
+            >
+              <DialogContent
+                className="
+          w-full max-w-[95vw] sm:max-w-3xl md:max-w-5xl lg:max-w-7xl
+          mx-4 sm:mx-auto
+          max-h-[90vh] overflow-hidden
+          rounded-3xl p-0 border-0 shadow-2xl bg-white backdrop-blur-xl
+          animate-in zoom-in-95 duration-200
+        "
+              >
+                <div className="relative flex flex-col h-full">
+                  <DialogHeader className="p-6 sm:p-8 pb-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-t-3xl">
+                    <button
+                      onClick={() => setShowBidDetailsModal(false)}
+                      className="absolute top-4 right-4 p-2 hover:bg-white/50 rounded-full transition-colors"
+                    >
+                      <X className="h-5 w-5 text-gray-500" />
+                    </button>
 
-                <div className="p-8 space-y-8">
-                  {selectedBidForDetails.status === "returned_for_revision" &&
-                    selectedBidForDetails.revisionDetails && (
-                      <div className="p-6 bg-yellow-50 border border-yellow-100 rounded-2xl">
-                        <div className="flex items-start">
-                          <AlertTriangle className="h-5 w-5 text-yellow-600 mr-3 mt-0.5" />
-                          <div>
-                            <h3 className="font-semibold text-yellow-800 mb-2">
-                              Revision Requested
-                            </h3>
-                            <p className="text-yellow-700 mb-2">
-                              {selectedBidForDetails.revisionDetails.reason}
-                            </p>
-                            <p className="text-sm text-yellow-600">
-                              Requested by:{" "}
-                              {
-                                selectedBidForDetails.revisionDetails
-                                  .requestedBy.email
-                              }{" "}
-                              on{" "}
-                              {
-                                selectedBidForDetails.revisionDetails
-                                  .requestedAt
-                              }
-                            </p>
+                    <div className="space-y-2">
+                      <DialogTitle className="text-lg sm:text-2xl font-bold text-gray-900 break-words">
+                        {selectedBidForDetails.tenderTitle}
+                      </DialogTitle>
+                      <DialogDescription className="text-sm text-gray-600">
+                        {t("bid_details_description") ||
+                          "Detailed information about your bid"}
+                      </DialogDescription>
+                    </div>
+                  </DialogHeader>
+
+                  {/* Content area with scroll */}
+                  <div
+                    className="p-4 sm:p-8 overflow-y-auto"
+                    style={{ maxHeight: "calc(90vh - 160px)" }}
+                  >
+                    {selectedBidForDetails.status === "returned_for_revision" &&
+                      selectedBidForDetails.revisionDetails && (
+                        <div className="p-4 sm:p-6 bg-yellow-50 border border-yellow-100 rounded-2xl mb-6">
+                          <div className="flex items-start">
+                            <AlertTriangle className="h-5 w-5 text-yellow-600 mr-3 mt-1" />
+                            <div>
+                              <h3 className="font-semibold text-yellow-800 mb-1">
+                                Revision Requested
+                              </h3>
+                              <p className="text-yellow-700 mb-1">
+                                {selectedBidForDetails.revisionDetails.reason}
+                              </p>
+                              <p className="text-sm text-yellow-600">
+                                Requested by:{" "}
+                                {
+                                  selectedBidForDetails.revisionDetails
+                                    .requestedBy.email
+                                }{" "}
+                                on{" "}
+                                {
+                                  selectedBidForDetails.revisionDetails
+                                    .requestedAt
+                                }
+                              </p>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    )}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="space-y-6">
-                      <h3 className="font-semibold text-xl text-gray-900">
-                        {t("your_bid_details") || "Your Bid Details"}
-                      </h3>
-                      <div className="bg-gray-50 rounded-2xl p-6 space-y-4">
-                        <div className="flex items-center justify-between">
+                      )}
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {/* Left column */}
+                      <div className="space-y-6">
+                        <h3 className="font-semibold text-lg text-gray-900">
+                          {t("your_bid_details") || "Your Bid Details"}
+                        </h3>
+
+                        <div className="bg-gray-50 rounded-2xl p-4 sm:p-6 space-y-4">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center">
+                              <div className="p-2 bg-green-100 rounded-xl mr-3">
+                                <DollarSign className="h-4 w-4 text-green-600" />
+                              </div>
+                              <div>
+                                <p className="text-sm text-gray-500">
+                                  {t("bid_amount") || "Bid Amount"}
+                                </p>
+                                <p className="font-semibold text-gray-900">
+                                  {selectedBidForDetails.amount} QAR
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+
                           <div className="flex items-center">
-                            <div className="p-2 bg-green-100 rounded-xl mr-3">
-                              <DollarSign className="h-4 w-4 text-green-600" />
+                            <div className="p-2 bg-blue-100 rounded-xl mr-3">
+                              <Calendar className="h-4 w-4 text-blue-600" />
                             </div>
                             <div>
                               <p className="text-sm text-gray-500">
-                                {t("bid_amount") || "Bid Amount"}
+                                {t("submitted") || "Submitted"}
                               </p>
-                              <p className="font-semibold text-gray-900">
-                                {selectedBidForDetails.amount} QAR
+                              <p className="font-medium text-gray-900">
+                                {new Date(
+                                  selectedBidForDetails.submittedAt
+                                ).toLocaleDateString()}
                               </p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center">
+                            <div className="p-2 bg-gray-100 rounded-xl mr-3">
+                              {getStatusIcon(selectedBidForDetails.status)}
+                            </div>
+                            <div>
+                              <p className="text-sm text-gray-500">
+                                {t("status") || "Status"}
+                              </p>
+                              <Badge
+                                className={`text-sm font-medium rounded-lg ${getStatusColor(
+                                  selectedBidForDetails.status
+                                )}`}
+                              >
+                                {getStatusText(selectedBidForDetails.status)}
+                              </Badge>
                             </div>
                           </div>
                         </div>
 
-                        <div className="flex items-center">
-                          <div className="p-2 bg-blue-100 rounded-xl mr-3">
-                            <Calendar className="h-4 w-4 text-blue-600" />
-                          </div>
-                          <div>
-                            <p className="text-sm text-gray-500">
-                              {t("submitted") || "Submitted"}
-                            </p>
-                            <p className="font-medium text-gray-900">
-                              {new Date(
-                                selectedBidForDetails.submittedAt
-                              ).toLocaleDateString()}
-                            </p>
-                          </div>
-                        </div>
+                        <div className="bg-white border border-gray-100 rounded-2xl p-4 sm:p-6">
+                          <h4 className="font-semibold mb-2 text-gray-900">
+                            {t("bid_description") || "Bid Description"}
+                          </h4>
+                          <p className="text-gray-700 leading-relaxed">
+                            {selectedBidForDetails.description}
+                          </p>
 
-                        <div className="flex items-center">
-                          <div className="p-2 bg-gray-100 rounded-xl mr-3">
-                            {getStatusIcon(selectedBidForDetails.status)}
-                          </div>
-                          <div>
-                            <p className="text-sm text-gray-500">
-                              {t("status") || "Status"}
-                            </p>
-                            <Badge
-                              className={`text-sm font-medium rounded-lg ${getStatusColor(
-                                selectedBidForDetails.status
-                              )}`}
-                            >
-                              {getStatusText(selectedBidForDetails.status)}
-                            </Badge>
-                          </div>
+                          {selectedBidForDetails.image?.url && (
+                            <div className="mt-4">
+                              <h4 className="font-semibold mb-2 text-gray-900">
+                                Attached Image
+                              </h4>
+                              <img
+                                src={selectedBidForDetails.image.url}
+                                alt="Bid image"
+                                className="rounded-md w-full max-h-56 sm:max-h-64 object-contain border border-gray-200"
+                              />
+                            </div>
+                          )}
                         </div>
                       </div>
 
-                      {/* Revision Request Section */}
+                      {/* Right column */}
+                      <div className="space-y-6">
+                        <h3 className="font-semibold text-lg text-gray-900">
+                          {t("tender_overview") || "Tender Overview"}
+                        </h3>
 
-                      <div className="bg-white border border-gray-100 rounded-2xl p-6">
-                        <h4 className="font-semibold mb-3 text-gray-900">
-                          {t("bid_description") || "Bid Description"}
-                        </h4>
-                        <p className="text-gray-700 leading-relaxed">
-                          {selectedBidForDetails.description}
-                        </p>
-                        {selectedBidForDetails.image?.url && (
-                          <div className="mt-6">
-                            <h4 className="font-semibold mb-3 text-gray-900">
-                              Attached Image
-                            </h4>
-                            <img
-                              src={selectedBidForDetails.image.url}
-                              alt="Bid image"
-                              className="rounded-md max-h-64 w-full object-contain border border-gray-200"
-                            />
+                        <div className="bg-gray-50 rounded-2xl p-4 sm:p-6 space-y-4">
+                          <div className="grid grid-cols-2 gap-3">
+                            <div>
+                              <div className="flex items-center mb-1">
+                                <DollarSign className="h-4 w-4 text-gray-500 mr-2" />
+                                <span className="text-sm text-gray-500">
+                                  {t("budget") || "Budget"}
+                                </span>
+                              </div>
+                              <p className="font-semibold text-gray-900">
+                                {selectedBidForDetails.budget ?? "-"} QAR
+                              </p>
+                            </div>
+                            <div>
+                              <div className="flex items-center mb-1">
+                                <Calendar className="h-4 w-4 text-gray-500 mr-2" />
+                                <span className="text-sm text-gray-500">
+                                  {t("deadline") || "Deadline"}
+                                </span>
+                              </div>
+                              <p className="font-semibold text-gray-900">
+                                {selectedBidForDetails.deadline ?? "-"}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-3">
+                            <div>
+                              <div className="flex items-center mb-1">
+                                <FileText className="h-4 w-4 text-gray-500 mr-2" />
+                                <span className="text-sm text-gray-500">
+                                  {t("category") || "Category"}
+                                </span>
+                              </div>
+                              <p className="font-semibold text-gray-900">
+                                {selectedBidForDetails.category ?? "-"}
+                              </p>
+                            </div>
+                            <div>
+                              <div className="flex items-center mb-1">
+                                <Info className="h-4 w-4 text-gray-500 mr-2" />
+                                <span className="text-sm text-gray-500">
+                                  {t("location") || "Location"}
+                                </span>
+                              </div>
+                              <p className="font-semibold text-gray-900">
+                                {selectedBidForDetails.location ?? "-"}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <DialogFooter className="flex flex-col sm:flex-row sm:justify-end gap-3 p-4 sm:p-6 border-t border-gray-100">
+                    <Link
+                      href={`/business-dashboard/tender-details/${selectedBidForDetails.tenderId}`}
+                    >
+                      <Button
+                        variant="outline"
+                        className="w-full sm:w-auto rounded-xl border-gray-200 hover:bg-gray-50 transition-colors"
+                      >
+                        <Eye className="h-4 w-4 mr-2" />
+                        {t("view_original_tender") || "View Original Tender"}
+                      </Button>
+                    </Link>
+
+                    {(selectedBidForDetails.status === "accepted" ||
+                      selectedBidForDetails.status === "completed") && (
+                      <Link href={`/business-dashboard/projects`}>
+                        <Button className="w-full sm:w-auto rounded-xl bg-green-600 hover:bg-green-700 text-white transition-colors">
+                          <MessageCircle className="h-4 w-4 mr-2" />
+                          {t("go_to_chat") || "Go to Chat"}
+                        </Button>
+                      </Link>
+                    )}
+
+                    <Button
+                      onClick={() => setShowBidDetailsModal(false)}
+                      variant="ghost"
+                      className="w-full sm:w-auto rounded-xl hover:bg-gray-100 transition-colors"
+                    >
+                      {t("close") || "Close"}
+                    </Button>
+                  </DialogFooter>
+                </div>
+              </DialogContent>
+            </Dialog>
+          )}
+
+          {/* Edit and Resubmit Modal */}
+          {showEditResubmitModal && (
+            <Dialog
+              open={showEditResubmitModal}
+              onOpenChange={setShowEditResubmitModal}
+            >
+              <DialogContent
+                className="
+          w-full max-w-[95vw] sm:max-w-md md:max-w-2xl
+          mx-4 sm:mx-auto
+          rounded-2xl bg-white/90 backdrop-blur-xl border border-gray-100/50
+          p-0 overflow-hidden
+        "
+              >
+                <div className="p-4 sm:p-6">
+                  <DialogHeader>
+                    <DialogTitle className="text-lg sm:text-xl font-semibold text-gray-900">
+                      {t("edit_bid_details") || "Edit Bid Details"}
+                    </DialogTitle>
+                    <DialogDescription className="text-sm text-gray-600">
+                      {t("update_bid_before_resubmit") ||
+                        "Update your bid before resubmitting"}
+                    </DialogDescription>
+                  </DialogHeader>
+
+                  <div className="py-4 space-y-4">
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="bid-amount"
+                        className="text-sm font-medium text-gray-700"
+                      >
+                        {t("bid_amount")}
+                      </Label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                          QAR
+                        </span>
+                        <Input
+                          id="bid-amount"
+                          type="number"
+                          placeholder="0.00"
+                          value={editBidAmount}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            setEditBidAmount(value === "" ? "" : Number(value));
+                            if (
+                              value !== "" &&
+                              (isNaN(Number(value)) || Number(value) <= 0)
+                            ) {
+                              setAmountError(
+                                t("please_enter_valid_bid_amount") ||
+                                  "Please enter a valid bid amount"
+                              );
+                            } else {
+                              setAmountError("");
+                            }
+                          }}
+                          className={`pl-10 bg-white/80 backdrop-blur-sm border border-gray-200/50 ${
+                            amountError ? "border-red-300" : ""
+                          }`}
+                          min="0"
+                        />
+                        {amountError && (
+                          <div className="text-red-500 text-sm mt-1 flex items-center">
+                            <AlertCircle className="h-4 w-4 mr-2" />
+                            {amountError}
                           </div>
                         )}
                       </div>
                     </div>
 
-                    <div className="space-y-6">
-                      <h3 className="font-semibold text-xl text-gray-900">
-                        {t("tender_overview") || "Tender Overview"}
-                      </h3>
-                      <div className="bg-gray-50 rounded-2xl p-6 space-y-4">
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <div className="flex items-center mb-2">
-                              <DollarSign className="h-4 w-4 text-gray-500 mr-2" />
-                              <span className="text-sm text-gray-500">
-                                {t("budget") || "Budget"}
-                              </span>
-                            </div>
-                            <p className="font-semibold text-gray-900">
-                              {selectedBidForDetails.budget ?? "-"} QAR
-                            </p>
-                          </div>
-                          <div>
-                            <div className="flex items-center mb-2">
-                              <Calendar className="h-4 w-4 text-gray-500 mr-2" />
-                              <span className="text-sm text-gray-500">
-                                {t("deadline") || "Deadline"}
-                              </span>
-                            </div>
-                            <p className="font-semibold text-gray-900">
-                              {selectedBidForDetails.deadline ?? "-"}
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <div className="flex items-center mb-2">
-                              <FileText className="h-4 w-4 text-gray-500 mr-2" />
-                              <span className="text-sm text-gray-500">
-                                {t("category") || "Category"}
-                              </span>
-                            </div>
-                            <p className="font-semibold text-gray-900">
-                              {selectedBidForDetails.category ?? "-"}
-                            </p>
-                          </div>
-                          <div>
-                            <div className="flex items-center mb-2">
-                              <Info className="h-4 w-4 text-gray-500 mr-2" />
-                              <span className="text-sm text-gray-500">
-                                {t("location") || "Location"}
-                              </span>
-                            </div>
-                            <p className="font-semibold text-gray-900">
-                              {selectedBidForDetails.location ?? "-"}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <DialogFooter className="flex flex-wrap gap-3 p-8 pt-0 border-t border-gray-100">
-                  <Link
-                    href={`/business-dashboard/tender-details/${selectedBidForDetails.tenderId}`}
-                  >
-                    <Button
-                      variant="outline"
-                      className="rounded-xl border-gray-200 hover:bg-gray-50 transition-colors"
-                    >
-                      <Eye className="h-4 w-4 mr-2" />
-                      {t("view_original_tender") || "View Original Tender"}
-                    </Button>
-                  </Link>
-
-                  {(selectedBidForDetails.status === "accepted" ||
-                    selectedBidForDetails.status === "completed") && (
-                    <Link href={`/business-dashboard/projects`}>
-                      <Button className="rounded-xl bg-green-600 hover:bg-green-700 text-white transition-colors">
-                        <MessageCircle className="h-4 w-4 mr-2" />
-                        {t("go_to_chat") || "Go to Chat"}
-                      </Button>
-                    </Link>
-                  )}
-
-                  <Button
-                    onClick={() => setShowBidDetailsModal(false)}
-                    variant="ghost"
-                    className="rounded-xl hover:bg-gray-100 transition-colors"
-                  >
-                    {t("close") || "Close"}
-                  </Button>
-                </DialogFooter>
-              </div>
-            </DialogContent>
-          </Dialog>
-        )}
-
-        {/* Edit and Resubmit Modal */}
-        {showEditResubmitModal && (
-          <Dialog
-            open={showEditResubmitModal}
-            onOpenChange={setShowEditResubmitModal}
-          >
-            <DialogContent className="max-w-2xl bg-white/90 backdrop-blur-xl rounded-2xl border border-gray-100/50">
-              <DialogHeader>
-                <DialogTitle className="text-xl font-semibold text-gray-900">
-                  {t("edit_bid_details") || "Edit Bid Details"}
-                </DialogTitle>
-                <DialogDescription className="text-gray-600">
-                  {t("update_bid_before_resubmit") ||
-                    "Update your bid before resubmitting"}
-                </DialogDescription>
-              </DialogHeader>
-              <div className="py-4 space-y-4">
-                <div className="space-y-2">
-                  <Label
-                    htmlFor="bid-amount"
-                    className="text-sm font-medium text-gray-700"
-                  >
-                    {t("bid_amount")}
-                  </Label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                      QAR
-                    </span>
-                    <Input
-                      id="bid-amount"
-                      type="number"
-                      placeholder="0.00"
-                      value={editBidAmount}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        setEditBidAmount(value === "" ? "" : Number(value));
-                        if (
-                          value !== "" &&
-                          (isNaN(Number(value)) || Number(value) <= 0)
-                        ) {
-                          setAmountError(
-                            t("please_enter_valid_bid_amount") ||
-                              "Please enter a valid bid amount"
-                          );
-                        } else {
-                          setAmountError("");
-                        }
-                      }}
-                      className={`pl-10 bg-white/80 backdrop-blur-sm border border-gray-200/50 ${
-                        amountError ? "border-red-300" : ""
-                      }`}
-                      min="0"
-                    />
-                    {amountError && (
-                      <div className="text-red-500 text-sm mt-1 flex items-center">
-                        <AlertCircle className="h-4 w-4 mr-2" />
-                        {amountError}
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label
-                    htmlFor="bid-description"
-                    className="text-sm font-medium text-gray-700"
-                  >
-                    {t("proposal_description") || "Proposal Description"}
-                  </Label>
-                  <Textarea
-                    id="bid-description"
-                    placeholder={t("describe_your_proposal")}
-                    value={editBidDescription}
-                    onChange={(e) => {
-                      setEditBidDescription(e.target.value);
-                      if (
-                        e.target.value.trim().length > 0 &&
-                        e.target.value.trim().length < 10
-                      ) {
-                        setDescriptionError(
-                          t("description_must_be_at_least_10_chars") ||
-                            "Description must be at least 10 characters long"
-                        );
-                      } else {
-                        setDescriptionError("");
-                      }
-                    }}
-                    className={`bg-white/80 backdrop-blur-sm border border-gray-200/50 hover:border-gray-300 focus:border-blue-500 transition-colors ${
-                      descriptionError ? "border-red-300" : ""
-                    }`}
-                    rows={5}
-                  />
-                  {descriptionError && (
-                    <div className="text-red-500 text-sm mt-1 flex items-center">
-                      <AlertCircle className="h-4 w-4 mr-2" />
-                      {descriptionError}
-                    </div>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-700">
-                    {t("bid_image") || "Bid Image (Optional)"}
-                  </Label>
-                  {imagePreview && (
-                    <div className="relative mb-4">
-                      <img
-                        src={imagePreview}
-                        alt="Preview"
-                        className="w-full max-h-48 object-contain rounded-md border border-gray-200"
-                      />
-                      <button
-                        onClick={() => {
-                          setImagePreview(null);
-                          setSelectedFile(null);
-                        }}
-                        className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full shadow-md hover:bg-red-600"
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="bid-description"
+                        className="text-sm font-medium text-gray-700"
                       >
-                        <X className="h-4 w-4" />
-                      </button>
-                    </div>
-                  )}
-                  {!imagePreview && (
-                    <div className="border-2 border-dashed border-gray-300 rounded-md p-6 text-center hover:border-blue-500 transition-colors">
-                      <Input
-                        type="file"
-                        accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                        {t("proposal_description") || "Proposal Description"}
+                      </Label>
+                      <Textarea
+                        id="bid-description"
+                        placeholder={t("describe_your_proposal")}
+                        value={editBidDescription}
                         onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) {
-                            if (file.size > 10 * 1024 * 1024) {
-                              setImageError(
-                                t("image_must_be_less_than_10mb") ||
-                                  "Image must be less than 10MB"
-                              );
-                              return;
-                            }
-                            if (
-                              ![
-                                "image/jpeg",
-                                "image/jpg",
-                                "image/png",
-                                "image/gif",
-                                "image/webp",
-                              ].includes(file.type)
-                            ) {
-                              setImageError(
-                                t("invalid_image_type") || "Invalid image type"
-                              );
-                              return;
-                            }
-                            setSelectedFile(file);
-                            setImagePreview(URL.createObjectURL(file));
-                            setImageError("");
+                          setEditBidDescription(e.target.value);
+                          if (
+                            e.target.value.trim().length > 0 &&
+                            e.target.value.trim().length < 10
+                          ) {
+                            setDescriptionError(
+                              t("description_must_be_at_least_10_chars") ||
+                                "Description must be at least 10 characters long"
+                            );
+                          } else {
+                            setDescriptionError("");
                           }
                         }}
-                        className="hidden"
-                        id="image-upload"
+                        className={`bg-white/80 backdrop-blur-sm border border-gray-200/50 hover:border-gray-300 focus:border-blue-500 transition-colors ${
+                          descriptionError ? "border-red-300" : ""
+                        }`}
+                        rows={5}
                       />
-                      <label
-                        htmlFor="image-upload"
-                        className="cursor-pointer block"
-                      >
-                        <div className="text-blue-600 font-medium mb-2">
-                          {t("upload_image") || "Upload Image"}
+                      {descriptionError && (
+                        <div className="text-red-500 text-sm mt-1 flex items-center">
+                          <AlertCircle className="h-4 w-4 mr-2" />
+                          {descriptionError}
                         </div>
-                        <p className="text-sm text-gray-500">
-                          JPEG, JPG, PNG, GIF, WEBP up to 10MB
-                        </p>
-                      </label>
+                      )}
                     </div>
-                  )}
-                  {imageError && (
-                    <div className="text-red-500 text-sm mt-1 flex items-center">
-                      <AlertCircle className="h-4 w-4 mr-2" />
-                      {imageError}
+
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium text-gray-700">
+                        {t("bid_image") || "Bid Image (Optional)"}
+                      </Label>
+
+                      {imagePreview ? (
+                        <div className="relative mb-4">
+                          <img
+                            src={imagePreview}
+                            alt="Preview"
+                            className="w-full max-h-48 sm:max-h-56 object-contain rounded-md border border-gray-200"
+                          />
+                          <button
+                            onClick={() => {
+                              setImagePreview(null);
+                              setSelectedFile(null);
+                            }}
+                            className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full shadow-md hover:bg-red-600"
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="border-2 border-dashed border-gray-300 rounded-md p-4 text-center hover:border-blue-500 transition-colors">
+                          <Input
+                            type="file"
+                            accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                if (file.size > 10 * 1024 * 1024) {
+                                  setImageError(
+                                    t("image_must_be_less_than_10mb") ||
+                                      "Image must be less than 10MB"
+                                  );
+                                  return;
+                                }
+                                if (
+                                  ![
+                                    "image/jpeg",
+                                    "image/jpg",
+                                    "image/png",
+                                    "image/gif",
+                                    "image/webp",
+                                  ].includes(file.type)
+                                ) {
+                                  setImageError(
+                                    t("invalid_image_type") ||
+                                      "Invalid image type"
+                                  );
+                                  return;
+                                }
+                                setSelectedFile(file);
+                                setImagePreview(URL.createObjectURL(file));
+                                setImageError("");
+                              }
+                            }}
+                            className="hidden"
+                            id="image-upload"
+                          />
+                          <label
+                            htmlFor="image-upload"
+                            className="cursor-pointer block"
+                          >
+                            <div className="text-blue-600 font-medium mb-1">
+                              {t("upload_image") || "Upload Image"}
+                            </div>
+                            <p className="text-sm text-gray-500">
+                              JPEG, JPG, PNG, GIF, WEBP up to 10MB
+                            </p>
+                          </label>
+                        </div>
+                      )}
+
+                      {imageError && (
+                        <div className="text-red-500 text-sm mt-1 flex items-center">
+                          <AlertCircle className="h-4 w-4 mr-2" />
+                          {imageError}
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-              </div>
-              <DialogFooter className="pt-4 border-t border-gray-100/50">
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setShowEditResubmitModal(false);
-                    setEditingBidId(null);
-                    setEditBidAmount("");
-                    setEditBidDescription("");
-                    setAmountError("");
-                    setDescriptionError("");
-                    setImageError("");
-                    setSelectedFile(null);
-                    setImagePreview(null);
-                    setHasExistingImage(false);
-                  }}
-                  className="bg-white/80 backdrop-blur-sm border border-gray-200/50 hover:bg-gray-50/80 transition-colors"
-                >
-                  {t("cancel") || "Cancel"}
-                </Button>
-                <Button
-                  onClick={handleEditResubmit}
-                  disabled={resubmitLoading}
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
-                >
-                  {resubmitLoading ? (
-                    <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                  ) : (
-                    <RefreshCw className="h-4 w-4 mr-2" />
-                  )}
-                  {t("update_and_resubmit") || "Update & Resubmit"}
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        )}
-
-        {/* Delete Confirmation Dialog */}
-        {bidToDelete && (
-          <Dialog
-            open={!!bidToDelete}
-            onOpenChange={() => setBidToDelete(null)}
-          >
-            <DialogContent className="sm:max-w-md rounded-3xl p-0 border-0 shadow-2xl bg-white backdrop-blur-xl animate-in zoom-in-95 duration-200">
-              <div className="relative">
-                <DialogHeader className="p-8 pb-6 bg-gradient-to-br from-red-50 to-pink-50 rounded-t-3xl">
-                  <button
-                    onClick={() => setBidToDelete(null)}
-                    className="absolute top-6 right-6 p-2 hover:bg-white/50 rounded-full transition-colors"
-                  >
-                    <X className="h-5 w-5 text-gray-500" />
-                  </button>
-                  <DialogTitle className="text-2xl font-bold text-gray-900">
-                    {t("confirm_delete") || "Delete Bid?"}
-                  </DialogTitle>
-                  <DialogDescription className="text-gray-600">
-                    {t("delete_bid_warning") ||
-                      "Are you sure you want to delete this bid? This action cannot be undone."}
-                  </DialogDescription>
-                </DialogHeader>
-
-                <div className="p-8 space-y-6">
-                  <div className="flex items-start text-sm text-gray-600">
-                    <AlertCircle className="h-5 w-5 text-red-500 mr-3 mt-0.5 flex-shrink-0" />
-                    <p>
-                      {t("this_will_permanently_remove_your_bid") ||
-                        "This will permanently remove your bid from the system."}
-                    </p>
                   </div>
-                </div>
 
-                <DialogFooter className="flex flex-wrap gap-3 p-8 pt-0 border-t border-gray-100">
-                  <Button
-                    variant="outline"
-                    onClick={() => setBidToDelete(null)}
-                    className="rounded-xl hover:bg-gray-50 transition-colors"
-                  >
-                    {t("cancel") || "Cancel"}
-                  </Button>
-                  <Button
-                    onClick={handleDeleteBid}
-                    className="rounded-xl bg-red-600 hover:bg-red-700 text-white transition-colors"
-                  >
-                    {t("delete_forever") || "Delete Forever"}
-                  </Button>
-                </DialogFooter>
-              </div>
-            </DialogContent>
-          </Dialog>
-        )}
+                  <DialogFooter className="flex flex-col sm:flex-row sm:justify-end gap-3 pt-4 border-t border-gray-100/50">
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setShowEditResubmitModal(false);
+                        setEditingBidId(null);
+                        setEditBidAmount("");
+                        setEditBidDescription("");
+                        setAmountError("");
+                        setDescriptionError("");
+                        setImageError("");
+                        setSelectedFile(null);
+                        setImagePreview(null);
+                        setHasExistingImage(false);
+                      }}
+                      className="w-full sm:w-auto bg-white/80 backdrop-blur-sm border border-gray-200/50 hover:bg-gray-50/80 transition-colors"
+                    >
+                      {t("cancel") || "Cancel"}
+                    </Button>
+                    <Button
+                      onClick={handleEditResubmit}
+                      disabled={resubmitLoading}
+                      className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white"
+                    >
+                      {resubmitLoading ? (
+                        <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                      ) : (
+                        <RefreshCw className="h-4 w-4 mr-2" />
+                      )}
+                      {t("update_and_resubmit") || "Update & Resubmit"}
+                    </Button>
+                  </DialogFooter>
+                </div>
+              </DialogContent>
+            </Dialog>
+          )}
+
+          {/* Delete Confirmation Dialog */}
+          {bidToDelete && (
+            <Dialog
+              open={!!bidToDelete}
+              onOpenChange={() => setBidToDelete(null)}
+            >
+              <DialogContent
+                className="
+          w-full max-w-[90vw] sm:max-w-md
+          mx-4 sm:mx-auto
+          rounded-3xl p-0 border-0 shadow-2xl bg-white backdrop-blur-xl
+          animate-in zoom-in-95 duration-200
+        "
+              >
+                <div className="relative flex flex-col">
+                  <DialogHeader className="p-6 sm:p-8 pb-4 bg-gradient-to-br from-red-50 to-pink-50 rounded-t-3xl">
+                    <button
+                      onClick={() => setBidToDelete(null)}
+                      className="absolute top-4 right-4 p-2 hover:bg-white/50 rounded-full transition-colors"
+                    >
+                      <X className="h-5 w-5 text-gray-500" />
+                    </button>
+
+                    <DialogTitle className="text-lg sm:text-2xl font-bold text-gray-900">
+                      {t("confirm_delete") || "Delete Bid?"}
+                    </DialogTitle>
+                    <DialogDescription className="text-sm text-gray-600">
+                      {t("delete_bid_warning") ||
+                        "Are you sure you want to delete this bid? This action cannot be undone."}
+                    </DialogDescription>
+                  </DialogHeader>
+
+                  <div className="p-4 sm:p-8 space-y-4">
+                    <div className="flex items-start text-sm text-gray-600">
+                      <AlertCircle className="h-5 w-5 text-red-500 mr-3 mt-0.5 flex-shrink-0" />
+                      <p>
+                        {t("this_will_permanently_remove_your_bid") ||
+                          "This will permanently remove your bid from the system."}
+                      </p>
+                    </div>
+                  </div>
+
+                  <DialogFooter className="flex flex-col sm:flex-row gap-3 p-4 sm:p-8 pt-0 border-t border-gray-100">
+                    <Button
+                      variant="outline"
+                      onClick={() => setBidToDelete(null)}
+                      className="w-full sm:w-auto rounded-xl hover:bg-gray-50 transition-colors"
+                    >
+                      {t("cancel") || "Cancel"}
+                    </Button>
+
+                    <Button
+                      onClick={handleDeleteBid}
+                      className="w-full sm:w-auto rounded-xl bg-red-600 hover:bg-red-700 text-white transition-colors"
+                    >
+                      {t("delete_forever") || "Delete Forever"}
+                    </Button>
+                  </DialogFooter>
+                </div>
+              </DialogContent>
+            </Dialog>
+          )}
+        </>
       </div>
     </PageTransitionWrapper>
   );
