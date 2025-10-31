@@ -17,7 +17,9 @@ function applyTheme(dark) {
 
   style.textContent = `
     img, video {
-      filter: invert(${invertValue}) hue-rotate(180deg) !important;
+      filter: invert(${invertValue}) hue-rotate(${
+    dark ? 180 : 0
+  }deg) !important;
     }
   `;
 }
