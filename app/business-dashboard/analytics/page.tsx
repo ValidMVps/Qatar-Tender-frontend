@@ -196,13 +196,19 @@ export default function page() {
     }
 
     bids.forEach((bid: any) => {
-      if (!bid.createdAt || !bid.updatedAt) return;
+      if (!bid.createdAt) return; // must have createdAt to count as placed
+
       const placedDate = new Date(bid.createdAt).toISOString().split("T")[0];
       if (dataMap.has(placedDate)) {
         dataMap.get(placedDate)!.bidsPlaced += 1;
       }
+
+      // Count wins only when status is accepted/completed.
+      // If updatedAt exists use it, otherwise fall back to createdAt (so value still shows).
       if (bid.status === "accepted" || bid.status === "completed") {
-        const winDate = new Date(bid.updatedAt).toISOString().split("T")[0];
+        const winDate = bid.updatedAt
+          ? new Date(bid.updatedAt).toISOString().split("T")[0]
+          : placedDate;
         if (dataMap.has(winDate)) {
           dataMap.get(winDate)!.bidsWon += 1;
         }
@@ -335,10 +341,11 @@ export default function page() {
     const filteredBids = bids.filter(
       (b) =>
         ["submitted", "accepted", "completed", "rejected"].includes(b.status) &&
-        b.paymentStatus === "paid" &&
         new Date(b.createdAt) >= startDate &&
         new Date(b.createdAt) <= endDate
     );
+    console.log("Filtered Tenders:", filteredTenders);
+    console.log("Filtered Bids:", filteredBids);
 
     const tendersPosted = filteredTenders.length;
     const bidsReceived = filteredTenders.reduce(
