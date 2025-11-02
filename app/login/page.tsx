@@ -13,7 +13,6 @@ import Headerauth from "@/components/Headerauth";
 import LoginForm from "@/components/LoginForm";
 import Image from "next/image";
 import image1 from "../../media/artwork.png";
-import { Navbar } from "../page";
 import useTranslation from "@/lib/hooks/useTranslation";
 
 export default function LoginPage() {
@@ -28,7 +27,6 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Fixed header */}
-      <Navbar />
 
       {/* Main content area */}
       <main className="flex flex-1 items-center justify-center px-4 sm:px-6 lg:px-8 pt-24 pb-12">
