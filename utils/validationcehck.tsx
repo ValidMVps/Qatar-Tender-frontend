@@ -11,14 +11,13 @@ interface ContactDetection {
     | "username";
   pattern: string;
   severity: "high" | "medium" | "low";
-  confidence: number;
   context?: string;
   rawPattern?: string;
 }
 
 export const VALIDATION_RULES = {
   title: { min: 10, max: 50 },
-  description: { min: 50, max: 500 },
+  description: { min: 50, max: 5000 },
   estimatedBudget: { min: 2, max: 5000000 },
   location: { min: 1, max: 100 },
   maxFileSize: 5 * 1024 * 1024,
@@ -346,19 +345,16 @@ const PHONE_PATTERNS = {
       pattern: /(?:\+?974\s*)?(\d{3}\s*\d{4})/g,
       minDigits: 7,
       maxDigits: 8,
-      confidence: 95,
     },
     {
       pattern: /(?:\+?974\s*)?(\d{2}\s*\d{3}\s*\d{3})/g,
       minDigits: 8,
       maxDigits: 8,
-      confidence: 90,
     },
     {
       pattern: /(?:\+?974\s*)?(\d{4}\s*\d{4})/g,
       minDigits: 8,
       maxDigits: 8,
-      confidence: 85,
     },
   ],
   // UAE - 8 or 9 digits depending on emirate
@@ -367,13 +363,11 @@ const PHONE_PATTERNS = {
       pattern: /(?:\+?971\s*)?(\d{2}\s*\d{3}\s*\d{4})/g,
       minDigits: 9,
       maxDigits: 9,
-      confidence: 95,
     },
     {
       pattern: /(?:\+?971\s*)?(\d{3}\s*\d{3}\s*\d{3})/g,
       minDigits: 9,
       maxDigits: 9,
-      confidence: 90,
     },
   ],
   // Saudi Arabia - 9 digits
@@ -382,13 +376,11 @@ const PHONE_PATTERNS = {
       pattern: /(?:\+?966\s*)?(\d{2}\s*\d{3}\s*\d{4})/g,
       minDigits: 9,
       maxDigits: 9,
-      confidence: 95,
     },
     {
       pattern: /(?:\+?966\s*)?(\d{3}\s*\d{3}\s*\d{3})/g,
       minDigits: 9,
       maxDigits: 9,
-      confidence: 90,
     },
   ],
   // Pakistan - varies by city
@@ -397,13 +389,11 @@ const PHONE_PATTERNS = {
       pattern: /(?:\+?92\s*)?(\d{2,4}\s*\d{5,7})/g,
       minDigits: 9,
       maxDigits: 11,
-      confidence: 95,
     },
     {
       pattern: /(?:\+?92\s*)?(\d{3}\s*\d{7})/g,
       minDigits: 10,
       maxDigits: 10,
-      confidence: 90,
     },
   ],
   // Generic international pattern
@@ -412,19 +402,16 @@ const PHONE_PATTERNS = {
       pattern: /(?:\+?\d{1,4}\s*)?(\d{3,4}\s*\d{3,4}\s*\d{3,4})/g,
       minDigits: 7,
       maxDigits: 15,
-      confidence: 85,
     },
     {
       pattern: /(?:\+?\d{1,4}\s*)?(\d{2,3}\s*\d{3,4}\s*\d{4})/g,
       minDigits: 7,
       maxDigits: 12,
-      confidence: 80,
     },
     {
       pattern: /(?:\+?\d{1,4}\s*)?(\d{3,4}\s*\d{4})/g,
       minDigits: 7,
       maxDigits: 8,
-      confidence: 75,
     },
   ],
 };
@@ -481,8 +468,8 @@ export function detectContactInfo(text: string): ContactDetection[] {
   // Layer 7: Contextual analysis
   const contextualDetections = analyzeContext(detections, text);
 
-  // Layer 8: Final confidence scoring
-  return calculateConfidence(contextualDetections, text);
+  // Layer 8: Final filtering (no confidence scoring)
+  return contextualDetections;
 }
 
 // ===== LAYER 1: DIRECT PATTERN MATCHING WITH ENHANCED URL DETECTION =====
@@ -492,13 +479,12 @@ function findDirectMatches(text: string): ContactDetection[] {
   // Enhanced URL patterns that specifically target space-separated domains
   const urlPatterns = [
     // Standard URLs
-    { regex: /https?:\/\/[^\s<>"'()]+/gi, type: "url", baseConfidence: 95 },
+    { regex: /https?:\/\/[^\s<>"'()]+/gi, type: "url" },
 
     // www. pattern
     {
       regex: /\bwww\.[a-z0-9-]+(?:\.[a-z0-9-]+)+\b/gi,
       type: "url",
-      baseConfidence: 90,
     },
 
     // Domain patterns without protocol (including space-separated variations)
@@ -506,7 +492,6 @@ function findDirectMatches(text: string): ContactDetection[] {
       regex:
         /\b[a-z0-9-]+\s*\.\s*(?:com|org|net|edu|gov|io|co|uk|ae|qa|pk|info|biz|me|tv|cc|pro|name|xyz|online|site|web|club|store|shop|tech|app|io|ai|ml|co\.uk|com\.pk|net\.pk|org\.pk)\b/gi,
       type: "url",
-      baseConfidence: 90,
     },
 
     // Domain patterns with common words + space-separated TLD (e.g., "website . com")
@@ -514,7 +499,6 @@ function findDirectMatches(text: string): ContactDetection[] {
       regex:
         /\b(?:website|site|online|web|app|service|contact|info)\s*\.\s*(?:com|org|net|edu|gov|io|co|uk|ae|qa|pk)\b/gi,
       type: "url",
-      baseConfidence: 85,
     },
 
     // Domain patterns with common words + space-separated TLD + optional country code (e.g., "website . com . pk")
@@ -522,7 +506,6 @@ function findDirectMatches(text: string): ContactDetection[] {
       regex:
         /\b(?:website|site|online|web|app|service|contact|info)\s*\.\s*(?:com|org|net)\s*\.\s*(?:pk|qa|ae|uk)\b/gi,
       type: "url",
-      baseConfidence: 85,
     },
 
     // Domain patterns with intentional space separation (e.g., "ahmed . com")
@@ -530,14 +513,12 @@ function findDirectMatches(text: string): ContactDetection[] {
       regex:
         /\b[a-z0-9-]+\s*\.\s*(?:com|org|net|edu|gov|io|co|uk|ae|qa|pk)\b/gi,
       type: "url",
-      baseConfidence: 85,
     },
 
     // Domain patterns with intentional space separation and country code (e.g., "ahmed . com . pk")
     {
       regex: /\b[a-z0-9-]+\s*\.\s*(?:com|org|net)\s*\.\s*(?:pk|qa|ae|uk)\b/gi,
       type: "url",
-      baseConfidence: 85,
     },
 
     // Domain patterns with intentional space separation and multiple TLDs (e.g., "ahmed . com . pk")
@@ -545,7 +526,6 @@ function findDirectMatches(text: string): ContactDetection[] {
       regex:
         /\b[a-z0-9-]+\s*\.\s*[a-z0-9-]+\s*\.\s*(?:com|org|net|edu|gov|io|co|uk|ae|qa|pk)\b/gi,
       type: "url",
-      baseConfidence: 80,
     },
   ];
 
@@ -559,11 +539,10 @@ function findDirectMatches(text: string): ContactDetection[] {
 
         if (!isFalsePositive(cleanMatch)) {
           detections.push({
-            type: pattern.type as ContactDetection['type'],
+            type: pattern.type as ContactDetection["type"],
             pattern: cleanMatch,
             rawPattern: match,
-            severity: "high",
-            confidence: pattern.baseConfidence,
+            severity: "low",
             context: getSurroundingContext(text, cleanMatch),
           });
         }
@@ -585,7 +564,6 @@ function findSpaceSeparatedUrlMatches(text: string): ContactDetection[] {
       regex:
         /\b([a-z0-9-]+)\s*\.\s*(com|org|net|edu|gov|io|co|uk|ae|qa|pk)\b/gi,
       type: "url",
-      baseConfidence: 95,
     },
 
     // Patterns with common words + space-separated TLD
@@ -593,14 +571,12 @@ function findSpaceSeparatedUrlMatches(text: string): ContactDetection[] {
       regex:
         /\b(website|site|online|web|app|service|contact|info)\s*\.\s*(com|org|net|edu|gov|io|co|uk|ae|qa|pk)\b/gi,
       type: "url",
-      baseConfidence: 90,
     },
 
     // Patterns with space-separated multi-level domains
     {
       regex: /\b([a-z0-9-]+)\s*\.\s*(com|org|net)\s*\.\s*(pk|qa|ae|uk)\b/gi,
       type: "url",
-      baseConfidence: 90,
     },
 
     // Patterns with space-separated domains and optional "www"
@@ -608,7 +584,6 @@ function findSpaceSeparatedUrlMatches(text: string): ContactDetection[] {
       regex:
         /\bwww\s*\.\s*([a-z0-9-]+)\s*\.\s*(com|org|net|edu|gov|io|co|uk|ae|qa|pk)\b/gi,
       type: "url",
-      baseConfidence: 85,
     },
   ];
 
@@ -624,11 +599,10 @@ function findSpaceSeparatedUrlMatches(text: string): ContactDetection[] {
 
       if (cleanMatch.length >= 3 && !isFalsePositive(cleanMatch)) {
         detections.push({
-          type: pattern.type as ContactDetection['type'],
+          type: pattern.type as ContactDetection["type"],
           pattern: cleanMatch,
           rawPattern: fullMatch,
-          severity: "high",
-          confidence: pattern.baseConfidence,
+          severity: "low",
           context: getSurroundingContext(text, cleanMatch),
         });
       }
@@ -669,8 +643,7 @@ function findMultiWordPatterns(text: string): ContactDetection[] {
         type: "email",
         pattern,
         rawPattern,
-        severity: "high",
-        confidence: 85,
+        severity: "low",
         context: getSurroundingWords(words, i, 3),
       });
     }
@@ -688,8 +661,7 @@ function findMultiWordPatterns(text: string): ContactDetection[] {
         type: "url",
         pattern,
         rawPattern,
-        severity: "high",
-        confidence: 80,
+        severity: "low",
         context: getSurroundingWords(words, i, 3),
       });
     }
@@ -712,8 +684,7 @@ function findMultiWordPatterns(text: string): ContactDetection[] {
         type: "email",
         pattern,
         rawPattern,
-        severity: "high",
-        confidence: 90,
+        severity: "low",
         context: getSurroundingWords(words, i, 5),
       });
     }
@@ -737,8 +708,7 @@ function findMultiWordPatterns(text: string): ContactDetection[] {
         type: "url",
         pattern,
         rawPattern,
-        severity: "high",
-        confidence: 85,
+        severity: "low",
         context: getSurroundingWords(words, i, 4),
       });
     }
@@ -760,8 +730,7 @@ function findMultiWordPatterns(text: string): ContactDetection[] {
         type: "email",
         pattern,
         rawPattern,
-        severity: "high",
-        confidence: 85,
+        severity: "low",
         context: getSurroundingWords(words, i, 4),
       });
     }
@@ -776,7 +745,6 @@ function findMultiWordPatterns(text: string): ContactDetection[] {
         pattern,
         rawPattern,
         severity: "medium",
-        confidence: 75,
         context: getSurroundingWords(words, i, 2),
       });
     }
@@ -809,8 +777,7 @@ function findMultiWordPatterns(text: string): ContactDetection[] {
             type: "email",
             pattern,
             rawPattern,
-            severity: "high",
-            confidence: 90,
+            severity: "low",
             context: getSurroundingWords(words, i, 5),
           });
         }
@@ -837,8 +804,7 @@ function findMultiWordPatterns(text: string): ContactDetection[] {
             type: "email",
             pattern,
             rawPattern,
-            severity: "high",
-            confidence: 95,
+            severity: "low",
             context: getSurroundingWords(words, i, 5),
           });
         }
@@ -859,21 +825,18 @@ function findPhoneNumbers(text: string): ContactDetection[] {
     {
       regex: /\+?\d{1,4}[-.\s]?\(?\d{1,4}\)?[-.\s]?\d{3,4}[-.\s]?\d{3,4}/g,
       type: "phone",
-      baseConfidence: 95,
     },
 
     // Middle Eastern formats (Qatar, UAE, etc.)
     {
       regex: /\+?97[0-9][-.\s]?\d{3}[-.\s]?\d{4}/g,
       type: "phone",
-      baseConfidence: 95,
     },
 
     // Common phone number patterns
     {
       regex: /\b(?:\d{3}[-.\s]?){2,3}\d{3,4}\b/g,
       type: "phone",
-      baseConfidence: 85,
     },
 
     // Phone numbers with words
@@ -881,7 +844,6 @@ function findPhoneNumbers(text: string): ContactDetection[] {
       regex:
         /\b(?:phone|tel|mobile|cell|whatsapp|wa)\s*[:\-]?\s*\+?\d{1,4}[-.\s]?\(?\d{1,4}\)?[-.\s]?\d{3,4}[-.\s]?\d{3,4}\b/gi,
       type: "phone",
-      baseConfidence: 95,
     },
   ];
 
@@ -898,8 +860,7 @@ function findPhoneNumbers(text: string): ContactDetection[] {
             type: "phone",
             pattern: cleanMatch.display,
             rawPattern: match,
-            severity: "high",
-            confidence: pattern.baseConfidence,
+            severity: "low",
             context: getSurroundingContext(text, match),
           });
         }
@@ -927,8 +888,7 @@ function findPhoneNumbers(text: string): ContactDetection[] {
             type: "phone",
             pattern: cleanMatch.display,
             rawPattern: rawMatch,
-            severity: "high",
-            confidence: patternConfig.confidence,
+            severity: "low",
             context: getSurroundingContext(text, rawMatch),
           });
         }
@@ -975,8 +935,7 @@ function findPhoneNumbers(text: string): ContactDetection[] {
             type: "phone",
             pattern: formatPhoneNumber(digits),
             rawPattern: rawPattern,
-            severity: "high",
-            confidence: 85,
+            severity: "low",
             context: getSurroundingWords(words, i, numberWords.length),
           });
         }
@@ -1000,8 +959,7 @@ function findPhoneNumbers(text: string): ContactDetection[] {
         type: "phone",
         pattern: formatPhoneNumber(englishDigits),
         rawPattern: rawPattern,
-        severity: "high",
-        confidence: 90,
+        severity: "low",
         context: getSurroundingContext(text, rawPattern),
       });
     }
@@ -1017,8 +975,7 @@ function findPhoneNumbers(text: string): ContactDetection[] {
           type: "phone",
           pattern: formatPhoneNumber(digits),
           rawPattern: match,
-          severity: "high",
-          confidence: 80,
+          severity: "low",
           context: getSurroundingContext(text, match),
         });
       }
@@ -1034,7 +991,6 @@ function findPhoneNumbers(text: string): ContactDetection[] {
         pattern: formatPhoneNumber(match),
         rawPattern: match,
         severity: "medium",
-        confidence: 70,
         context: getSurroundingContext(text, match),
       });
     });
@@ -1116,14 +1072,12 @@ function findNormalizedMatches(text: string): ContactDetection[] {
     {
       regex: /[a-z0-9]+(?:com|org|net|edu|gov|io|co|uk|ae|qa|pk)[a-z0-9]*/gi,
       type: "url",
-      baseConfidence: 75,
     },
 
     // Domain patterns with common misspellings (e.g., ahmedcompk)
     {
       regex: /[a-z0-9]+(?:com|org|net)(?:pk|qa|ae|uk)[a-z0-9]*/gi,
       type: "url",
-      baseConfidence: 70,
     },
 
     // Common word + TLD patterns without separators (e.g., websitecom)
@@ -1131,7 +1085,6 @@ function findNormalizedMatches(text: string): ContactDetection[] {
       regex:
         /(?:website|site|online|web|app|service|contact|info)(?:com|org|net|edu|gov|io|co|uk|ae|qa|pk)[a-z0-9]*/gi,
       type: "url",
-      baseConfidence: 80,
     },
   ];
 
@@ -1142,7 +1095,6 @@ function findNormalizedMatches(text: string): ContactDetection[] {
       regex:
         /[a-z0-9]+(?:gmail|yahoo|hotmail|outlook|aol|protonmail|zoho)[a-z0-9]*com[a-z0-9]*/gi,
       type: "email",
-      baseConfidence: 80,
     },
 
     // Email with common misspellings
@@ -1150,7 +1102,6 @@ function findNormalizedMatches(text: string): ContactDetection[] {
       regex:
         /[a-z0-9]+(?:gmai|yah00|hotma1|outl00k|a0l|pr0t0nm4il|z0h0)[a-z0-9]*c0m[a-z0-9]*/gi,
       type: "obfuscated",
-      baseConfidence: 75,
     },
   ];
 
@@ -1161,10 +1112,9 @@ function findNormalizedMatches(text: string): ContactDetection[] {
         const cleanMatch = cleanMatchResult(match, pattern.type);
         if (cleanMatch.length >= 3 && !isFalsePositive(cleanMatch)) {
           detections.push({
-            type: pattern.type as ContactDetection['type'],
+            type: pattern.type as ContactDetection["type"],
             pattern: cleanMatch,
             severity: "medium",
-            confidence: pattern.baseConfidence,
             context: "normalized",
           });
         }
@@ -1179,10 +1129,9 @@ function findNormalizedMatches(text: string): ContactDetection[] {
         const cleanMatch = cleanMatchResult(match, pattern.type);
         if (cleanMatch.length >= 3 && !isFalsePositive(cleanMatch)) {
           detections.push({
-            type: pattern.type as ContactDetection['type'],
+            type: pattern.type as ContactDetection["type"],
             pattern: cleanMatch,
             severity: "medium",
-            confidence: pattern.baseConfidence,
             context: "normalized",
           });
         }
@@ -1203,7 +1152,6 @@ function findDeepMatches(text: string): ContactDetection[] {
     {
       regex: /[a-z0-9]+(?:c0m|0rg|n3t|3du|g0v|10|c0|uk|a3|q4|pk)[a-z0-9]*/gi,
       type: "obfuscated",
-      baseConfidence: 80,
     },
 
     // Domain patterns with repeated characters (e.g., aahmeedcom)
@@ -1211,7 +1159,6 @@ function findDeepMatches(text: string): ContactDetection[] {
       regex:
         /(.)\1{2,}[a-z0-9]+(?:com|org|net|edu|gov|io|co|uk|ae|qa|pk)[a-z0-9]*/gi,
       type: "obfuscated",
-      baseConfidence: 75,
     },
 
     // Common word + TLD patterns with character substitution
@@ -1219,7 +1166,6 @@ function findDeepMatches(text: string): ContactDetection[] {
       regex:
         /(?:webs1te|s1te|onl1ne|w3b|4pp|s3rv1ce|c0nt4ct|1nfo)(?:c0m|0rg|n3t|3du|g0v|10|c0|uk|a3|q4|pk)[a-z0-9]*/gi,
       type: "obfuscated",
-      baseConfidence: 85,
     },
   ];
 
@@ -1230,7 +1176,6 @@ function findDeepMatches(text: string): ContactDetection[] {
       regex:
         /[a-z0-9]+@(?:gma1l|yah00|hotma1|outl00k|a0l|pr0t0nm4il|z0h0)\.(?:c0m|0rg|n3t|3du|g0v|10|c0|uk|a3|q4|pk)/gi,
       type: "obfuscated",
-      baseConfidence: 85,
     },
   ];
 
@@ -1241,10 +1186,9 @@ function findDeepMatches(text: string): ContactDetection[] {
         const cleanMatch = cleanMatchResult(match, pattern.type);
         if (cleanMatch.length >= 3 && !isFalsePositive(cleanMatch)) {
           detections.push({
-            type: pattern.type as ContactDetection['type'],
+            type: pattern.type as ContactDetection["type"],
             pattern: cleanMatch,
-            severity: "high",
-            confidence: pattern.baseConfidence,
+            severity: "low",
             context: "deep_normalized",
           });
         }
@@ -1259,10 +1203,9 @@ function findDeepMatches(text: string): ContactDetection[] {
         const cleanMatch = cleanMatchResult(match, pattern.type);
         if (cleanMatch.length >= 3 && !isFalsePositive(cleanMatch)) {
           detections.push({
-            type: pattern.type as ContactDetection['type'],
+            type: pattern.type as ContactDetection["type"],
             pattern: cleanMatch,
-            severity: "high",
-            confidence: pattern.baseConfidence,
+            severity: "low",
             context: "deep_normalized",
           });
         }
@@ -1400,79 +1343,20 @@ function analyzeContext(
   text: string
 ): ContactDetection[] {
   return detections.map((detection) => {
-    let confidence = detection.confidence;
-
-    // Check for context clues
+    // Context clues are still used for filtering/boosting detection relevance
     const contextLower = detection.context?.toLowerCase() || "";
-    const contextClues = CONTEXT_CLUES.filter((clue) =>
+    const hasContextClue = CONTEXT_CLUES.some((clue) =>
       contextLower.includes(clue.toLowerCase())
-    ).length;
-
-    confidence += Math.min(20, contextClues * 3);
-
-    // Boost confidence for common words + TLD patterns
-    const commonWordPattern = new RegExp(
-      `\\b(${COMMON_WORDS_FOR_DOMAINS.join(
-        "|"
-      )})\\s*\\.\\s*(com|org|net|edu|gov|io|co|uk|ae|qa|pk)\\b`,
-      "i"
     );
-    if (commonWordPattern.test(detection.pattern)) {
-      confidence += 15;
-    }
 
-    // Boost confidence if it's a complete URL or email
-    if (
-      detection.type === "url" &&
-      detection.pattern.includes(".") &&
-      !detection.pattern.startsWith("www.") &&
-      !detection.pattern.endsWith(".")
-    ) {
-      confidence += 10;
-    }
-
-    // Boost confidence for patterns that include common name keywords
-    if (
-      NAME_KEYWORDS.some((kw) => detection.pattern.toLowerCase().includes(kw))
-    ) {
-      confidence += 10;
-    }
-
-    // Boost confidence for phone numbers with context clues
-    if (
-      detection.type === "phone" &&
-      PHONE_INDICATORS.some((indicator) => contextLower.includes(indicator))
-    ) {
-      confidence += 15;
-    }
+    // Boost severity if strong context
+    const severity = hasContextClue ? "high" : detection.severity;
 
     return {
       ...detection,
-      confidence,
+      severity,
     };
   });
-}
-
-function calculateConfidence(
-  detections: ContactDetection[],
-  text: string
-): ContactDetection[] {
-  return detections
-    .map((detection) => {
-      // Adjust severity based on confidence
-      const severity: ContactDetection["severity"] =
-        detection.confidence >= 85
-          ? "high"
-          : detection.confidence >= 65
-          ? "medium"
-          : "low";
-
-      return {
-        ...detection,
-        severity,
-      };
-    })
-    .filter((d) => d.confidence >= 55); // Filter out low confidence detections
 }
 
 // ===== UTILITY: LEVENSHTEIN DISTANCE FOR SIMILARITY CHECKING =====
