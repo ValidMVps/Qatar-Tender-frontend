@@ -165,35 +165,72 @@ function Navbar() {
 /* -------------------------------- Hero ------------------------------------ */
 function Hero() {
   const [currentStep, setCurrentStep] = useState(0);
+  const [formData, setFormData] = useState({
+    projectName: "",
+    category: "",
+    budgetRange: "",
+    description: "",
+    timeline: "",
+    deliveryLocation: "",
+    uploadSpecs: "",
+    tenderTerms: "",
+    prequalification: "",
+  });
+
   const router = useRouter();
 
   const steps = [
     {
       id: 1,
       title: "Project Details",
-      fields: ["Project Name", "Category", "Budget Range"],
+      fields: [
+        { name: "projectName", label: "Project Name", type: "text" },
+        { name: "category", label: "Category", type: "text" },
+        { name: "budgetRange", label: "Budget Range", type: "text" },
+      ],
     },
     {
       id: 2,
       title: "Requirements",
-      fields: ["Description", "Timeline", "Delivery Location"],
+      fields: [
+        { name: "description", label: "Description", type: "textarea" },
+        { name: "timeline", label: "Timeline", type: "text" },
+        { name: "deliveryLocation", label: "Delivery Location", type: "text" },
+      ],
     },
     {
       id: 3,
       title: "Documents",
-      fields: ["Upload Specs", "Tender Terms", "Prequalification"],
+      fields: [
+        { name: "uploadSpecs", label: "Upload Specs", type: "file" },
+        { name: "tenderTerms", label: "Tender Terms", type: "file" },
+        { name: "prequalification", label: "Prequalification", type: "file" },
+      ],
     },
   ];
+
+  const handleChange = (e: any) => {
+    const { name, value, files, type } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "file" ? files[0] : value,
+    }));
+  };
 
   const nextStep = () =>
     currentStep < steps.length - 1 && setCurrentStep(currentStep + 1);
   const prevStep = () => currentStep > 0 && setCurrentStep(currentStep - 1);
 
+  const handleSubmit = () => {
+    console.log("Form submitted:", formData);
+    router.push("/signup");
+  };
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 w-full">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
-          {/* Left */}
+          {/* ---------------- Left Side ---------------- */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -209,9 +246,9 @@ function Hero() {
                 </span>
               </h1>
               <p className="text-xl sm:text-2xl text-[#6e6e73] font-normal leading-relaxed max-w-xl">
-                GoTenderly is a secure e‑tendering platform for Qatari
-                organisations — KYC‑verified suppliers, audit-ready workflows,
-                and built‑in evaluation tools to shorten procurement cycles.
+                GoTenderly is a secure e-tendering platform for Qatari
+                organisations — KYC-verified suppliers, audit-ready workflows,
+                and built-in evaluation tools to shorten procurement cycles.
               </p>
             </div>
 
@@ -246,14 +283,14 @@ function Hero() {
             </div>
           </motion.div>
 
-          {/* Right - Form */}
+          {/* ---------------- Right Side (Form) ---------------- */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
             <div className="bg-white rounded-[28px] shadow-2xl border border-[#d2d2d7] p-8 sm:p-10 backdrop-blur-xl">
-              {/* Progress */}
+              {/* Progress Bar */}
               <div className="flex items-center justify-between mb-8">
                 {steps.map((step, i) => (
                   <div key={step.id} className="flex items-center">
@@ -290,7 +327,7 @@ function Hero() {
                 ))}
               </div>
 
-              {/* Form fields (visual only on landing) */}
+              {/* Step Fields */}
               <AnimatePresence mode="wait">
                 <motion.div
                   key={currentStep}
@@ -304,21 +341,46 @@ function Hero() {
                   </h3>
                   {steps[currentStep].fields.map((field, idx) => (
                     <motion.div
-                      key={field}
+                      key={field.name}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: idx * 0.06 }}
                       className="space-y-2"
                     >
                       <label className="text-sm font-medium text-[#6e6e73]">
-                        {field}
+                        {field.label}
                       </label>
-                      <div className="h-12 bg-[#f5f5f7] rounded-xl border border-transparent hover:border-[#38b6ff]/20 transition-colors" />
+                      {field.type === "textarea" ? (
+                        <textarea
+                          name={field.name}
+                          value={formData[field.name as keyof typeof formData]}
+                          onChange={handleChange}
+                          placeholder={field.label}
+                          className="w-full h-24 bg-[#f5f5f7] rounded-xl border border-transparent hover:border-[#38b6ff]/20 focus:border-[#38b6ff] focus:ring-0 px-4 py-3 text-sm outline-none transition-colors"
+                        />
+                      ) : field.type === "file" ? (
+                        <input
+                          type="file"
+                          name={field.name}
+                          onChange={handleChange}
+                          className="w-full h-12 bg-[#f5f5f7] rounded-xl border border-transparent hover:border-[#38b6ff]/20 focus:border-[#38b6ff] file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-[#38b6ff] file:text-white file:text-sm text-sm outline-none transition-colors"
+                        />
+                      ) : (
+                        <input
+                          type={field.type}
+                          name={field.name}
+                          value={formData[field.name as keyof typeof formData]}
+                          onChange={handleChange}
+                          placeholder={field.label}
+                          className="w-full h-12 bg-[#f5f5f7] rounded-xl border border-transparent hover:border-[#38b6ff]/20 focus:border-[#38b6ff] focus:ring-0 px-4 text-sm outline-none transition-colors"
+                        />
+                      )}
                     </motion.div>
                   ))}
                 </motion.div>
               </AnimatePresence>
 
+              {/* Navigation Buttons */}
               <div className="flex gap-3 mt-8">
                 {currentStep > 0 && (
                   <button
@@ -329,11 +391,11 @@ function Hero() {
                   </button>
                 )}
                 <button
-                  onClick={() => {
-                    if (currentStep === steps.length - 1)
-                      router.push("/signup");
-                    else nextStep();
-                  }}
+                  onClick={() =>
+                    currentStep === steps.length - 1
+                      ? handleSubmit()
+                      : nextStep()
+                  }
                   className="flex-1 bg-[#38b6ff] hover:bg-[#0077ed] text-white h-12 rounded-xl font-medium flex items-center justify-center gap-2"
                 >
                   {currentStep === steps.length - 1
