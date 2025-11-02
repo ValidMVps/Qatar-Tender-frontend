@@ -7,6 +7,7 @@ const RATE_LIMIT_MAX = 3; // Max 3 requests per IP per minute
 const rateLimitMap = new Map<string, { count: number; timestamp: number }>();
 
 function rateLimit(ip: string): boolean {
+
   const now = Date.now();
   const record = rateLimitMap.get(ip);
   if (!record) {
@@ -175,9 +176,9 @@ export async function POST(req: Request) {
             <div>
               <div class="label">Name</div>
               <div>${safeName}</div>
-              <div class="label">Email</div>
+              <div class="label">{t('email')}</div>
               <div><a href="mailto:${safeEmail}">${safeEmail}</a></div>
-              <div class="label">Message</div>
+              <div class="label">{t('message')}</div>
               <div class="message">${safeMessage}</div>
             </div>
             <div class="footer">

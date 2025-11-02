@@ -26,18 +26,18 @@ export default function ProfileHeader() {
           </div>
           <div className="flex-1 space-y-2">
             <div className="flex flex-col gap-2 md:flex-row md:items-center">
-              <h1 className="text-2xl font-bold">John Doe</h1>
-              <Badge variant="secondary">Pro Member</Badge>
+              <h1 className="text-2xl font-bold">{t('john_doe')}</h1>
+              <Badge variant="secondary">{t('pro_member')}</Badge>
             </div>
-            <p className="text-muted-foreground">Senior Product Designer</p>
+            <p className="text-muted-foreground">{t('senior_product_designer')}</p>
             <div className="text-muted-foreground flex flex-wrap gap-4 text-sm">
               <div className="flex items-center gap-1">
                 <Mail className="size-4" />
-                john.doe@example.com
+                {t('johndoeexamplecom')}
               </div>
               <div className="flex items-center gap-1">
                 <MapPin className="size-4" />
-                San Francisco, CA
+                {t('san_francisco_ca')}
               </div>
               <div className="flex items-center gap-1">
                 <Calendar className="size-4" />
@@ -45,7 +45,7 @@ export default function ProfileHeader() {
               </div>
             </div>
           </div>
-          <Button variant="default">Edit Profile</Button>
+          <Button variant="default">{t('edit_profile')}</Button>
         </div>
       </CardContent>
     </Card>

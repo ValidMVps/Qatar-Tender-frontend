@@ -22,19 +22,17 @@ import { UiTender } from "@/types/ui";
 import { updateTenderStatus } from "@/app/services/tenderService";
 import ReopenTenderModal from "./ReopenTenderModal";
 import { useAuth } from "@/context/AuthContext";
+import useTranslation from "@/lib/hooks/useTranslation";
 
 interface TenderCardProps {
   tender: UiTender;
   onReapply: (id: string) => void;
   onUpdate?: (apiTender: any) => void;
-  t: (key: string, params?: any) => string;
   fetchTenders: () => Promise<void>;
 }
-
 export default function MyTenderCard({
   tender,
   onUpdate,
-  t,
   fetchTenders,
 }: TenderCardProps) {
   const [openTenderModal, setOpenTenderModal] = useState(false);
@@ -46,7 +44,7 @@ export default function MyTenderCard({
 
   // Reopen Tender state
   const [isReopening, setIsReopening] = useState(false);
-
+  const { t } = useTranslation();
   const stopAnd = (e: React.MouseEvent, cb?: () => void) => {
     e.preventDefault();
     e.stopPropagation();
@@ -139,7 +137,7 @@ export default function MyTenderCard({
                 {tender.bidCount}
               </p>
               <p className="text-xs sm:text-sm text-gray-500 font-medium">
-                Bids Received
+                {t("bids_received")}
               </p>
             </div>
             <div className="py-2">
@@ -147,7 +145,7 @@ export default function MyTenderCard({
                 {tender.deadlineDate}
               </p>
               <p className="text-xs sm:text-sm text-gray-500 font-medium">
-                Deadline
+                {t("deadline")}
               </p>
             </div>
           </div>
@@ -190,7 +188,7 @@ export default function MyTenderCard({
               }
             >
               <button className="flex items-center justify-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-blue-50 text-blue-700 hover:bg-blue-100 active:bg-blue-200 transition-all text-sm font-medium w-full sm:w-auto">
-                <span>View Details</span>
+                <span>{t("view_details")}</span>
                 <ChevronRightIcon className="h-4 w-4" />
               </button>
             </Link>
@@ -226,10 +224,11 @@ export default function MyTenderCard({
             <div className="bg-white rounded-2xl shadow-lg w-full max-w-sm overflow-hidden border border-gray-200">
               <div className="p-6 text-center">
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  Close Tender
+                  {t("close_tender")}
                 </h3>
                 <p className="text-sm text-gray-600 mb-4">
-                  Are you sure you want to mark this tender as <b>Closed</b>?
+                  Are you sure you want to mark this tender as{" "}
+                  <b>{t("closed")}</b>?
                 </p>
 
                 {closeError && (
@@ -244,7 +243,7 @@ export default function MyTenderCard({
                   onClick={() => setConfirmClose(false)}
                   disabled={isClosing}
                 >
-                  Cancel
+                  {t("cancel")}
                 </Button>
                 <Button
                   variant="destructive"

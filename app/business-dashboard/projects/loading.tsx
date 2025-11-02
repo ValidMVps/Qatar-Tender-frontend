@@ -4,14 +4,15 @@ import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 
 export default function Loading() {
+
   return (
     <>
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center">
           <Building2 className="h-7 w-7 mr-3" />
-          Active Projects
+         active_projects
         </h1>
-        <p className="text-gray-600">Track and manage your ongoing and completed projects</p>
+        <p className="text-gray-600">track_and_manage_your_ongoing_and_completed_projec</p>
       </div>
 
       {/* Filters Skeleton */}

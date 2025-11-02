@@ -4,14 +4,15 @@ import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 
 export default function Loading() {
+
   return (
     <>
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center">
           <HelpCircle className="h-7 w-7 mr-3" />
-          Help & Support
+        help_support
         </h1>
-        <p className="text-gray-600">Find answers to common questions or contact our support team</p>
+        <p className="text-gray-600">find_answers_to_common_questions_or_contact_our_su</p>
       </div>
 
       {/* Quick Links / Sections Skeleton */}
@@ -31,7 +32,7 @@ export default function Loading() {
       {/* FAQ Section Skeleton */}
       <Card className="mb-8 border border-gray-200 shadow-sm">
         <CardHeader>
-          <CardTitle className="text-lg font-semibold">Frequently Asked Questions</CardTitle>
+          <CardTitle className="text-lg font-semibold">frequently_asked_questions</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="relative mb-4">
@@ -52,7 +53,7 @@ export default function Loading() {
       {/* Contact Support Form Skeleton */}
       <Card className="border border-gray-200 shadow-sm">
         <CardHeader>
-          <CardTitle className="text-lg font-semibold">Contact Support</CardTitle>
+          <CardTitle className="text-lg font-semibold">contact_support</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-6">

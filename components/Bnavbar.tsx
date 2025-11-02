@@ -84,7 +84,7 @@ export default function BNavbar({
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
             className="block lg:hidden border border-gray-200 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-600"
-            aria-label="Toggle sidebar"
+            aria-label={t('toggle_sidebar')}
           >
             {sidebarOpen ? (
               <PanelLeft className="h-5 w-5 text-gray-700" />
@@ -109,7 +109,7 @@ export default function BNavbar({
               onClick={() => setOpenTenderModal(true)}
             >
               <Plus className="mr-2 h-4 w-4" />
-              New Tender
+              {t('new_tender')}
             </Button>
           )}
 
@@ -185,7 +185,7 @@ export default function BNavbar({
                       className="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-gray-100 cursor-pointer"
                     >
                       <LogOut className="w-4 h-4 text-red-500" />
-                      Sign out
+                      {t('sign_out')}
                     </div>
                   </div>
                 </motion.div>
@@ -204,7 +204,7 @@ export default function BNavbar({
             onClick={() => setOpenTenderModal(true)}
           >
             <Plus className="mr-2 h-4 w-4" />
-            New Tender
+            {t('new_tender')}
           </Button>
         </div>
       )}

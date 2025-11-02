@@ -253,7 +253,7 @@ export default function BidderProfilePage() {
             className="text-blue-600 hover:bg-blue-50 rounded-xl font-semibold transition-all duration-200"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
+            {t('back')}
           </Button>
         </div>
       </div>
@@ -319,7 +319,7 @@ export default function BidderProfilePage() {
                     />
                   </svg>
                 </div>
-                About
+                {t('about')}
               </h2>
               <p className="text-gray-700 leading-relaxed text-lg whitespace-pre-wrap">
                 {bidder.bio}
@@ -331,7 +331,7 @@ export default function BidderProfilePage() {
                 <div className="w-8 h-8 bg-green-100 rounded-xl flex items-center justify-center mr-3">
                   <Briefcase className="w-4 h-4 text-green-600" />
                 </div>
-                Projects & Reviews
+                {t('projects_and_reviews')}
               </h2>
 
               {bidder.projectHistory.length > 0 ? (
@@ -433,14 +433,14 @@ export default function BidderProfilePage() {
                     />
                   </svg>
                 </div>
-                Contact
+                {t('contact')}
               </h2>
 
               <div className="space-y-4">
                 <div className="flex items-start gap-3 p-3 rounded-xl bg-gray-50/80 border border-gray-200/30">
                   <Mail className="w-5 h-5 text-gray-600 mt-0.5 flex-shrink-0" />
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm text-gray-500 mb-1">Email</p>
+                    <p className="text-sm text-gray-500 mb-1">{t('email')}</p>
                     <p className="text-gray-900 font-medium break-all text-sm">
                       {bidder.email}
                     </p>
@@ -450,7 +450,7 @@ export default function BidderProfilePage() {
                 <div className="flex items-start gap-3 p-3 rounded-xl bg-gray-50/80 border border-gray-200/30">
                   <Phone className="w-5 h-5 text-gray-600 mt-0.5 flex-shrink-0" />
                   <div>
-                    <p className="text-sm text-gray-500 mb-1">Phone</p>
+                    <p className="text-sm text-gray-500 mb-1">{t('phone')}</p>
                     <p className="text-gray-900 font-medium text-sm">
                       {bidder.phone}
                     </p>
@@ -460,7 +460,7 @@ export default function BidderProfilePage() {
                 <div className="flex items-start gap-3 p-3 rounded-xl bg-gray-50/80 border border-gray-200/30">
                   <MapPin className="w-5 h-5 text-gray-600 mt-0.5 flex-shrink-0" />
                   <div>
-                    <p className="text-sm text-gray-500 mb-1">Address</p>
+                    <p className="text-sm text-gray-500 mb-1">{t('address')}</p>
                     <p className="text-gray-900 font-medium text-sm leading-relaxed">
                       {bidder.address}
                     </p>
@@ -477,7 +477,7 @@ export default function BidderProfilePage() {
 
               <div className="space-y-4">
                 <div className="flex justify-between items-center py-2">
-                  <span className="text-gray-600">Total Reviews</span>
+                  <span className="text-gray-600">{t('total_reviews')}</span>
                   <span className="font-bold text-gray-900">
                     {bidder.totalReviews}
                   </span>
@@ -489,7 +489,7 @@ export default function BidderProfilePage() {
                   </span>
                 </div>
                 <div className="flex justify-between items-center py-2">
-                  <span className="text-gray-600">Average Rating</span>
+                  <span className="text-gray-600">{t('average_rating')}</span>
                   <span className="font-bold text-gray-900">
                     {bidder.overallRating}/5
                   </span>

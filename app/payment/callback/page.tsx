@@ -6,6 +6,7 @@ import { CheckCircle2, XCircle, Loader2, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { verifyPaymentStatus } from "@/app/services/paymentService";
+import useTranslation from "@/lib/hooks/useTranslation";
 
 function PaymentCallbackContent() {
   const router = useRouter();
@@ -15,6 +16,7 @@ function PaymentCallbackContent() {
     "success" | "failed" | "pending" | null
   >(null);
   const [paymentDetails, setPaymentDetails] = useState<any>(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const verifyPayment = async () => {
@@ -111,7 +113,7 @@ function PaymentCallbackContent() {
               <div className="flex justify-between items-center">
                 <span className="text-gray-600">Status:</span>
                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                  Completed
+                  {t("completed")}
                 </span>
               </div>
             </div>
@@ -139,7 +141,7 @@ function PaymentCallbackContent() {
               className="flex-1 rounded-xl py-3"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Dashboard
+              {t("dashboard")}
             </Button>
             <Button
               onClick={handleViewBids}
@@ -196,7 +198,7 @@ function PaymentCallbackContent() {
             onClick={() => router.push("/tenders")}
             className="flex-1 bg-blue-500 hover:bg-blue-600 text-white rounded-xl py-3"
           >
-            Browse Tenders
+            {t("browse_tenders")}
           </Button>
         </div>
       </div>

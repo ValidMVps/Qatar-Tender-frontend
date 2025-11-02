@@ -25,6 +25,7 @@ import { getUserTenders } from "@/app/services/tenderService";
 import { getUserBids } from "@/app/services/BidService";
 import { Loader2, TrendingUp, Calendar, Award } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import useTranslation from "@/lib/hooks/useTranslation";
 
 const chartConfig = {
   tenders: { label: "Tenders" },
@@ -63,6 +64,7 @@ export function OverviewChart() {
     acceptedBids: 0,
   });
   const { user } = useAuth();
+  const { t } = useTranslation();
 
   const processDataForChart = (tenders: any[], bids: any[]) => {
     const dataMap = new Map<string, ChartDataPoint>();
@@ -208,7 +210,7 @@ export function OverviewChart() {
       <div className="w-full h-full flex items-center justify-center h-[400px]">
         <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
         <span className="ml-2 text-sm text-gray-500">
-          Loading dashboard data...
+          {t("loading_dashboard_data")}
         </span>
       </div>
     );
@@ -229,16 +231,16 @@ export function OverviewChart() {
         {/* Timeline Chart */}{" "}
         {/* <Select value={timeRange} onValueChange={setTimeRange}>
           <SelectTrigger className="w-[160px] rounded-full bg-gray-100 border-0">
-            <SelectValue placeholder="Last 3 months" />
+            <SelectValue placeholder={t('last_3_months')} />
           </SelectTrigger>
           <SelectContent className="rounded-xl">
-            <SelectItem value="30d">Last 30 days</SelectItem>
-            <SelectItem value="7d">Last 7 days</SelectItem>
+            <SelectItem value="30d">{t('last_30_days')}</SelectItem>
+            <SelectItem value="7d">{t('last_7_days')}</SelectItem>
           </SelectContent>
         </Select> */}
         <div className="bg-white p-5 rounded-2xl h-[300px] lg:h-[400px]">
           <h4 className="text-md font-semibold mb-4 text-gray-900">
-            Activity Timeline
+            {t("activity_timeline")}
           </h4>
           <ChartContainer config={chartConfig} className="w-full h-full">
             <ResponsiveContainer width="100%" height="100%">

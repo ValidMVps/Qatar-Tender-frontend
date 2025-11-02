@@ -72,7 +72,7 @@ export const getChatMessages = async (
  */
 export const sendMessage = async (
   roomId: string,
-  payload: { text?: string; media?: string }
+  payload: { text?: string; media?: any }
 ): Promise<ChatMessage> => {
   try {
     const res = await api.post<ChatMessage>(

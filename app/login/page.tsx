@@ -13,8 +13,12 @@ import Headerauth from "@/components/Headerauth";
 import LoginForm from "@/components/LoginForm";
 import Image from "next/image";
 import image1 from "../../media/artwork.png";
+import { Navbar } from "../page";
+import useTranslation from "@/lib/hooks/useTranslation";
 
 export default function LoginPage() {
+  const { t } = useTranslation();
+
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [email, setEmail] = useState("");
@@ -24,7 +28,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Fixed header */}
-      <Headerauth />
+      <Navbar />
 
       {/* Main content area */}
       <main className="flex flex-1 items-center justify-center px-4 sm:px-6 lg:px-8 pt-24 pb-12">
@@ -34,10 +38,10 @@ export default function LoginPage() {
             <Card className="w-full max-w-md border border-neutral-200 shadow-sm rounded-xl bg-white">
               <CardHeader className="text-center space-y-1">
                 <CardTitle className="text-lg lg:text-2xl font-semibold tracking-tight text-gray-900">
-                  Log in to your account
+                  {t("log_in_to_your_account")}
                 </CardTitle>
                 <CardDescription className="text-gray-500 text-sm lg:text-sm">
-                  Enter your credentials to access your dashboard
+                  {t("enter_your_credentials_to_access_your_dashboard")}
                 </CardDescription>
               </CardHeader>
               <CardContent className="lg:px-4 px-0 mt-0 pt-0">

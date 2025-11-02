@@ -15,6 +15,7 @@ import { Send, Paperclip, X, User, Menu, AlertCircle } from "lucide-react";
 import io from "socket.io-client";
 import { profileApi } from "@/app/services/profileApi";
 import { uploadToCloudinary } from "@/utils/uploadToCloudinary"; // Changed to use uploadToCloudinary
+import useTranslation from "@/lib/hooks/useTranslation";
 
 // Ensure you have SOCKET_URL in .env.local
 const SOCKET_URL =
@@ -28,6 +29,7 @@ interface ChatSectionProps {
 }
 
 export default function ChatSection({
+
   tenderId,
   className = "",
   onOpenProjectList,
@@ -52,7 +54,7 @@ export default function ChatSection({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const socketRef = useRef<any>(null);
-
+    const { t } = useTranslation();
   // Connect to Socket.IO on mount
   useEffect(() => {
     if (!user?._id) return;
@@ -320,7 +322,7 @@ export default function ChatSection({
       // Send via API with the actual URLs
       await sendApiMessage(roomId, {
         text: tempMessage.text,
-        media: uploadedMedia[0].url,
+        media: uploadedMedia,
       });
 
       // After success, remove temp message and add real one
@@ -435,7 +437,7 @@ export default function ChatSection({
           onClick={onOpenProjectDetails}
           className="text-blue-600 hover:text-blue-700 text-sm font-semibold px-4 py-2 rounded-xl hover:bg-blue-50 transition-all duration-200"
         >
-          Details
+          {t('details')}
         </button>
       </div>
 

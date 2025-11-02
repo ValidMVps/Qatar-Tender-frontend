@@ -83,7 +83,7 @@ export function TenderCard({ tender }: TenderCardProps) {
                 {tender.userVerified && (
                   <span className="flex items-center text-gray-800">
                     <CheckCircle className="h-4 w-4 mr-1 text-green-600" />
-                    Verified
+                    {t('verified')}
                   </span>
                 )}
                 {tender.rating > 0 && (

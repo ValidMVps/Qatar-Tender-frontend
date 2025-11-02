@@ -29,16 +29,14 @@ import {
   createMockFile,
 } from "@/utils/random-data";
 import SignupWizard from "@/components/SignupWizard";
+import { Navbar } from "../page";
 
 type AccountType = "individual" | "business" | null;
 
-
-
 export default function SignupPage() {
-
   return (
     <div className="min-h-screen p-0 bg-gray-100">
-      <Headerauth />
+      <Navbar />
       <div className="flex justify-center items-center h-full p-0">
         <div className="min-h-screen flex  items-center justify-center px-4 py-16">
           <SignupWizard />

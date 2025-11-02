@@ -24,6 +24,7 @@ import { toast } from "sonner";
 import { createBid } from "@/app/services/BidService";
 import { uploadToCloudinary } from "@/utils/uploadToCloudinary";
 import { useAuth } from "@/context/AuthContext";
+import useTranslation from "@/lib/hooks/useTranslation";
 
 enum BidStep {
   BID_DETAILS = 1,
@@ -60,8 +61,9 @@ export default function BiddingSection({
   const [uploading, setUploading] = useState(false);
   const { user } = useAuth();
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const { t } = useTranslation();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  if (user?.isDocumentVerified) {
+  if (user?.isDocumentVerified != "verified") {
     return (
       <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
         <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 text-center">
@@ -76,7 +78,7 @@ export default function BiddingSection({
             onClick={onCancel}
             className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-xl py-3 font-medium transition-all duration-300"
           >
-            Close
+            {t("close")}
           </Button>
         </div>
       </div>
@@ -324,7 +326,7 @@ export default function BiddingSection({
             </h3>
             <div className="bg-gray-50 rounded-xl p-6 space-y-4">
               <div className="flex justify-between items-center">
-                <span className="text-gray-600">Bid Amount:</span>
+                <span className="text-gray-600">{t("bidamount")}</span>
                 <span className="text-2xl font-bold text-green-600">
                   {Number(bidAmount).toLocaleString()} QAR
                 </span>
@@ -401,7 +403,7 @@ export default function BiddingSection({
             </div>
             <div className="bg-gray-50 rounded-xl p-6 space-y-3">
               <div className="flex justify-between items-center">
-                <span className="text-gray-600">Bid Amount:</span>
+                <span className="text-gray-600">{t("bidamount")}</span>
                 <span className="font-bold text-green-600">
                   {Number(bidAmount).toLocaleString()} QAR
                 </span>
@@ -451,7 +453,7 @@ export default function BiddingSection({
               disabled={!paymentUrl}
             >
               <ExternalLink className="h-5 w-5 mr-2" />
-              Proceed to Payment
+              {t("proceed_to_payment")}
             </Button>
           </div>
         );
@@ -534,9 +536,9 @@ export default function BiddingSection({
               ></div>
             </div>
             <div className="flex justify-between text-xs text-gray-500">
-              <span>Details</span>
-              <span>Review</span>
-              <span>Payment</span>
+              <span>{t("details")}</span>
+              <span>{t("review")}</span>
+              <span>{t("payment")}</span>
             </div>
           </div>
 
@@ -554,7 +556,7 @@ export default function BiddingSection({
                   disabled={submittingBid}
                 >
                   <ChevronLeft className="h-4 w-4 mr-2" />
-                  Previous
+                  {t("previous")}
                 </Button>
               )}
             {currentStep === BidStep.BID_DETAILS && (
@@ -564,14 +566,14 @@ export default function BiddingSection({
                   onClick={onCancel}
                   className="flex-1 rounded-xl border-gray-200 hover:bg-gray-50 py-3 font-medium transition-all duration-300"
                 >
-                  Cancel
+                  {t("cancel")}
                 </Button>
                 <Button
                   onClick={handleNextStep}
                   className="flex-1 bg-blue-500 hover:bg-blue-600 text-white rounded-xl py-3 font-medium transition-all duration-300 shadow-lg shadow-blue-500/25"
                   disabled={!bidAmount || !bidDescription.trim()}
                 >
-                  Next
+                  {t("next")}
                   <ArrowRight className="h-4 w-4 ml-2" />
                 </Button>
               </>
@@ -589,7 +591,7 @@ export default function BiddingSection({
                   </div>
                 ) : (
                   <>
-                    Proceed to Payment
+                    {t("proceed_to_payment")}
                     <ArrowRight className="h-4 w-4 ml-2" />
                   </>
                 )}

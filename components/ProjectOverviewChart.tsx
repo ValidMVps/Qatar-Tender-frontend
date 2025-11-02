@@ -25,6 +25,7 @@ import { getUserTenders } from "@/app/services/tenderService";
 import { getUserBids } from "@/app/services/BidService";
 import { Loader2, TrendingUp, Calendar, Award } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import useTranslation from "@/lib/hooks/useTranslation";
 
 const chartConfig = {
   tenders: { label: "Tenders" },
@@ -47,6 +48,8 @@ interface BidSuccessData {
 }
 
 export default function OverviewChart2() {
+    const { t } = useTranslation();
+
   const [timeRange, setTimeRange] = React.useState("7d");
   const [chartData, setChartData] = React.useState<ChartDataPoint[]>([]);
   const [bidSuccessData, setBidSuccessData] = React.useState<BidSuccessData[]>(
@@ -207,7 +210,7 @@ export default function OverviewChart2() {
       <div className="w-full h-full flex items-center justify-center h-[400px]">
         <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
         <span className="ml-2 text-sm text-gray-500">
-          Loading dashboard data...
+          {t('loading_dashboard_data')}
         </span>
       </div>
     );
@@ -219,7 +222,7 @@ export default function OverviewChart2() {
       <div className="flex items-center justify-between border-b pb-4">
         <div className="grid flex-1 gap-1">
           <h3 className="text-xl font-semibold text-gray-900">
-            Activity Overview
+            {t('activity_overview')}
           </h3>
           <p className="text-sm text-gray-500">
             {error
@@ -229,11 +232,11 @@ export default function OverviewChart2() {
         </div>
         <Select value={timeRange} onValueChange={setTimeRange}>
           <SelectTrigger className="w-[160px] rounded-full bg-gray-100 border-0">
-            <SelectValue placeholder="Last 3 months" />
+            <SelectValue placeholder={t('last_3_months')} />
           </SelectTrigger>
           <SelectContent className="rounded-xl">
-            <SelectItem value="30d">Last 30 days</SelectItem>
-            <SelectItem value="7d">Last 7 days</SelectItem>
+            <SelectItem value="30d">{t('last_30_days')}</SelectItem>
+            <SelectItem value="7d">{t('last_7_days')}</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -253,7 +256,7 @@ export default function OverviewChart2() {
               <Calendar className="h-5 w-5 text-blue-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-500">Tenders Posted</p>
+              <p className="text-sm text-gray-500">{t('tenders_posted')}</p>
               <p className="text-xl font-semibold text-gray-900">
                 {filteredData.reduce(
                   (sum, item) => sum + item.tendersPosted,
@@ -271,7 +274,7 @@ export default function OverviewChart2() {
               <TrendingUp className="h-5 w-5 text-purple-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-500">Bids Placed</p>
+              <p className="text-sm text-gray-500">{t('bids_placed')}</p>
               <p className="text-xl font-semibold text-gray-900">
                 {bidSuccessData.reduce((sum, item) => sum + item.bidsPlaced, 0)}
               </p>
@@ -286,7 +289,7 @@ export default function OverviewChart2() {
               <Award className="h-5 w-5 text-green-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-500">Bids Won</p>
+              <p className="text-sm text-gray-500">{t('bids_won')}</p>
               <p className="text-xl font-semibold text-gray-900">
                 {bidSuccessData.reduce((sum, item) => sum + item.bidsWon, 0)}
               </p>
@@ -301,7 +304,7 @@ export default function OverviewChart2() {
               <Award className="h-5 w-5 text-amber-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-500">Win Rate</p>
+              <p className="text-sm text-gray-500">{t('win_rate')}</p>
               <p className="text-xl font-semibold text-gray-900">
                 {bidSuccessData.reduce((sum, item) => sum + item.bidsPlaced, 0)
                   ? Math.round(
@@ -328,7 +331,7 @@ export default function OverviewChart2() {
         {/* Timeline Chart */}
         <div className="bg-white p-5 rounded-2xl h-[300px] lg:h-[400px]">
           <h4 className="text-md font-semibold mb-4 text-gray-900">
-            Activity Timeline
+            {t('activity_timeline')}
           </h4>
           <ChartContainer config={chartConfig} className="w-full h-full">
             <ResponsiveContainer width="100%" height="100%">
@@ -414,7 +417,7 @@ export default function OverviewChart2() {
         {/* Bid Success Chart */}
         <div className="bg-white p-5 rounded-2xl h-[300px] lg:h-[400px]">
           <h4 className="text-md font-semibold mb-4 text-gray-900">
-            Bid Success Rate
+            {t('bid_success_rate')}
           </h4>
           {bidSuccessData.some(
             (item) => item.bidsPlaced > 0 || item.bidsWon > 0

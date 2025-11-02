@@ -100,7 +100,7 @@ export function ApplyTenderForm({
             </div>
             <div>
               <Label htmlFor="cover-letter" className="mb-2 block">
-                Cover Letter
+                {t('cover_letter')}
               </Label>
               <Textarea
                 id="cover-letter"
@@ -128,7 +128,7 @@ export function ApplyTenderForm({
               )}
             </div>
             <Button type="submit" className="w-full">
-              Proceed to Payment
+              {t('proceed_to_payment')}
             </Button>
           </form>
         )}

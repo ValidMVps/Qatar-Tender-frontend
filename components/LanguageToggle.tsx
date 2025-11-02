@@ -16,7 +16,7 @@ export function LanguageToggle() {
 
   // Prevent hydration mismatch by showing nothing during SSR
   if (!isClient) {
-    return <Button className="px-4 py-2 border rounded">English</Button>;
+    return <Button className="px-4 py-2 border rounded">{t('english')}</Button>;
   }
 
   return (

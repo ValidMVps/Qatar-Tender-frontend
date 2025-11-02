@@ -112,7 +112,7 @@ export default function LoginForm() {
             href="/signup"
             className="font-medium text-blue-600 hover:underline"
           >
-            Sign up
+            {t('sign_up')}
           </Link>
         </div>
       </form>

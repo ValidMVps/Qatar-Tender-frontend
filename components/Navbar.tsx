@@ -94,7 +94,7 @@ export default function Navbar({
       <button
         onClick={() => setSidebarOpen(!sidebarOpen)}
         className="md:pe-3 pe-2 py-2 md:py-4 border-r border-gray-200 lg:hidden focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-600"
-        aria-label="Toggle sidebar"
+        aria-label={t('toggle_sidebar')}
       >
         {sidebarOpen ? (
           <PanelLeft className="h-5 w-5 text-gray-700" />
@@ -120,7 +120,7 @@ export default function Navbar({
               onClick={() => setOpenTenderModal(true)}
             >
               <Plus className="mr-2 h-4 w-4" />
-              New Tender
+              {t('new_tender')}
             </Button>
           )}
           <div className="relative">
@@ -201,7 +201,7 @@ export default function Navbar({
                       className="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
                     >
                       <LogOut className="w-4 h-4 text-red-500" />
-                      Sign out
+                      {t('sign_out')}
                     </div>
                   </div>
                 </motion.div>

@@ -90,7 +90,7 @@ interface BidStatusTimelineData {
 }
 
 export default function page() {
-  const [timeRange, setTimeRange] = React.useState("7d");
+  const [timeRange, setTimeRange] = React.useState("30d");
   const [chartData, setChartData] = React.useState<ChartDataPoint[]>([]);
   const [bidSuccessData, setBidSuccessData] = React.useState<BidSuccessData[]>(
     []

@@ -43,39 +43,72 @@ class AuthService {
   async login(email: string, password: string) {
     try {
       const response = await api.post("/api/users/login", { email, password });
-      const { accessToken, ...userData } = response.data;
       console.log("📦 Login Response:", response.data);
-      if (accessToken) {
-        setTokenCookie(accessToken);
-        return { success: true, user: userData };
+
+      // If server returns a structured failure in a 200-ish response
+      if (response.data && response.data.success === false) {
+        return {
+          success: false,
+          error: response.data.error || response.data.message || "Login failed",
+        };
       }
 
-      return { success: false, error: "No access token received" };
+      // normalize token field names
+      const accessToken =
+        response.data?.accessToken ??
+        response.data?.access_token ??
+        response.data?.token;
+
+      if (!accessToken) {
+        // server didn't return a token (explicitly fail with server message if present)
+        return {
+          success: false,
+          error:
+            response.data?.error ||
+            response.data?.message ||
+            "No access token received",
+        };
+      }
+
+      // persist token (your helper)
+      setTokenCookie(accessToken);
+
+      // pick user payload (prefer explicit `user` field)
+      const user =
+        response.data?.user ??
+        (() => {
+          // remove known fields and return the rest as user data
+          const { accessToken: _, access_token: __, token: ___, success, ...rest } =
+            response.data || {};
+          return rest;
+        })();
+
+      return { success: true, user };
     } catch (error: any) {
       let errorMessage = "Login failed. Please try again.";
 
       if (error.response) {
-        // Backend returned an error response
-        if (error.response.data?.message) {
-          errorMessage = error.response.data.message;
-        } else if (error.response.status === 401) {
-          errorMessage = "Invalid credentials or account not verified.";
-        } else if (error.response.status >= 500) {
-          errorMessage = "Server error. Please try again later.";
-        }
-      } else if (error.request) {
-        // No response from backend
+        // backend responded with non-2xx
+        const body = error.response.data || {};
         errorMessage =
-          "No response from server. Check your network connection.";
+          body.error ||
+          body.message ||
+          (error.response.status === 401
+            ? "Invalid credentials or account not verified."
+            : error.response.status >= 500
+              ? "Server error. Please try again later."
+              : `Request failed (${error.response.status})`);
+      } else if (error.request) {
+        // request made but no response
+        errorMessage = "No response from server. Check your network connection.";
       } else {
-        // Something went wrong setting up the request
-        errorMessage = error.message || "Unexpected error occurred.";
+        // something else happened
+        errorMessage = error.message || errorMessage;
       }
 
       return { success: false, error: errorMessage };
     }
   }
-
   async logout() {
     try {
       await api.post("/api/users/logout");

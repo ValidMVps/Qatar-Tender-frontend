@@ -6,8 +6,11 @@ import { useAuth } from "@/context/AuthContext";
 import { useNotifications } from "@/context/NotificationContext";
 import { useRouter } from "next/navigation";
 import { formatDistanceToNow, format, differenceInDays } from "date-fns";
+import useTranslation from "@/lib/hooks/useTranslation";
 
 const NotificationDemo = () => {
+  const { t } = useTranslation();
+
   const router = useRouter();
   const {
     notifications = [],
@@ -404,12 +407,12 @@ const NotificationDemo = () => {
                     d="M15 19l-7-7 7-7"
                   />
                 </svg>
-                <span>Back</span>
+                <span>{t("back")}</span>
               </button>
 
               <div>
                 <h1 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent tracking-tight">
-                  Notifications
+                  {t("notifications")}
                 </h1>
                 {unreadCount > 0 && (
                   <p className="text-xs sm:text-sm text-slate-500 mt-1 sm:mt-2 font-medium">

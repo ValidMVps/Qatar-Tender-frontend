@@ -10,6 +10,7 @@ import Link from "next/link";
 import Headerauth from "@/components/Headerauth";
 import { useToast } from "@/hooks/use-toast";
 import { authService } from "@/utils/auth";
+import useTranslation from "@/lib/hooks/useTranslation";
 
 export default function ForgotPasswordForm() {
   const [step, setStep] = useState<"email" | "otp">("email");
@@ -20,6 +21,7 @@ export default function ForgotPasswordForm() {
   const [isPending, setIsPending] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
+  const { t } = useTranslation();
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -111,7 +113,7 @@ export default function ForgotPasswordForm() {
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="email">Email</Label>
+                        <Label htmlFor="email">{t("email")}</Label>
                         <Input
                           id="email"
                           name="email"
@@ -169,7 +171,7 @@ export default function ForgotPasswordForm() {
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="newPassword">New Password</Label>
+                        <Label htmlFor="newPassword">{t("new_password")}</Label>
                         <Input
                           id="newPassword"
                           name="newPassword"
