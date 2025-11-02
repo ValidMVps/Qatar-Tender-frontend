@@ -20,6 +20,23 @@ import { useToast } from "@/hooks/use-toast";
 interface Profile {
   _id: string;
   user: any;
+  phone?: string;
+  fullName?: string;
+  companyName?: string;
+  address?: string;
+  rating?: number;
+  ratingCount?: number;
+  userType?: "individual" | "business" | "admin";
+  createdAt?: string;
+  updatedAt?: string;
+
+  // ✅ Add virtuals
+  totalTenders?: number;
+  activeTenders?: number;
+  rejectedTenders?: number;
+  completedTenders?: number;
+  awardedTenders?: number;
+  totalSpent?: number;
 }
 
 interface AuthContextType {
