@@ -460,7 +460,6 @@ export default function MyTendersPage() {
                     onReapply={handleReapplyTender}
                     onUpdate={handleUpdateTender}
                     fetchTenders={fetchTenders}
-                    t={t}
                   />
                 ))
               ) : (
