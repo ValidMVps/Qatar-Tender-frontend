@@ -153,9 +153,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     (async () => {
       const u = await checkAuth();
       if (
-        u &&
-        (window.location.pathname === "/login" ||
-          window.location.pathname === "/")
+        (u && window.location.pathname === "/login") ||
+        window.location.pathname === "/signup"
       ) {
         router.push(
           u.userType === "business" ? "/business-dashboard" : "/dashboard"
@@ -187,87 +186,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     return () => window.removeEventListener("focus", handleFocus);
   }, [isLoading, user, checkAuth]);
 
-  /** ------------------ GLOBAL 401 INTERCEPTOR ------------------ */
-  useEffect(() => {
-    const interceptor = api.interceptors.response.use(
-      (res) => res,
-      (error) => {
-        if (error.response?.status === 401) {
-          logout();
-          toast({
-            title: "Logged Out",
-            description: "Session expired.",
-            variant: "destructive",
-          });
-          router.push("/login?session=expired");
-        }
-        return Promise.reject(error);
-      }
-    );
-    return () => api.interceptors.response.eject(interceptor);
-  }, [logout, router, toast]);
-
-  /** ------------------ CROSS-TAB REFRESH ------------------ */
-  const notifyOtherTabsOfLogin = useCallback(() => {
-    const payload = { ts: Date.now(), tabId: tabIdRef.current };
-
-    // BroadcastChannel
-    if ("BroadcastChannel" in window) {
-      const bc = new BroadcastChannel("session-channel");
-      bc.postMessage(payload);
-      bc.close();
-    }
-
-    // localStorage fallback
-    try {
-      localStorage.setItem("session_refresh", JSON.stringify(payload));
-    } catch {}
-  }, []);
-
-  useEffect(() => {
-    const bcSupported = typeof (window as any).BroadcastChannel !== "undefined";
-    let bc: BroadcastChannel | null = null;
-
-    const handleIncoming = async (data: any) => {
-      if (suppressReloadRef.current) {
-        suppressReloadRef.current = false;
-        return;
-      }
-      await checkAuth();
-    };
-
-    if (bcSupported) {
-      try {
-        bc = new BroadcastChannel("session-channel");
-        bc.addEventListener("message", (ev) => handleIncoming(ev.data));
-      } catch {
-        bc = null;
-      }
-    }
-
-    const onStorage = (ev: StorageEvent) => {
-      if (ev.key !== "session_refresh") return;
-      try {
-        const data = ev.newValue ? JSON.parse(ev.newValue) : null;
-        handleIncoming(data);
-      } catch {}
-    };
-
-    window.addEventListener("storage", onStorage);
-
-    return () => {
-      if (bc) {
-        try {
-          bc.removeEventListener("message", (ev) => handleIncoming(ev.data));
-        } catch {}
-        try {
-          bc.close();
-        } catch {}
-      }
-      window.removeEventListener("storage", onStorage);
-    };
-  }, [checkAuth]);
-
   /** ------------------ LOGIN ------------------ */
   const login = async (email: string, password: string) => {
     setIsLoading(true);
@@ -279,8 +197,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
         suppressReloadRef.current = true;
         setTimeout(() => (suppressReloadRef.current = false), 5500);
-
-        notifyOtherTabsOfLogin();
 
         const token = getTokenFromCookie();
         if (token) {
