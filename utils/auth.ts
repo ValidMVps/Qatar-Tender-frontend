@@ -5,6 +5,7 @@ import {
   clearTokens,
 } from "@/utils/tokenHelpers";
 import { api } from "@/lib/apiClient";
+import { createTenderDraft } from "@/app/services/tenderService";
 
 export interface User {
   _id: string;
@@ -60,7 +61,6 @@ class AuthService {
         response.data?.token;
 
       if (!accessToken) {
-        // server didn't return a token (explicitly fail with server message if present)
         return {
           success: false,
           error:
@@ -70,25 +70,71 @@ class AuthService {
         };
       }
 
-      // persist token (your helper)
+      // persist token
       setTokenCookie(accessToken);
 
-      // pick user payload (prefer explicit `user` field)
+      // pick user payload
       const user =
         response.data?.user ??
         (() => {
-          // remove known fields and return the rest as user data
-          const { accessToken: _, access_token: __, token: ___, success, ...rest } =
-            response.data || {};
+          const {
+            accessToken: _,
+            access_token: __,
+            token: ___,
+            success,
+            ...rest
+          } = response.data || {};
           return rest;
         })();
+
+      // ✅ AUTO-CONVERT GUEST TENDER TO DRAFT
+      try {
+        const guestTender = localStorage.getItem("guestTender");
+        if (guestTender) {
+          console.log("🎯 Found guest tender, converting to draft...");
+
+          const parsed: any = JSON.parse(guestTender);
+
+          // Map to exact backend format
+          const payload = {
+            title: parsed.title?.trim() || "Untitled Tender",
+            description: parsed.description?.trim() || "",
+            location: parsed.location?.trim() || "",
+            contactEmail: parsed.contactEmail?.trim() || email,
+            deadline: parsed.deadline || null,
+            estimatedBudget: parsed.estimatedBudget
+              ? parseFloat(parsed.estimatedBudget)
+              : null,
+          };
+
+          // Only proceed if minimal data exists
+          if (payload.title && payload.description) {
+            console.log("📤 Creating draft with payload:", payload);
+
+            await createTenderDraft(payload);
+            console.log("✅ Guest tender converted to draft successfully!");
+
+            // Clean up localStorage
+            localStorage.removeItem("guestTender");
+          } else {
+            console.log("⚠️ Guest tender missing required fields, discarding");
+            localStorage.removeItem("guestTender");
+          }
+        }
+      } catch (draftError) {
+        console.error(
+          "❌ Failed to convert guest tender to draft:",
+          draftError
+        );
+        // Don't fail login - just log error
+        // Guest tender remains in localStorage for manual recovery
+      }
 
       return { success: true, user };
     } catch (error: any) {
       let errorMessage = "Login failed. Please try again.";
 
       if (error.response) {
-        // backend responded with non-2xx
         const body = error.response.data || {};
         errorMessage =
           body.error ||
@@ -96,13 +142,12 @@ class AuthService {
           (error.response.status === 401
             ? "Invalid credentials or account not verified."
             : error.response.status >= 500
-              ? "Server error. Please try again later."
-              : `Request failed (${error.response.status})`);
+            ? "Server error. Please try again later."
+            : `Request failed (${error.response.status})`);
       } else if (error.request) {
-        // request made but no response
-        errorMessage = "No response from server. Check your network connection.";
+        errorMessage =
+          "No response from server. Check your network connection.";
       } else {
-        // something else happened
         errorMessage = error.message || errorMessage;
       }
 

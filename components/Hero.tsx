@@ -19,6 +19,8 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
+const GUEST_TENDER_KEY = "guestTender"; // Single tender
+
 export default function Hero() {
   const [showForm, setShowForm] = useState(false);
   const [showSignupScreen, setShowSignupScreen] = useState(false);
@@ -33,6 +35,7 @@ export default function Hero() {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [pendingClose, setPendingClose] = useState(false);
+  const [isSaved, setIsSaved] = useState(false); // Track if tender is saved
   const router = useRouter();
   const hasUnsavedData = useRef(false);
 
@@ -84,48 +87,39 @@ export default function Hero() {
     },
   ];
 
-  // --------------------------------------------------------------
-  // Load the **single** saved tender when the dialog opens
-  // --------------------------------------------------------------
+  // Load saved tender on mount or reopen
   useEffect(() => {
     if (showForm && !showSignupScreen) {
-      const saved = localStorage.getItem("guestTender"); // note: singular key
+      const saved = localStorage.getItem(GUEST_TENDER_KEY);
       if (saved) {
         try {
-          const parsed = JSON.parse(saved);
+          const tender = JSON.parse(saved);
           setFormData({
-            title: parsed.title ?? "",
-            description: parsed.description ?? "",
-            estimatedBudget: parsed.estimatedBudget ?? "",
-            deadline: parsed.deadline ? new Date(parsed.deadline) : null,
-            location: parsed.location ?? "",
-            contactEmail: parsed.contactEmail ?? "",
+            title: tender.title || "",
+            description: tender.description || "",
+            estimatedBudget: tender.estimatedBudget || "",
+            deadline: tender.deadline ? new Date(tender.deadline) : null,
+            location: tender.location || "",
+            contactEmail: tender.contactEmail || "",
           });
-          // If the saved tender was already posted, go straight to signup screen
-          if (parsed.posted) {
-            setShowSignupScreen(true);
-          }
+          setIsSaved(true);
         } catch (e) {
-          console.warn("Failed to parse saved tender", e);
+          console.error("Failed to load saved tender", e);
         }
       }
     }
   }, [showForm, showSignupScreen]);
 
-  // --------------------------------------------------------------
   // Track unsaved changes
-  // --------------------------------------------------------------
   useEffect(() => {
     const hasData = Object.values(formData).some(
       (val) =>
         (typeof val === "string" && val.trim() !== "") || val instanceof Date
     );
-    hasUnsavedData.current = hasData && !showSignupScreen;
-  }, [formData, showSignupScreen]);
+    hasUnsavedData.current = hasData && !showSignupScreen && !isSaved;
+  }, [formData, showSignupScreen, isSaved]);
 
-  // --------------------------------------------------------------
-  // Browser tab-close warning
-  // --------------------------------------------------------------
+  // Browser close warning
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       if (hasUnsavedData.current) {
@@ -137,12 +131,10 @@ export default function Hero() {
     if (showForm) {
       window.addEventListener("beforeunload", handleBeforeUnload);
     }
+
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [showForm]);
 
-  // --------------------------------------------------------------
-  // Validation
-  // --------------------------------------------------------------
   const validateStep = (step: number): boolean => {
     const stepFields = steps[step].fields;
     const newErrors: Record<string, string> = {};
@@ -178,6 +170,7 @@ export default function Hero() {
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setIsSaved(false); // Unmark as saved on edit
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
@@ -185,6 +178,7 @@ export default function Hero() {
 
   const handleDeadlineChange = (date: Date | undefined) => {
     setFormData((prev) => ({ ...prev, deadline: date || null }));
+    setIsSaved(false);
     if (errors.deadline) {
       setErrors((prev) => ({ ...prev, deadline: "" }));
     }
@@ -195,36 +189,32 @@ export default function Hero() {
       currentStep < steps.length - 1 && setCurrentStep(currentStep + 1);
     }
   };
+
   const prevStep = () => currentStep > 0 && setCurrentStep(currentStep - 1);
 
-  // --------------------------------------------------------------
-  // Save / replace the **single** tender
-  // --------------------------------------------------------------
   const handlePostTender = () => {
-    if (!validateStep(currentStep)) return;
+    if (validateStep(currentStep)) {
+      const payload = {
+        title: formData.title.trim(),
+        description: formData.description.trim(),
+        estimatedBudget: formData.estimatedBudget.replace(/[^0-9]/g, ""),
+        deadline: formData.deadline ? formData.deadline.toISOString() : "",
+        location: formData.location.trim(),
+        contactEmail: formData.contactEmail.trim(),
+        createdAt: new Date().toISOString(),
+      };
 
-    const payload = {
-      title: formData.title.trim(),
-      description: formData.description.trim(),
-      estimatedBudget: formData.estimatedBudget.replace(/[^0-9]/g, ""),
-      deadline: formData.deadline ? formData.deadline.toISOString() : "",
-      location: formData.location.trim(),
-      contactEmail: formData.contactEmail.trim(),
-      posted: true, // flag that it has been “posted”
-    };
+      // Save ONLY ONE tender — replaces any existing
+      localStorage.setItem(GUEST_TENDER_KEY, JSON.stringify(payload));
 
-    // **Replace** whatever is already there
-    localStorage.setItem("guestTender", JSON.stringify(payload));
-
-    setShowSignupScreen(true);
-    hasUnsavedData.current = false;
+      setShowSignupScreen(true);
+      setIsSaved(true);
+      hasUnsavedData.current = false;
+    }
   };
 
-  // --------------------------------------------------------------
-  // Close handling
-  // --------------------------------------------------------------
   const confirmClose = () => {
-    if (hasUnsavedData.current && !showSignupScreen) {
+    if (hasUnsavedData.current) {
       setPendingClose(true);
     } else {
       performClose();
@@ -232,9 +222,9 @@ export default function Hero() {
   };
 
   const performClose = () => {
-    // If we are on the signup screen → delete the saved tender
+    // Only remove if user is closing after saving (on signup screen)
     if (showSignupScreen) {
-      localStorage.removeItem("guestTender");
+      localStorage.removeItem(GUEST_TENDER_KEY);
     }
     resetForm();
     setPendingClose(false);
@@ -244,6 +234,7 @@ export default function Hero() {
     setCurrentStep(0);
     setShowSignupScreen(false);
     setErrors({});
+    setIsSaved(false);
     setFormData({
       title: "",
       description: "",
@@ -256,12 +247,20 @@ export default function Hero() {
     hasUnsavedData.current = false;
   };
 
-  // --------------------------------------------------------------
-  // Render
-  // --------------------------------------------------------------
+  // Open form — reset if no saved draft
+  const openForm = () => {
+    const saved = localStorage.getItem(GUEST_TENDER_KEY);
+    if (saved) {
+      setShowSignupScreen(true); // Show saved state
+    } else {
+      setShowSignupScreen(false);
+      setCurrentStep(0);
+    }
+    setShowForm(true);
+  };
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20 bg-white">
-      {/* ... hero content (unchanged) ... */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 w-full">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -295,7 +294,7 @@ export default function Hero() {
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              onClick={() => setShowForm(true)}
+              onClick={openForm}
               className="px-6 h-12 flex justify-center items-center gap-5 bg-[#38b6ff] cursor-pointer hover:bg-[#0077ed] text-white rounded-full font-medium"
             >
               Create a tender
@@ -315,7 +314,7 @@ export default function Hero() {
         </motion.div>
       </div>
 
-      {/* ---------- Tender Dialog ---------- */}
+      {/* Tender Dialog */}
       <Dialog open={showForm} onOpenChange={(open) => !open && confirmClose()}>
         <DialogContent className="max-w-2xl p-0 overflow-hidden bg-white rounded-[28px] shadow-2xl border border-[#d2d2d7] max-h-[90vh] overflow-y-auto">
           <DialogHeader className="p-8 pb-4">
@@ -395,12 +394,15 @@ export default function Hero() {
                           <span className="text-red-500 ml-1">*</span>
                         )}
                       </label>
-
                       {field.type === "textarea" ? (
                         <div className="relative">
                           <textarea
                             name={field.name}
-                            value={formData[field.name as keyof typeof formData] as string}
+                            value={
+                              formData[
+                                field.name as keyof typeof formData
+                              ] as string
+                            }
                             onChange={handleChange}
                             placeholder={field.label}
                             className={cn(
@@ -430,24 +432,59 @@ export default function Hero() {
                                 )}
                               >
                                 {formData.deadline ? (
-                                  format(formData.deadline, "PPP")
+                                  format(formData.deadline, "PPP p") // includes date + time
                                 ) : (
                                   <span>Select deadline</span>
                                 )}
                                 <CalendarIcon className="mr-2 h-4 w-4" />
                               </button>
                             </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0">
+
+                            <PopoverContent className="w-auto p-4 space-y-3">
+                              {/* Calendar for Date */}
                               <Calendar
                                 mode="single"
                                 selected={formData.deadline || undefined}
-                                onSelect={handleDeadlineChange}
+                                onSelect={(date) => {
+                                  if (!date) return;
+                                  const prev = formData.deadline || new Date();
+                                  const newDate = new Date(date);
+                                  newDate.setHours(
+                                    prev.getHours(),
+                                    prev.getMinutes()
+                                  );
+                                  handleDeadlineChange(newDate);
+                                }}
                                 initialFocus
                               />
+
+                              {/* Time Picker */}
+                              <div className="flex items-center justify-between space-x-2">
+                                <input
+                                  type="time"
+                                  className="w-full rounded-md border px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#38b6ff]"
+                                  value={
+                                    formData.deadline
+                                      ? format(formData.deadline, "HH:mm")
+                                      : ""
+                                  }
+                                  onChange={(e) => {
+                                    const [hours, minutes] = e.target.value
+                                      .split(":")
+                                      .map(Number);
+                                    const prev =
+                                      formData.deadline || new Date();
+                                    const newDate = new Date(prev);
+                                    newDate.setHours(hours, minutes);
+                                    handleDeadlineChange(newDate);
+                                  }}
+                                />
+                              </div>
                             </PopoverContent>
                           </Popover>
+
                           {errors.deadline && (
-                            <p className="text-red-500 text-xs mt-1 absolute left-0">
+                            <p className="text-red-500 text-xs mt-1">
                               {errors.deadline}
                             </p>
                           )}
@@ -455,9 +492,15 @@ export default function Hero() {
                       ) : (
                         <div className="relative">
                           <input
-                            type={field.name === "contactEmail" ? "email" : "text"}
+                            type={
+                              field.name === "contactEmail" ? "email" : "text"
+                            }
                             name={field.name}
-                            value={formData[field.name as keyof typeof formData] as string}
+                            value={
+                              formData[
+                                field.name as keyof typeof formData
+                              ] as string
+                            }
                             onChange={handleChange}
                             placeholder={field.label}
                             className={cn(
@@ -493,8 +536,8 @@ export default function Hero() {
                       Tender Saved
                     </h3>
                     <p className="text-lg text-[#6e6e73] max-w-md mx-auto">
-                      Signup to start receiving bids from verified suppliers and
-                      publish your tender.
+                      Signup to publish and start receiving bids from verified
+                      suppliers.
                     </p>
                   </div>
                 </motion.div>
@@ -519,34 +562,47 @@ export default function Hero() {
                       : nextStep()
                   }
                   className="flex-1 bg-[#38b6ff] hover:bg-[#0077ed] text-white h-12 rounded-xl font-medium flex items-center justify-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  disabled={Object.keys(errors).length > 0}
                 >
-                  {currentStep === steps.length - 1 ? "Post Tender" : "Continue"}
+                  {currentStep === steps.length - 1
+                    ? "Save & Continue"
+                    : "Continue"}
                 </button>
               ) : (
-                <motion.a
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  href="/signup"
-                  className="flex-1 bg-[#38b6ff] hover:bg-[#0077ed] text-white h-12 rounded-xl font-medium flex items-center justify-center gap-2 transition-colors"
-                >
-                  Sign up now
-                </motion.a>
+                <div className="flex gap-3 w-full">
+                  <button
+                    onClick={() => {
+                      localStorage.removeItem(GUEST_TENDER_KEY);
+                      setShowSignupScreen(false);
+                      setCurrentStep(0);
+                      setIsSaved(false);
+                    }}
+                    className="flex-1 h-12 rounded-xl border border-[#d2d2d7] text-[#1d1d1f] hover:bg-[#f5f5f7] transition-colors"
+                  >
+                    Edit Tender
+                  </button>
+                  <motion.a
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    href="/signup"
+                    className="flex-1 bg-[#38b6ff] hover:bg-[#0077ed] text-white h-12 rounded-xl font-medium flex items-center justify-center gap-2 transition-colors"
+                  >
+                    Sign up now
+                  </motion.a>
+                </div>
               )}
             </div>
-
             <p className="text-center text-xs text-[#86868b] mt-6">
               {!showSignupScreen
                 ? currentStep === steps.length - 1
-                  ? "Your tender will be saved locally until you sign up."
+                  ? "Your tender will be saved locally."
                   : `Step ${currentStep + 1} of ${steps.length}`
-                : "Create an account to access your saved tender and more."}
+                : "Your draft is saved. Sign up to publish."}
             </p>
           </div>
         </DialogContent>
       </Dialog>
 
-      {/* ---------- Confirmation Dialog ---------- */}
+      {/* Discard Confirmation */}
       <Dialog open={pendingClose} onOpenChange={setPendingClose}>
         <DialogContent className="max-w-md p-6 bg-white rounded-2xl">
           <div className="space-y-6 text-center">
@@ -555,10 +611,10 @@ export default function Hero() {
             </div>
             <div>
               <h3 className="text-xl font-semibold text-[#1d1d1f]">
-                Discard tender?
+                Discard changes?
               </h3>
               <p className="text-[#6e6e73] mt-2">
-                Your tender will be lost if you close without saving.
+                Your current draft will be lost.
               </p>
             </div>
             <div className="flex gap-3">

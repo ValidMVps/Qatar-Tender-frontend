@@ -9,6 +9,7 @@ import {
   RefreshCcw,
   MapPin,
   ChevronRightIcon,
+  ActivitySquare,
 } from "lucide-react";
 import Link from "next/link";
 import EditTenderModal from "@/components/EdittenderModal";
@@ -156,13 +157,22 @@ export default function MyTenderCard({
               <button className="p-2.5 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 active:bg-gray-300 transition-all">
                 <Eye className="h-4 w-4" />
               </button>
-              <button
-                className="p-2.5 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 active:bg-gray-300 transition-all"
-                onClick={(e) => stopAnd(e, () => setOpenTenderModal(true))}
-              >
-                <Edit className="h-4 w-4" />
-              </button>
-
+              {tender.status !== "draft" && (
+                <button
+                  className="p-2.5 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 active:bg-gray-300 transition-all"
+                  onClick={(e) => stopAnd(e, () => setOpenTenderModal(true))}
+                >
+                  <Edit className="h-4 w-4" />
+                </button>
+              )}
+              {tender.status === "draft" && (
+                <button
+                  className="p-2.5 rounded-full bg-green-100 text-gray-700 hover:bg-green-200 active:bg-green-300 transition-all"
+                  onClick={(e) => stopAnd(e, () => setIsReopening(true))}
+                >
+                  <Edit className="h-4 w-4 text-green-400" />
+                </button>
+              )}
               {tender.status === "active" && tender.bidCount === 0 ? (
                 <button
                   className="p-2.5 rounded-full bg-red-50 text-red-600 hover:bg-red-100 active:bg-red-200 transition-all"

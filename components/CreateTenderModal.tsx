@@ -93,9 +93,20 @@ interface FormErrors {
 const CreateTenderModal = ({
   open,
   onOpenChange,
+  initialData,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  initialData?: Partial<{
+    title: string;
+    description: string;
+    category: string;
+    estimatedBudget: string;
+    deadline: string;
+    location: string;
+    contactEmail: string;
+    image: string;
+  }>;
 }) => {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(0);
@@ -104,14 +115,14 @@ const CreateTenderModal = ({
   const { t } = useTranslation();
   const [CATEGORIES, setCategories] = useState<Category[]>([]);
   const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    category: "",
-    estimatedBudget: "",
-    deadline: "",
-    location: "",
-    contactEmail: "",
-    image: "",
+    title: initialData?.title || "",
+    description: initialData?.description || "",
+    category: initialData?.category || "",
+    estimatedBudget: initialData?.estimatedBudget || "",
+    deadline: initialData?.deadline || "",
+    location: initialData?.location || "",
+    contactEmail: initialData?.contactEmail || "",
+    image: initialData?.image || "",
   });
   useEffect(() => {
     const fetchCategories = async () => {

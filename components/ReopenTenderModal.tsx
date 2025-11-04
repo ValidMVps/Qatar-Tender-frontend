@@ -1075,7 +1075,7 @@ const ReopenTenderModal = ({
                       transition={{ delay: 0.1 }}
                     >
                       <CardTitle className="text-3xl font-semibold tracking-tight text-gray-900 dark:text-white text-center">
-                        {t("reopen_tender")}
+                        {t("make_tender_active")}
                       </CardTitle>
                       <CardDescription className="text-gray-500 dark:text-gray-400 mt-1 text-center">
                         {STEPS[currentStep].description}
@@ -1157,7 +1157,7 @@ const ReopenTenderModal = ({
                             ) : (
                               <CheckCircle2 className="w-4 h-4" />
                             )}
-                            {isSubmitting ? t("updating") : t("update_tender")}
+                            {isSubmitting ? t("updating") : t("save_tender")}
                           </Button>
                         </motion.div>
                       )}

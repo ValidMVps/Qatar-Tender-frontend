@@ -85,7 +85,7 @@ export default function IndividualDashboardPage() {
     expired: 0,
   });
   const [loading, setLoading] = useState(true);
-
+  const [hasDraftTender, setHasDraftTender] = useState(false);
   // Helper functions
   const resolveCategoryName = (tender: any) => {
     if (typeof tender.category === "string") return tender.category;
@@ -126,7 +126,8 @@ export default function IndividualDashboardPage() {
         const tenders = Array.isArray(tendersRes) ? tendersRes : [];
 
         setMyTenders(tenders);
-
+        const hasDraft = tenders.some((t) => t.status === "draft");
+        setHasDraftTender(hasDraft);
         const statusSummary = tenders.reduce(
           (acc, t) => {
             const now = new Date();
@@ -974,6 +975,47 @@ export default function IndividualDashboardPage() {
             open={openTenderModal}
             onOpenChange={setOpenTenderModal}
           />
+          {hasDraftTender && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
+              onClick={() => setHasDraftTender(false)}
+            >
+              <motion.div
+                className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 sm:p-8"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="text-center space-y-4">
+                  <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
+                    <FileText className="w-8 h-8 text-blue-600" />
+                  </div>
+                  <h3 className="text-xl sm:text-2xl font-semibold text-gray-900">
+                    Complete Your Tender Now
+                  </h3>
+                  <p className="text-gray-600 text-sm sm:text-base">
+                    You have a draft tender waiting. Finish it to start
+                    receiving bids.
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => setHasDraftTender(false)}
+                      className="w-full"
+                    >
+                      Later
+                    </Button>
+                    <Button
+                      asChild
+                      className="w-full bg-blue-600 hover:bg-blue-700"
+                    >
+                      <Link href="/my-tenders">Go to My Tenders</Link>
+                    </Button>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
         </div>
       </motion.div>
     </TooltipProvider>
