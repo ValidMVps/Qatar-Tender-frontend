@@ -323,7 +323,7 @@ export function ProjectDetailsSidebar({
             )}
 
             {/* Action Buttons */}
-            <div className="space-y-3">
+            <div className="space-y-3 w-min">
               {/* View Details Button */}
               <Link
                 href={
@@ -336,7 +336,6 @@ export function ProjectDetailsSidebar({
                   <div className="flex items-center justify-between w-full">
                     <div className="flex items-center gap-3">
                       <div className="p-2 bg-white/20 rounded-lg">
-                        <Eye className="w-4 h-4" />
                       </div>
                       <span className="font-medium">
                         {t("view_tender_details")}
@@ -356,7 +355,6 @@ export function ProjectDetailsSidebar({
                   <div className="flex items-center justify-between w-full">
                     <div className="flex items-center gap-3">
                       <div className="p-2 bg-white/20 rounded-lg">
-                        <CheckCircle className="w-4 h-4" />
                       </div>
                       <span className="font-medium">
                         {t("mark_as_completed")}
@@ -370,13 +368,12 @@ export function ProjectDetailsSidebar({
               {/* Leave Review Button */}
               {isTenderOwner && isCompleted && !hasReview && (
                 <Button
-                  className="w-full group bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white rounded-xl py-6 transition-all duration-200 shadow-md hover:shadow-lg"
+                  className="w-full group bg-gradient-to-r mt-5 from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white rounded-xl py-6 transition-all duration-200 shadow-md hover:shadow-lg"
                   onClick={() => setIsReviewDialogOpen(true)}
                 >
                   <div className="flex items-center justify-between w-full">
                     <div className="flex items-center gap-3">
                       <div className="p-2 bg-white/20 rounded-lg">
-                        <Star className="w-4 h-4" />
                       </div>
                       <span className="font-medium">{t("leave_review")}</span>
                     </div>

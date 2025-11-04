@@ -322,7 +322,7 @@ export default function Component() {
                             value="owned"
                             className="flex-1 rounded-lg text-sm data-[state=active]:bg-white data-[state=active]:shadow-sm dark:data-[state=active]:bg-gray-700"
                           >
-                            {t("owned_projects")}
+                            {t("Tenders")}
                           </TabsTrigger>
                 
                         </TabsList>

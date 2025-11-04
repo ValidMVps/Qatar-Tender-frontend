@@ -196,18 +196,32 @@ const AnalyticsCard: React.FC<{
   </Card>
 );
 
-const ReviewCard: React.FC<{ review: Review }> = ({ review }) => {
+interface ReviewCardProps {
+  review: any;
+  type: "received" | "given";
+}
+const ReviewCard: React.FC<ReviewCardProps> = ({ review, type }) => {
   const { t } = useTranslation();
   const router = useRouter();
+
+  const handleViewProject = () => {
+    if (type === "given") {
+      router.push(`/business-dashboard/tender/${review.tenderId}`);
+    } else {
+      router.push(`/business-dashboard/tender-details/${review.tenderId}`);
+    }
+  };
+
   return (
     <Card className="bg-white border-0 shadow-sm hover:shadow-md transition-all duration-200 rounded-2xl overflow-hidden">
       <CardHeader className="bg-gradient-to-br from-gray-50 to-gray-100/50 pb-4">
         <div className="flex items-start justify-between">
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-gray-900 text-base sm:text-lg mb-1 truncate">
-              {review.contractorEmail}
+              {type === "given"
+                ? review.projectOwnerEmail || "Unknown User"
+                : review.contractorEmail}
             </h3>
-
             <div className="flex items-center gap-2">
               <StarRating rating={review.rating} size="sm" />
               <span className="text-sm font-medium text-gray-700">
@@ -220,6 +234,7 @@ const ReviewCard: React.FC<{ review: Review }> = ({ review }) => {
           </span>
         </div>
       </CardHeader>
+
       <CardContent className="p-4 sm:p-6">
         <p className="text-gray-700 leading-relaxed mb-4 sm:mb-6">
           {review.comment}
@@ -237,18 +252,8 @@ const ReviewCard: React.FC<{ review: Review }> = ({ review }) => {
 
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-2">
             <Button
-              size="sm"
-              variant="outline"
-              className="flex-1 rounded-xl border-gray-200 hover:bg-gray-50 transition-colors"
-              onClick={() => router.push(`/chat/${review.contractorId}`)}
-            >
-              <MessageCircle className="h-3.5 w-3.5 mr-1.5 sm:h-4 sm:w-4 sm:mr-2" />
-              <span className="text-xs sm:text-sm">{t("chat") || "Chat"}</span>
-            </Button>
-            <Button
-              size="sm"
-              className="flex-1 bg-blue-600 hover:bg-blue-700  text-white rounded-xl transition-colors"
-              onClick={() => router.push(`/projects/${review.tenderId}`)}
+              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors"
+              onClick={handleViewProject}
             >
               <FileText className="h-3.5 w-3.5 mr-1.5 sm:h-4 sm:w-4 sm:mr-2" />
               <span className="text-xs sm:text-sm">
@@ -316,7 +321,9 @@ const EditableReviewCard: React.FC<{
         <div className="flex items-start justify-between">
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-gray-900 text-base sm:text-lg mb-1 truncate">
-              {user?.email}
+              {review.projectOwnerName ||
+                review.projectOwnerEmail ||
+                "Unknown User"}
             </h3>
             <div className="flex items-center gap-2">
               {isEditing ? (
@@ -601,7 +608,7 @@ const ReviewsRatingsPage: React.FC = () => {
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8">
         {/* Analytics Cards */}
-        <div className="lg:grid hidden grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div className="lg:grid hidden grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           <AnalyticsCard
             title={t("average_rating") || "Average Rating"}
             value={analytics?.averageRating}
@@ -621,12 +628,6 @@ const ReviewsRatingsPage: React.FC = () => {
             value={`${analytics.fiveStarPercentage}%`}
             icon={<Award className="w-4 h-4" />}
             description={t("excellent_ratings") || "excellent ratings"}
-          />
-          <AnalyticsCard
-            title={t("top_project") || "Top Project"}
-            value={analytics.topProject}
-            icon={<Clock className="w-4 h-4" />}
-            description={t("most_reviewed_project") || "most reviewed project"}
           />
         </div>
 
@@ -705,7 +706,11 @@ const ReviewsRatingsPage: React.FC = () => {
                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
                   {filteredReviews.length > 0 ? (
                     filteredReviews.map((review) => (
-                      <ReviewCard key={review.id} review={review} />
+                      <ReviewCard
+                        key={review.id}
+                        review={review}
+                        type="received"
+                      />
                     ))
                   ) : (
                     <EmptyState type="received" />

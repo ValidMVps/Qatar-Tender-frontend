@@ -830,8 +830,7 @@ export default function MyBidsPage() {
                               </DropdownMenuItem>
                             )}
                             {bid.status !== "completed" &&
-                              bid.status !== "accepted" &&
-                              bid.status !== "returned_for_revision" && (
+                              bid.status !== "accepted" && (
                                 <>
                                   <DropdownMenuSeparator />
                                   <DropdownMenuItem

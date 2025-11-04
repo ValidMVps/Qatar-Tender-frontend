@@ -326,7 +326,7 @@ export default function Component() {
       data-[state=active]:bg-blue-500 data-[state=active]:text-white data-[state=active]:shadow-
       hover:bg-blue-100/80 dark:hover:bg-blue-800/50 dark:data-[state=active]:bg-blue-600"
                             >
-                              {t("owned_projects")}
+                              {t("Tender")}
                             </TabsTrigger>
                             <TabsTrigger
                               value="awarded"
@@ -334,7 +334,7 @@ export default function Component() {
       data-[state=active]:bg-blue-500 data-[state=active]:text-white data-[state=active]:shadow-
       hover:bg-blue-100/80 dark:hover:bg-blue-800/50 dark:data-[state=active]:bg-blue-600"
                             >
-                              {t("awarded_to_me")}
+                              {t("Bids")}
                             </TabsTrigger>
                           </TabsList>
                         </div>
@@ -570,7 +570,7 @@ export default function Component() {
       data-[state=active]:bg-blue-500 data-[state=active]:text-white data-[state=active]:shadow
       hover:bg-blue-100/80 dark:hover:bg-blue-800/50 dark:data-[state=active]:bg-blue-600"
                           >
-                            {t("owned_projects")}
+                            {t("Tenders")}
                           </TabsTrigger>
                           <TabsTrigger
                             value="awarded"
@@ -578,7 +578,7 @@ export default function Component() {
       data-[state=active]:bg-blue-500 data-[state=active]:text-white data-[state=active]:shadow
       hover:bg-blue-100/80 dark:hover:bg-blue-800/50 dark:data-[state=active]:bg-blue-600"
                           >
-                            {t("awarded_to_me")}
+                            {t("Bids")}
                           </TabsTrigger>
                         </TabsList>
                       </div>
