@@ -1,4 +1,3 @@
-// LanguageProvider.tsx
 "use client";
 import React, { createContext, useContext, useState, useEffect } from "react";
 import i18n from "../lib/i18n";
@@ -13,27 +12,35 @@ const LanguageContext = createContext<LanguageContextType | undefined>(
 );
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  // initialize from i18n.language (which now was initialized with saved lang)
   const [language, setLanguage] = useState<string>(() => {
     if (typeof window === "undefined") return i18n.language || "en";
     return localStorage.getItem("language") || i18n.language || "en";
   });
 
-  useEffect(() => {
-    // keep i18n in sync (if provider state is changed elsewhere)
-    if (i18n.language !== language) {
-      i18n.changeLanguage(language).catch(() => {});
-    }
+  const [ready, setReady] = useState(false);
 
+  useEffect(() => {
+    const savedLang = localStorage.getItem("language") || "en";
+
+    i18n.changeLanguage(savedLang).then(() => {
+      setLanguage(savedLang);
+      document.documentElement.lang = savedLang;
+      setReady(true);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!ready) return;
     document.documentElement.lang = language;
-    try {
-      localStorage.setItem("language", language);
-    } catch (e) {}
-  }, [language]);
+    localStorage.setItem("language", language);
+    i18n.changeLanguage(language).catch(() => {});
+  }, [language, ready]);
 
   const changeLanguage = (lang: string) => {
-    setLanguage(lang); // triggers effect which calls i18n.changeLanguage
+    setLanguage(lang);
   };
+
+  if (!ready) return null; // Prevent render until language is ready
 
   return (
     <LanguageContext.Provider value={{ language, changeLanguage }}>

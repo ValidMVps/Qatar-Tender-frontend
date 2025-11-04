@@ -6,6 +6,7 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
+    "extract:translations": "ts-node extract-translations.ts",
     "lint": "next lint",
     "extract:i18n": "i18next-scanner --config i18next-scanner.config.js",
     "extract:i18n:watch": "i18next-scanner --config i18next-scanner.config.js --watch"
