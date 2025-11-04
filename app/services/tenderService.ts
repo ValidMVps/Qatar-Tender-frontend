@@ -1,6 +1,6 @@
 // services/tenderService.ts
 import { api } from "@/lib/apiClient";
-
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 // Fetch tenders for a specific user
 export const getUserTenders = async (userId: string) => {
   try {
@@ -127,4 +127,56 @@ export const createTenderDraft = async (payload: any) => {
     );
     throw error;
   }
+};
+type CreateGuestTenderResp = {
+  tenderId: string;
+  guestToken: string;
+  message?: string;
+  [k: string]: any;
+};
+export const createGuestTender = async (
+  payload: FormData | Record<string, any>
+): Promise<CreateGuestTenderResp> => {
+  const url = `${API_BASE_URL}/api/tenders/public`;
+  const init: RequestInit = {
+    method: "POST",
+  };
+
+  if (payload instanceof FormData) {
+    init.body = payload;
+    // IMPORTANT: do NOT set Content-Type header for FormData — browser sets boundary
+  } else {
+    init.headers = {
+      "Content-Type": "application/json",
+    };
+    init.body = JSON.stringify(payload);
+  }
+
+  const res = await fetch(url, init);
+  let payloadJson: any = null;
+  try {
+    payloadJson = await res.json();
+  } catch (e) {
+    // non-JSON response
+  }
+
+  if (!res.ok) {
+    const msg =
+      payloadJson?.message ||
+      payloadJson?.error ||
+      res.statusText ||
+      "Request failed";
+    throw new Error(msg);
+  }
+
+  return payloadJson as CreateGuestTenderResp;
+};
+
+export const claimGuestTender = async (payload: {
+  tenderId: string;
+  guestToken: string;
+}) => {
+  // this endpoint is protected — caller must be authenticated
+  const res = await api.post("/api/tenders/claim", payload);
+  return res.data; // { message, tender }
 };

@@ -157,7 +157,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         window.location.pathname === "/signup"
       ) {
         router.push(
-          u.userType === "business" ? "/business-dashboard" : "/dashboard"
+          u?.userType === "business" ? "/business-dashboard" : "/dashboard"
         );
       }
     })();

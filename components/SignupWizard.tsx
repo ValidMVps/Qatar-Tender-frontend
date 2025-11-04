@@ -29,6 +29,7 @@ import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
 import { useTranslation } from "../lib/hooks/useTranslation";
 import { useAuth } from "@/context/AuthContext";
+import { claimGuestTender } from "@/app/services/tenderService";
 
 type Step = 1 | 2 | 3;
 type AccountType = "individual" | "business";
@@ -229,7 +230,61 @@ export default function SignupWizard() {
             result.message ||
             `We've sent a verification email to ${currentEmail}. Please check your email and click the verification link.`,
         });
+
+        // Attempt to claim guest draft if present
+        try {
+          const guestRaw = localStorage.getItem("guestTender");
+          if (!guestRaw) return; // nothing to claim
+
+          const { tenderId, guestToken } = JSON.parse(guestRaw);
+
+          // call protected endpoint - must include auth session
+          const claimRes = await claimGuestTender({ tenderId, guestToken });
+
+          // success: remove local copy and navigate to tender
+          localStorage.removeItem("guestTender");
+          toast({
+            title: "Tender published",
+            description: claimRes.message || "Your tender is now live.",
+          });
+
+          router.push(`/tenders/${tenderId}`);
+          return;
+        } catch (err: any) {
+          // If user not authenticated / verified yet
+          if (err?.response?.status === 401) {
+            toast({
+              title: "Claim pending",
+              description:
+                "Your account is not signed in / verified yet. Verify your email or log in to publish your draft. Your draft is saved and can be claimed after login.",
+            });
+            return;
+          }
+
+          // Token expired or invalid
+          if (err?.response?.status === 400 || err?.response?.status === 403) {
+            toast({
+              title: "Could not publish draft",
+              description:
+                err?.response?.data?.message ||
+                "We couldn't publish your draft automatically. You can claim it from your dashboard after logging in.",
+              variant: "destructive",
+            });
+            return;
+          }
+
+          // Generic fallback
+          console.error("Claim draft error:", err);
+          toast({
+            title: "Unable to publish draft",
+            description:
+              "We couldn't publish your draft automatically. It is saved locally and will be available to claim after you log in.",
+            variant: "destructive",
+          });
+          return;
+        }
       } else {
+        // registration failed
         if (result.error?.includes("already exists")) {
           setErrors({
             email: "This email is already registered. Try logging in instead.",
