@@ -7,22 +7,16 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Calendar as CalendarIcon, Check, X } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
-const GUEST_TENDER_KEY = "guestTender"; // Single tender
+const GUEST_TENDER_KEY = "guestTender";
 
 export default function Hero() {
-  const [showForm, setShowForm] = useState(false);
+  const [showForm, setShowForm] = useState(true);
   const [showSignupScreen, setShowSignupScreen] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState({
@@ -35,7 +29,7 @@ export default function Hero() {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [pendingClose, setPendingClose] = useState(false);
-  const [isSaved, setIsSaved] = useState(false); // Track if tender is saved
+  const [isSaved, setIsSaved] = useState(false);
   const router = useRouter();
   const hasUnsavedData = useRef(false);
 
@@ -45,30 +39,15 @@ export default function Hero() {
       title: "Tender Title & Description",
       fields: [
         { name: "title", label: "Tender Title", type: "text", required: true },
-        {
-          name: "description",
-          label: "Description",
-          type: "textarea",
-          required: true,
-        },
+        { name: "description", label: "Description", type: "textarea", required: true },
       ],
     },
     {
       id: 2,
       title: "Budget & Deadline",
       fields: [
-        {
-          name: "estimatedBudget",
-          label: "Estimated Budget (QAR)",
-          type: "text",
-          required: true,
-        },
-        {
-          name: "deadline",
-          label: "Deadline",
-          type: "calendar",
-          required: true,
-        },
+        { name: "estimatedBudget", label: "Estimated Budget (QAR)", type: "text", required: true },
+        { name: "deadline", label: "Deadline", type: "calendar", required: true },
       ],
     },
     {
@@ -76,18 +55,11 @@ export default function Hero() {
       title: "Location & Contact",
       fields: [
         { name: "location", label: "Location", type: "text", required: true },
-        {
-          name: "contactEmail",
-          label: "Contact Email",
-          type: "text",
-          required: true,
-          validate: "email",
-        },
+        { name: "contactEmail", label: "Contact Email", type: "text", required: true, validate: "email" },
       ],
     },
   ];
 
-  // Load saved tender on mount or reopen
   useEffect(() => {
     if (showForm && !showSignupScreen) {
       const saved = localStorage.getItem(GUEST_TENDER_KEY);
@@ -110,16 +82,13 @@ export default function Hero() {
     }
   }, [showForm, showSignupScreen]);
 
-  // Track unsaved changes
   useEffect(() => {
     const hasData = Object.values(formData).some(
-      (val) =>
-        (typeof val === "string" && val.trim() !== "") || val instanceof Date
+      (val) => (typeof val === "string" && val.trim() !== "") || val instanceof Date
     );
     hasUnsavedData.current = hasData && !showSignupScreen && !isSaved;
   }, [formData, showSignupScreen, isSaved]);
 
-  // Browser close warning
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       if (hasUnsavedData.current) {
@@ -128,10 +97,7 @@ export default function Hero() {
       }
     };
 
-    if (showForm) {
-      window.addEventListener("beforeunload", handleBeforeUnload);
-    }
-
+    if (showForm) window.addEventListener("beforeunload", handleBeforeUnload);
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [showForm]);
 
@@ -141,10 +107,7 @@ export default function Hero() {
 
     stepFields.forEach((field) => {
       const value = formData[field.name as keyof typeof formData];
-      if (
-        field.required &&
-        (!value || (typeof value === "string" && value.trim() === ""))
-      ) {
+      if (field.required && (!value || (typeof value === "string" && value.trim() === ""))) {
         newErrors[field.name] = `${field.label} is required`;
       }
       if (field.validate === "email" && value) {
@@ -165,23 +128,17 @@ export default function Hero() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    setIsSaved(false); // Unmark as saved on edit
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: "" }));
-    }
+    setIsSaved(false);
+    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
   const handleDeadlineChange = (date: Date | undefined) => {
     setFormData((prev) => ({ ...prev, deadline: date || null }));
     setIsSaved(false);
-    if (errors.deadline) {
-      setErrors((prev) => ({ ...prev, deadline: "" }));
-    }
+    if (errors.deadline) setErrors((prev) => ({ ...prev, deadline: "" }));
   };
 
   const nextStep = () => {
@@ -204,9 +161,7 @@ export default function Hero() {
         createdAt: new Date().toISOString(),
       };
 
-      // Save ONLY ONE tender — replaces any existing
       localStorage.setItem(GUEST_TENDER_KEY, JSON.stringify(payload));
-
       setShowSignupScreen(true);
       setIsSaved(true);
       hasUnsavedData.current = false;
@@ -222,10 +177,7 @@ export default function Hero() {
   };
 
   const performClose = () => {
-    // Only remove if user is closing after saving (on signup screen)
-    if (showSignupScreen) {
-      localStorage.removeItem(GUEST_TENDER_KEY);
-    }
+    if (showSignupScreen) localStorage.removeItem(GUEST_TENDER_KEY);
     resetForm();
     setPendingClose(false);
   };
@@ -247,11 +199,10 @@ export default function Hero() {
     hasUnsavedData.current = false;
   };
 
-  // Open form — reset if no saved draft
   const openForm = () => {
     const saved = localStorage.getItem(GUEST_TENDER_KEY);
     if (saved) {
-      setShowSignupScreen(true); // Show saved state
+      setShowSignupScreen(true);
     } else {
       setShowSignupScreen(false);
       setCurrentStep(0);
@@ -260,380 +211,314 @@ export default function Hero() {
   };
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20 bg-white">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-0 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 w-full">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="text-center space-y-8 max-w-4xl mx-auto"
-        >
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-semibold tracking-tight text-[#1d1d1f] leading-[1.05]">
-            Procurement built for Qatar.
-            <br />
-            <span className="text-[#38b6ff]">
-              Compliant. Transparent. Faster.
-            </span>
-          </h1>
-          <p className="text-xl sm:text-2xl text-[#6e6e73] font-normal leading-relaxed mx-auto">
-            GoTenderly is a secure e-tendering platform for Qatari organisations
-            — KYC-verified suppliers, audit-ready workflows, and built-in
-            evaluation tools to shorten procurement cycles.
-          </p>
+        {/* Side-by-Side Layout */}
+        <div className="grid lg:grid-cols-2 gap-12 items-start">
+          {/* Left: Hero Text */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="space-y-8 text-left"
+          >
+            <h1 className="text-5xl sm:text-6xl lg:text-6xl font-semibold tracking-tight text-[#1d1d1f] leading-[1.05]">
+               built for Qatar.
+              <br />
+              <span className="text-[#38b6ff]">Compliant. Transparent. Faster.</span>
+            </h1>
+            <p className="text-xl sm:text-lg text-[#6e6e73] font-normal leading-relaxed">
+              GoTenderly is a secure e-tendering platform for Qatari organisations — KYC-verified suppliers, audit-ready workflows, and built-in evaluation tools to shorten procurement cycles.
+            </p>
 
-          <div className="flex flex-wrap justify-center items-center gap-4">
-            <motion.a
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              href="/signup"
-              className="px-6 h-12 text-[#38b6ff] hover:bg-[#38b6ff]/5 cursor-pointer rounded-full font-medium shadow-sm flex items-center gap-2"
-            >
-              Get started
-            </motion.a>
+            <div className="flex flex-wrap gap-4">
+              <motion.a
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                href="/signup"
+                className="px-6 h-12 text-[#38b6ff] hover:bg-[#38b6ff]/5 rounded-full font-medium shadow-sm flex items-center gap-2"
+              >
+                Get started
+              </motion.a>
 
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={openForm}
-              className="px-6 h-12 flex justify-center items-center gap-5 bg-[#38b6ff] cursor-pointer hover:bg-[#0077ed] text-white rounded-full font-medium"
-            >
-              Create a tender
-            </motion.button>
-          </div>
-
-          <div className="flex flex-wrap justify-center items-center gap-8 pt-4 text-sm text-[#6e6e73]">
-            <div className="flex items-center gap-2">
-              <Check className="w-5 h-5 text-[#38b6ff]" />
-              KYC & company verification
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={openForm}
+                className="px-6 h-12 bg-[#38b6ff] hover:bg-[#0077ed] text-white rounded-full font-medium flex items-center gap-5"
+              >
+                Create a tender
+              </motion.button>
             </div>
-            <div className="flex items-center gap-2">
-              <Check className="w-5 h-5 text-[#38b6ff]" />
-              Evaluation scorecards & audit trail
+
+            <div className="flex flex-wrap gap-8 pt-4 text-sm text-[#6e6e73]">
+              <div className="flex items-center gap-2">
+                <Check className="w-5 h-5 text-[#38b6ff]" />
+                KYC & company verification
+              </div>
+              <div className="flex items-center gap-2">
+                <Check className="w-5 h-5 text-[#38b6ff]" />
+                Evaluation scorecards & audit trail
+              </div>
             </div>
-          </div>
-        </motion.div>
-      </div>
+          </motion.div>
 
-      {/* Tender Dialog */}
-      <Dialog open={showForm} onOpenChange={(open) => !open && confirmClose()}>
-        <DialogContent className="max-w-2xl p-0 overflow-hidden bg-white rounded-[28px] shadow-2xl border border-[#d2d2d7] max-h-[90vh] overflow-y-auto">
-          <DialogHeader className="p-8 pb-4">
-            <DialogTitle className="text-2xl font-semibold text-[#1d1d1f] sr-only">
-              Create Tender
-            </DialogTitle>
-            <button
-              onClick={confirmClose}
-              className="absolute top-6 right-6 text-[#86868b] hover:text-[#1d1d1f] transition-colors z-10"
-              aria-label="Close"
+          {/* Right: Tender Form (Inline) */}
+          {showForm && (
+            <motion.div
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 50 }}
+              className="bg-white rounded-[28px] shadow-2xl border border-[#d2d2d7] p-8 max-h-[90vh] overflow-y-auto sticky top-24"
             >
-              <X className="w-6 h-6" />
-            </button>
-          </DialogHeader>
+              {/* Close Button */}
+              <button
+                onClick={confirmClose}
+                className="absolute top-6 right-6 text-[#86868b] hover:text-[#1d1d1f] transition-colors z-10"
+                aria-label="Close"
+              >
+                <X className="w-6 h-6" />
+              </button>
 
-          <div className="p-8 pt-0 space-y-8">
-            {/* Progress Bar */}
-            <div className="flex items-center justify-between">
-              {steps.map((step, i) => (
-                <div key={step.id} className="flex items-center">
-                  <motion.div
-                    animate={{
-                      backgroundColor: i <= currentStep ? "#38b6ff" : "#f5f5f7",
-                      scale: i === currentStep ? 1.06 : 1,
-                    }}
-                    className="w-10 h-10 rounded-full flex items-center justify-center"
-                  >
-                    {i < currentStep ? (
-                      <Check className="w-5 h-5 text-white" />
-                    ) : (
-                      <span
-                        className={`text-sm font-semibold ${
-                          i <= currentStep ? "text-white" : "text-[#86868b]"
-                        }`}
-                      >
-                        {step.id}
-                      </span>
-                    )}
-                  </motion.div>
-                  {i < steps.length - 1 && (
+              {/* Progress Bar */}
+              <div className="flex items-center justify-center mb-8">
+                {steps.map((step, i) => (
+                  <div key={step.id} className="flex items-center">
                     <motion.div
                       animate={{
-                        backgroundColor:
-                          i < currentStep ? "#38b6ff" : "#e5e5ea",
+                        backgroundColor: i <= currentStep ? "#38b6ff" : "#f5f5f7",
+                        scale: i === currentStep ? 1.06 : 1,
                       }}
-                      className="h-0.5 w-12 sm:w-16 mx-2"
-                    />
-                  )}
-                </div>
-              ))}
-            </div>
-
-            {/* Step Fields or Signup Screen */}
-            <AnimatePresence mode="wait">
-              {!showSignupScreen ? (
-                <motion.div
-                  key={currentStep}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  className="space-y-6"
-                >
-                  <h3 className="text-2xl font-semibold text-[#1d1d1f]">
-                    {steps[currentStep].title}
-                  </h3>
-                  {steps[currentStep].fields.map((field, idx) => (
-                    <motion.div
-                      key={field.name}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: idx * 0.06 }}
-                      className="space-y-2"
+                      className="w-10 h-10 rounded-full flex items-center justify-center"
                     >
-                      <label className="text-sm font-medium text-[#6e6e73]">
-                        {field.label}
-                        {field.required && (
-                          <span className="text-red-500 ml-1">*</span>
-                        )}
-                      </label>
-                      {field.type === "textarea" ? (
-                        <div className="relative">
-                          <textarea
-                            name={field.name}
-                            value={
-                              formData[
-                                field.name as keyof typeof formData
-                              ] as string
-                            }
-                            onChange={handleChange}
-                            placeholder={field.label}
-                            className={cn(
-                              "w-full h-32 bg-[#f5f5f7] rounded-xl border px-4 py-3 text-sm outline-none transition-colors resize-none",
-                              errors[field.name]
-                                ? "border-red-500"
-                                : "border-transparent hover:border-[#38b6ff]/20 focus:border-[#38b6ff]"
+                      {i < currentStep ? (
+                        <Check className="w-5 h-5 text-white" />
+                      ) : (
+                        <span className={`text-sm font-semibold ${i <= currentStep ? "text-white" : "text-[#86868b]"}`}>
+                          {step.id}
+                        </span>
+                      )}
+                    </motion.div>
+                    {i < steps.length - 1 && (
+                      <motion.div
+                        animate={{ backgroundColor: i < currentStep ? "#38b6ff" : "#e5e5ea" }}
+                        className="h-0.5 w-12 mx-2"
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              <AnimatePresence mode="wait">
+                {!showSignupScreen ? (
+                  <motion.div
+                    key={currentStep}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    className="space-y-6"
+                  >
+                    <h3 className="text-2xl font-semibold text-[#1d1d1f]">
+                      {steps[currentStep].title}
+                    </h3>
+                    {steps[currentStep].fields.map((field, idx) => (
+                      <motion.div
+                        key={field.name}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: idx * 0.06 }}
+                        className="space-y-2"
+                      >
+                        <label className="text-sm font-medium text-[#6e6e73]">
+                          {field.label}
+                          {field.required && <span className="text-red-500 ml-1">*</span>}
+                        </label>
+
+                        {field.type === "textarea" ? (
+                          <div className="relative">
+                            <textarea
+                              name={field.name}
+                              value={formData[field.name as keyof typeof formData] as string}
+                              onChange={handleChange}
+                              placeholder={field.label}
+                              className={cn(
+                                "w-full h-32 bg-[#f5f5f7] rounded-xl border px-4 py-3 text-sm outline-none transition-colors resize-none",
+                                errors[field.name] ? "border-red-500" : "border-transparent hover:border-[#38b6ff]/20 focus:border-[#38b6ff]"
+                              )}
+                            />
+                            {errors[field.name] && (
+                              <p className="text-red-500 text-xs mt-1">{errors[field.name]}</p>
                             )}
-                          />
-                          {errors[field.name] && (
-                            <p className="text-red-500 text-xs mt-1">
-                              {errors[field.name]}
-                            </p>
-                          )}
-                        </div>
-                      ) : field.type === "calendar" ? (
-                        <div className="relative">
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <button
-                                className={cn(
-                                  "w-full h-12 bg-[#f5f5f7] rounded-xl border px-4 text-sm text-left font-normal flex items-center justify-between transition-colors",
-                                  errors.deadline
-                                    ? "border-red-500"
-                                    : "border-transparent hover:border-[#38b6ff]/20 focus:border-[#38b6ff]",
-                                  !formData.deadline && "text-muted-foreground"
-                                )}
-                              >
-                                {formData.deadline ? (
-                                  format(formData.deadline, "PPP p") // includes date + time
-                                ) : (
-                                  <span>Select deadline</span>
-                                )}
-                                <CalendarIcon className="mr-2 h-4 w-4" />
-                              </button>
-                            </PopoverTrigger>
-
-                            <PopoverContent className="w-auto p-4 space-y-3">
-                              {/* Calendar for Date */}
-                              <Calendar
-                                mode="single"
-                                selected={formData.deadline || undefined}
-                                onSelect={(date) => {
-                                  if (!date) return;
-                                  const prev = formData.deadline || new Date();
-                                  const newDate = new Date(date);
-                                  newDate.setHours(
-                                    prev.getHours(),
-                                    prev.getMinutes()
-                                  );
-                                  handleDeadlineChange(newDate);
-                                }}
-                                initialFocus
-                              />
-
-                              {/* Time Picker */}
-                              <div className="flex items-center justify-between space-x-2">
+                          </div>
+                        ) : field.type === "calendar" ? (
+                          <div className="relative">
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <button
+                                  className={cn(
+                                    "w-full h-12 bg-[#f5f5f7] rounded-xl border px-4 text-sm text-left font-normal flex items-center justify-between transition-colors",
+                                    errors.deadline ? "border-red-500" : "border-transparent hover:border-[#38b6ff]/20 focus:border-[#38b6ff]",
+                                    !formData.deadline && "text-muted-foreground"
+                                  )}
+                                >
+                                  {formData.deadline ? format(formData.deadline, "PPP p") : <span>Select deadline</span>}
+                                  <CalendarIcon className="mr-2 h-4 w-4" />
+                                </button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-auto p-4 space-y-3">
+                                <Calendar
+                                  mode="single"
+                                  selected={formData.deadline || undefined}
+                                  onSelect={(date) => {
+                                    if (!date) return;
+                                    const prev = formData.deadline || new Date();
+                                    const newDate = new Date(date);
+                                    newDate.setHours(prev.getHours(), prev.getMinutes());
+                                    handleDeadlineChange(newDate);
+                                  }}
+                                  initialFocus
+                                />
                                 <input
                                   type="time"
                                   className="w-full rounded-md border px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#38b6ff]"
-                                  value={
-                                    formData.deadline
-                                      ? format(formData.deadline, "HH:mm")
-                                      : ""
-                                  }
+                                  value={formData.deadline ? format(formData.deadline, "HH:mm") : ""}
                                   onChange={(e) => {
-                                    const [hours, minutes] = e.target.value
-                                      .split(":")
-                                      .map(Number);
-                                    const prev =
-                                      formData.deadline || new Date();
+                                    const [hours, minutes] = e.target.value.split(":").map(Number);
+                                    const prev = formData.deadline || new Date();
                                     const newDate = new Date(prev);
                                     newDate.setHours(hours, minutes);
                                     handleDeadlineChange(newDate);
                                   }}
                                 />
-                              </div>
-                            </PopoverContent>
-                          </Popover>
-
-                          {errors.deadline && (
-                            <p className="text-red-500 text-xs mt-1">
-                              {errors.deadline}
-                            </p>
-                          )}
-                        </div>
-                      ) : (
-                        <div className="relative">
-                          <input
-                            type={
-                              field.name === "contactEmail" ? "email" : "text"
-                            }
-                            name={field.name}
-                            value={
-                              formData[
-                                field.name as keyof typeof formData
-                              ] as string
-                            }
-                            onChange={handleChange}
-                            placeholder={field.label}
-                            className={cn(
-                              "w-full h-12 bg-[#f5f5f7] rounded-xl border px-4 text-sm outline-none transition-colors",
-                              errors[field.name]
-                                ? "border-red-500"
-                                : "border-transparent hover:border-[#38b6ff]/20 focus:border-[#38b6ff]"
-                            )}
-                          />
-                          {errors[field.name] && (
-                            <p className="text-red-500 text-xs mt-1">
-                              {errors[field.name]}
-                            </p>
-                          )}
-                        </div>
-                      )}
-                    </motion.div>
-                  ))}
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="signup-screen"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  className="space-y-8 text-center py-12"
-                >
-                  <div className="mx-auto w-24 h-24 bg-[#38b6ff]/10 rounded-full flex items-center justify-center">
-                    <Check className="w-12 h-12 text-[#38b6ff]" />
-                  </div>
-                  <div className="space-y-4">
-                    <h3 className="text-3xl font-semibold text-[#1d1d1f]">
-                      Tender Saved
-                    </h3>
-                    <p className="text-lg text-[#6e6e73] max-w-md mx-auto">
-                      Signup to publish and start receiving bids from verified
-                      suppliers.
-                    </p>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* Navigation Buttons */}
-            <div className="flex gap-3 mt-8">
-              {!showSignupScreen && currentStep > 0 && (
-                <button
-                  onClick={prevStep}
-                  className="flex-1 h-12 rounded-xl text-[#38b6ff] hover:bg-[#38b6ff]/5 transition-colors"
-                >
-                  Back
-                </button>
-              )}
-              {!showSignupScreen ? (
-                <button
-                  onClick={() =>
-                    currentStep === steps.length - 1
-                      ? handlePostTender()
-                      : nextStep()
-                  }
-                  className="flex-1 bg-[#38b6ff] hover:bg-[#0077ed] text-white h-12 rounded-xl font-medium flex items-center justify-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {currentStep === steps.length - 1
-                    ? "Save & Continue"
-                    : "Continue"}
-                </button>
-              ) : (
-                <div className="flex gap-3 w-full">
-                  <button
-                    onClick={() => {
-                      localStorage.removeItem(GUEST_TENDER_KEY);
-                      setShowSignupScreen(false);
-                      setCurrentStep(0);
-                      setIsSaved(false);
-                    }}
-                    className="flex-1 h-12 rounded-xl border border-[#d2d2d7] text-[#1d1d1f] hover:bg-[#f5f5f7] transition-colors"
+                              </PopoverContent>
+                            </Popover>
+                            {errors.deadline && <p className="text-red-500 text-xs mt-1">{errors.deadline}</p>}
+                          </div>
+                        ) : (
+                          <div className="relative">
+                            <input
+                              type={field.name === "contactEmail" ? "email" : "text"}
+                              name={field.name}
+                              value={formData[field.name as keyof typeof formData] as string}
+                              onChange={handleChange}
+                              placeholder={field.label}
+                              className={cn(
+                                "w-full h-12 bg-[#f5f5f7] rounded-xl border px-4 text-sm outline-none transition-colors",
+                                errors[field.name] ? "border-red-500" : "border-transparent hover:border-[#38b6ff]/20 focus:border-[#38b6ff]"
+                              )}
+                            />
+                            {errors[field.name] && <p className="text-red-500 text-xs mt-1">{errors[field.name]}</p>}
+                          </div>
+                        )}
+                      </motion.div>
+                    ))}
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="signup-screen"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="space-y-8 text-center py-12"
                   >
-                    Edit Tender
+                    <div className="mx-auto w-24 h-24 bg-[#38b6ff]/10 rounded-full flex items-center justify-center">
+                      <Check className="w-12 h-12 text-[#38b6ff]" />
+                    </div>
+                    <div className="space-y-4">
+                      <h3 className="text-3xl font-semibold text-[#1d1d1f]">Tender Saved</h3>
+                      <p className="text-lg text-[#6e6e73] max-w-md mx-auto">
+                        Signup to publish and start receiving bids from verified suppliers.
+                      </p>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Navigation */}
+              <div className="flex gap-3 mt-8">
+                {!showSignupScreen && currentStep > 0 && (
+                  <button
+                    onClick={prevStep}
+                    className="flex-1 h-12 rounded-xl text-[#38b6ff] hover:bg-[#38b6ff]/5 transition-colors"
+                  >
+                    Back
                   </button>
-                  <motion.a
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    href="/signup"
+                )}
+                {!showSignupScreen ? (
+                  <button
+                    onClick={() => (currentStep === steps.length - 1 ? handlePostTender() : nextStep())}
                     className="flex-1 bg-[#38b6ff] hover:bg-[#0077ed] text-white h-12 rounded-xl font-medium flex items-center justify-center gap-2 transition-colors"
                   >
-                    Sign up now
-                  </motion.a>
-                </div>
-              )}
-            </div>
-            <p className="text-center text-xs text-[#86868b] mt-6">
-              {!showSignupScreen
-                ? currentStep === steps.length - 1
-                  ? "Your tender will be saved locally."
-                  : `Step ${currentStep + 1} of ${steps.length}`
-                : "Your draft is saved. Sign up to publish."}
-            </p>
-          </div>
-        </DialogContent>
-      </Dialog>
+                    {currentStep === steps.length - 1 ? "Save & Continue" : "Continue"}
+                  </button>
+                ) : (
+                  <div className="flex gap-3 w-full">
+                    <button
+                      onClick={() => {
+                        localStorage.removeItem(GUEST_TENDER_KEY);
+                        setShowSignupScreen(false);
+                        setCurrentStep(0);
+                        setIsSaved(false);
+                      }}
+                      className="flex-1 h-12 rounded-xl border border-[#d2d2d7] text-[#1d1d1f] hover:bg-[#f5f5f7]"
+                    >
+                      Edit Tender
+                    </button>
+                    <motion.a
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      href="/signup"
+                      className="flex-1 bg-[#38b6ff] hover:bg-[#0077ed] text-white h-12 rounded-xl font-medium flex items-center justify-center gap-2"
+                    >
+                      Sign up now
+                    </motion.a>
+                  </div>
+                )}
+              </div>
 
-      {/* Discard Confirmation */}
-      <Dialog open={pendingClose} onOpenChange={setPendingClose}>
-        <DialogContent className="max-w-md p-6 bg-white rounded-2xl">
-          <div className="space-y-6 text-center">
+              <p className="text-center text-xs text-[#86868b] mt-6">
+                {!showSignupScreen
+                  ? currentStep === steps.length - 1
+                    ? "Your tender will be saved locally."
+                    : `Step ${currentStep + 1} of ${steps.length}`
+                  : "Your draft is saved. Sign up to publish."}
+              </p>
+            </motion.div>
+          )}
+        </div>
+      </div>
+
+      {/* Discard Confirmation Dialog */}
+      {pendingClose && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="bg-white rounded-2xl p-6 max-w-md w-full space-y-6 text-center"
+          >
             <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
               <X className="w-8 h-8 text-red-600" />
             </div>
             <div>
-              <h3 className="text-xl font-semibold text-[#1d1d1f]">
-                Discard changes?
-              </h3>
-              <p className="text-[#6e6e73] mt-2">
-                Your current draft will be lost.
-              </p>
+              <h3 className="text-xl font-semibold text-[#1d1d1f]">Discard changes?</h3>
+              <p className="text-[#6e6e73] mt-2">Your current draft will be lost.</p>
             </div>
             <div className="flex gap-3">
               <button
                 onClick={() => setPendingClose(false)}
-                className="flex-1 h-12 rounded-xl border border-[#d2d2d7] text-[#1d1d1f] hover:bg-[#f5f5f7] transition-colors"
+                className="flex-1 h-12 rounded-xl border border-[#d2d2d7] text-[#1d1d1f] hover:bg-[#f5f5f7]"
               >
                 Cancel
               </button>
               <button
                 onClick={performClose}
-                className="flex-1 h-12 rounded-xl bg-red-500 hover:bg-red-600 text-white transition-colors"
+                className="flex-1 h-12 rounded-xl bg-red-500 hover:bg-red-600 text-white"
               >
                 Discard
               </button>
             </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+          </motion.div>
+        </div>
+      )}
     </section>
   );
 }

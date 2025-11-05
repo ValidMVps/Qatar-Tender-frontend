@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { motion } from "framer-motion";
-
+import logo from "../../media/logo.png";
 import { useTranslation } from "../../lib/hooks/useTranslation";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { ProtectedRoute } from "@/components/auth-guard";
@@ -75,11 +75,8 @@ export default function DashboardLayout({
             >
               <div className="flex items-center justify-between px-3 py-4">
                 <div className="flex items-center">
-                  <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center shadow-sm">
-                    <Building2 className="h-5 w-5 text-white" />
-                  </div>
                   <span className="ml-2 text-lg font-semibold text-gray-900">
-                    TenderHub Qatar
+                    <img src={logo.src} alt="" />
                   </span>
                 </div>
                 <button onClick={() => setSidebarOpen(false)}>
@@ -119,17 +116,16 @@ export default function DashboardLayout({
             sidebarOpen ? "w-16" : "w-64"
           }`}
         >
-          <div className="relative px-4 py-6 pb-10 flex items-center justify-between">
+          <div className="relative px-4 py- pb-10 flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="w-9 h-9 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-sm">
-                <Building2 className="h-5 w-5 text-white" />
-              </div>
               <span
                 className={`text-2xl font-semibold text-gray-900 transition-opacity duration-200 ${
                   sidebarOpen ? "opacity-0 w-0 overflow-hidden" : "opacity-100"
                 }`}
               >
-                {t("tenderhub")}
+                <span className="ml-2 text-lg font-semibold text-gray-900">
+                  <img src={logo.src} alt="" className="w-[90%] mx-auto" />
+                </span>
               </span>
             </div>
           </div>

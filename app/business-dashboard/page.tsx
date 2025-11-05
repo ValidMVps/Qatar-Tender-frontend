@@ -1,16 +1,14 @@
 "use client";
 import {
   FileText,
-  Banknote,
-  Clock,
   MessageSquare,
+  Clock,
+  AlertCircle,
+  CheckCircle,
   Search,
   ChevronRight,
   MapPin,
-  AlertCircle,
-  CheckCircle,
   Users,
-  Eye,
   DollarSign,
   CalendarDays,
   Plus,
@@ -18,6 +16,9 @@ import {
   TrendingUp,
   Timer,
   ClipboardList,
+  RefreshCw,
+  Bell,
+  Banknote,
 } from "lucide-react";
 import type React from "react";
 import Link from "next/link";
@@ -38,13 +39,15 @@ import CreateTenderModal from "@/components/CreateTenderModal";
 import { useTranslation } from "../../lib/hooks/useTranslation";
 import { useAuth } from "@/context/AuthContext";
 import { getUserTenders } from "../services/tenderService";
+import { getTenderBids } from "../services/BidService";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useNotifications } from "@/context/NotificationContext"; // ← NEW
 import { getUserBids } from "../services/BidService";
 import { getActiveTenders } from "../services/tenderService";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { OverviewChart } from "@/components/OverviewChart";
 import PageTransitionWrapper from "@/components/animations/PageTransitionWrapper";
-import { id } from "date-fns/locale";
-
+import { formatDistanceToNow, differenceInDays, format } from "date-fns";
+import { useRouter } from "next/navigation";
 // Types (unchanged)
 interface Tender {
   _id: string;
@@ -58,7 +61,7 @@ interface Tender {
   estimatedBudget?: number;
   budget?: string | number;
   bidCount?: number;
-  awardedTo?: string;
+  awardedTo?: any;
   awardedBidId?: string;
 }
 export interface Bid {
@@ -68,7 +71,7 @@ export interface Bid {
     title: string;
     description?: string;
     deadline: string;
-    postedBy?: { companyName?: string };
+    postedBy?: any;
   };
   amount: number;
   description: string;
@@ -109,7 +112,134 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [hasDraftTender, setHasDraftTender] = useState(false);
   // All helper and effect functions remain unchanged (as requested)
+  const DRAFT_TENDER_DONT_SHOW_KEY = "draftTenderDontShow";
+  const [dontShowDraftPrompt, setDontShowDraftPrompt] = useState(false);
+  const {
+    notifications = [],
+    unreadCount = 0,
+    markAsRead,
+    isLoading: notifLoading,
+  } = useNotifications() || {};
 
+  // Live clock for “X minutes ago”
+  const [now, setNow] = useState(Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 30_000);
+    return () => clearInterval(id);
+  }, []);
+  const NotificationCard = () => {
+    const prefix =
+      profile?.userType === "business" ? "business-dashboard" : "dashboard";
+
+    const getRoute = (n: any) => {
+      // Same routing logic you already use in NotificationDemo
+      const tenderId = n.relatedTender?._id || n.relatedTender;
+      const bidId = n.relatedBid?._id || n.relatedBid;
+      switch (n.type) {
+        case "new_bid_received":
+        case "tender_status":
+        case "tender_created":
+          return tenderId
+            ? `/${prefix}/tender/${tenderId}`
+            : `/${prefix}/my-tenders`;
+        case "bid_submitted":
+        case "bid_status_update":
+          return tenderId
+            ? `/${prefix}/tender-details/${tenderId}`
+            : `/${prefix}/bids`;
+        case "tender_awarded":
+          return `/${prefix}/projects`;
+        default:
+          return tenderId
+            ? `/${prefix}/tender-details/${tenderId}`
+            : `/${prefix}`;
+      }
+    };
+
+    const timeAgo = (date: string) => {
+      const d = new Date(date);
+      return differenceInDays(now, d) >= 7
+        ? format(d, "dd MMM yyyy")
+        : formatDistanceToNow(d, { addSuffix: true });
+    };
+
+    const theme = (type: string) => {
+      const map: Record<string, any> = {
+        new_bid_received: {
+          dot: "bg-blue-500",
+          iconBg: "bg-blue-100",
+          icon: "text-blue-600",
+        },
+        tender_awarded: {
+          dot: "bg-emerald-500",
+          iconBg: "bg-emerald-100",
+          icon: "text-emerald-600",
+        },
+        default: {
+          dot: "bg-gray-500",
+          iconBg: "bg-gray-100",
+          icon: "text-gray-600",
+        },
+      };
+      return map[type] || map.default;
+    };
+    const router = useRouter();
+    const handleClick = async (n: any) => {
+      router.push(getRoute(n));
+    };
+
+    return (
+      <KpiCard
+        title={t("recent_activity")}
+        icon={Bell}
+        href="/business-dashboard/notification"
+      >
+        {notifLoading ? (
+          <div className="flex items-center justify-center py-4">
+            <div className="w-5 h-5 border-2 border-gray-200 border-t-blue-500 rounded-full animate-spin" />
+          </div>
+        ) : notifications.length === 0 ? (
+          <p className="text-gray-400 text-xs sm:text-sm text-center py-3">
+            {t("no_notifications")}
+          </p>
+        ) : (
+          <div className="space-y-2">
+            {notifications.slice(0, 3).map((n) => {
+              const th = theme(n.type);
+              return (
+                <button
+                  key={n._id}
+                  onClick={() => handleClick(n)}
+                  className="w-full text-left group"
+                >
+                  <div className="flex items-start gap-2 p-2 rounded-lg hover:bg-gray-50/70 transition">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs sm:text-sm text-gray-800 font-medium truncate">
+                        {n.message}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {timeAgo(n.createdAt)}
+                      </p>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition" />
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </KpiCard>
+    );
+  };
+  // init from localStorage (client-only)
+  useEffect(() => {
+    try {
+      const val = localStorage.getItem(DRAFT_TENDER_DONT_SHOW_KEY);
+      if (val === "1") setDontShowDraftPrompt(true);
+    } catch (e) {
+      // ignore localStorage errors
+    }
+  }, []);
   const resolveBudget = (tender: any) => {
     if (typeof tender.estimatedBudget === "number")
       return tender.estimatedBudget;
@@ -144,13 +274,14 @@ export default function DashboardPage() {
         const tenders = Array.isArray(tendersRes) ? tendersRes : [];
         const hasDraft = tenders.some((t) => t.status === "draft");
         setHasDraftTender(hasDraft);
-        setRecentTenders(tenders.slice(0, 6));
+        setRecentTenders(tenders);
         setTendersWithNoBids(tenders.filter((t) => t.bidCount === 0));
         setAwardedByMe(
           tenders.filter(
             (t) => t.status === "awarded" || t.status === "completed"
           )
         );
+  
         const bidsRes = await getUserBids();
         const bids = Array.isArray(bidsRes) ? bidsRes : [];
         setMyBids(bids);
@@ -159,6 +290,7 @@ export default function DashboardPage() {
             (b) => b.status === "accepted" || b.status === "completed"
           )
         );
+
         const activeRes = await getActiveTenders();
         const filtered = Array.isArray(activeRes)
           ? activeRes.filter((tender) => {
@@ -204,30 +336,53 @@ export default function DashboardPage() {
 
   const tenderStatusSummary = recentTenders.reduce(
     (acc, t) => {
-      const status =
-        t.status === "awarded" || t.status === "completed"
-          ? "awarded"
-          : t.status;
+      const status = t.status || "unknown";
       acc[status] = (acc[status] || 0) + 1;
       return acc;
     },
-    { active: 0, awarded: 0, expired: 0, draft: 0 } as Record<string, number>
+    {
+      active: 0,
+      awarded: 0,
+      completed: 0,
+      rejected: 0,
+      closed: 0,
+      draft: 0,
+    } as Record<string, number>
   );
 
-  const recentActivity = [
-    ...recentTenders.slice(0, 2).map((t) => ({
-      type: "tender",
+  const toTs = (d?: string | Date | number) => (d ? new Date(d).getTime() : 0);
+
+  // 2) build and filter items
+  const tenderItems = recentTenders
+    .filter((t) => t && t.status !== "draft") // remove drafts
+    .map((t) => ({
+      type: "tender" as const,
       title: t.title,
       id: t._id,
-      time: formatShortDate(t.createdAt),
-    })),
-    ...myBids.slice(0, 1).map((b) => ({
-      type: "bid",
+      createdAt: t.createdAt,
+      ts: toTs(t.createdAt),
+      status: t.status,
+    }));
+
+  const bidItems = myBids
+    .filter((b) => b && b.tender && b.tender.title) // ignore bids on draft tenders
+    .map((b) => ({
+      type: "bid" as const,
       title: b.tender.title,
       id: b._id,
-      time: formatShortDate(b.createdAt),
-    })),
-  ].slice(0, 3);
+      createdAt: b.createdAt,
+      ts: toTs(b.createdAt),
+      tenderId: b.tender._id,
+    }));
+
+  // 3) combine, sort by timestamp desc, take top 3, then format time
+  const recentActivity = [...tenderItems, ...bidItems]
+    .sort((a, b) => b.ts - a.ts) // newest first
+    .slice(0, 3)
+    .map((act) => ({
+      ...act,
+      time: formatShortDate(act.createdAt),
+    }));
 
   const KpiCard = ({
     title,
@@ -347,46 +502,7 @@ export default function DashboardPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, ease: "easeOut" }}
             >
-              <KpiCard
-                title="Recent Activity"
-                icon={ClipboardList}
-                href="/business-dashboard/my-tenders"
-              >
-                {recentActivity.length === 0 ? (
-                  <p className="text-gray-400 text-xs sm:text-sm">
-                    No recent activity
-                  </p>
-                ) : (
-                  recentActivity.map((act, i) => (
-                    <Link
-                      key={i}
-                      href={
-                        act.type === "tender"
-                          ? `/business-dashboard/tender/${act.id || "#"}`
-                          : "/business-dashboard/bids"
-                      }
-                      className="flex items-center justify-between py-1.5 px-2.5 sm:py-2 sm:px-3 bg-gray-50/50 rounded-lg sm:rounded-xl hover:bg-gray-100 transition"
-                    >
-                      <div className="flex items-center gap-2 sm:gap-3">
-                        <div
-                          className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${
-                            act.type === "tender"
-                              ? "bg-blue-500"
-                              : "bg-green-500"
-                          }`}
-                        ></div>
-                        <span className="text-xs sm:text-sm text-gray-700 truncate max-w-[120px] sm:max-w-[140px]">
-                          {act.type === "tender" ? "Posted: " : "Bid on: "}
-                          {act.title}
-                        </span>
-                      </div>
-                      <span className="text-xs text-gray-500 font-medium">
-                        {act.time}
-                      </span>
-                    </Link>
-                  ))
-                )}
-              </KpiCard>
+              <NotificationCard />
 
               <KpiCard
                 title="Bid Summary"
@@ -418,36 +534,40 @@ export default function DashboardPage() {
                 icon={BarChart2}
                 href="/business-dashboard/my-tenders"
               >
-                {["active", "awarded", "completed", "rejected", "closed"].map(
-                  (status) => {
-                    const count = tenderStatusSummary[status];
-                    if (!count) return null;
-                    return (
-                      <div
-                        key={status}
-                        className="flex items-center justify-between py-1.5 px-2.5 sm:py-2 sm:px-3 bg-gray-50/50 rounded-lg sm:rounded-xl"
+                {[
+                  "active",
+                  "awarded",
+                  "completed",
+                  "rejected",
+                  "closed",
+                  "draft",
+                ].map((status) => {
+                  const count = tenderStatusSummary[status];
+                  if (!count) return null;
+                  return (
+                    <div
+                      key={status}
+                      className="flex items-center justify-between py-1.5 px-2.5 sm:py-2 sm:px-3 bg-gray-50/50 rounded-lg sm:rounded-xl"
+                    >
+                      <span className="capitalize text-xs sm:text-sm text-gray-700 font-medium">
+                        {status}
+                      </span>
+                      <AppleBadge
+                        className={`min-w-[20px] sm:min-w-[24px] text-center ${
+                          status === "awarded" || status === "completed"
+                            ? "bg-green-100/80 text-green-700"
+                            : status === "active"
+                            ? "bg-blue-100/80 text-blue-700"
+                            : status === "draft"
+                            ? "bg-gray-100/80 text-gray-700"
+                            : "bg-red-100/80 text-red-700"
+                        }`}
                       >
-                        <span className="capitalize text-xs sm:text-sm text-gray-700 font-medium">
-                          {status}
-                        </span>
-                        <AppleBadge
-                          className={`min-w-[20px] sm:min-w-[24px] text-center ${
-                            status === "awarded"
-                              ? "bg-green-100/80 text-green-700"
-                              : status === "active"
-                              ? "bg-blue-100/80 text-blue-700"
-                              : "bg-red-100/80 text-red-700"
-                          }`}
-                        >
-                          {count}
-                        </AppleBadge>
-                      </div>
-                    );
-                  }
-                )}
-                {Object.values(tenderStatusSummary).every((v) => v === 0) && (
-                  <p className="text-gray-400 text-xs sm:text-sm">No tenders</p>
-                )}
+                        {count}
+                      </AppleBadge>
+                    </div>
+                  );
+                })}
               </KpiCard>
 
               <KpiCard title="Upcoming Deadlines" icon={Timer}>
@@ -990,8 +1110,7 @@ export default function DashboardPage() {
                                       {bid.tender.title}
                                     </TableCell>
                                     <TableCell className="text-gray-600 text-xs sm:text-sm">
-                                      {bid.tender.postedBy?.companyName ||
-                                        "Private"}
+                                      {bid.tender.postedBy?.email || "Private"}
                                     </TableCell>
                                     <TableCell className="font-semibold text-gray-900 text-sm">
                                       {new Intl.NumberFormat().format(
@@ -1011,7 +1130,7 @@ export default function DashboardPage() {
                                     </TableCell>
                                     <TableCell>
                                       <Link
-                                        href={`/business-dashboard/projects/`}
+                                        href={`/business-dashboard/project`}
                                         className="text-blue-600 hover:text-blue-700 font-medium bg-blue-50/80 px-2 py-0.5 sm:px-3 sm:py-1 rounded-md sm:rounded-lg text-xs sm:text-sm transition-colors"
                                       >
                                         Go to Chat
@@ -1078,7 +1197,7 @@ export default function DashboardPage() {
                                     {tender.title}
                                   </TableCell>
                                   <TableCell className="text-gray-600 text-xs sm:text-sm">
-                                    Contractor
+                                    {tender?.awardedTo?.email}
                                   </TableCell>
                                   <TableCell className="font-medium text-xs sm:text-sm">
                                     {resolveBudget(tender) > 0
@@ -1120,12 +1239,12 @@ export default function DashboardPage() {
               open={openTenderModal}
               onOpenChange={setOpenTenderModal}
             />{" "}
-            {hasDraftTender && (
+            {hasDraftTender && !dontShowDraftPrompt && (
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
-                onClick={() => setHasDraftTender(false)}
+                onClick={() => setHasDraftTender(false)} // background click just closes for now
               >
                 <motion.div
                   className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 sm:p-8"
@@ -1145,16 +1264,41 @@ export default function DashboardPage() {
                     <div className="flex flex-col sm:flex-row gap-3 pt-2">
                       <Button
                         variant="outline"
-                        onClick={() => setHasDraftTender(false)}
+                        onClick={() => {
+                          // persist "don't show again"
+                          try {
+                            localStorage.setItem(
+                              DRAFT_TENDER_DONT_SHOW_KEY,
+                              "1"
+                            );
+                          } catch (e) {
+                            /* ignore */
+                          }
+                          setDontShowDraftPrompt(true);
+                          setHasDraftTender(false);
+                        }}
                         className="w-full"
                       >
                         Later
                       </Button>
+
                       <Button
                         asChild
                         className="w-full bg-blue-600 hover:bg-blue-700"
+                        onClick={() => {
+                          // optional: also mark as dismissed when going to My Tenders
+                          try {
+                            localStorage.setItem(
+                              DRAFT_TENDER_DONT_SHOW_KEY,
+                              "1"
+                            );
+                          } catch (e) {}
+                          setDontShowDraftPrompt(true);
+                        }}
                       >
-                        <Link href="/my-tenders">Go to My Tenders</Link>
+                        <Link href="/business-dashboard/my-tenders">
+                          Go to My Tenders
+                        </Link>
                       </Button>
                     </div>
                   </div>

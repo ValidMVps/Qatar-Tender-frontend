@@ -979,9 +979,7 @@ export default function TenderDetailPage() {
                       </p>
                       {isAwarded && (
                         <Button
-                          onClick={() =>
-                            router.push(`/chat/${awardedBid.bidder._id}`)
-                          }
+                          onClick={() => router.push(`/dashboard/project`)}
                           className="bg-blue-500 hover:bg-blue-600 text-white rounded-full px-4 py-2 h-auto font-medium text-sm sm:text-base"
                         >
                           <MessageSquare className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />

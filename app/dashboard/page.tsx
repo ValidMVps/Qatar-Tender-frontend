@@ -17,6 +17,7 @@ import {
   Timer,
   ClipboardList,
   RefreshCw,
+  Bell,
 } from "lucide-react";
 import type React from "react";
 import Link from "next/link";
@@ -39,7 +40,13 @@ import { useAuth } from "@/context/AuthContext";
 import { getUserTenders } from "../services/tenderService";
 import { getTenderBids } from "../services/BidService";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
+import { useNotifications } from "@/context/NotificationContext"; // ← NEW
+import { getUserBids } from "../services/BidService";
+import { getActiveTenders } from "../services/tenderService";
+import { OverviewChart } from "@/components/OverviewChart";
+import PageTransitionWrapper from "@/components/animations/PageTransitionWrapper";
+import { formatDistanceToNow, differenceInDays, format } from "date-fns";
+import { useRouter } from "next/navigation";
 // Types
 interface Tender {
   _id: string;
@@ -47,6 +54,7 @@ interface Tender {
   category: string | { name: string };
   status: string;
   deadline: string;
+  awardedTo: any;
   createdAt: string;
   description?: string;
   location?: string;
@@ -61,6 +69,7 @@ interface Bid {
     companyName: string;
     _id: string;
   };
+  bidder: any;
   amount: number;
   description: string;
   status: "pending" | "accepted" | "rejected" | "under_review" | "completed";
@@ -79,14 +88,47 @@ export default function IndividualDashboardPage() {
   const [bidsReceived, setBidsReceived] = useState<Record<string, Bid[]>>({});
   const [tendersWithNoBids, setTendersWithNoBids] = useState<Tender[]>([]);
   const [awardedProjects, setAwardedProjects] = useState<Tender[]>([]);
-  const [tenderStatusSummary, setTenderStatusSummary] = useState({
-    open: 0,
+  const [tenderStatusSummary, setTenderStatusSummary] = useState<
+    Record<string, number>
+  >({
+    active: 0,
     awarded: 0,
+    completed: 0,
+    rejected: 0,
+    closed: 0,
+    draft: 0,
+    open: 0,
     expired: 0,
   });
   const [loading, setLoading] = useState(true);
   const [hasDraftTender, setHasDraftTender] = useState(false);
   // Helper functions
+  // add near your other state hooks
+  const DRAFT_TENDER_DONT_SHOW_KEY = "draftTenderDontShow";
+  const [dontShowDraftPrompt, setDontShowDraftPrompt] = useState(false);
+  const router = useRouter();
+  const {
+    notifications = [],
+    unreadCount = 0,
+    markAsRead,
+    isLoading: notifLoading,
+  } = useNotifications() || {};
+
+  // Live clock for “X minutes ago”
+  const [now, setNow] = useState(Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 30_000);
+    return () => clearInterval(id);
+  }, []);
+  // init from localStorage (client-only)
+  useEffect(() => {
+    try {
+      const val = localStorage.getItem(DRAFT_TENDER_DONT_SHOW_KEY);
+      if (val === "1") setDontShowDraftPrompt(true);
+    } catch (e) {
+      // ignore localStorage errors
+    }
+  }, []);
   const resolveCategoryName = (tender: any) => {
     if (typeof tender.category === "string") return tender.category;
     return tender.category?.name || "General";
@@ -130,22 +172,18 @@ export default function IndividualDashboardPage() {
         setHasDraftTender(hasDraft);
         const statusSummary = tenders.reduce(
           (acc, t) => {
-            const now = new Date();
-            const deadline = new Date(t.deadline);
-            const isExpired = deadline < now;
-            const isAwarded =
-              t.status === "awarded" || t.status === "completed";
-
-            if (isAwarded) {
-              acc.awarded += 1;
-            } else if (isExpired) {
-              acc.expired += 1;
-            } else {
-              acc.open += 1;
-            }
+            const status = t.status || "unknown";
+            acc[status] = (acc[status] || 0) + 1;
             return acc;
           },
-          { open: 0, awarded: 0, expired: 0 }
+          {
+            active: 0,
+            awarded: 0,
+            completed: 0,
+            rejected: 0,
+            closed: 0,
+            draft: 0,
+          } as Record<string, number>
         );
         setTenderStatusSummary(statusSummary);
 
@@ -168,6 +206,7 @@ export default function IndividualDashboardPage() {
             bidsMap[tender._id] = [];
           }
         }
+        console.log(bidsMap, "bidsmap");
         setBidsReceived(bidsMap);
       } catch (error) {
         console.error("Failed to fetch individual dashboard data:", error);
@@ -267,6 +306,7 @@ export default function IndividualDashboardPage() {
   const awardedCount = awardedProjects.length;
 
   const upcomingDeadlines = myTenders
+    .filter((t) => t.status !== "draft")
     .map((t) => ({
       title: t.title,
       id: t._id,
@@ -280,35 +320,49 @@ export default function IndividualDashboardPage() {
     )
     .slice(0, 3);
 
-  const recentActivity = [
-    ...myTenders.slice(0, 2).map((t) => ({
-      type: "tender",
+  const toTs = (d?: string | Date | number) => (d ? new Date(d).getTime() : 0);
+
+  // 2) build and filter items
+  const tenderItems = myTenders
+    .filter((t) => t.status !== "draft") // remove draft tenders
+    .map((t) => ({
+      type: "tender" as const,
       title: t.title,
-      time: formatShortDate(t.createdAt),
       id: t._id,
-    })),
-    ...(Object.values(bidsReceived).flat().slice(0, 1) as Bid[]).map((b) => ({
-      type: "bid-received",
-      title: `Bid from ${b.contractor?.companyName}`,
-      time: formatShortDate(b.createdAt),
-    })),
-  ].slice(0, 3);
+      createdAt: t.createdAt,
+      ts: toTs(t.createdAt),
+    }));
+
+  // If you want bids in recent activity, make sure their tender isn't draft
+
+  // Combine, sort by timestamp, and slice top 3
+  const recentActivity = [...tenderItems]
+    .sort((a, b) => b.ts - a.ts)
+    .slice(0, 3)
+    .map((act) => ({
+      ...act,
+      time: formatShortDate(act.createdAt),
+    }));
 
   const KpiCard = ({
     title,
     icon: Icon,
     children,
     href,
+    className,
   }: {
     title: string;
     icon: React.ElementType;
     children: React.ReactNode;
     href?: string;
+    className?: string;
   }) => {
     const cardContent = (
       <motion.div
         whileHover={{ scale: href ? 1.02 : 1 }}
-        className="bg-white/90 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-100/50 transition-all duration-300 h-full group cursor-pointer"
+        className={`bg-white/90 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-100/50 transition-all duration-300 h-full group cursor-pointer ${
+          className ?? ""
+        }`}
       >
         <div className="p-4 sm:p-6">
           <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
@@ -348,6 +402,111 @@ export default function IndividualDashboardPage() {
       );
     }
     return <span className={`${baseClasses} ${className}`}>{children}</span>;
+  };
+
+  const NotificationCard = () => {
+    const prefix =
+      profile?.userType === "business" ? "business-dashboard" : "dashboard";
+
+    const getRoute = (n: any) => {
+      // Same routing logic you already use in NotificationDemo
+      const tenderId = n.relatedTender?._id || n.relatedTender;
+      const bidId = n.relatedBid?._id || n.relatedBid;
+      switch (n.type) {
+        case "new_bid_received":
+        case "tender_status":
+        case "tender_created":
+          return tenderId
+            ? `/${prefix}/tender/${tenderId}`
+            : `/${prefix}/my-tenders`;
+        case "bid_submitted":
+        case "bid_status_update":
+          return tenderId
+            ? `/${prefix}/tender-details/${tenderId}`
+            : `/${prefix}/bids`;
+        case "tender_awarded":
+          return `/${prefix}/projects`;
+        default:
+          return tenderId
+            ? `/${prefix}/tender-details/${tenderId}`
+            : `/${prefix}`;
+      }
+    };
+
+    const timeAgo = (date: string) => {
+      const d = new Date(date);
+      return differenceInDays(now, d) >= 7
+        ? format(d, "dd MMM yyyy")
+        : formatDistanceToNow(d, { addSuffix: true });
+    };
+
+    const theme = (type: string) => {
+      const map: Record<string, any> = {
+        new_bid_received: {
+          dot: "bg-blue-500",
+          iconBg: "bg-blue-100",
+          icon: "text-blue-600",
+        },
+        tender_awarded: {
+          dot: "bg-emerald-500",
+          iconBg: "bg-emerald-100",
+          icon: "text-emerald-600",
+        },
+        default: {
+          dot: "bg-gray-500",
+          iconBg: "bg-gray-100",
+          icon: "text-gray-600",
+        },
+      };
+      return map[type] || map.default;
+    };
+    const router = useRouter();
+    const handleClick = async (n: any) => {
+      router.push(getRoute(n));
+    };
+
+    return (
+      <KpiCard
+        title={t("recent_activity")}
+        icon={Bell}
+        href="/dashboard/notification"
+      >
+        {notifLoading ? (
+          <div className="flex items-center justify-center py-4">
+            <div className="w-5 h-5 border-2 border-gray-200 border-t-blue-500 rounded-full animate-spin" />
+          </div>
+        ) : notifications.length === 0 ? (
+          <p className="text-gray-400 text-xs sm:text-sm text-center py-3">
+            {t("no_notifications")}
+          </p>
+        ) : (
+          <div className="space-y-2">
+            {notifications.slice(0, 3).map((n) => {
+              const th = theme(n.type);
+              return (
+                <button
+                  key={n._id}
+                  onClick={() => handleClick(n)}
+                  className="w-full text-left group"
+                >
+                  <div className="flex items-start gap-2 p-2 rounded-lg hover:bg-gray-50/70 transition">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs sm:text-sm text-gray-800 font-medium truncate">
+                        {n.message}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {timeAgo(n.createdAt)}
+                      </p>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition" />
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </KpiCard>
+    );
   };
 
   return (
@@ -405,44 +564,7 @@ export default function IndividualDashboardPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
           >
-            <KpiCard
-              title="Recent Activity"
-              icon={ClipboardList}
-              href="/dashboard/my-tenders"
-            >
-              {recentActivity.length === 0 ? (
-                <p className="text-gray-400 text-xs sm:text-sm">
-                  No recent activity
-                </p>
-              ) : (
-                recentActivity.map((act, i) => (
-                  <Link
-                    key={i}
-                    href={
-                      act.type === "tender"
-                        ? `/dashboard/tender/${(act as any).id || "#"}`
-                        : "/dashboard/my-tenders"
-                    }
-                    className="flex items-center justify-between py-1.5 px-2.5 sm:py-2 sm:px-3 bg-gray-50/50 rounded-lg sm:rounded-xl hover:bg-gray-100 transition text-xs sm:text-sm"
-                  >
-                    <div className="flex items-center gap-2 sm:gap-3">
-                      <div
-                        className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${
-                          act.type === "tender" ? "bg-blue-500" : "bg-green-500"
-                        }`}
-                      ></div>
-                      <span className="text-gray-700 truncate max-w-[120px] sm:max-w-[140px]">
-                        {act.type === "tender" ? "Posted: " : "Bid received: "}
-                        {act.title}
-                      </span>
-                    </div>
-                    <span className="text-gray-500 font-medium">
-                      {act.time}
-                    </span>
-                  </Link>
-                ))
-              )}
-            </KpiCard>
+            <NotificationCard />
 
             <KpiCard
               title="Bids Received"
@@ -474,33 +596,44 @@ export default function IndividualDashboardPage() {
               icon={BarChart2}
               href="/dashboard/my-tenders"
             >
-              {Object.entries(tenderStatusSummary).map(([status, count]) => {
-                if (count === 0) return null;
-                return (
-                  <div
-                    key={status}
-                    className="flex items-center justify-between py-1.5 px-2.5 sm:py-2 sm:px-3 bg-gray-50/50 rounded-lg sm:rounded-xl"
-                  >
-                    <span className="capitalize text-gray-700 font-medium text-xs sm:text-sm">
-                      {status}
-                    </span>
-                    <AppleBadge
-                      className={`min-w-[20px] sm:min-w-[24px] text-center ${
-                        status === "awarded"
-                          ? "bg-green-100/80 text-green-700"
-                          : status === "open"
-                          ? "bg-blue-100/80 text-blue-700"
-                          : "bg-red-100/80 text-red-700"
-                      }`}
+              {/* Scrollable container */}
+              <div className="flex flex-col gap-2 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-50 h-full">
+                {[
+                  "active",
+                  "awarded",
+                  "completed",
+                  "rejected",
+                  "closed",
+                  "draft",
+                ].map((status) => {
+                  const count = tenderStatusSummary[status];
+                  if (!count) return null;
+
+                  return (
+                    <div
+                      key={status}
+                      className="flex items-center justify-between py-1.5 px-2.5 sm:py-2 sm:px-3 bg-gray-50/50 rounded-lg sm:rounded-xl"
                     >
-                      {count}
-                    </AppleBadge>
-                  </div>
-                );
-              })}
-              {Object.values(tenderStatusSummary).every((v) => v === 0) && (
-                <p className="text-gray-400 text-xs sm:text-sm">No tenders</p>
-              )}
+                      <span className="capitalize text-xs sm:text-sm text-gray-700 font-medium">
+                        {status}
+                      </span>
+                      <AppleBadge
+                        className={`min-w-[20px] sm:min-w-[24px] text-center ${
+                          status === "awarded" || status === "completed"
+                            ? "bg-green-100/80 text-green-700"
+                            : status === "active"
+                            ? "bg-blue-100/80 text-blue-700"
+                            : status === "draft"
+                            ? "bg-gray-100/80 text-gray-700"
+                            : "bg-red-100/80 text-red-700"
+                        }`}
+                      >
+                        {count}
+                      </AppleBadge>
+                    </div>
+                  );
+                })}
+              </div>
             </KpiCard>
 
             <KpiCard
@@ -726,25 +859,25 @@ export default function IndividualDashboardPage() {
                                 {tender.title}
                               </h4>
                             </div>
-                            <Table>
+                            <Table className="table-fixed w-full">
                               <TableHeader>
                                 <TableRow className="border-gray-100/60 bg-gray-50/50">
-                                  <TableHead className="font-semibold text-gray-700 whitespace-nowrap">
+                                  <TableHead className="font-semibold text-gray-700 whitespace-nowrap w-1/6">
                                     Contractor
                                   </TableHead>
-                                  <TableHead className="font-semibold text-gray-700 whitespace-nowrap">
-                                    Proposal
+                                  <TableHead className="font-semibold text-gray-700 whitespace-nowrap w-2/6">
+                                    Bidder Proposals
                                   </TableHead>
-                                  <TableHead className="font-semibold text-gray-700 whitespace-nowrap">
+                                  <TableHead className="font-semibold text-gray-700 whitespace-nowrap w-1/6">
                                     Amount
                                   </TableHead>
-                                  <TableHead className="font-semibold text-gray-700 whitespace-nowrap">
+                                  <TableHead className="font-semibold text-gray-700 whitespace-nowrap w-1/6">
                                     Status
                                   </TableHead>
-                                  <TableHead className="font-semibold text-gray-700 whitespace-nowrap">
+                                  <TableHead className="font-semibold text-gray-700 whitespace-nowrap w-1/6">
                                     Submitted
                                   </TableHead>
-                                  <TableHead className="font-semibold text-gray-700 whitespace-nowrap">
+                                  <TableHead className="font-semibold text-gray-700 whitespace-nowrap w-1/6">
                                     Action
                                   </TableHead>
                                 </TableRow>
@@ -755,27 +888,27 @@ export default function IndividualDashboardPage() {
                                     key={bid._id}
                                     className="hover:bg-gray-50/50 border-gray-100/60 transition-colors"
                                   >
-                                    <TableCell className="font-medium text-gray-900">
-                                      {bid.contractor?.companyName}
+                                    <TableCell className="font-medium text-gray-900 w-1/6">
+                                      {bid.bidder?.email}
                                     </TableCell>
-                                    <TableCell className="text-gray-600 text-sm max-w-[120px] sm:max-w-xs line-clamp-1">
+                                    <TableCell className="text-gray-600 text-sm max-w-[320px] ">
                                       {bid.description || "No details"}
                                     </TableCell>
-                                    <TableCell className="font-semibold text-gray-900">
+                                    <TableCell className="font-semibold text-gray-900 w-1/6">
                                       {new Intl.NumberFormat().format(
                                         bid.amount
                                       )}{" "}
                                       {t("QAR")}
                                     </TableCell>
-                                    <TableCell>
+                                    <TableCell className="w-1/6">
                                       {getBidStatusBadge(bid.status)}
                                     </TableCell>
-                                    <TableCell className="text-gray-600">
+                                    <TableCell className="text-gray-600 w-1/6">
                                       {new Date(
                                         bid.createdAt
                                       ).toLocaleDateString()}
                                     </TableCell>
-                                    <TableCell>
+                                    <TableCell className="w-1/6">
                                       <Link
                                         href={`/dashboard/tender/${tender._id}`}
                                         className="text-blue-600 hover:text-blue-700 font-medium bg-blue-50/80 px-2 py-1 sm:px-3 sm:py-1 rounded-md sm:rounded-lg transition-colors text-xs sm:text-sm"
@@ -936,7 +1069,7 @@ export default function IndividualDashboardPage() {
                                 {tender.title}
                               </TableCell>
                               <TableCell className="text-gray-600">
-                                Contractor Assigned
+                                {tender?.awardedTo?.email}
                               </TableCell>
                               <TableCell className="font-medium">
                                 {resolveBudget(tender) > 0
@@ -975,12 +1108,12 @@ export default function IndividualDashboardPage() {
             open={openTenderModal}
             onOpenChange={setOpenTenderModal}
           />
-          {hasDraftTender && (
+          {hasDraftTender && !dontShowDraftPrompt && (
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
-              onClick={() => setHasDraftTender(false)}
+              onClick={() => setHasDraftTender(false)} // background click just closes for now
             >
               <motion.div
                 className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 sm:p-8"
@@ -1000,16 +1133,33 @@ export default function IndividualDashboardPage() {
                   <div className="flex flex-col sm:flex-row gap-3 pt-2">
                     <Button
                       variant="outline"
-                      onClick={() => setHasDraftTender(false)}
+                      onClick={() => {
+                        // persist "don't show again"
+                        try {
+                          localStorage.setItem(DRAFT_TENDER_DONT_SHOW_KEY, "1");
+                        } catch (e) {
+                          /* ignore */
+                        }
+                        setDontShowDraftPrompt(true);
+                        setHasDraftTender(false);
+                      }}
                       className="w-full"
                     >
                       Later
                     </Button>
+
                     <Button
                       asChild
                       className="w-full bg-blue-600 hover:bg-blue-700"
+                      onClick={() => {
+                        // optional: also mark as dismissed when going to My Tenders
+                        try {
+                          localStorage.setItem(DRAFT_TENDER_DONT_SHOW_KEY, "1");
+                        } catch (e) {}
+                        setDontShowDraftPrompt(true);
+                      }}
                     >
-                      <Link href="/my-tenders">Go to My Tenders</Link>
+                      <Link href="/dashboard/my-tenders">Go to My Tenders</Link>
                     </Button>
                   </div>
                 </div>

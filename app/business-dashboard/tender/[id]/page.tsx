@@ -195,6 +195,7 @@ export default function TenderDetailPage() {
       const bidsData = await getTenderBids(tenderId);
       const questionsData = await getQuestionsForTender(tenderId);
       setTender(tenderData);
+      console.log(bidsData);
       setBids(bidsData);
       setQuestions(questionsData as unknown as Question[]);
     } catch (err: any) {
@@ -637,15 +638,22 @@ export default function TenderDetailPage() {
                               <div className="flex-1 min-w-0">
                                 <div className="flex flex-wrap items-center gap-2 mb-4">
                                   <h3 className="font-semibold text-gray-900 text-base sm:text-lg truncate">
-                                    {(!bid.bidder.profile?.anonymousBidding ||
-                                      bid.status === "accepted" ||
-                                      bid.status === "completed") && (
-                                      <>
-                                        {bid.bidder.profile?.fullName ||
-                                          bid.bidder.profile?.companyName ||
-                                          bid.bidder.email.split("@")[0]}
-                                      </>
-                                    )}
+                                    {(() => {
+                                      const { profile, email } = bid.bidder;
+                                      const showName =
+                                        !profile?.anonymousBidding ||
+                                        bid.status === "accepted" ||
+                                        bid.status === "completed";
+
+                                      if (!showName) return "Anonymous Bidder";
+
+                                      return (
+                                        profile?.fullName ||
+                                        profile?.companyName ||
+                                        email.split("@")[0] ||
+                                        "Bidder"
+                                      );
+                                    })()}
                                   </h3>
                                   {bid.bidder.isVerified && (
                                     <div className="flex items-center bg-blue-50 text-blue-700 px-2 py-1 rounded-full text-xs font-medium">
@@ -980,7 +988,7 @@ export default function TenderDetailPage() {
                       {isAwarded && (
                         <Button
                           onClick={() =>
-                            router.push(`/chat/${awardedBid.bidder._id}`)
+                            router.push(`/business-dashboard/project`)
                           }
                           className="bg-blue-500 hover:bg-blue-600 text-white rounded-full px-4 py-2 h-auto font-medium text-sm sm:text-base"
                         >

@@ -8,7 +8,6 @@ import { LanguageProvider } from "@/components/LanguageProvider";
 import { AuthProvider } from "@/context/AuthContext";
 import { ThemeProvider } from "@/components/DarkFilterController";
 import { NotificationProvider } from "@/context/NotificationContext";
-
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],

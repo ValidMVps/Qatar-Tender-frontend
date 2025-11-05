@@ -245,7 +245,15 @@ export default function BiddingSection({
               <Textarea
                 id="bid-description"
                 value={bidDescription}
-                onChange={(e) => setBidDescription(e.target.value)}
+                onChange={(e) => {
+                  // Limit to 5000 characters
+                  if (e.target.value.length <= 5000) {
+                    setBidDescription(e.target.value);
+                  } else {
+                    setBidDescription(e.target.value.slice(0, 5000));
+                    toast.error("Maximum 5000 characters allowed");
+                  }
+                }}
                 placeholder="Describe your approach, experience, and why you're the best fit for this project..."
                 rows={6}
                 className="w-full rounded-xl border-gray-200 focus:border-blue-400 focus:ring-blue-400/20 transition-all duration-300"

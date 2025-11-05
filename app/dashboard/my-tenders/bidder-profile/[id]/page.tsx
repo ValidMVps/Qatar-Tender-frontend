@@ -380,9 +380,9 @@ export default function BidderProfilePage() {
                               className="bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-gray-200/50"
                             >
                               <div className="flex justify-between items-start mb-3">
-                                <span className="font-semibold text-gray-900 text-sm">
+                                {/* <span className="font-semibold text-gray-900 text-sm">
                                   {review.reviewer}
-                                </span>
+                                </span> */}
                                 <div className="flex items-center">
                                   <Star className="h-4 w-4 text-yellow-500 fill-current mr-1" />
                                   <span className="font-semibold text-yellow-700 text-sm">

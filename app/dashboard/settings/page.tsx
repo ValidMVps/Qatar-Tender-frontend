@@ -253,7 +253,6 @@ export default function AppleStyleSettings() {
   const tabs = [
     { id: "general", label: t("General"), icon: Settings },
     { id: "security", label: t("Security_&_Privacy"), icon: Shield },
-    { id: "privacy", label: t("Privacy_Settings"), icon: EyeOff },
   ];
 
   const handleSave = (e: React.FormEvent) => {
@@ -619,7 +618,7 @@ export default function AppleStyleSettings() {
                     </p>
                   </div>
 
-                  <SettingRow
+                  {/* <SettingRow
                     icon={Eye}
                     label={t("Show_Public_Profile")}
                     description={t(
@@ -636,7 +635,7 @@ export default function AppleStyleSettings() {
                         )
                       }
                     />
-                  </SettingRow>
+                  </SettingRow> */}
                 </div>
               </div>
             )}

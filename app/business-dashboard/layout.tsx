@@ -21,7 +21,7 @@ import {
 import Navbar from "@/components/Navbar";
 import { motion } from "framer-motion";
 import BNavbar from "@/components/Bnavbar";
-
+import logo from "../../media/logo.png";
 import { useTranslation } from "../../lib/hooks/useTranslation";
 import { ProtectedRoute } from "@/components/auth-guard";
 import { NotificationProvider } from "@/context/NotificationContext";
@@ -162,11 +162,9 @@ export default function DashboardLayout({
               >
                 <div className="flex items-center justify-between px-3 py-4">
                   <div className="flex items-center">
-                    <div className="w-8 h-8  bg-blue-500  rounded-lg flex items-center justify-center shadow-sm">
-                      <Building2 className="h-5 w-5 text-white" />
-                    </div>
+                
                     <span className="ml-2 text-lg font-semibold text-gray-900">
-                      {t("tenderhub_qatar")}
+                      <img src={logo.src} alt="" />
                     </span>
                   </div>
                   <button onClick={() => setSidebarOpen(false)}>
@@ -182,11 +180,8 @@ export default function DashboardLayout({
           <aside className="sticky top-0 h-screen bg-white border-r border-gray-200 hidden lg:flex flex-col w-64">
             <div className="px-4 py-6">
               <div className="flex items-center space-x-3">
-                <div className="w-9 h-9 bg-gradient-to-br bg-blue-500  rounded-xl flex items-center justify-center shadow-sm">
-                  <Building2 className="h-5 w-5 text-white" />
-                </div>
-                <span className="text-2xl font-semibold text-gray-900">
-                  {t("tenderhub")}
+                <span className="text-2xl font-semibold text-gray-900 flex">
+                  <img src={logo.src} alt="" className="w-[90%] mx-auto" />
                 </span>
               </div>
             </div>

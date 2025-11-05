@@ -1735,7 +1735,9 @@
   "view_tender_details": "View tender details",
   "please_enter_valid_bid_amount": "Please enter a valid bid amount",
   "please_rate_worker": "Please rate the worker",
+  "recent_activity": "Recent Acitivity",
   "please_retry_failed_payments": "Please retry failed payments",
+  "make_tender_active": "Make Tender Active",
   "please_wait_while_we_process_your_changes": "Please wait while we process your changes",
   "note_do_not_include_contact_information_in_your_answer": "Do not include email, phone, or website links. Communication should stay on platform."
 }

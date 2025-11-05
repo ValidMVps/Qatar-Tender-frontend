@@ -425,14 +425,16 @@ const EditableReviewCard: React.FC<{
             <Button
               variant="outline"
               className="flex-1 rounded-xl border-gray-200 hover:bg-gray-50 transition-colors"
-              onClick={() => router.push(`/chat/${review.userId}`)}
+              onClick={() => router.push(`/business-dashboard/project`)}
             >
               <MessageCircle className="h-3.5 w-3.5 mr-1.5 sm:h-4 sm:w-4 sm:mr-2" />
               <span className="text-xs sm:text-sm">{t("chat") || "Chat"}</span>
             </Button>
             <Button
               className="flex-1 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors"
-              onClick={() => router.push(`/projects/${review.tenderId}`)}
+              onClick={() =>
+                router.push(`/business-dashboard/tender/${review.tenderId}`)
+              }
             >
               <FileText className="h-3.5 w-3.5 mr-1.5 sm:h-4 sm:w-4 sm:mr-2" />
               <span className="text-xs sm:text-sm">

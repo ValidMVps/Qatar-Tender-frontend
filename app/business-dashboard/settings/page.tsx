@@ -638,24 +638,7 @@ export default function AppleStyleSettings() {
                     />
                   </SettingRow>
 
-                  <SettingRow
-                    icon={Eye}
-                    label={t("Show_Public_Profile")}
-                    description={t(
-                      "Allow_others_to_view_your_public_profile_when_they_award_you_projects"
-                    )}
-                  >
-                    <Switch
-                      checked={showPublicProfile}
-                      onCheckedChange={(checked) =>
-                        updateProfileSetting(
-                          "showPublicProfile",
-                          checked,
-                          t("Public_profile_settings_updated")
-                        )
-                      }
-                    />
-                  </SettingRow>
+        
                 </div>
               </div>
             )}

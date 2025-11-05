@@ -19,7 +19,7 @@ function Headerauth() {
             <Building2 className="h-5 w-5 text-white" />
           </div>
           <span className="text-xl font-semibold text-gray-900">
-            TenderHub Qatar
+            GoTenderly Qatar
           </span>
         </Link>
 

@@ -288,7 +288,7 @@ export default function TenderDetailsPage({ params }: PageProps) {
               <div onClick={() => router.back()}>
                 <Button className="bg-blue-500 hover:bg-blue-600 text-white rounded-lg sm:rounded-xl px-4 py-2 sm:px-6 sm:py-2.5 font-medium text-sm sm:text-base transition-all duration-300">
                   <ArrowLeft className="h-4 w-4 mr-2" />
-                  {t('back_to_tenders')}
+                  {t("back_to_tenders")}
                 </Button>
               </div>
             </div>
@@ -310,7 +310,7 @@ export default function TenderDetailsPage({ params }: PageProps) {
                   className="flex items-center text-blue-500 hover:text-blue-600 font-medium text-sm sm:text-base transition-colors cursor-pointer"
                 >
                   <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
-                  {t('browse_tenders')}
+                  {t("browse_tenders")}
                 </div>
               </div>
             </div>
@@ -401,7 +401,7 @@ export default function TenderDetailsPage({ params }: PageProps) {
                         <div className="flex items-center gap-1 sm:gap-2 mb-1 sm:mb-2">
                           <DollarSign className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
                           <span className="text-xs sm:text-sm font-medium text-green-700">
-                            {t('budget')}
+                            {t("budget")}
                           </span>
                         </div>
                         <p className="text-lg sm:text-2xl font-bold text-green-700">
@@ -412,7 +412,7 @@ export default function TenderDetailsPage({ params }: PageProps) {
                         <div className="flex items-center gap-1 sm:gap-2 mb-1 sm:mb-2">
                           <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
                           <span className="text-xs sm:text-sm font-medium text-blue-700">
-                            {t('deadline')}
+                            {t("deadline")}
                           </span>
                         </div>
                         <p className="text-base sm:text-lg font-semibold text-blue-700">
@@ -423,7 +423,7 @@ export default function TenderDetailsPage({ params }: PageProps) {
                         <div className="flex items-center gap-1 sm:gap-2 mb-1 sm:mb-2">
                           <MapPin className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600" />
                           <span className="text-xs sm:text-sm font-medium text-purple-700">
-                            {t('location')}
+                            {t("location")}
                           </span>
                         </div>
                         <p className="text-base sm:text-lg font-semibold text-purple-700">
@@ -434,7 +434,7 @@ export default function TenderDetailsPage({ params }: PageProps) {
                         <div className="flex items-center gap-1 sm:gap-2 mb-1 sm:mb-2">
                           <Star className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-600" />
                           <span className="text-xs sm:text-sm font-medium text-yellow-700">
-                            {t('bids_placed')}
+                            {t("bids_placed")}
                           </span>
                         </div>
                         <p className="text-base sm:text-lg font-semibold text-yellow-700">
@@ -569,7 +569,8 @@ export default function TenderDetailsPage({ params }: PageProps) {
                     {userBid ? (
                       <div className="space-y-2 sm:space-y-3">
                         {userBid.status === "under_review" &&
-                          userBid.paymentStatus === "failed" && (
+                          (userBid.paymentStatus === "failed" ||
+                            userBid.paymentStatus === "pending") && (
                             <Button
                               onClick={handleRetryPayment}
                               className="w-full bg-red-500 hover:bg-red-600 text-white rounded-lg sm:rounded-xl py-2.5 sm:py-3 font-medium text-sm sm:text-base transition-all duration-300 shadow-lg shadow-red-500/25"
