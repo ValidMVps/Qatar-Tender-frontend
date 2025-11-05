@@ -399,6 +399,28 @@ const NotificationDemo = () => {
     <div className="mx-auto p-4 sm:p-6 w-full">
       <div className="bg-white/95 backdrop-blur-2xl rounded-2xl sm:rounded-3xl border border-slate-200/40 overflow-hidden shadow-xl shadow-slate-200/20">
         {/* Header */}
+        <div className="flex items-center justify-end space-x-3">
+          {unreadCount > 0 && (
+            <>
+              <button
+                onClick={async () => {
+                  try {
+                    if (markAllAsRead) await markAllAsRead();
+                  } catch (err) {
+                    console.error("markAllAsRead failed:", err);
+                  }
+                }}
+                className="text-sm sm:text-base text-blue-600 hover:text-blue-700 font-semibold px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg hover:bg-blue-50/50 transition-colors"
+              >
+                {t("Mark All as Read")}
+              </button>
+
+              <div className="bg-gradient-to-r from-red-500 to-rose-500 text-white text-xs font-bold rounded-full h-6 w-6 sm:h-7 sm:w-7 flex items-center justify-center shadow-lg shadow-red-200/40">
+                {unreadCount > 99 ? "99+" : unreadCount}
+              </div>
+            </>
+          )}
+        </div>
         <div className="bg-gradient-to-r from-slate-50 via-blue-50/30 to-indigo-50/40 backdrop-blur-xl border-b border-slate-200/30 p-4 sm:p-6 md:p-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center space-x-3 sm:space-x-4">
