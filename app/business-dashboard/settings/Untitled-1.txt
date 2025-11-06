@@ -15,3 +15,4 @@ audit log need to be fixed
 validation checker need to be fixed
 Upload image show review
 admin Notifications mark as read
+useeeffect in both admin and user context not wokring first tiem so it goes to blank page on user and on amdin it keeps gettigne rror

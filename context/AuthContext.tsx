@@ -14,8 +14,9 @@ import { useRouter } from "next/navigation";
 import { authService, RegisterData, User } from "@/utils/auth";
 import { api } from "@/lib/apiClient";
 import socketService from "@/lib/socket";
-import { getTokenFromCookie } from "@/utils/tokenHelpers";
+import { clearTokens, getTokenFromCookie } from "@/utils/tokenHelpers";
 import { useToast } from "@/hooks/use-toast";
+import { jwtDecode } from "jwt-decode";
 
 interface Profile {
   _id: string;
@@ -73,7 +74,56 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     `${Date.now()}-${Math.random().toString(36).slice(2)}`
   );
   const suppressReloadRef = useRef(false);
+  useEffect(() => {
+    const checkAdminAndRedirect = () => {
+      const token = getTokenFromCookie();
+      if (!token) {
+        setIsLoading(false);
+        return;
+      }
 
+      try {
+        const decoded: any = jwtDecode(token);
+        if (decoded?.userType === "admin") {
+          // Admin in user dashboard → kick out
+          clearTokens();
+
+          // Clear all cookies (extra safety)
+          if (typeof document !== "undefined") {
+            document.cookie.split(";").forEach((c) => {
+              document.cookie = c
+                .replace(/^ +/, "")
+                .replace(
+                  /=.*/,
+                  "=;expires=" + new Date(0).toUTCString() + ";path=/"
+                );
+            });
+          }
+
+          // Redirect
+          window.location.href = "/login?error=admin_not_allowed";
+          return;
+        }
+
+        // Valid non-admin → fetch profile
+        authService
+          .getCurrentUser()
+          .then((profile) => {
+            setUser(profile);
+            setIsLoading(false);
+          })
+          .catch(() => {
+            clearTokens();
+            setIsLoading(false);
+          });
+      } catch (err) {
+        clearTokens();
+        setIsLoading(false);
+      }
+    };
+
+    checkAdminAndRedirect();
+  }, []);
   /** ------------------ PROFILE FETCH ------------------ */
   const fetchProfile = useCallback(async () => {
     try {
@@ -188,36 +238,29 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   /** ------------------ LOGIN ------------------ */
   const login = async (email: string, password: string) => {
-    setIsLoading(true);
-    try {
-      const result = await authService.login(email, password);
-      if (result.success && result.user) {
-        setUser(result.user);
-        fetchProfile(); // async fetch
-
-        suppressReloadRef.current = true;
-        setTimeout(() => (suppressReloadRef.current = false), 5500);
-
-        const token = getTokenFromCookie();
-        if (token) {
-          socketService.connect(token);
-          socketService
-            .getSocket()
-            ?.emit("join-user-room", { userId: result.user._id });
+    const result = await authService.login(email, password);
+    if (result.success) {
+      const token = getTokenFromCookie();
+      if (token) {
+        try {
+          const decoded: any = jwtDecode(token);
+          if (decoded?.userType === "admin") {
+            // This should not happen if backend is correct, but just in case
+            clearTokens();
+            window.location.href = "/login?error=admin_not_allowed";
+            return {
+              success: false,
+              error: "Admin access is not allowed here.",
+            };
+          }
+        } catch (e) {
+          /* ignore */
         }
-
-        router.push(
-          result.user.userType === "business"
-            ? "/business-dashboard"
-            : "/dashboard"
-        );
       }
-      return result;
-    } catch (err: any) {
-      return { success: false, error: err?.message || "Login failed" };
-    } finally {
-      setIsLoading(false);
+      const profile = await authService.getCurrentUser();
+      setUser(profile);
     }
+    return result;
   };
 
   /** ------------------ OTHER METHODS ------------------ */

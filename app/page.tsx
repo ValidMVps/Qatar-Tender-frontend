@@ -17,19 +17,16 @@ import {
   Menu,
   X,
   Star,
-  FileText,
+  MessageSquare,
   Shield,
-  BarChart3,
+  EyeOff,
+  Bell,
   Users,
-  Clock,
-  Globe2,
-  UserPlus,
   Search,
   Award,
-  FilePlus,
-  Cloud,
+  FileText,
   Lock,
-  Layers,
+  Zap,
 } from "lucide-react";
 import logo from "../media/logo.png";
 import Hero from "@/components/Hero";
@@ -42,12 +39,12 @@ import Navbarlanding from "@/components/Navbarladning";
 /* ----------------------------- TrustedBy ---------------------------------- */
 function TrustedBy() {
   const partners = [
-    { name: "Ministry of Commerce", width: "w-32" },
-    { name: "Qatar Energy", width: "w-28" },
-    { name: "Ashghal", width: "w-24" },
-    { name: "Kahramaa", width: "w-32" },
-    { name: "Hamad Medical", width: "w-28" },
-    { name: "Qatar Airways", width: "w-32" },
+    { name: "Lusail Residents", width: "w-32" },
+    { name: "Doha SMEs", width: "w-28" },
+    { name: "Al Wakrah Events", width: "w-32" },
+    { name: "Pearl Qatar", width: "w-28" },
+    { name: "West Bay Offices", width: "w-32" },
+    { name: "Qatar Garages", width: "w-32" },
   ];
 
   return (
@@ -60,7 +57,7 @@ function TrustedBy() {
           className="text-center mb-12"
         >
           <p className="text-lg text-[#86868b] font-medium">
-            Used by public and private sector teams across Qatar
+            Used by individuals and businesses across Qatar
           </p>
         </motion.div>
 
@@ -89,73 +86,43 @@ function TrustedBy() {
   );
 }
 
-/* ------------------------------- Features --------------------------------- */
-function Features() {
-  const features = [
+/* ------------------------------- Problems --------------------------------- */
+function Problems() {
+  const problems = [
     {
+      title: "Hard to find all options; vendors are fragmented.",
+      icon: Search,
+      audience: "For tenderers",
+    },
+    {
+      title: "Unclear requirements lead to wrong quotes and rework.",
       icon: FileText,
-      title: "Tender Lifecycle",
-      description:
-        "Create, publish and manage tenders with templated workflows, automatic timelines and versioned documents.",
+      audience: "For tenderers",
     },
     {
-      icon: Shield,
-      title: "KYC & Compliance",
-      description:
-        "Verified supplier onboarding, document checks and compliance with Qatari procurement policies.",
+      title: "Repeating the same brief to each vendor takes time.",
+      icon: MessageSquare,
+      audience: "For tenderers",
     },
     {
-      icon: BarChart3,
-      title: "Evaluation & Analytics",
-      description:
-        "Configurable scorecards, weighted evaluation and audit-ready reports for procurement committees.",
+      title: "Specs are vague; quoting feels risky or time-wasting.",
+      icon: FileText,
+      audience: "For bidders (suppliers)",
     },
     {
+      title: "Hard to find real, ready buyers; leads aren’t qualified.",
       icon: Users,
-      title: "Multi-Role Dashboards",
-      description:
-        "Separate views for buyers, suppliers and admins with role-based access controls.",
+      audience: "For bidders (suppliers)",
     },
     {
-      icon: Clock,
-      title: "Real‑time Notifications",
-      description:
-        "Bid alerts, timeline reminders and status updates through email and in-app notifications.",
-    },
-    {
-      icon: Globe2,
-      title: "Bilingual & Localized",
-      description:
-        "Full Arabic and English interfaces, QAR currency support and localized date formats.",
-    },
-    {
-      icon: FilePlus,
-      title: "Secure Document Hub",
-      description:
-        "Document versioning, secure downloads and optional e‑sign integration for contract execution.",
-    },
-    {
-      icon: Lock,
-      title: "Bid Security & EMD",
-      description:
-        "Support for bid bonds / EMD management and secure escrow workflows.",
-    },
-    {
-      icon: Cloud,
-      title: "Integrations & API",
-      description:
-        "CSV/Excel imports, REST APIs and SSO for enterprise integrations.",
-    },
-    {
-      icon: Layers,
-      title: "Prequalification",
-      description:
-        "Pre‑qualify suppliers with PQ questionnaires and pass/fail rules for quick shortlist generation.",
+      title: "Negotiations spread across calls/emails and get lost.",
+      icon: MessageSquare,
+      audience: "For bidders (suppliers)",
     },
   ];
 
   return (
-    <section id="features" className="py-24 sm:py-32 bg-[#fbfbfd]">
+    <section id="problems" className="py-24 sm:py-32 bg-[#fbfbfd]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -165,41 +132,147 @@ function Features() {
           className="text-center mb-16"
         >
           <h2 className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-[#1d1d1f] mb-4">
-            A procurement platform built for results.
+            The procurement struggle is real.
           </h2>
           <p className="text-xl text-[#6e6e73] max-w-2xl mx-auto">
-            Everything buyers and suppliers need to run compliant tenders — from
-            publishing to award and audit.
+            Whether you're posting or bidding, traditional methods waste time
+            and lead to mismatched outcomes.
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {features.map((f, i) => {
-            const Icon = f.icon;
-            return (
-              <motion.div
-                key={f.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.45, delay: i * 0.06 }}
-                whileHover={{ y: -4 }}
-                className="group"
-              >
-                <div className="bg-white rounded-[24px] p-8 h-full border border-[#d2d2d7] hover:border-[#38b6ff]/30 transition-all">
-                  <div className="w-12 h-12 rounded-2xl bg-[#38b6ff] flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                    <Icon className="w-6 h-6 text-white" />
-                  </div>
-                  <h3 className="text-xl font-semibold text-[#1d1d1f] mb-3">
-                    {f.title}
-                  </h3>
-                  <p className="text-base text-[#6e6e73] leading-relaxed">
-                    {f.description}
-                  </p>
-                </div>
-              </motion.div>
-            );
-          })}
+        <div className="grid md:grid-cols-2 gap-8">
+          {["For tenderers", "For bidders (suppliers)"].map((audience) => (
+            <div key={audience}>
+              <h3 className="text-2xl font-semibold text-[#1d1d1f] mb-6 text-center md:text-left">
+                {audience}
+              </h3>
+              <div className="space-y-6">
+                {problems
+                  .filter((p) => p.audience === audience)
+                  .map((p, i) => {
+                    const Icon = p.icon;
+                    return (
+                      <motion.div
+                        key={p.title}
+                        initial={{ opacity: 0, x: -20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.45, delay: i * 0.1 }}
+                        className="flex items-start gap-4"
+                      >
+                        <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center flex-shrink-0">
+                          <Icon className="w-5 h-5 text-red-600" />
+                        </div>
+                        <p className="text-base text-[#6e6e73] leading-relaxed">
+                          {p.title}
+                        </p>
+                      </motion.div>
+                    );
+                  })}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ------------------------------- Outcomes --------------------------------- */
+function Outcomes() {
+  const outcomes = [
+    {
+      title: "Post once and reach many bidders at once.",
+      icon: Zap,
+      audience: "For tenderers — Outcomes with Tenderly",
+    },
+    {
+      title: "Use built-in Q/A to clarify missing details before award.",
+      icon: MessageSquare,
+      audience: "For tenderers — Outcomes with Tenderly",
+    },
+    {
+      title: "Compare apples-to-apples (price, ETA, notes) in one view.",
+      icon: Award,
+      audience: "For tenderers — Outcomes with Tenderly",
+    },
+    {
+      title: "Stay anonymous until award; choose the best fit faster.",
+      icon: EyeOff,
+      audience: "For tenderers — Outcomes with Tenderly",
+    },
+    {
+      title: "Ask/answer clarifying questions publicly on the tender.",
+      icon: MessageSquare,
+      audience: "For bidders — Outcomes with Tenderly",
+    },
+    {
+      title:
+        "See all required fields up front; submit a clear, competitive bid.",
+      icon: FileText,
+      audience: "For bidders — Outcomes with Tenderly",
+    },
+    {
+      title: "Keep negotiations in one private thread; get awarded faster.",
+      icon: Lock,
+      audience: "For bidders — Outcomes with Tenderly",
+    },
+  ];
+
+  return (
+    <section id="outcomes" className="py-24 sm:py-32 bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-16"
+        >
+          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-[#1d1d1f] mb-4">
+            Better outcomes with Tenderly.
+          </h2>
+          <p className="text-xl text-[#6e6e73] max-w-2xl mx-auto">
+            Eliminate friction, get clarity, and close deals faster — for both
+            sides.
+          </p>
+        </motion.div>
+
+        <div className="grid md:grid-cols-2 gap-8">
+          {[
+            "For tenderers — Outcomes with Tenderly",
+            "For bidders — Outcomes with Tenderly",
+          ].map((audience) => (
+            <div key={audience}>
+              <h3 className="text-2xl font-semibold text-[#1d1d1f] mb-6 text-center md:text-left">
+                {audience}
+              </h3>
+              <div className="space-y-6">
+                {outcomes
+                  .filter((o) => o.audience === audience)
+                  .map((o, i) => {
+                    const Icon = o.icon;
+                    return (
+                      <motion.div
+                        key={o.title}
+                        initial={{ opacity: 0, x: 20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.45, delay: i * 0.1 }}
+                        className="flex items-start gap-4"
+                      >
+                        <div className="w-10 h-10 rounded-xl bg-[#38b6ff]/10 flex items-center justify-center flex-shrink-0">
+                          <Icon className="w-5 h-5 text-[#38b6ff]" />
+                        </div>
+                        <p className="text-base text-[#6e6e73] leading-relaxed">
+                          {o.title}
+                        </p>
+                      </motion.div>
+                    );
+                  })}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </section>
@@ -210,33 +283,27 @@ function Features() {
 function HowItWorks() {
   const steps = [
     {
-      icon: UserPlus,
-      title: "Onboard & Verify",
-      description:
-        "Suppliers register, upload licences and company documents — automated KYC reduces manual checks.",
-    },
-    {
       icon: FileText,
-      title: "Publish or Search",
+      title: "Post",
       description:
-        "Buyers publish tenders with templates; suppliers discover opportunities with advanced filters and saved searches.",
-    },
-    {
-      icon: Search,
-      title: "Submit & Evaluate",
-      description:
-        "Suppliers submit bids and documents; evaluation panels use scorecards to produce objective, auditable results.",
+        "Share your requirements once — title, category, deadline, deliverables, and optional budget.",
     },
     {
       icon: Award,
-      title: "Award & Execute",
+      title: "Receive & compare bids",
       description:
-        "Award contracts, handle EMD releases and finalise agreements with document signing and payment options in QAR.",
+        "Bids come in with price, ETA, and notes. Use Q/A to clarify anything before comparing side-by-side.",
+    },
+    {
+      icon: MessageSquare,
+      title: "Chat & award",
+      description:
+        "Negotiate privately. Identities revealed only after award — then finalize offline.",
     },
   ];
 
   return (
-    <section id="how-it-works" className="py-24 sm:py-32 bg-white">
+    <section id="how-it-works" className="py-24 sm:py-32 bg-[#fbfbfd]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -246,15 +313,14 @@ function HowItWorks() {
           className="text-center mb-20"
         >
           <h2 className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-[#1d1d1f] mb-4">
-            How it works.
+            How it works in 3 steps.
           </h2>
           <p className="text-xl text-[#6e6e73] max-w-2xl mx-auto">
-            Four clear steps to close procurement faster and with full
-            compliance.
+            Simple, transparent, and fast — from post to award.
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+        <div className="grid md:grid-cols-3 gap-8">
           {steps.map((s, i) => {
             const Icon = s.icon;
             return (
@@ -292,41 +358,43 @@ function HowItWorks() {
   );
 }
 
-/* -------------------------------- Stats ----------------------------------- */
-function AnimatedCounter({ value, suffix }: { value: number; suffix: string }) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const motionValue = useMotionValue(0);
-  const springValue = useSpring(motionValue, { duration: 2000 });
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
-
-  useEffect(() => {
-    if (isInView) motionValue.set(value);
-  }, [isInView, motionValue, value]);
-  useEffect(() => {
-    springValue.on("change", (latest) => {
-      if (ref.current)
-        ref.current.textContent = Math.floor(latest).toLocaleString();
-    });
-  }, [springValue]);
-
-  return (
-    <>
-      <span ref={ref}>0</span>
-      <span>{suffix}</span>
-    </>
-  );
-}
-
-function Stats() {
-  const stats = [
-    { value: 1_250, suffix: "+", label: "Active Tenders" },
-    { value: 3_800, suffix: "+", label: "Verified Suppliers" },
-    { value: 92, suffix: "%", label: "Award Accuracy" },
-    { value: 120, suffix: "M+", label: "QAR Facilitated" },
+/* ------------------------------ UseCases ---------------------------------- */
+function UseCases() {
+  const cases = [
+    {
+      title: "Home services (cleaning & maintenance)",
+      scenario:
+        "NA is moving out of an apartment in Lusail and needs a deep clean on a specific date. Calling companies one by one was slow and prices varied wildly. On Tenderly, NA posted once with the date, apartment size, and checklist. Through Q/A, bidders confirmed building access and timings. NA received multiple quotes the same day, compared inclusions (steam, windows, oven), and awarded the best match—done.",
+    },
+    {
+      title: "Automotive services (repair, detailing, tires)",
+      scenario:
+        "HM’s SUV needs brake pads and a full detail. Not sure of fair pricing or downtime. HM posted the plate/model and preferred time window. Garages responded with parts options (OEM/aftermarket), ETAs, and warranty notes; a detailer asked in Q/A about interior shampoo vs. quick wash. HM picked a garage that offered pick-up/drop-off and a detail combo—problem solved in one go.",
+    },
+    {
+      title: "Events (weddings, corporate, birthdays)",
+      scenario:
+        "MA is planning a small wedding in Al Wakrah: catering for 120, décor, DJ, and photo/video. Vendors were scattered and hard to coordinate. MA posted the budget range, menu style, and venue restrictions. Using Q/A, suppliers clarified power load and layout. MA quickly compared package breakdowns, shortlisted two, negotiated extras (LED dance floor), and awarded a single vendor bundle.",
+    },
+    {
+      title: "Construction & renovation (small works, fit-outs, repairs)",
+      scenario:
+        "AA wants a kitchen refresh—cabinet re-facing and new countertop. Past quotes were inconsistent and missed measurements. AA posted with drawings/photos and a rough timeline. Contractors used Q/A to ask about materials and site access; AA added dimensions. Comparable bids arrived with line-item costs and lead times. AA awarded one contractor and arranged a site visit after award.",
+    },
+    {
+      title: "Facilities management & building maintenance",
+      scenario:
+        "LT needs a combined soft/hard FM contract: daily cleaning plus quarterly HVAC maintenance. Previous suppliers covered only part of the scope. LT posted a single tender with SLAs and KPIs. In Q/A, bidders confirmed consumables, call-out times, and preventive schedules. LT compared consolidated proposals, checked references, and awarded one provider for the whole site.",
+    },
+    {
+      title: "IT & managed services (support, cloud, networking)",
+      scenario:
+        "KR’s team needs 24/7 helpdesk, endpoint security, and cloud backups. Cold outreach was noisy; scopes didn’t match. KR posted requirements (users, devices, response times, compliance needs). MSPs asked in Q/A about current stack and ticket volume, then submitted structured bids with SLAs and onboarding plans. KR compared like-for-like, negotiated onboarding fees, and awarded the best-fit MSP.",
+    },
   ];
 
   return (
-    <section className="py-24 sm:py-32 bg-[#fbfbfd]">
+    <section id="use-cases" className="py-24 sm:py-32 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -336,27 +404,33 @@ function Stats() {
           className="text-center mb-16"
         >
           <h2 className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-[#1d1d1f] mb-4">
-            Trusted across Qatar.
+            Real use cases in Qatar.
           </h2>
           <p className="text-xl text-[#6e6e73] max-w-2xl mx-auto">
-            Real procurement outcomes for public and private sector teams.
+            From home cleaning to enterprise IT — see how Tenderly works in
+            practice.
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-          {stats.map((s, i) => (
+        <div className="grid md:grid-cols-2 gap-6">
+          {cases.map((c, i) => (
             <motion.div
-              key={s.label}
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
+              key={c.title}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: i * 0.06 }}
-              className="text-center"
+              transition={{ duration: 0.45, delay: i * 0.06 }}
+              whileHover={{ y: -4 }}
+              className="group"
             >
-              <div className="text-5xl sm:text-6xl font-semibold text-[#38b6ff] mb-2">
-                <AnimatedCounter value={s.value} suffix={s.suffix} />
+              <div className="bg-[#fbfbfd] rounded-[24px] p-8 h-full border border-[#d2d2d7] hover:border-[#38b6ff]/30 transition-all">
+                <h3 className="text-xl font-semibold text-[#1d1d1f] mb-4">
+                  {c.title}
+                </h3>
+                <p className="text-base text-[#6e6e73] leading-relaxed">
+                  {c.scenario}
+                </p>
               </div>
-              <p className="text-base text-[#6e6e73]">{s.label}</p>
             </motion.div>
           ))}
         </div>
@@ -365,57 +439,29 @@ function Stats() {
   );
 }
 
-/* ------------------------------- Pricing ---------------------------------- */
-function Pricing() {
-  const plans = [
+/* --------------------------- HowItWorksDetailed --------------------------- */
+function HowItWorksDetailed() {
+  const steps = [
     {
-      name: "Starter",
-      description: "For local suppliers and small tenders",
-      price: "Free",
-      period: "",
-      features: [
-        "5 active bids / month",
-        "Basic supplier profile",
-        "Email notifications",
-        "Community support",
+      audience: "For tenderers (buyers)",
+      items: [
+        "Post your tender (title, category, deadline, optional budget, deliverables).",
+        "Use Q/A to clarify specs or request revisions—without revealing identity.",
+        "Compare & shortlist side-by-side, then award the winner (identities reveal after award).",
       ],
-      cta: "Get started",
-      highlighted: false,
     },
     {
-      name: "Professional",
-      description: "For procurement teams and growing suppliers",
-      price: "1,499",
-      period: "/month",
-      features: [
-        "Unlimited bids",
-        "Verified badge & PQ tools",
-        "Advanced analytics & exports",
-        "Priority support",
-        "API access",
+      audience: "For bidders (suppliers)",
+      items: [
+        "Register & browse matching tenders.",
+        "Submit your bid (price, ETA, terms, attachments); update anytime before the deadline.",
+        "Negotiate privately until the tenderer awards; identities reveal post-award for contracting.",
       ],
-      cta: "Start free trial",
-      highlighted: true,
-    },
-    {
-      name: "Enterprise",
-      description: "For large organisations and ministries",
-      price: "Custom",
-      period: "",
-      features: [
-        "SLA & custom integrations",
-        "White‑label portals",
-        "Dedicated onboarding",
-        "24/7 support",
-        "Custom security reviews",
-      ],
-      cta: "Contact sales",
-      highlighted: false,
     },
   ];
 
   return (
-    <section id="pricing" className="py-24 sm:py-32 bg-white">
+    <section id="how-it-works-detailed" className="py-24 sm:py-32 bg-[#fbfbfd]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -425,80 +471,165 @@ function Pricing() {
           className="text-center mb-16"
         >
           <h2 className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-[#1d1d1f] mb-4">
-            Simple predictable pricing.
+            How it works — step by step.
           </h2>
           <p className="text-xl text-[#6e6e73] max-w-2xl mx-auto">
-            Plans for suppliers, procurement teams and enterprise customers —
-            pricing in QAR, billing monthly or annually.
+            Clear actions for both tenderers and bidders.
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-          {plans.map((p, i) => (
+        <div className="grid md:grid-cols-2 gap-8">
+          {steps.map((s, i) => (
             <motion.div
-              key={p.name}
+              key={s.audience}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.45, delay: i * 0.06 }}
-              className="relative"
+              transition={{ duration: 0.5, delay: i * 0.1 }}
             >
-              {p.highlighted && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                  <span className="bg-[#38b6ff] text-white text-xs font-medium px-4 py-1.5 rounded-full">
-                    Most popular
-                  </span>
-                </div>
-              )}
-              <div
-                className={`h-full bg-white rounded-[28px] p-8 border-2 transition-all ${
-                  p.highlighted
-                    ? "border-[#38b6ff] shadow-xl scale-105"
-                    : "border-[#d2d2d7] hover:border-[#38b6ff]/30"
-                }`}
-              >
-                <div className="mb-6">
-                  <h3 className="text-2xl font-semibold text-[#1d1d1f] mb-2">
-                    {p.name}
-                  </h3>
-                  <p className="text-sm text-[#86868b]">{p.description}</p>
-                </div>
-
-                <div className="mb-8">
-                  <div className="flex items-baseline gap-1">
-                    {p.price !== "Custom" && p.price !== "Free" && (
-                      <span className="text-lg text-[#86868b]">QAR</span>
-                    )}
-                    <span className="text-5xl font-semibold text-[#1d1d1f]">
-                      {p.price}
+              <h3 className="text-2xl font-semibold text-[#1d1d1f] mb-6">
+                {s.audience}
+              </h3>
+              <ol className="space-y-4">
+                {s.items.map((item, idx) => (
+                  <li
+                    key={idx}
+                    className="flex items-start gap-3 text-base text-[#6e6e73]"
+                  >
+                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[#38b6ff] text-white text-sm font-medium flex items-center justify-center">
+                      {idx + 1}
                     </span>
-                    {p.period && (
-                      <span className="text-lg text-[#86868b]">{p.period}</span>
-                    )}
-                  </div>
-                </div>
-
-                <button
-                  className={`w-full h-12 rounded-xl font-medium mb-8 ${
-                    p.highlighted
-                      ? "bg-[#38b6ff] hover:bg-[#0077ed] text-white"
-                      : "bg-[#f5f5f7] hover:bg-[#e8e8ed] text-[#1d1d1f]"
-                  }`}
-                >
-                  {p.cta}
-                </button>
-
-                <div className="space-y-4">
-                  {p.features.map((f) => (
-                    <div key={f} className="flex items-start gap-3">
-                      <Check className="w-5 h-5 text-[#38b6ff] flex-shrink-0 mt-0.5" />
-                      <span className="text-sm text-[#1d1d1f]">{f}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ol>
             </motion.div>
           ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ------------------------------ KeyFeatures ------------------------------- */
+function KeyFeatures() {
+  const features = [
+    {
+      icon: Zap,
+      title: "One-to-Many Quotes",
+      description: "Post once, reach many bidders instantly.",
+    },
+    {
+      icon: Lock,
+      title: "Private Chat & Negotiation",
+      description: "Clarify details without sharing identity.",
+    },
+    {
+      icon: EyeOff,
+      title: "Anonymity by Default",
+      description: "Both sides stay anonymous until award.",
+    },
+    {
+      icon: Shield,
+      title: "Profiles & Verification",
+      description: "KYC/business verification and ratings.",
+    },
+    {
+      icon: Bell,
+      title: "Notifications",
+      description: "Alerts for new bids and messages.",
+    },
+  ];
+
+  return (
+    <section id="features" className="py-24 sm:py-32 bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-16"
+        >
+          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-[#1d1d1f] mb-4">
+            Key features.
+          </h2>
+          <p className="text-xl text-[#6e6e73] max-w-2xl mx-auto">
+            Everything you need to post, bid, and award — securely and
+            efficiently.
+          </p>
+        </motion.div>
+
+        <div className="grid md:grid-cols-3 lg:grid-cols-5 gap-6">
+          {features.map((f, i) => {
+            const Icon = f.icon;
+            return (
+              <motion.div
+                key={f.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.45, delay: i * 0.06 }}
+                whileHover={{ y: -4 }}
+                className="group"
+              >
+                <div className="bg-white rounded-[24px] p-6 h-full border border-[#d2d2d7] hover:border-[#38b6ff]/30 transition-all text-center">
+                  <div className="w-12 h-12 rounded-2xl bg-[#38b6ff] flex items-center justify-center mb-4 mx-auto group-hover:scale-110 transition-transform">
+                    <Icon className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-[#1d1d1f] mb-2">
+                    {f.title}
+                  </h3>
+                  <p className="text-sm text-[#6e6e73] leading-relaxed">
+                    {f.description}
+                  </p>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ------------------------------- Pricing ---------------------------------- */
+function Pricing() {
+  return (
+    <section id="pricing" className="py-24 sm:py-32 bg-[#fbfbfd]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-16"
+        >
+          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-[#1d1d1f] mb-4">
+            Free to post. Free to bid.
+          </h2>
+          <p className="text-xl text-[#6e6e73] max-w-2xl mx-auto">
+            We’re just the platform: No involvement in contracts, custody, or
+            payments.
+          </p>
+        </motion.div>
+
+        <div className="max-w-md mx-auto">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="bg-white rounded-[32px] p-12 border-2 border-[#38b6ff] text-center"
+          >
+            <div className="text-6xl font-bold text-[#38b6ff] mb-2">Free</div>
+            <p className="text-lg text-[#6e6e73] mb-8">
+              Unlimited posts and bids. No hidden fees.
+            </p>
+            <button className="w-full h-14 bg-[#38b6ff] hover:bg-[#0077ed] text-white rounded-xl font-medium">
+              Post your first tender
+            </button>
+          </motion.div>
         </div>
       </div>
     </section>
@@ -509,19 +640,17 @@ function Pricing() {
 function Testimonials() {
   const testimonials = [
     {
-      name: "Ahmed Al‑Kuwari",
-      role: "Procurement Director",
-      company: "Qatar Energy",
+      name: "NA",
+      role: "Resident, Lusail",
       content:
-        "GoTenderly reduced tender cycle time by 40% and improved transparency across teams.",
+        "I posted my apartment cleaning once and got 5 solid quotes in hours — picked the best one without calling anyone.",
       rating: 5,
     },
     {
-      name: "Fatima Hassan",
-      role: "Supply Chain Manager",
-      company: "Hamad Medical Corporation",
+      name: "HM",
+      role: "Car Owner, Doha",
       content:
-        "Scorecards and audit logs made regulatory reporting simpler and faster.",
+        "Got brake repair + detailing from one garage with pick-up. Saved time and money — all through Tenderly.",
       rating: 5,
     },
   ];
@@ -537,11 +666,10 @@ function Testimonials() {
           className="text-center mb-16"
         >
           <h2 className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-[#1d1d1f] mb-4">
-            Trusted by procurement teams.
+            Loved by users in Qatar.
           </h2>
           <p className="text-xl text-[#6e6e73] max-w-2xl mx-auto">
-            Hear from buyers and suppliers using GoTenderly to run compliant
-            tenders.
+            Real people getting real results — faster and fairer.
           </p>
         </motion.div>
 
@@ -570,7 +698,6 @@ function Testimonials() {
                 <div>
                   <p className="font-semibold text-[#1d1d1f]">{t.name}</p>
                   <p className="text-sm text-[#6e6e73]">{t.role}</p>
-                  <p className="text-sm text-[#38b6ff]">{t.company}</p>
                 </div>
               </div>
             </motion.div>
@@ -586,29 +713,45 @@ function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const faqs = [
     {
-      question: "How do you verify suppliers?",
+      question: "I’m not sure how to write requirements.",
       answer:
-        "We run company document checks, ID verification, and manual review where required. Verified suppliers receive a public badge and prequalification status.",
+        "Use Tenderly’s Q/A feature: bidders and tenderers can ask and answer clarifying questions on the tender page to surface any unknown or missing details (scope, deliverables, timeline, acceptance criteria). This keeps everything transparent, comparable, and helps you receive accurate quotes—no guided templates needed.",
     },
     {
-      question: "Can we import existing tender lists?",
+      question: "What is Tenderly?",
       answer:
-        "Yes — buyers can bulk import tenders and vendor lists via CSV/Excel and map fields to templates.",
+        "Qatar’s open tender platform. Post projects, get bids, pick the best.",
     },
     {
-      question: "Is GoTenderly compliant with Qatar regulations?",
+      question: "Is it really anonymous?",
       answer:
-        "Yes — the platform is built to support common Qatari procurement workflows and provides exportable audit trails for regulator review.",
+        "Yes. Your profile and contact details are hidden until you choose a winner. After award, both parties can share details.",
     },
     {
-      question: "What payment options are available?",
-      answer:
-        "Payments and EMD handling are supported via bank transfer and partner payment providers in QAR. Enterprise customers can enable escrow workflows.",
+      question: "Who can bid?",
+      answer: "Registered companies only.",
     },
     {
-      question: "How long does supplier verification take?",
+      question: "How do I post?",
       answer:
-        "Typical KYC review is 1–3 business days once all documents are submitted; urgent verifications are available for enterprise customers.",
+        "Register → create a new tender and publish → view bids and award.",
+    },
+    {
+      question: "Any fees?",
+      answer: "No. Posting and bidding are free.",
+    },
+    {
+      question: "Do you handle contracts or payments?",
+      answer:
+        "No. We’re a neutral platform. You finalize contracts and payments directly with the other party.",
+    },
+    {
+      question: "Who can use Tenderly?",
+      answer: "Anyone—individuals and businesses of any size.",
+    },
+    {
+      question: "What categories are allowed?",
+      answer: "Anything.",
     },
   ];
 
@@ -628,8 +771,7 @@ function FAQ() {
             Frequently asked.
           </h2>
           <p className="text-xl text-[#6e6e73]">
-            Answers to common questions about security, compliance and
-            onboarding.
+            Got questions? We’ve got answers.
           </p>
         </motion.div>
 
@@ -706,19 +848,8 @@ function CTA() {
                 transition={{ duration: 0.6, delay: 0.2 }}
                 className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-white mb-6 leading-tight"
               >
-                Ready to run compliant tenders?
+                Get better quotes without the back-and-forth.
               </motion.h2>
-
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.3 }}
-                className="text-xl text-white/90 mb-10 max-w-2xl mx-auto"
-              >
-                Book a demo with our procurement specialists or start a free
-                trial and publish your first tender today.
-              </motion.p>
 
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -730,18 +861,10 @@ function CTA() {
                 <motion.a
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  href="/signup"
+                  href="/post"
                   className="bg-white text-[#38b6ff] hover:bg-white/90 rounded-full px-8 h-14 text-lg font-medium shadow-lg flex items-center gap-2"
                 >
-                  Get started free <ArrowRight className="w-5 h-5" />
-                </motion.a>
-                <motion.a
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  href="/demo"
-                  className="text-white hover:bg-white/10 rounded-full px-8 h-14 text-lg font-medium border-2 border-white/30"
-                >
-                  Schedule demo
+                  Post your tender for free <ArrowRight className="w-5 h-5" />
                 </motion.a>
               </motion.div>
 
@@ -752,8 +875,7 @@ function CTA() {
                 transition={{ duration: 0.6, delay: 0.5 }}
                 className="text-sm text-white/70 mt-8"
               >
-                No credit card required • Free 14‑day trial • Enterprise
-                onboarding available
+                Anonymous until award • No fees • Takes ~2 minutes
               </motion.p>
             </div>
           </div>
@@ -768,20 +890,18 @@ function Footer() {
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
   const footerLinks = {
-    product: [
-      { name: "Features", href: "#features" },
+    platform: [
       { name: "How it works", href: "#how-it-works" },
-      { name: "Testimonials", href: "#testimonials" },
+      { name: "Use cases", href: "#use-cases" },
+      { name: "FAQ", href: "#faq" },
     ],
     company: [
       { name: "About", href: "#about" },
-      { name: "Careers", href: "#careers" },
       { name: "Contact", href: "#contact" },
     ],
     legal: [
       { name: "Privacy", href: "#privacy" },
       { name: "Terms", href: "#terms" },
-      { name: "Compliance", href: "#compliance" },
     ],
   };
 
@@ -792,15 +912,15 @@ function Footer() {
           <div className="lg:col-span-2">
             <div className="flex items-center gap-2 mb-4">
               <div className="w-8 h-8 bg-[#38b6ff] rounded-lg flex items-center justify-center">
-                <span className="text-white font-semibold text-sm">GT</span>
+                <span className="text-white font-semibold text-sm">T</span>
               </div>
               <span className="text-lg font-semibold text-[#1d1d1f]">
-                GoTenderly
+                Tenderly
               </span>
             </div>
             <p className="text-[#6e6e73] leading-relaxed max-w-sm">
-              A secure e‑tendering platform for Qatar — built for procurement
-              teams, suppliers and regulators.
+              Qatar’s open tender platform — post once, get competitive bids,
+              award the best.
             </p>
           </div>
 
@@ -828,7 +948,7 @@ function Footer() {
         <div className="border-t border-[#d2d2d7] pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-sm text-[#6e6e73]">
-              © {new Date().getFullYear()} GoTenderly. All rights reserved.
+              © {new Date().getFullYear()} Tenderly. All rights reserved.
             </p>
             <div className="flex gap-6 text-sm">
               <a
@@ -869,9 +989,12 @@ export default function Home() {
       <Navbarlanding />
       <Hero />
       <TrustedBy />
-      <Features />
+      <Problems />
+      <Outcomes />
       <HowItWorks />
-      <Stats />
+      <UseCases />
+      <HowItWorksDetailed />
+      <KeyFeatures />
       <Pricing />
       <Testimonials />
       <FAQ />
