@@ -41,6 +41,8 @@ export const getStatusText = (t: UiTender) => {
       return "Draft";
     case "rejected":
       return "Rejected";
+    case "Rejected":
+      return "Rejected";
     case "awarded":
       return "Awarded";
     default:

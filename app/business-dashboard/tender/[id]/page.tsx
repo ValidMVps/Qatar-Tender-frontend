@@ -197,6 +197,7 @@ export default function TenderDetailPage() {
       const bidsData = await getTenderBids(tenderId);
       const questionsData = await getQuestionsForTender(tenderId);
       setTender(tenderData);
+      console.log(tenderData);
       setBids(bidsData);
       setQuestions(questionsData as unknown as Question[]);
     } catch (err: any) {
@@ -448,7 +449,7 @@ export default function TenderDetailPage() {
               </div>
             </div>
           )}
-          {tender.status === "rejected" && tender.closeReason && (
+          {tender.closeReason && (
             <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
               <div className="flex items-start gap-2">
                 <AlertTriangle className="h-5 w-5 text-red-600 mt-0.5 flex-shrink-0" />
@@ -759,6 +760,7 @@ export default function TenderDetailPage() {
                               </div>
                               <div className="flex flex-wrap gap-2">
                                 {bid.status === "submitted" &&
+                                  tender.status !== "rejected" &&
                                   !hasAwardedBid && (
                                     <div className="flex flex-wrap gap-2">
                                       <Button

@@ -71,7 +71,6 @@ export default function MyTenderCard({
       setIsClosing(false);
     }
   };
-
   const { profile } = useAuth();
   return (
     <>
@@ -183,7 +182,7 @@ export default function MyTenderCard({
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
-              ) : tender.status === "closed" ? (
+              ) : tender.status === "closed" || tender.status === "rejected" ? (
                 <button
                   className="p-2.5 rounded-full bg-green-50 text-green-600 hover:bg-green-100 active:bg-green-200 transition-all"
                   onClick={(e) => stopAnd(e, () => setIsReopening(true))}
