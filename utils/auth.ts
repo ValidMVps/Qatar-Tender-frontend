@@ -156,6 +156,7 @@ class AuthService {
   }
   async logout() {
     try {
+      localStorage.removeItem("draftTenderDontShow");
       await api.post("/api/users/logout");
     } catch (error) {
       console.error("Logout error:", error);

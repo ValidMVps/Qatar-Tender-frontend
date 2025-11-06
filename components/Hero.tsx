@@ -39,15 +39,30 @@ export default function Hero() {
       title: "Tender Title & Description",
       fields: [
         { name: "title", label: "Tender Title", type: "text", required: true },
-        { name: "description", label: "Description", type: "textarea", required: true },
+        {
+          name: "description",
+          label: "Description",
+          type: "textarea",
+          required: true,
+        },
       ],
     },
     {
       id: 2,
       title: "Budget & Deadline",
       fields: [
-        { name: "estimatedBudget", label: "Estimated Budget (QAR)", type: "text", required: true },
-        { name: "deadline", label: "Deadline", type: "calendar", required: true },
+        {
+          name: "estimatedBudget",
+          label: "Estimated Budget (QAR)",
+          type: "text",
+          required: false,
+        }, // ← was true
+        {
+          name: "deadline",
+          label: "Deadline",
+          type: "calendar",
+          required: true,
+        },
       ],
     },
     {
@@ -55,11 +70,22 @@ export default function Hero() {
       title: "Location & Contact",
       fields: [
         { name: "location", label: "Location", type: "text", required: true },
-        { name: "contactEmail", label: "Contact Email", type: "text", required: true, validate: "email" },
+        {
+          name: "contactEmail",
+          label: "Contact Email",
+          type: "text",
+          required: true,
+          validate: "email",
+        },
       ],
     },
   ];
+  useEffect(() => {
+    const saved = localStorage.getItem(GUEST_TENDER_KEY);
+    const wasSaved = saved && JSON.parse(saved).createdAt; // saved drafts have createdAt
 
+    localStorage.removeItem(GUEST_TENDER_KEY);
+  }, []);
   useEffect(() => {
     if (showForm && !showSignupScreen) {
       const saved = localStorage.getItem(GUEST_TENDER_KEY);
@@ -84,7 +110,8 @@ export default function Hero() {
 
   useEffect(() => {
     const hasData = Object.values(formData).some(
-      (val) => (typeof val === "string" && val.trim() !== "") || val instanceof Date
+      (val) =>
+        (typeof val === "string" && val.trim() !== "") || val instanceof Date
     );
     hasUnsavedData.current = hasData && !showSignupScreen && !isSaved;
   }, [formData, showSignupScreen, isSaved]);
@@ -107,7 +134,10 @@ export default function Hero() {
 
     stepFields.forEach((field) => {
       const value = formData[field.name as keyof typeof formData];
-      if (field.required && (!value || (typeof value === "string" && value.trim() === ""))) {
+      if (
+        field.required &&
+        (!value || (typeof value === "string" && value.trim() === ""))
+      ) {
         newErrors[field.name] = `${field.label} is required`;
       }
       if (field.validate === "email" && value) {
@@ -117,6 +147,7 @@ export default function Hero() {
         }
       }
       if (field.name === "estimatedBudget" && value) {
+        // ← only run when value exists
         const budget = (value as string).replace(/[^0-9]/g, "");
         if (budget && (isNaN(Number(budget)) || Number(budget) <= 0)) {
           newErrors[field.name] = "Budget must be a positive number";
@@ -128,7 +159,9 @@ export default function Hero() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     setIsSaved(false);
@@ -223,12 +256,16 @@ export default function Hero() {
             className="space-y-8 text-left"
           >
             <h1 className="text-5xl sm:text-6xl lg:text-6xl font-semibold tracking-tight text-[#1d1d1f] leading-[1.05]">
-               built for Qatar.
+              built for Qatar.
               <br />
-              <span className="text-[#38b6ff]">Compliant. Transparent. Faster.</span>
+              <span className="text-[#38b6ff]">
+                Compliant. Transparent. Faster.
+              </span>
             </h1>
             <p className="text-xl sm:text-lg text-[#6e6e73] font-normal leading-relaxed">
-              GoTenderly is a secure e-tendering platform for Qatari organisations — KYC-verified suppliers, audit-ready workflows, and built-in evaluation tools to shorten procurement cycles.
+              GoTenderly is a secure e-tendering platform for Qatari
+              organisations — KYC-verified suppliers, audit-ready workflows, and
+              built-in evaluation tools to shorten procurement cycles.
             </p>
 
             <div className="flex flex-wrap gap-4">
@@ -286,7 +323,8 @@ export default function Hero() {
                   <div key={step.id} className="flex items-center">
                     <motion.div
                       animate={{
-                        backgroundColor: i <= currentStep ? "#38b6ff" : "#f5f5f7",
+                        backgroundColor:
+                          i <= currentStep ? "#38b6ff" : "#f5f5f7",
                         scale: i === currentStep ? 1.06 : 1,
                       }}
                       className="w-10 h-10 rounded-full flex items-center justify-center"
@@ -294,14 +332,21 @@ export default function Hero() {
                       {i < currentStep ? (
                         <Check className="w-5 h-5 text-white" />
                       ) : (
-                        <span className={`text-sm font-semibold ${i <= currentStep ? "text-white" : "text-[#86868b]"}`}>
+                        <span
+                          className={`text-sm font-semibold ${
+                            i <= currentStep ? "text-white" : "text-[#86868b]"
+                          }`}
+                        >
                           {step.id}
                         </span>
                       )}
                     </motion.div>
                     {i < steps.length - 1 && (
                       <motion.div
-                        animate={{ backgroundColor: i < currentStep ? "#38b6ff" : "#e5e5ea" }}
+                        animate={{
+                          backgroundColor:
+                            i < currentStep ? "#38b6ff" : "#e5e5ea",
+                        }}
                         className="h-0.5 w-12 mx-2"
                       />
                     )}
@@ -331,23 +376,34 @@ export default function Hero() {
                       >
                         <label className="text-sm font-medium text-[#6e6e73]">
                           {field.label}
-                          {field.required && <span className="text-red-500 ml-1">*</span>}
+                          {field.required && (
+                            <span className="text-red-500 ml-1">*</span>
+                          )}{" "}
+                          {/* asterisk removed */}
                         </label>
 
                         {field.type === "textarea" ? (
                           <div className="relative">
                             <textarea
                               name={field.name}
-                              value={formData[field.name as keyof typeof formData] as string}
+                              value={
+                                formData[
+                                  field.name as keyof typeof formData
+                                ] as string
+                              }
                               onChange={handleChange}
                               placeholder={field.label}
                               className={cn(
                                 "w-full h-32 bg-[#f5f5f7] rounded-xl border px-4 py-3 text-sm outline-none transition-colors resize-none",
-                                errors[field.name] ? "border-red-500" : "border-transparent hover:border-[#38b6ff]/20 focus:border-[#38b6ff]"
+                                errors[field.name]
+                                  ? "border-red-500"
+                                  : "border-transparent hover:border-[#38b6ff]/20 focus:border-[#38b6ff]"
                               )}
                             />
                             {errors[field.name] && (
-                              <p className="text-red-500 text-xs mt-1">{errors[field.name]}</p>
+                              <p className="text-red-500 text-xs mt-1">
+                                {errors[field.name]}
+                              </p>
                             )}
                           </div>
                         ) : field.type === "calendar" ? (
@@ -357,11 +413,18 @@ export default function Hero() {
                                 <button
                                   className={cn(
                                     "w-full h-12 bg-[#f5f5f7] rounded-xl border px-4 text-sm text-left font-normal flex items-center justify-between transition-colors",
-                                    errors.deadline ? "border-red-500" : "border-transparent hover:border-[#38b6ff]/20 focus:border-[#38b6ff]",
-                                    !formData.deadline && "text-muted-foreground"
+                                    errors.deadline
+                                      ? "border-red-500"
+                                      : "border-transparent hover:border-[#38b6ff]/20 focus:border-[#38b6ff]",
+                                    !formData.deadline &&
+                                      "text-muted-foreground"
                                   )}
                                 >
-                                  {formData.deadline ? format(formData.deadline, "PPP p") : <span>Select deadline</span>}
+                                  {formData.deadline ? (
+                                    format(formData.deadline, "PPP p")
+                                  ) : (
+                                    <span>Select deadline</span>
+                                  )}
                                   <CalendarIcon className="mr-2 h-4 w-4" />
                                 </button>
                               </PopoverTrigger>
@@ -371,9 +434,13 @@ export default function Hero() {
                                   selected={formData.deadline || undefined}
                                   onSelect={(date) => {
                                     if (!date) return;
-                                    const prev = formData.deadline || new Date();
+                                    const prev =
+                                      formData.deadline || new Date();
                                     const newDate = new Date(date);
-                                    newDate.setHours(prev.getHours(), prev.getMinutes());
+                                    newDate.setHours(
+                                      prev.getHours(),
+                                      prev.getMinutes()
+                                    );
                                     handleDeadlineChange(newDate);
                                   }}
                                   initialFocus
@@ -381,10 +448,17 @@ export default function Hero() {
                                 <input
                                   type="time"
                                   className="w-full rounded-md border px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#38b6ff]"
-                                  value={formData.deadline ? format(formData.deadline, "HH:mm") : ""}
+                                  value={
+                                    formData.deadline
+                                      ? format(formData.deadline, "HH:mm")
+                                      : ""
+                                  }
                                   onChange={(e) => {
-                                    const [hours, minutes] = e.target.value.split(":").map(Number);
-                                    const prev = formData.deadline || new Date();
+                                    const [hours, minutes] = e.target.value
+                                      .split(":")
+                                      .map(Number);
+                                    const prev =
+                                      formData.deadline || new Date();
                                     const newDate = new Date(prev);
                                     newDate.setHours(hours, minutes);
                                     handleDeadlineChange(newDate);
@@ -392,22 +466,38 @@ export default function Hero() {
                                 />
                               </PopoverContent>
                             </Popover>
-                            {errors.deadline && <p className="text-red-500 text-xs mt-1">{errors.deadline}</p>}
+                            {errors.deadline && (
+                              <p className="text-red-500 text-xs mt-1">
+                                {errors.deadline}
+                              </p>
+                            )}
                           </div>
                         ) : (
                           <div className="relative">
                             <input
-                              type={field.name === "contactEmail" ? "email" : "text"}
+                              type={
+                                field.name === "contactEmail" ? "email" : "text"
+                              }
                               name={field.name}
-                              value={formData[field.name as keyof typeof formData] as string}
+                              value={
+                                formData[
+                                  field.name as keyof typeof formData
+                                ] as string
+                              }
                               onChange={handleChange}
                               placeholder={field.label}
                               className={cn(
                                 "w-full h-12 bg-[#f5f5f7] rounded-xl border px-4 text-sm outline-none transition-colors",
-                                errors[field.name] ? "border-red-500" : "border-transparent hover:border-[#38b6ff]/20 focus:border-[#38b6ff]"
+                                errors[field.name]
+                                  ? "border-red-500"
+                                  : "border-transparent hover:border-[#38b6ff]/20 focus:border-[#38b6ff]"
                               )}
                             />
-                            {errors[field.name] && <p className="text-red-500 text-xs mt-1">{errors[field.name]}</p>}
+                            {errors[field.name] && (
+                              <p className="text-red-500 text-xs mt-1">
+                                {errors[field.name]}
+                              </p>
+                            )}
                           </div>
                         )}
                       </motion.div>
@@ -424,9 +514,12 @@ export default function Hero() {
                       <Check className="w-12 h-12 text-[#38b6ff]" />
                     </div>
                     <div className="space-y-4">
-                      <h3 className="text-3xl font-semibold text-[#1d1d1f]">Tender Saved</h3>
+                      <h3 className="text-3xl font-semibold text-[#1d1d1f]">
+                        Tender Published
+                      </h3>
                       <p className="text-lg text-[#6e6e73] max-w-md mx-auto">
-                        Signup to publish and start receiving bids from verified suppliers.
+                        Signup to publish and start receiving bids from verified
+                        suppliers.
                       </p>
                     </div>
                   </motion.div>
@@ -445,10 +538,16 @@ export default function Hero() {
                 )}
                 {!showSignupScreen ? (
                   <button
-                    onClick={() => (currentStep === steps.length - 1 ? handlePostTender() : nextStep())}
+                    onClick={() =>
+                      currentStep === steps.length - 1
+                        ? handlePostTender()
+                        : nextStep()
+                    }
                     className="flex-1 bg-[#38b6ff] hover:bg-[#0077ed] text-white h-12 rounded-xl font-medium flex items-center justify-center gap-2 transition-colors"
                   >
-                    {currentStep === steps.length - 1 ? "Save & Continue" : "Continue"}
+                    {currentStep === steps.length - 1
+                      ? "Save & Continue"
+                      : "Continue"}
                   </button>
                 ) : (
                   <div className="flex gap-3 w-full">
@@ -480,7 +579,7 @@ export default function Hero() {
                   ? currentStep === steps.length - 1
                     ? "Your tender will be saved locally."
                     : `Step ${currentStep + 1} of ${steps.length}`
-                  : "Your draft is saved. Sign up to publish."}
+                  : ""}
               </p>
             </motion.div>
           )}
@@ -499,8 +598,12 @@ export default function Hero() {
               <X className="w-8 h-8 text-red-600" />
             </div>
             <div>
-              <h3 className="text-xl font-semibold text-[#1d1d1f]">Discard changes?</h3>
-              <p className="text-[#6e6e73] mt-2">Your current draft will be lost.</p>
+              <h3 className="text-xl font-semibold text-[#1d1d1f]">
+                Discard changes?
+              </h3>
+              <p className="text-[#6e6e73] mt-2">
+                Your current draft will be lost.
+              </p>
             </div>
             <div className="flex gap-3">
               <button

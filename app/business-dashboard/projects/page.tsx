@@ -400,17 +400,7 @@ export default function Component() {
                               budget: selectedTender.budget,
                               status: selectedTender.status,
                               startDate: selectedTender.createdAt,
-                              awardedTo: selectedTender.awardedTo
-                                ? typeof selectedTender.awardedTo === "string"
-                                  ? {
-                                      _id: selectedTender.awardedTo,
-                                      email: "unknown@example.com",
-                                    }
-                                  : {
-                                      _id: selectedTender.awardedTo._id,
-                                      email: selectedTender.awardedTo.email,
-                                    }
-                                : undefined,
+                              awardedTo: selectedTender.awardedTo,
                               postedBy:
                                 typeof selectedTender.postedBy === "string"
                                   ? selectedTender.postedBy
@@ -495,17 +485,7 @@ export default function Component() {
                                 budget: selectedTender.budget,
                                 status: selectedTender.status,
                                 startDate: selectedTender.createdAt,
-                                awardedTo: selectedTender.awardedTo
-                                  ? typeof selectedTender.awardedTo === "string"
-                                    ? {
-                                        _id: selectedTender.awardedTo,
-                                        email: "unknown@example.com",
-                                      }
-                                    : {
-                                        _id: selectedTender.awardedTo._id,
-                                        email: selectedTender.awardedTo.email,
-                                      }
-                                  : undefined,
+                                awardedTo: selectedTender.awardedTo,
                                 postedBy:
                                   typeof selectedTender.postedBy === "string"
                                     ? selectedTender.postedBy

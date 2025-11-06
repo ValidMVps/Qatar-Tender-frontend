@@ -521,7 +521,9 @@ export default function TenderDetailPage() {
                     <div>
                       <p className="text-xs sm:text-sm text-gray-500">Budget</p>
                       <p className="font-semibold text-emerald-600 text-sm sm:text-base">
-                        {formatCurrency(tender.estimatedBudget)}
+                        {Number(tender.estimatedBudget) === 0
+                          ? "Negotiable"
+                          : formatCurrency(tender.estimatedBudget)}
                       </p>
                     </div>
                   </div>

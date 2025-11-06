@@ -50,6 +50,7 @@ import { toast } from "sonner";
 interface Tender {
   _id: string;
   title: string;
+  closeReason: string;
   description: string;
   estimatedBudget: number;
   deadline: string;
@@ -59,7 +60,8 @@ interface Tender {
     | "pending_approval"
     | "closed"
     | "awarded"
-    | "completed";
+    | "completed"
+    | "rejected";
   category: { _id: string; name?: string; description: string };
   location: string;
   contactEmail: string;
@@ -195,7 +197,6 @@ export default function TenderDetailPage() {
       const bidsData = await getTenderBids(tenderId);
       const questionsData = await getQuestionsForTender(tenderId);
       setTender(tenderData);
-      console.log(bidsData);
       setBids(bidsData);
       setQuestions(questionsData as unknown as Question[]);
     } catch (err: any) {
@@ -447,7 +448,21 @@ export default function TenderDetailPage() {
               </div>
             </div>
           )}
-
+          {tender.status === "rejected" && tender.closeReason && (
+            <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <div className="flex items-start gap-2">
+                <AlertTriangle className="h-5 w-5 text-red-600 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="text-sm font-medium text-red-900">
+                    {t("tender_closed_reason")}
+                  </p>
+                  <p className="mt-1 text-sm text-red-700 whitespace-pre-wrap">
+                    {tender.closeReason}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
           <div className="bg-white rounded-md shadow-none border border-gray-100 p-6 sm:p-8 mb-8">
             <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
               <div className="flex-1">
@@ -522,7 +537,9 @@ export default function TenderDetailPage() {
                     <div>
                       <p className="text-xs sm:text-sm text-gray-500">Budget</p>
                       <p className="font-semibold text-emerald-600 text-sm sm:text-base">
-                        {formatCurrency(tender.estimatedBudget)}
+                        {Number(tender.estimatedBudget) === 0
+                          ? "Negotiable"
+                          : formatCurrency(tender.estimatedBudget)}
                       </p>
                     </div>
                   </div>
@@ -638,22 +655,15 @@ export default function TenderDetailPage() {
                               <div className="flex-1 min-w-0">
                                 <div className="flex flex-wrap items-center gap-2 mb-4">
                                   <h3 className="font-semibold text-gray-900 text-base sm:text-lg truncate">
-                                    {(() => {
-                                      const { profile, email } = bid.bidder;
-                                      const showName =
-                                        !profile?.anonymousBidding ||
-                                        bid.status === "accepted" ||
-                                        bid.status === "completed";
-
-                                      if (!showName) return "Anonymous Bidder";
-
-                                      return (
-                                        profile?.fullName ||
-                                        profile?.companyName ||
-                                        email.split("@")[0] ||
-                                        "Bidder"
-                                      );
-                                    })()}
+                                    {(!bid.bidder.profile?.anonymousBidding ||
+                                      bid.status === "accepted" ||
+                                      bid.status === "completed") && (
+                                      <>
+                                        {bid.bidder.profile?.fullName ||
+                                          bid.bidder.profile?.companyName ||
+                                          bid.bidder.email.split("@")[0]}
+                                      </>
+                                    )}
                                   </h3>
                                   {bid.bidder.isVerified && (
                                     <div className="flex items-center bg-blue-50 text-blue-700 px-2 py-1 rounded-full text-xs font-medium">
@@ -987,9 +997,7 @@ export default function TenderDetailPage() {
                       </p>
                       {isAwarded && (
                         <Button
-                          onClick={() =>
-                            router.push(`/business-dashboard/project`)
-                          }
+                          onClick={() => router.push(`/dashboard/project`)}
                           className="bg-blue-500 hover:bg-blue-600 text-white rounded-full px-4 py-2 h-auto font-medium text-sm sm:text-base"
                         >
                           <MessageSquare className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />

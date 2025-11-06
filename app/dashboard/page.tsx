@@ -360,7 +360,7 @@ export default function IndividualDashboardPage() {
     const cardContent = (
       <motion.div
         whileHover={{ scale: href ? 1.02 : 1 }}
-        className={`bg-white/90 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-100/50 transition-all duration-300 h-full group cursor-pointer ${
+        className={`bg-white/90  backdrop-blur-xl rounded-2xl shadow-sm border border-gray-100/50 transition-all duration-300 h-full group cursor-pointer ${
           className ?? ""
         }`}
       >
@@ -373,7 +373,9 @@ export default function IndividualDashboardPage() {
               {title}
             </h3>
           </div>
-          <div className="space-y-2 sm:space-y-3">{children}</div>
+          <div className="space-y-2 sm:space-y-3 h-40 overflow-y-auto ">
+            {children}
+          </div>
         </div>
       </motion.div>
     );
@@ -889,7 +891,7 @@ export default function IndividualDashboardPage() {
                                     className="hover:bg-gray-50/50 border-gray-100/60 transition-colors"
                                   >
                                     <TableCell className="font-medium text-gray-900 w-1/6">
-                                      {bid.bidder?.email}
+                                      {bid.bidder?.profile.companyName}
                                     </TableCell>
                                     <TableCell className="text-gray-600 text-sm max-w-[320px] ">
                                       {bid.description || "No details"}
@@ -1069,7 +1071,7 @@ export default function IndividualDashboardPage() {
                                 {tender.title}
                               </TableCell>
                               <TableCell className="text-gray-600">
-                                {tender?.awardedTo?.email}
+                                {tender?.awardedTo?.profile.companyName}
                               </TableCell>
                               <TableCell className="font-medium">
                                 {resolveBudget(tender) > 0

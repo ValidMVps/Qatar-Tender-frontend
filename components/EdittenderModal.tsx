@@ -58,7 +58,7 @@ const STEPS = [
     title: "Project Details",
     description: "Update category and budget information",
     icon: DollarSign,
-    fields: ["category", "estimatedBudget"],
+    fields: ["category"],
   },
   {
     id: "schedule",
@@ -251,7 +251,7 @@ const EditTenderModal = ({
           break;
 
         case "estimatedBudget":
-          if (!value) return t("estimated_budget_is_required");
+          if (!value) break; // ← allow empty
           const budget = parseFloat(value);
           if (isNaN(budget) || budget < VALIDATION_RULES.estimatedBudget.min)
             return t("estimated_budget_must_be_a_positive_number");
@@ -451,6 +451,7 @@ const EditTenderModal = ({
 
     try {
       // Build JSON payload
+
       const payload: Record<string, any> = {
         title: formData.title?.trim(),
         description: formData.description?.trim(),
@@ -460,7 +461,9 @@ const EditTenderModal = ({
         deadline: formData.deadline,
         category: formData.category,
       };
-
+      if (formData.estimatedBudget) {
+        payload.estimatedBudget = parseFloat(formData.estimatedBudget);
+      }
       // Only include `image` if you plan to send its URL/base64 string.
       if (formData.image && typeof formData.image === "string") {
         payload.image = formData.image;
@@ -731,7 +734,7 @@ const EditTenderModal = ({
                 htmlFor="estimatedBudget"
                 className="absolute -top-3 left-4 bg-white dark:bg-gray-900 px-1 text-gray-500 text-sm"
               >
-                {t("estimated_budget_qar")} *
+                {t("estimated_budget_qar")}
               </Label>
               <Input
                 id="estimatedBudget"
@@ -739,26 +742,21 @@ const EditTenderModal = ({
                 value={formData.estimatedBudget}
                 onChange={handleChange}
                 onBlur={() => handleBlur("estimatedBudget")}
-                placeholder="1500"
+                placeholder={t("optional_enter_budget")}
                 min="1"
-                max={VALIDATION_RULES.estimatedBudget.max}
                 step="0.01"
-                className={`rounded-full border border-gray-300 dark:border-gray-700 px-4 py-2 focus:ring-2 focus:ring-blue-400 focus:outline-none ${
+                className={`... ${
                   fieldErrors.estimatedBudget ? "border-red-500" : ""
                 }`}
               />
               <div className="h-5 mt-1">
                 {fieldErrors.estimatedBudget ? (
-                  <motion.p
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="text-xs text-red-500"
-                  >
+                  <motion.p className="text-xs text-red-500">
                     {fieldErrors.estimatedBudget}
                   </motion.p>
                 ) : (
                   <p className="text-xs text-gray-400">
-                    {t("provide_your_estimated_budget_in_qar")}
+                    {t("leave_blank_if_budget_is_negotiable")}
                   </p>
                 )}
               </div>
@@ -991,7 +989,7 @@ const EditTenderModal = ({
                   <span className="font-medium">
                     {formData.estimatedBudget
                       ? `${formData.estimatedBudget} QAR`
-                      : t("not_set")}
+                      : t("negotiable")}
                   </span>
                 </div>
                 <div>

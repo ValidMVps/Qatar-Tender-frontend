@@ -42,11 +42,8 @@ interface ProjectDetailsSidebarProps
     status: string;
     startDate: string;
     budget: string;
-    awardedTo?: {
-      _id: string;
-      email: string;
-    };
-    postedBy: string;
+    awardedTo?: any;
+    postedBy: any;
   } | null;
   getStatusColor: (status: string) => string;
   onMarkComplete: () => void;
@@ -91,7 +88,7 @@ export function ProjectDetailsSidebar({
   useEffect(() => {
     const fetchSelectedBidAmount = async () => {
       if (!selectedProject || !selectedProject.awardedTo) return;
-
+      console.log(selectedProject);
       setBidLoading(true);
       try {
         const bids = await getTenderBids(selectedProject.id);
@@ -305,7 +302,10 @@ export function ProjectDetailsSidebar({
                     </label>
                     <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-200/60 dark:border-gray-700/60">
                       <p className="text-sm text-gray-700 dark:text-gray-300">
-                        {selectedProject.awardedTo.email}
+                        {typeof selectedProject.awardedTo === "object"
+                          ? selectedProject?.awardedTo?.profile?.fullName ||
+                            selectedProject?.awardedTo?.profile?.companyName
+                          : selectedProject.awardedTo}
                       </p>
                     </div>
                   </div>
@@ -335,8 +335,7 @@ export function ProjectDetailsSidebar({
                 <Button className="w-full group bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl py-6 transition-all duration-200 shadow-md hover:shadow-lg">
                   <div className="flex items-center justify-between w-full">
                     <div className="flex items-center gap-3">
-                      <div className="p-2 bg-white/20 rounded-lg">
-                      </div>
+                      <div className="p-2 bg-white/20 rounded-lg"></div>
                       <span className="font-medium">
                         {t("view_tender_details")}
                       </span>
@@ -354,8 +353,7 @@ export function ProjectDetailsSidebar({
                 >
                   <div className="flex items-center justify-between w-full">
                     <div className="flex items-center gap-3">
-                      <div className="p-2 bg-white/20 rounded-lg">
-                      </div>
+                      <div className="p-2 bg-white/20 rounded-lg"></div>
                       <span className="font-medium">
                         {t("mark_as_completed")}
                       </span>
@@ -373,8 +371,7 @@ export function ProjectDetailsSidebar({
                 >
                   <div className="flex items-center justify-between w-full">
                     <div className="flex items-center gap-3">
-                      <div className="p-2 bg-white/20 rounded-lg">
-                      </div>
+                      <div className="p-2 bg-white/20 rounded-lg"></div>
                       <span className="font-medium">{t("leave_review")}</span>
                     </div>
                     <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

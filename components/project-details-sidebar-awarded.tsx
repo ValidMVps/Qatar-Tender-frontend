@@ -46,7 +46,7 @@ interface ProjectDetailsSidebarProps
       _id: string;
       email: string;
     };
-    postedBy: string | { _id: string; email: string; userType?: string };
+    postedBy: any;
   } | null;
   getStatusColor: (status: string) => string;
   currentUserId: string;
@@ -288,7 +288,8 @@ export function ProjectDetailsSidebarawarded({
                     <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-200/60 dark:border-gray-700/60">
                       <p className="text-sm text-gray-700 dark:text-gray-300">
                         {typeof selectedProject.postedBy === "object"
-                          ? selectedProject.postedBy.email
+                          ? selectedProject.postedBy.profile.fullName ||
+                            selectedProject.postedBy.profile.companyName
                           : selectedProject.postedBy}
                       </p>
                     </div>
@@ -309,7 +310,9 @@ export function ProjectDetailsSidebarawarded({
             {/* Action Buttons */}
             <div className="space-y-3">
               {/* View Details Button */}
-              <Link href={`/business-dashboard/tender-details/${selectedProject.id}`}>
+              <Link
+                href={`/business-dashboard/tender-details/${selectedProject.id}`}
+              >
                 <Button className="w-full group bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl py-6 transition-all duration-200 shadow-md hover:shadow-lg">
                   <div className="flex items-center justify-between w-full">
                     <div className="flex items-center gap-3">

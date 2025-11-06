@@ -159,10 +159,7 @@ export default function TenderDetailsPage({ params }: PageProps) {
   useEffect(() => {
     if (!tender || !userBid) return;
     setcanviewtenderifno(
-      (userBid &&
-        (userBid.status === "accepted" ||
-          userBid.paymentStatus === "completed")) ||
-        tender?.postedBy?.profile.showPublicProfile === true
+      userBid && ["accepted", "completed"].includes(userBid.status)
     );
   }, [userBid, tender]);
 
@@ -341,7 +338,8 @@ export default function TenderDetailsPage({ params }: PageProps) {
                             <h3 className="font-semibold text-gray-900 text-sm sm:text-base truncate">
                               {canviewtenderifno
                                 ? tender.postedBy?.name ||
-                                  tender.postedBy?.email ||
+                                  tender.postedBy?.profile.companyName ||
+                                  tender.postedBy?.profile.fullName ||
                                   "Client"
                                 : "Anonymous Client"}
                             </h3>
@@ -364,7 +362,10 @@ export default function TenderDetailsPage({ params }: PageProps) {
                                         tender.postedBy.profile.rating
                                       )}
                                       <span className="text-xs sm:text-sm font-medium text-gray-700 ml-1">
-                                        {tender.postedBy.profile.rating} Rating
+                                        {tender.postedBy.profile.rating.toFixed(
+                                          1
+                                        )}{" "}
+                                        Rating
                                       </span>
                                     </>
                                   ) : (

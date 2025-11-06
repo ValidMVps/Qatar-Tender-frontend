@@ -14,4 +14,3 @@ audit log need to be fixed
 96/5000 take minumun of tender
 validation checker need to be fixed
 Upload image show review
-admin Notifications mark as read

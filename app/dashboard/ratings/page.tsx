@@ -425,7 +425,7 @@ const EditableReviewCard: React.FC<{
             <Button
               variant="outline"
               className="flex-1 rounded-xl border-gray-200 hover:bg-gray-50 transition-colors"
-              onClick={() => router.push("/dashboard/project")}
+              onClick={() => router.push("/dashboard/projects")}
             >
               <MessageCircle className="h-3.5 w-3.5 mr-1.5 sm:h-4 sm:w-4 sm:mr-2" />
               <span className="text-xs sm:text-sm">{t("chat") || "Chat"}</span>

@@ -281,7 +281,12 @@ export default function DashboardPage() {
             (t) => t.status === "awarded" || t.status === "completed"
           )
         );
-  
+        console.log(
+          tenders.filter(
+            (t) => t.status === "awarded" || t.status === "completed"
+          )
+        );
+
         const bidsRes = await getUserBids();
         const bids = Array.isArray(bidsRes) ? bidsRes : [];
         setMyBids(bids);
@@ -378,7 +383,7 @@ export default function DashboardPage() {
   // 3) combine, sort by timestamp desc, take top 3, then format time
   const recentActivity = [...tenderItems, ...bidItems]
     .sort((a, b) => b.ts - a.ts) // newest first
-    .slice(0, 3)
+    .slice(0, 5)
     .map((act) => ({
       ...act,
       time: formatShortDate(act.createdAt),
@@ -398,7 +403,7 @@ export default function DashboardPage() {
     const cardContent = (
       <motion.div
         whileHover={{ scale: href ? 1.02 : 1 }}
-        className="bg-white/90 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-100/50 transition-all duration-300 h-full group cursor-pointer"
+        className="bg-white/90  backdrop-blur-xl rounded-2xl shadow-sm border border-gray-100/50 transition-all duration-300 group cursor-pointer"
       >
         <div className="p-4 sm:p-6">
           <div className="flex items-center gap-3 mb-3 sm:mb-4">
@@ -409,7 +414,9 @@ export default function DashboardPage() {
               {title}
             </h3>
           </div>
-          <div className="space-y-2 sm:space-y-3">{children}</div>
+          <div className="space-y-2 sm:space-y-3 h-40 overflow-y-auto ">
+            {children}
+          </div>
         </div>
       </motion.div>
     );
@@ -497,10 +504,11 @@ export default function DashboardPage() {
             </motion.div>
             {/* Apple-style KPI Cards */}
             <motion.div
-              className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6"
+              className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6 p-1"
               initial={{ opacity: 0, y: 5 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, ease: "easeOut" }}
+              style={{ scrollbarWidth: "thin" }} // Optional: thinner scrollbar in Firefox
             >
               <NotificationCard />
 
@@ -1110,7 +1118,10 @@ export default function DashboardPage() {
                                       {bid.tender.title}
                                     </TableCell>
                                     <TableCell className="text-gray-600 text-xs sm:text-sm">
-                                      {bid.tender.postedBy?.email || "Private"}
+                                      {bid.tender.postedBy?.profile
+                                        .companyName ||
+                                        bid.tender.postedBy?.profile.fullName ||
+                                        "Private"}
                                     </TableCell>
                                     <TableCell className="font-semibold text-gray-900 text-sm">
                                       {new Intl.NumberFormat().format(
@@ -1197,7 +1208,7 @@ export default function DashboardPage() {
                                     {tender.title}
                                   </TableCell>
                                   <TableCell className="text-gray-600 text-xs sm:text-sm">
-                                    {tender?.awardedTo?.email}
+                                    {tender?.awardedTo?.profile.companyName}
                                   </TableCell>
                                   <TableCell className="font-medium text-xs sm:text-sm">
                                     {resolveBudget(tender) > 0

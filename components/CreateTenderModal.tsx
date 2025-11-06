@@ -57,7 +57,7 @@ const STEPS = [
     title: "Project Details",
     description: "Category and budget information",
     icon: DollarSign,
-    fields: ["category", "estimatedBudget"],
+    fields: ["category"],
   },
   {
     id: "schedule",
@@ -143,7 +143,7 @@ const CreateTenderModal = ({
   const [submissionType, setSubmissionType] = useState<"post" | "draft" | null>(
     null
   );
-
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   // Validation functions
   const validateField = useCallback(
     (fieldName: string, value: any): string | undefined => {
@@ -201,7 +201,8 @@ const CreateTenderModal = ({
           break;
 
         case "estimatedBudget":
-          if (!value) return t("estimated_budget_is_required");
+          // ---- OPTIONAL ----
+          if (!value) break; // ← allow empty / undefined
           const budget = parseFloat(value);
           if (isNaN(budget) || budget < VALIDATION_RULES.estimatedBudget.min)
             return t("estimated_budget_must_be_a_positive_number");
@@ -283,90 +284,65 @@ const CreateTenderModal = ({
     // IMAGE upload flow
     if (id === "image" && files && files[0]) {
       const file = files[0];
-
-      console.log("🖼️ Image file selected:", {
+      console.log("Image file selected:", {
         name: file.name,
         size: file.size,
         type: file.type,
-        lastModified: file.lastModified,
       });
 
       // Client-side validations
       const allowedTypes = ["image/png", "image/jpeg", "image/jpg"];
       if (!allowedTypes.includes(file.type)) {
-        console.error("❌ Invalid file type:", file.type);
         setErrors((prev) => ({
           ...prev,
           image: `Only ${allowedTypes.join(", ")} files are allowed`,
         }));
-        // Reset the file input
         target.value = "";
+        setImagePreview(null);
         return;
       }
 
       const maxSize = 5 * 1024 * 1024; // 5MB
       if (file.size > maxSize) {
-        console.error("❌ File too large:", file.size, "bytes");
         setErrors((prev) => ({
           ...prev,
-          image: `File size must be less than ${maxSize / 1024 / 1024}MB`,
+          image: `File size must be less than 5MB`,
         }));
-        // Reset the file input
         target.value = "";
+        setImagePreview(null);
         return;
       }
 
-      // Clear previous errors and start upload
+      // Generate preview URL
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreview(previewUrl);
+
+      // Clear previous errors
       setErrors((prev) => ({ ...prev, image: undefined }));
       setIsUploading(true);
 
       try {
-        console.log("🚀 Starting upload process...");
         const uploadedUrl = await uploadToCloudinary(file);
-
-        // Verify the URL is valid
         if (!uploadedUrl || typeof uploadedUrl !== "string") {
           throw new Error("Invalid URL returned from upload");
         }
 
-        console.log("✅ Upload completed successfully!");
-        console.log("🔗 Uploaded URL:", uploadedUrl);
-
-        // Update form data with the new image URL
-        setFormData((prev) => {
-          const updated = { ...prev, image: uploadedUrl };
-          console.log("📝 Updated formData:", updated);
-          return updated;
-        });
-
-        // Optional: Show success message
-        setErrors((prev) => ({
-          ...prev,
-          image: undefined,
-        }));
-      } catch (uploadError) {
-        console.error("💥 Upload failed:", uploadError);
-
-        // Set specific error message
+        setFormData((prev) => ({ ...prev, image: uploadedUrl }));
+        setImagePreview(uploadedUrl); // Show uploaded image
+      } catch (uploadError: any) {
+        console.error("Upload failed:", uploadError);
         setErrors((prev) => ({
           ...prev,
           image:
-            typeof uploadError === "object" &&
-            uploadError !== null &&
-            "message" in uploadError &&
-            typeof (uploadError as any).message === "string"
-              ? (uploadError as any).message
-              : "Image upload failed. Please try again.",
+            uploadError?.message || "Image upload failed. Please try again.",
         }));
-
-        // Reset the file input so user can try again
+        setImagePreview(null);
         target.value = "";
-
-        // Don't change the existing image URL in formData
-        // This way, if there was a previous successful upload, it stays
       } finally {
         setIsUploading(false);
       }
+
+      return; // Prevent default field update
     } else {
       // Handle other form fields (text, textarea, etc.)
       setFormData((prev) => ({ ...prev, [id]: value }));
@@ -935,7 +911,7 @@ const CreateTenderModal = ({
                 htmlFor="estimatedBudget"
                 className="absolute -top-3 left-4 bg-white dark:bg-gray-900 px-1 text-gray-500 text-sm"
               >
-                {t("estimated_budget_qar")} *
+                {t("estimated_budget_qar")} {/* ← no asterisk */}
               </Label>
               <Input
                 id="estimatedBudget"
@@ -943,7 +919,7 @@ const CreateTenderModal = ({
                 value={formData.estimatedBudget}
                 onChange={handleChange}
                 onBlur={() => handleBlur("estimatedBudget")}
-                placeholder="1500"
+                placeholder={t("optional_enter_your_budget")}
                 min="1"
                 max={VALIDATION_RULES.estimatedBudget.max}
                 step="0.01"
@@ -962,7 +938,7 @@ const CreateTenderModal = ({
                   </motion.p>
                 ) : (
                   <p className="text-xs text-gray-400">
-                    {t("provide_your_estimated_budget_in_qar")}
+                    {t("leave_blank_if_budget_is_negotiable")}
                   </p>
                 )}
               </div>
@@ -1182,7 +1158,7 @@ const CreateTenderModal = ({
                   <span className="font-medium">
                     {formData.estimatedBudget
                       ? `${formData.estimatedBudget} QAR`
-                      : t("not_set")}
+                      : t("negotiable")}
                   </span>
                 </div>
                 <div>
@@ -1199,6 +1175,50 @@ const CreateTenderModal = ({
                       : t("not_set")}
                   </span>
                 </div>
+                {imagePreview && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="mt-4"
+                  >
+                    <div className="relative inline-block">
+                      <img
+                        src={imagePreview}
+                        alt="Tender preview"
+                        className="w-full max-w-sm h-64 object-cover rounded-xl shadow-md border border-gray-200 dark:border-gray-700"
+                      />
+                      {isUploading && (
+                        <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-xl">
+                          <motion.div
+                            animate={{ rotate: 360 }}
+                            transition={{
+                              duration: 1,
+                              repeat: Infinity,
+                              ease: "linear",
+                            }}
+                            className="w-8 h-8 border-4 border-white border-t-transparent rounded-full"
+                          />
+                        </div>
+                      )}
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setImagePreview(null);
+                        setFormData((prev) => ({ ...prev, image: "" }));
+                        const input = document.getElementById(
+                          "image"
+                        ) as HTMLInputElement;
+                        if (input) input.value = "";
+                      }}
+                      className="mt-2 text-red-600 hover:text-red-700"
+                    >
+                      Remove Image
+                    </Button>
+                  </motion.div>
+                )}
               </div>
             </div>
           </motion.div>
