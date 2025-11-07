@@ -14,7 +14,7 @@ import {
 import { cn } from "@/lib/utils";
 
 const GUEST_TENDER_KEY = "guestTender";
-
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 export default function Hero() {
   const [showForm, setShowForm] = useState(true);
   const [showSignupScreen, setShowSignupScreen] = useState(false);
@@ -26,6 +26,7 @@ export default function Hero() {
     deadline: null as Date | null,
     location: "",
     contactEmail: "",
+    contactPhone: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [pendingClose, setPendingClose] = useState(false);
@@ -77,6 +78,12 @@ export default function Hero() {
           required: true,
           validate: "email",
         },
+        {
+          name: "contactPhone",
+          label: "Contact Phone",
+          type: "text",
+          required: true,
+        },
       ],
     },
   ];
@@ -99,6 +106,7 @@ export default function Hero() {
             deadline: tender.deadline ? new Date(tender.deadline) : null,
             location: tender.location || "",
             contactEmail: tender.contactEmail || "",
+            contactPhone: tender.contactPhone || "",
           });
           setIsSaved(true);
         } catch (e) {
@@ -182,22 +190,56 @@ export default function Hero() {
 
   const prevStep = () => currentStep > 0 && setCurrentStep(currentStep - 1);
 
-  const handlePostTender = () => {
-    if (validateStep(currentStep)) {
-      const payload = {
-        title: formData.title.trim(),
-        description: formData.description.trim(),
-        estimatedBudget: formData.estimatedBudget.replace(/[^0-9]/g, ""),
-        deadline: formData.deadline ? formData.deadline.toISOString() : "",
-        location: formData.location.trim(),
-        contactEmail: formData.contactEmail.trim(),
+  const handlePostTender = async () => {
+    if (!validateStep(currentStep)) return;
+
+    const payload = {
+      title: formData.title.trim(),
+      description: formData.description.trim(),
+      estimatedBudget: formData.estimatedBudget
+        ? formData.estimatedBudget.replace(/[^0-9]/g, "")
+        : "",
+      deadline: formData.deadline ? formData.deadline.toISOString() : "",
+      location: formData.location.trim(),
+      contactEmail: formData.contactEmail.trim(),
+      contactPhone: formData.contactPhone?.trim() || "", // make sure you add an input for phone if not present
+      createdAt: new Date().toISOString(),
+    };
+
+    try {
+      // show some UI loading state if you want
+      const res = await fetch(`${API_BASE_URL}/api/tenders/guest`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || "Failed to save tender");
+      }
+
+      const data = await res.json();
+      // Save returned token + tender id so user can claim it later after signup
+      const saveObj = {
+        ...payload,
+        tenderId: data.tenderId,
+        guestToken: data.guestToken,
         createdAt: new Date().toISOString(),
       };
+      localStorage.setItem(GUEST_TENDER_KEY, JSON.stringify(saveObj));
 
-      localStorage.setItem(GUEST_TENDER_KEY, JSON.stringify(payload));
       setShowSignupScreen(true);
       setIsSaved(true);
       hasUnsavedData.current = false;
+    } catch (error: any) {
+      // show error inline — you can map server errors to UI
+      console.error("Guest tender save failed:", error);
+      // set a user-visible error (reuse errors state or create a top-level message)
+      setErrors((prev) => ({
+        ...prev,
+        form: error.message || "Unable to save tender",
+      }));
     }
   };
 
@@ -227,6 +269,7 @@ export default function Hero() {
       deadline: null,
       location: "",
       contactEmail: "",
+      contactPhone: "",
     });
     setShowForm(false);
     hasUnsavedData.current = false;
