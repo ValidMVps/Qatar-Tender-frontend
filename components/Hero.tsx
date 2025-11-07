@@ -233,7 +233,7 @@ export default function Hero() {
       setIsSaved(true);
       hasUnsavedData.current = false;
     } catch (error: any) {
-      // show error inline — you can map server errors to UI
+      // show error inline you can map server errors to UI
       console.error("Guest tender save failed:", error);
       // set a user-visible error (reuse errors state or create a top-level message)
       setErrors((prev) => ({
@@ -301,13 +301,13 @@ export default function Hero() {
             <h1 className="text-5xl sm:text-6xl lg:text-6xl font-semibold tracking-tight text-[#1d1d1f] leading-[1.05]">
               built for Qatar.
               <br />
-              <span className="text-[#38b6ff]">
+              <span className="text-black">
                 Compliant. Transparent. Faster.
               </span>
             </h1>
             <p className="text-xl sm:text-lg text-[#6e6e73] font-normal leading-relaxed">
               GoTenderly is a secure e-tendering platform for Qatari
-              organisations — KYC-verified suppliers, audit-ready workflows, and
+              organisations KYC-verified suppliers, audit-ready workflows, and
               built-in evaluation tools to shorten procurement cycles.
             </p>
 
@@ -316,7 +316,7 @@ export default function Hero() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 href="/signup"
-                className="px-6 h-12 text-[#38b6ff] hover:bg-[#38b6ff]/5 rounded-full font-medium shadow-sm flex items-center gap-2"
+                className="px-6 h-12 text-black hover:bg-black/5 rounded-full font-medium  flex items-center gap-2"
               >
                 Get started
               </motion.a>
@@ -325,7 +325,7 @@ export default function Hero() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={openForm}
-                className="px-6 h-12 bg-[#38b6ff] hover:bg-[#0077ed] text-white rounded-full font-medium flex items-center gap-5"
+                className="px-6 h-12 bg-black hover:bg-neutral-900 text-white rounded-full font-medium flex items-center gap-5"
               >
                 Create a tender
               </motion.button>
@@ -333,11 +333,11 @@ export default function Hero() {
 
             <div className="flex flex-wrap gap-8 pt-4 text-sm text-[#6e6e73]">
               <div className="flex items-center gap-2">
-                <Check className="w-5 h-5 text-[#38b6ff]" />
+                <Check className="w-5 h-5 text-black" />
                 KYC & company verification
               </div>
               <div className="flex items-center gap-2">
-                <Check className="w-5 h-5 text-[#38b6ff]" />
+                <Check className="w-5 h-5 text-black" />
                 Evaluation scorecards & audit trail
               </div>
             </div>
@@ -349,7 +349,7 @@ export default function Hero() {
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 50 }}
-              className="bg-white rounded-[28px] shadow-2xl border border-[#d2d2d7] p-8 max-h-[90vh] overflow-y-auto sticky top-24"
+              className="bg-white rounded-[28px]  border border-[#d2d2d7] p-8 max-h-[90vh] overflow-y-auto sticky top-24"
             >
               {/* Close Button */}
               <button
@@ -367,7 +367,7 @@ export default function Hero() {
                     <motion.div
                       animate={{
                         backgroundColor:
-                          i <= currentStep ? "#38b6ff" : "#f5f5f7",
+                          i <= currentStep ? "#000000" : "#f5f5f7",
                         scale: i === currentStep ? 1.06 : 1,
                       }}
                       className="w-10 h-10 rounded-full flex items-center justify-center"
@@ -388,7 +388,7 @@ export default function Hero() {
                       <motion.div
                         animate={{
                           backgroundColor:
-                            i < currentStep ? "#38b6ff" : "#e5e5ea",
+                            i < currentStep ? "#000000" : "#e5e5ea",
                         }}
                         className="h-0.5 w-12 mx-2"
                       />
@@ -440,7 +440,7 @@ export default function Hero() {
                                 "w-full h-32 bg-[#f5f5f7] rounded-xl border px-4 py-3 text-sm outline-none transition-colors resize-none",
                                 errors[field.name]
                                   ? "border-red-500"
-                                  : "border-transparent hover:border-[#38b6ff]/20 focus:border-[#38b6ff]"
+                                  : "border-transparent hover:border-black/20 focus:border-black"
                               )}
                             />
                             {errors[field.name] && (
@@ -458,7 +458,7 @@ export default function Hero() {
                                     "w-full h-12 bg-[#f5f5f7] rounded-xl border px-4 text-sm text-left font-normal flex items-center justify-between transition-colors",
                                     errors.deadline
                                       ? "border-red-500"
-                                      : "border-transparent hover:border-[#38b6ff]/20 focus:border-[#38b6ff]",
+                                      : "border-transparent hover:border-black/20 focus:border-black",
                                     !formData.deadline &&
                                       "text-muted-foreground"
                                   )}
@@ -490,7 +490,7 @@ export default function Hero() {
                                 />
                                 <input
                                   type="time"
-                                  className="w-full rounded-md border px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#38b6ff]"
+                                  className="w-full rounded-md border px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-black"
                                   value={
                                     formData.deadline
                                       ? format(formData.deadline, "HH:mm")
@@ -533,7 +533,7 @@ export default function Hero() {
                                 "w-full h-12 bg-[#f5f5f7] rounded-xl border px-4 text-sm outline-none transition-colors",
                                 errors[field.name]
                                   ? "border-red-500"
-                                  : "border-transparent hover:border-[#38b6ff]/20 focus:border-[#38b6ff]"
+                                  : "border-transparent hover:border-black/20 focus:border-black"
                               )}
                             />
                             {errors[field.name] && (
@@ -553,8 +553,8 @@ export default function Hero() {
                     animate={{ opacity: 1, y: 0 }}
                     className="space-y-8 text-center py-12"
                   >
-                    <div className="mx-auto w-24 h-24 bg-[#38b6ff]/10 rounded-full flex items-center justify-center">
-                      <Check className="w-12 h-12 text-[#38b6ff]" />
+                    <div className="mx-auto w-24 h-24 bg-black/10 rounded-full flex items-center justify-center">
+                      <Check className="w-12 h-12 text-black" />
                     </div>
                     <div className="space-y-4">
                       <h3 className="text-3xl font-semibold text-[#1d1d1f]">
@@ -574,7 +574,7 @@ export default function Hero() {
                 {!showSignupScreen && currentStep > 0 && (
                   <button
                     onClick={prevStep}
-                    className="flex-1 h-12 rounded-xl text-[#38b6ff] hover:bg-[#38b6ff]/5 transition-colors"
+                    className="flex-1 h-12 rounded-xl text-black hover:bg-black/5 transition-colors"
                   >
                     Back
                   </button>
@@ -586,7 +586,7 @@ export default function Hero() {
                         ? handlePostTender()
                         : nextStep()
                     }
-                    className="flex-1 bg-[#38b6ff] hover:bg-[#0077ed] text-white h-12 rounded-xl font-medium flex items-center justify-center gap-2 transition-colors"
+                    className="flex-1 bg-black hover:bg-neutral-900 text-white h-12 rounded-xl font-medium flex items-center justify-center gap-2 transition-colors"
                   >
                     {currentStep === steps.length - 1
                       ? "Save & Continue"
@@ -609,7 +609,7 @@ export default function Hero() {
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       href="/signup"
-                      className="flex-1 bg-[#38b6ff] hover:bg-[#0077ed] text-white h-12 rounded-xl font-medium flex items-center justify-center gap-2"
+                      className="flex-1 bg-black hover:bg-neutral-900 text-white h-12 rounded-xl font-medium flex items-center justify-center gap-2"
                     >
                       Sign up now
                     </motion.a>

@@ -34,7 +34,7 @@ export default function NavbarLanding() {
           : "rgba(255,255,255,0)",
       }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled ? "backdrop-blur-xl border-b border-[#d2d2d7]/40" : ""
+        scrolled ? "backdrop-blur-xl border-b border-gray-300" : ""
       }`}
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -56,7 +56,7 @@ export default function NavbarLanding() {
               <a
                 key={item.name}
                 href={item.href}
-                className="text-sm text-[#1d1d1f] hover:text-[#38b6ff] transition-colors"
+                className="text-sm text-black hover:text-gray-600 transition-colors"
               >
                 {item.name}
               </a>
@@ -65,7 +65,7 @@ export default function NavbarLanding() {
             {user ? (
               <Link
                 href="/dashboard"
-                className="px-6 py-2 bg-[#38b6ff] hover:bg-[#0077ed] text-white rounded-full transition-colors"
+                className="px-6 py-2 bg-black text-white rounded-full hover:bg-gray-800 transition-colors"
               >
                 Dashboard
               </Link>
@@ -73,13 +73,13 @@ export default function NavbarLanding() {
               <div className="flex items-center gap-3">
                 <Link
                   href="/login"
-                  className="px-4 py-2 text-[#38b6ff] hover:bg-[#38b6ff]/10 rounded-full transition-colors"
+                  className="px-4 py-2 text-black border border-gray-300 rounded-full hover:bg-gray-100 transition-colors"
                 >
                   Sign in
                 </Link>
                 <Link
                   href="/signup"
-                  className="px-6 py-2 bg-[#38b6ff] hover:bg-[#0077ed] text-white rounded-full transition-colors"
+                  className="px-6 py-2 bg-black text-white rounded-full hover:bg-gray-800 transition-colors"
                 >
                   Get started
                 </Link>
@@ -90,7 +90,7 @@ export default function NavbarLanding() {
           {/* Mobile toggle */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden p-2 rounded-lg hover:bg-[#38b6ff]/10 transition-colors"
+            className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
           >
             {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -104,7 +104,7 @@ export default function NavbarLanding() {
           isOpen ? { height: "auto", opacity: 1 } : { height: 0, opacity: 0 }
         }
         transition={{ duration: 0.25 }}
-        className="md:hidden overflow-hidden bg-white/95 backdrop-blur-xl border-t border-[#d2d2d7]/50"
+        className="md:hidden overflow-hidden bg-white/95 backdrop-blur-xl border-t border-gray-300"
       >
         <div className="px-4 py-4 space-y-3">
           {navItems.map((item) => (
@@ -112,7 +112,7 @@ export default function NavbarLanding() {
               key={item.name}
               href={item.href}
               onClick={() => setIsOpen(false)}
-              className="block py-2 text-sm text-[#1d1d1f] hover:text-[#38b6ff] transition-colors"
+              className="block py-2 text-sm text-black hover:text-gray-600 transition-colors"
             >
               {item.name}
             </a>
@@ -122,7 +122,7 @@ export default function NavbarLanding() {
             <Link
               href="/dashboard"
               onClick={() => setIsOpen(false)}
-              className="block py-2 bg-[#38b6ff] text-white rounded-full text-center hover:bg-[#0077ed]"
+              className="block py-2 bg-black text-white rounded-full text-center hover:bg-gray-800 transition-colors"
             >
               Dashboard
             </Link>
@@ -131,14 +131,14 @@ export default function NavbarLanding() {
               <Link
                 href="/login"
                 onClick={() => setIsOpen(false)}
-                className="flex-1 py-2 rounded-full border border-[#d2d2d7] hover:bg-[#f5f5f7] text-center"
+                className="flex-1 py-2 rounded-full border border-gray-300 text-center hover:bg-gray-100 transition-colors"
               >
                 Sign in
               </Link>
               <Link
                 href="/signup"
                 onClick={() => setIsOpen(false)}
-                className="flex-1 py-2 bg-[#38b6ff] text-white rounded-full text-center hover:bg-[#0077ed]"
+                className="flex-1 py-2 bg-black text-white rounded-full text-center hover:bg-gray-800 transition-colors"
               >
                 Get started
               </Link>

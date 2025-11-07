@@ -1,45 +1,15 @@
 "use client";
 
-import {
-  motion,
-  AnimatePresence,
-  useInView,
-  useMotionValue,
-  useSpring,
-} from "framer-motion";
+import { motion } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
 import {
   ArrowRight,
-  ArrowUp,
   Check,
-  Plus,
-  Minus,
-  Menu,
-  X,
-  Star,
   MessageSquare,
   Shield,
-  EyeOff,
-  Bell,
   Users,
-  Search,
   Award,
-  FileText,
-  Lock,
-  Zap,
   Briefcase,
-  Trophy,
-  MessagesSquare,
-  FilePlus,
-  Car,
-  PartyPopper,
-  Hammer,
-  Laptop,
-  Building2,
-  HelpCircle,
-  BookOpen,
-  Upload,
-  BarChart3,
   Facebook,
   Instagram,
   Twitter,
@@ -53,60 +23,7 @@ import Navbarlanding from "@/components/Navbarladning";
 import Image from "next/image";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-
-/* -------------------------------------------------------------------------- */
-/*                                 COMPONENTS                                 */
-/* -------------------------------------------------------------------------- */
-
-/* ----------------------------- TrustedBy ---------------------------------- */
-function TrustedBy() {
-  const partners = [
-    { name: "Lusail Residents", width: "w-32" },
-    { name: "Doha SMEs", width: "w-28" },
-    { name: "Al Wakrah Events", width: "w-32" },
-    { name: "Pearl Qatar", width: "w-28" },
-    { name: "West Bay Offices", width: "w-32" },
-    { name: "Qatar Garages", width: "w-32" },
-  ];
-
-  return (
-    <section className="py-20 bg-white border-y border-[#d2d2d7]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          className="text-center mb-12"
-        >
-          <p className="text-lg text-[#86868b] font-medium">
-            Used by individuals and businesses across Qatar
-          </p>
-        </motion.div>
-
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 items-center">
-          {partners.map((p, i) => (
-            <motion.div
-              key={p.name}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: i * 0.08 }}
-              className="flex items-center justify-center"
-            >
-              <div
-                className={`${p.width} h-12 bg-[#f5f5f7] rounded-xl flex items-center justify-center hover:bg-[#e8e8ed] transition-colors`}
-              >
-                <span className="text-xs font-medium text-[#86868b] text-center px-2">
-                  {p.name}
-                </span>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
+import PageTransitionWrapper from "@/components/animations/PageTransitionWrapper";
 
 const processSteps = [
   {
@@ -139,7 +56,7 @@ const processSteps = [
 
 function Process() {
   return (
-    <section className="px-6 py-16 md:px-16 md:py-28 bg-Color-Scheme-1-Background">
+    <section className="px-6 py-16 md:px-16 md:py-28 bg-gray-50">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="max-w-3xl mx-auto text-center mb-16">
@@ -159,7 +76,7 @@ function Process() {
           {processSteps.map((step, index) => (
             <div
               key={index}
-              className="group relative h-[540px] md:h-[580px] rounded-xl overflow-hidden shadow-lg transition-transform hover:scale-[1.02]"
+              className="group relative h-[540px] md:h-[580px] rounded-md overflow-hidden shadow-lg transition-transform hover:scale-[1.02]"
               style={{
                 backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.7)), url('${step.bgImage}')`,
                 backgroundSize: "cover",
@@ -199,217 +116,6 @@ function Process() {
     </section>
   );
 }
-
-/* ------------------------------- Outcomes --------------------------------- */
-function Outcomes() {
-  const outcomes = [
-    {
-      title: "Post once and reach many bidders at once.",
-      icon: Zap,
-      audience: "For tenderers ,  Outcomes with Tenderly",
-    },
-    {
-      title: "Use built-in Q/A to clarify missing details before award.",
-      icon: MessageSquare,
-      audience: "For tenderers ,  Outcomes with Tenderly",
-    },
-    {
-      title: "Compare apples-to-apples (price, ETA, notes) in one view.",
-      icon: Award,
-      audience: "For tenderers ,  Outcomes with Tenderly",
-    },
-    {
-      title: "Stay anonymous until award; choose the best fit faster.",
-      icon: EyeOff,
-      audience: "For tenderers ,  Outcomes with Tenderly",
-    },
-    {
-      title: "Ask/answer clarifying questions publicly on the tender.",
-      icon: MessageSquare,
-      audience: "For bidders ,  Outcomes with Tenderly",
-    },
-    {
-      title:
-        "See all required fields up front; submit a clear, competitive bid.",
-      icon: FileText,
-      audience: "For bidders ,  Outcomes with Tenderly",
-    },
-    {
-      title: "Keep negotiations in one private thread; get awarded faster.",
-      icon: Lock,
-      audience: "For bidders ,  Outcomes with Tenderly",
-    },
-  ];
-
-  return (
-    <section id="outcomes" className="py-24 sm:py-32 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-16"
-        >
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-[#1d1d1f] mb-4">
-            Better outcomes with Tenderly.
-          </h2>
-          <p className="text-xl text-[#6e6e73] max-w-2xl mx-auto">
-            Eliminate friction, get clarity, and close deals faster , for both
-            sides.
-          </p>
-        </motion.div>
-
-        <div className="grid md:grid-cols-2 gap-8">
-          {[
-            "For tenderers ,  Outcomes with Tenderly",
-            "For bidders ,  Outcomes with Tenderly",
-          ].map((audience) => (
-            <div key={audience}>
-              <h3 className="text-2xl font-semibold text-[#1d1d1f] mb-6 text-center md:text-left">
-                {audience}
-              </h3>
-              <div className="space-y-6">
-                {outcomes
-                  .filter((o) => o.audience === audience)
-                  .map((o, i) => {
-                    const Icon = o.icon;
-                    return (
-                      <motion.div
-                        key={o.title}
-                        initial={{ opacity: 0, x: 20 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.45, delay: i * 0.1 }}
-                        className="flex items-start gap-4"
-                      >
-                        <div className="w-10 h-10 rounded-xl bg-[#38b6ff]/10 flex items-center justify-center flex-shrink-0">
-                          <Icon className="w-5 h-5 text-[#38b6ff]" />
-                        </div>
-                        <p className="text-base text-[#6e6e73] leading-relaxed">
-                          {o.title}
-                        </p>
-                      </motion.div>
-                    );
-                  })}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// /* ------------------------------ UseCases ---------------------------------- */
-// function UseCases() {
-//   const cases = [
-//     {
-//       title: "Home services (cleaning & maintenance)",
-//       scenario:
-//         "NA is moving out of an apartment in Lusail and needs a deep clean on a specific date. Calling companies one by one was slow and prices varied wildly. On Tenderly, NA posted once with the date, apartment size, and checklist. Through Q/A, bidders confirmed building access and timings. NA received multiple quotes the same day, compared inclusions (steam, windows, oven), and awarded the best match, done.",
-//       icon: Home,
-//     },
-//     {
-//       title: "Automotive services (repair, detailing, tires)",
-//       scenario:
-//         "HM’s SUV needs brake pads and a full detail. Not sure of fair pricing or downtime. HM posted the plate/model and preferred time window. Garages responded with parts options (OEM/aftermarket), ETAs, and warranty notes; a detailer asked in Q/A about interior shampoo vs. quick wash. HM picked a garage that offered pick-up/drop-off and a detail combo, problem solved in one go.",
-//       icon: Car,
-//     },
-//     {
-//       title: "Events (weddings, corporate, birthdays)",
-//       scenario:
-//         "MA is planning a small wedding in Al Wakrah: catering for 120, décor, DJ, and photo/video. Vendors were scattered and hard to coordinate. MA posted the budget range, menu style, and venue restrictions. Using Q/A, suppliers clarified power load and layout. MA quickly compared package breakdowns, shortlisted two, negotiated extras (LED dance floor), and awarded a single vendor bundle.",
-//       icon: PartyPopper,
-//     },
-//     {
-//       title: "Construction & renovation (small works, fit-outs, repairs)",
-//       scenario:
-//         "AA wants a kitchen refresh, cabinet re-facing and new countertop. Past quotes were inconsistent and missed measurements. AA posted with drawings/photos and a rough timeline. Contractors used Q/A to ask about materials and site access; AA added dimensions. Comparable bids arrived with line-item costs and lead times. AA awarded one contractor and arranged a site visit after award.",
-//       icon: Hammer,
-//     },
-//     {
-//       title: "Facilities management & building maintenance",
-//       scenario:
-//         "LT needs a combined soft/hard FM contract: daily cleaning plus quarterly HVAC maintenance. Previous suppliers covered only part of the scope. LT posted a single tender with SLAs and KPIs. In Q/A, bidders confirmed consumables, call-out times, and preventive schedules. LT compared consolidated proposals, checked references, and awarded one provider for the whole site.",
-//       icon: Building2,
-//     },
-//     {
-//       title: "IT & managed services (support, cloud, networking)",
-//       scenario:
-//         "KR’s team needs 24/7 helpdesk, endpoint security, and cloud backups. Cold outreach was noisy; scopes didn’t match. KR posted requirements (users, devices, response times, compliance needs). MSPs asked in Q/A about current stack and ticket volume, then submitted structured bids with SLAs and onboarding plans. KR compared like-for-like, negotiated onboarding fees, and awarded the best-fit MSP.",
-//       icon: Laptop,
-//     },
-//   ];
-//   return (
-//     <section
-//       id="use-cases"
-//       className="py-16 md:py-24 lg:py-32 bg-Opacity-White-5"
-//     >
-//       <div className="max-w-7xl mx-auto px-6 lg:px-8">
-//         {/* Header */}
-//         <motion.div
-//           initial={{ opacity: 0, y: 20 }}
-//           whileInView={{ opacity: 1, y: 0 }}
-//           viewport={{ once: true }}
-//           transition={{ duration: 0.8 }}
-//           className="text-center mb-12 md:mb-16"
-//         >
-//           <h2 className="text-4xl sm:text-5xl lg:text-6xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight">
-//             Real use cases in Qatar.
-//           </h2>
-//           <p className="mt-4 text-lg md:text-xl font-normal font-inter text-Color-Scheme-1-Text/70 max-w-2xl mx-auto leading-relaxed">
-//             From home cleaning to enterprise IT ,  see how Tenderly works in
-//             practice.
-//           </p>
-//         </motion.div>
-
-//         {/* Use Cases Grid */}
-//         <div className="grid md:grid-cols-2 gap-6 lg:gap-8">
-//           {cases.map((c, i) => {
-//             const Icon = c.icon;
-//             return (
-//               <motion.div
-//                 key={c.title}
-//                 initial={{ opacity: 0, y: 20 }}
-//                 whileInView={{ opacity: 1, y: 0 }}
-//                 viewport={{ once: true }}
-//                 transition={{ duration: 0.5, delay: i * 0.08 }}
-//                 whileHover={{ y: -6 }}
-//                 className="group"
-//               >
-//                 <div
-//                   className="h-full p-6 md:p-8 rounded-2xl bg-Opacity-White-5 backdrop-blur-sm
-//                              border border-Opacity-Neutral-Darkest-10
-//                              transition-all duration-300
-//                              hover:shadow-xl hover:border-Color-Matisse/30"
-//                 >
-//                   {/* Icon + Title */}
-//                   <div className="flex items-start gap-4 mb-5">
-//                     <div
-//                       className="w-12 h-12 rounded-xl bg-Color-Matisse/10 flex items-center justify-center flex-shrink-0
-//                                     ring-4 ring-Color-Matisse/20 group-hover:bg-Color-Matisse/15 transition-colors"
-//                     >
-//                       <Icon size={28} className="text-Color-Matisse" />
-//                     </div>
-//                     <h3 className="text-xl md:text-2xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight">
-//                       {c.title}
-//                     </h3>
-//                   </div>
-
-//                   {/* Scenario */}
-//                   <p className="text-base md:text-lg font-normal font-inter text-Color-Scheme-1-Text/80 leading-relaxed">
-//                     {c.scenario}
-//                   </p>
-//                 </div>
-//               </motion.div>
-//             );
-//           })}
-//         </div>
-//       </div>
-//     </section>
-//   );
-// }
 
 /* --------------------------- HowItWorksDetailed --------------------------- */
 function HowItWorksDetailed() {
@@ -482,174 +188,20 @@ function HowItWorksDetailed() {
     </section>
   );
 }
-
-/* ------------------------------ KeyFeatures ------------------------------- */
-function KeyFeatures() {
-  return (
-    <>
-      <section className="py-16 px-4 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-start">
-            {/* Left Column - Main Insight */}
-            <div className="flex-1 lg:max-w-md">
-              <div className="flex items-center gap-2 text-sm font-medium text-gray-600 mb-3">
-                <span className="inline-flex items-center justify-center w-6 h-6">
-                  <div className="w-full h-px bg-gray-400"></div>
-                </span>
-                <span>Insights</span>
-              </div>
-              <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4 leading-tight">
-                Navigate tender complexities with confidence
-              </h2>
-              <p className="text-base text-gray-600 mb-6 leading-relaxed">
-                Navigate the complexities of business bidding with confidence
-                and clarity.
-              </p>
-              <div className="flex gap-3">
-                <button className="px-5 py-2.5 border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors">
-                  Explore
-                </button>
-                <button className="px-5 py-2.5 border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors flex items-center gap-2">
-                  Learn
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
-                </button>
-              </div>
-            </div>
-
-            {/* Right Column - Feature Cards */}
-            <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Card 1 */}
-              <div className="bg-white p-6 rounded-lg hover:shadow-sm transition-shadow">
-                <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mb-4">
-                  <HelpCircle className="w-6 h-6 text-gray-700" />
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  Your tender questions answered
-                </h3>
-                <p className="text-sm text-gray-600 leading-relaxed">
-                  Navigate the complexities of business bidding with confidence
-                  and clarity.
-                </p>
-              </div>
-
-              {/* Card 2 */}
-              <div className="bg-white p-6 rounded-lg  hover:shadow-sm transition-shadow">
-                <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mb-4">
-                  <BookOpen className="w-6 h-6 text-gray-700" />
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  Streamline your tendering process
-                </h3>
-                <p className="text-sm text-gray-600 leading-relaxed">
-                  Our platform provides intuitive tools that simplify complex
-                  procurement workflows and reduce administrative burden.
-                </p>
-              </div>
-
-              {/* Card 3 */}
-              <div className="bg-white p-6 rounded-lg  hover:shadow-sm transition-shadow">
-                <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mb-4">
-                  <Shield className="w-6 h-6 text-gray-700" />
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  Secure and transparent
-                </h3>
-                <p className="text-sm text-gray-600 leading-relaxed">
-                  We ensure complete confidentiality and verification for every
-                  interaction, protecting your business interests.
-                </p>
-              </div>
-
-              {/* Card 4 */}
-              <div className="bg-white p-6 rounded-lg  hover:shadow-sm transition-shadow">
-                <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mb-4">
-                  <Zap className="w-6 h-6 text-gray-700" />
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  Secure your competitive edge
-                </h3>
-                <p className="text-sm text-gray-600 leading-relaxed">
-                  Streamline your bidding strategy with intelligent tools and
-                  expert support.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-    </>
-  );
-}
-
-/* ------------------------------- Pricing ---------------------------------- */
-function Pricing() {
-  return (
-    <section id="pricing" className="py-24 sm:py-32 bg-[#fbfbfd]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-16"
-        >
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-[#1d1d1f] mb-4">
-            Free to post. Free to bid.
-          </h2>
-          <p className="text-xl text-[#6e6e73] max-w-2xl mx-auto">
-            We’re just the platform: No involvement in contracts, custody, or
-            payments.
-          </p>
-        </motion.div>
-
-        <div className="max-w-md mx-auto">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="bg-white rounded-[32px] p-12 border-2 border-[#38b6ff] text-center"
-          >
-            <div className="text-6xl font-bold text-[#38b6ff] mb-2">Free</div>
-            <p className="text-lg text-[#6e6e73] mb-8">
-              Unlimited posts and bids. No hidden fees.
-            </p>
-            <button className="w-full h-14 bg-[#38b6ff] hover:bg-[#0077ed] text-white rounded-xl font-medium">
-              Post your first tender
-            </button>
-          </motion.div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 /* ----------------------------- Testimonials ------------------------------- */
 function Testimonials() {
   return (
-    <div className="bg-white py-16 px-8">
+    <div className="bg-gray-50 py-16 px-8">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 items-start gap-12">
           {/* Left Image */}
-          <div className="w-full h-full bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden">
+          <div className="w-full h-full bg-gray-200 rounded-md flex items-center justify-center overflow-hidden">
             <div className="relative w-full h-[600px]">
               <Image
                 src="https://www.shutterstock.com/image-photo/positive-handsome-arabic-businessman-beard-600nw-2510267591.jpg"
                 alt="Arabic businessman smiling in office"
                 fill
-                className="object-cover rounded-lg"
+                className="object-cover rounded-md"
                 sizes="(max-width: 768px) 100vw, 50vw"
               />
             </div>
@@ -759,176 +311,55 @@ function Testimonials() {
   );
 }
 
-/* --------------------------------- FAQ ------------------------------------ */
-function FAQ() {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const faqs = [
-    {
-      question: "I’m not sure how to write requirements.",
-      answer:
-        "Use Tenderly’s Q/A feature: bidders and tenderers can ask and answer clarifying questions on the tender page to surface any unknown or missing details (scope, deliverables, timeline, acceptance criteria). This keeps everything transparent, comparable, and helps you receive accurate quotes, no guided templates needed.",
-    },
-    {
-      question: "What is Tenderly?",
-      answer:
-        "Qatar’s open tender platform. Post projects, get bids, pick the best.",
-    },
-    {
-      question: "Is it really anonymous?",
-      answer:
-        "Yes. Your profile and contact details are hidden until you choose a winner. After award, both parties can share details.",
-    },
-    {
-      question: "Who can bid?",
-      answer: "Registered companies only.",
-    },
-    {
-      question: "How do I post?",
-      answer:
-        "Register → create a new tender and publish → view bids and award.",
-    },
-    {
-      question: "Any fees?",
-      answer: "No. Posting and bidding are free.",
-    },
-    {
-      question: "Do you handle contracts or payments?",
-      answer:
-        "No. We’re a neutral platform. You finalize contracts and payments directly with the other party.",
-    },
-    {
-      question: "Who can use Tenderly?",
-      answer: "Anyone, individuals and businesses of any size.",
-    },
-    {
-      question: "What categories are allowed?",
-      answer: "Anything.",
-    },
-  ];
-
-  const toggleFAQ = (i: number) => setOpenIndex(openIndex === i ? null : i);
-
-  return (
-    <section id="faq" className="py-24 sm:py-32 bg-[#fbfbfd]">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-16"
-        >
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-[#1d1d1f] mb-4">
-            Frequently asked.
-          </h2>
-          <p className="text-xl text-[#6e6e73]">
-            Got questions? We’ve got answers.
-          </p>
-        </motion.div>
-
-        <div className="space-y-4">
-          {faqs.map((faq, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.45, delay: i * 0.05 }}
-            >
-              <button
-                onClick={() => toggleFAQ(i)}
-                className="w-full bg-white rounded-[20px] p-6 border border-[#d2d2d7] hover:border-[#38b6ff]/30 transition-all text-left"
-              >
-                <div className="flex items-center justify-between gap-4">
-                  <h3 className="text-lg font-semibold text-[#1d1d1f] pr-8">
-                    {faq.question}
-                  </h3>
-                  <motion.div
-                    animate={{ rotate: openIndex === i ? 180 : 0 }}
-                    transition={{ duration: 0.28 }}
-                  >
-                    {openIndex === i ? (
-                      <Minus className="w-5 h-5 text-[#38b6ff]" />
-                    ) : (
-                      <Plus className="w-5 h-5 text-[#38b6ff]" />
-                    )}
-                  </motion.div>
-                </div>
-
-                <AnimatePresence>
-                  {openIndex === i && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.28 }}
-                      className="overflow-hidden"
-                    >
-                      <p className="text-[#6e6e73] leading-relaxed mt-4 pr-8">
-                        {faq.answer}
-                      </p>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </button>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
 /* --------------------------------- CTA ------------------------------------ */
 function CTA() {
   return (
-    <section className="py-24 sm:py-32 bg-white">
+    <section className="py-24 sm:py-32  text-black">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
+          className="relative overflow-hidden rounded-sm border border-white/10 bg-gray-100 p-12 sm:p-16 lg:p-20"
         >
-          <div className="relative overflow-hidden bg-gradient-to-br from-[#38b6ff] to-[#0077ed] rounded-[48px] p-12 sm:p-16 lg:p-20">
-            <div className="relative z-10 max-w-3xl mx-auto text-center">
-              <motion.h2
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-white mb-6 leading-tight"
-              >
-                Get better quotes without the back-and-forth.
-              </motion.h2>
+          <div className="relative z-10 max-w-3xl mx-auto text-center">
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight leading-tight mb-10"
+            >
+              Get better quotes without the back-and-forth.
+            </motion.h2>
 
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.4 }}
-                className="flex flex-col sm:flex-row items-center justify-center gap-4"
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="flex flex-col sm:flex-row items-center justify-center gap-4"
+            >
+              <motion.a
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                href="/post"
+                className="bg-white text-black hover:bg-white/90 rounded-full px-8 h-14 text-lg font-medium  flex items-center gap-2"
               >
-                <motion.a
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  href="/post"
-                  className="bg-white text-[#38b6ff] hover:bg-white/90 rounded-full px-8 h-14 text-lg font-medium shadow-lg flex items-center gap-2"
-                >
-                  Post your tender for free <ArrowRight className="w-5 h-5" />
-                </motion.a>
-              </motion.div>
+                Post your tender for free <ArrowRight className="w-5 h-5" />
+              </motion.a>
+            </motion.div>
 
-              <motion.p
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.5 }}
-                className="text-sm text-white/70 mt-8"
-              >
-                Anonymous until award • No fees • Takes ~2 minutes
-              </motion.p>
-            </div>
+            <motion.p
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+              className="text-sm text-white/60 mt-8"
+            >
+              Anonymous until award • No fees • Takes ~2 minutes
+            </motion.p>
           </div>
         </motion.div>
       </div>
@@ -957,11 +388,11 @@ function Footer() {
   };
 
   return (
-    <footer className="bg-white border-t border-gray-200">
-      <div className="max-w-screen-2xl mx-auto px-6 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
+    <footer className="bg-gray-50 border-t border-gray-200">
+      <div className="max-w-7xl mx-auto px-6 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
           {/* Left Column - Logo, Location, Contact */}
-          <div className="flex flex-col">
+          <div className="flex flex-col ">
             <span className="text-sm font-medium text-gray-900 mb-4">Logo</span>
 
             <div className="space-y-4 text-sm text-gray-600">
@@ -969,20 +400,20 @@ function Footer() {
               <p>Level 1, 123 Innovation Drive, Sydney NSW 2000</p>
 
               <p className="font-semibold text-gray-900 mt-6">Connect</p>
-              <p>1800 tender help@hello@tenderplatform.com</p>
+              <p>1800 tender • help@tenderplatform.com</p>
             </div>
 
             <div className="flex space-x-4 mt-6">
-              <Facebook className="w-5 h-5 text-gray-600 cursor-pointer hover:text-blue-600" />
-              <Instagram className="w-5 h-5 text-gray-600 cursor-pointer hover:text-pink-600" />
-              <Twitter className="w-5 h-5 text-gray-600 cursor-pointer hover:text-blue-400" />
-              <Linkedin className="w-5 h-5 text-gray-600 cursor-pointer hover:text-blue-700" />
-              <Youtube className="w-5 h-5 text-gray-600 cursor-pointer hover:text-red-600" />
+              <Facebook className="w-5 h-5 text-gray-600 cursor-pointer hover:text-gray-900" />
+              <Instagram className="w-5 h-5 text-gray-600 cursor-pointer hover:text-gray-900" />
+              <Twitter className="w-5 h-5 text-gray-600 cursor-pointer hover:text-gray-900" />
+              <Linkedin className="w-5 h-5 text-gray-600 cursor-pointer hover:text-gray-900" />
+              <Youtube className="w-5 h-5 text-gray-600 cursor-pointer hover:text-gray-900" />
             </div>
           </div>
 
           {/* Right Column - Links */}
-          <div className="grid grid-cols-2 gap-x-12 gap-y-6 text-sm">
+          <div className="flex justify-end items-center gap-x-27  gap-y-6 text-sm">
             <div>
               <p className="font-semibold text-gray-900 mb-3">
                 Platform insights
@@ -1024,18 +455,24 @@ function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-gray-200 text-sm text-gray-600">
-          <div>© 2024 Tender Platform. All rights reserved.</div>
-          <div className="flex space-x-6 mt-4 md:mt-0">
-            <span className="hover:text-gray-900 cursor-pointer">
-              Privacy policy
-            </span>
-            <span className="hover:text-gray-900 cursor-pointer">
-              Terms of service
-            </span>
-            <span className="hover:text-gray-900 cursor-pointer">
-              Cookies settings
-            </span>
+        <div className="pt-2">
+          {/* <div className="w-full text-center font-serif font-bold text-gray-900 mb-6 text-[100px] leading-none tracking-widest uppercase break-words">
+        GoTenderly
+      </div> */}
+
+          <div className="flex flex-col md:flex-row justify-between items-center border-t border-gray-200 pt-6 text-sm text-gray-600">
+            <div>© 2024 Tender Platform. All rights reserved.</div>
+            <div className="flex space-x-6 mt-4 md:mt-0">
+              <span className="hover:text-gray-900 cursor-pointer">
+                Privacy policy
+              </span>
+              <span className="hover:text-gray-900 cursor-pointer">
+                Terms of service
+              </span>
+              <span className="hover:text-gray-900 cursor-pointer">
+                Cookies settings
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -1187,7 +624,7 @@ function About() {
             <img
               src="https://images.pexels.com/photos/3184338/pexels-photo-3184338.jpeg?auto=compress&cs=tinysrgb&w=600&h=640"
               alt="Professional workspace"
-              className="w-full h-[540px] md:h-[600px] object-cover rounded-lg shadow-lg"
+              className="w-full h-[540px] md:h-[600px] object-cover rounded-md shadow-lg"
             />
           </div>
         </div>
@@ -1197,7 +634,7 @@ function About() {
           <img
             src="https://images.pexels.com/photos/3184338/pexels-photo-3184338.jpeg?auto=compress&cs=tinysrgb&w=600&h=640"
             alt="Professional workspace"
-            className="w-full h-80 object-cover rounded-lg shadow-md"
+            className="w-full h-80 object-cover rounded-md shadow-md"
           />
         </div>
       </div>
@@ -1260,7 +697,7 @@ function Services() {
         <div className="grid lg:grid-cols-2 gap-8">
           {/* Large Card (Individuals) */}
           <div
-            className="group relative h-[500px] md:h-full p-8 md:p-12 rounded-xl overflow-hidden
+            className="group relative h-[500px] md:h-full p-8 md:p-12 rounded-md overflow-hidden
                        bg-cover bg-center transition-transform hover:scale-[1.01]"
             style={{
               backgroundImage: `
@@ -1303,7 +740,7 @@ function Services() {
             {smallServices.map((service, idx) => (
               <div
                 key={idx}
-                className="group relative h-72 md:h-80 p-6 rounded-xl overflow-hidden bg-cover bg-center
+                className="group relative h-72 md:h-80 p-6 rounded-md overflow-hidden bg-cover bg-center
                            transition-transform hover:scale-[1.03] shadow-lg"
                 style={{
                   backgroundImage: `
@@ -1344,167 +781,6 @@ function Services() {
   );
 }
 
-const features2 = [
-  ["Unlimited tender postings", "Basic vendor matching"],
-  ["Standard support", "Community access"],
-  ["Email notifications", "Basic profile"],
-  ["Community forums", "Standard security"],
-  ["Mobile access", "Basic analytics"],
-];
-const pricingData = {
-  free: {
-    title: "Basic tender posting",
-    description: "Perfect for individual and small business needs",
-    price: "$0",
-    features: [
-      ["Post up to 3 tenders per month", "Receive up to 10 bids per tender"],
-      ["Basic project specifications", "Email support"],
-      ["Standard response time", "Public tender visibility"],
-    ],
-    cta: "Start now",
-  },
-  always: {
-    title: "Unlimited tendering",
-    description: "For growing teams and frequent procurement needs",
-    price: "$49",
-    features: [
-      ["Unlimited tender posts", "Unlimited bids received"],
-      ["Advanced specs & attachments", "Priority email + chat support"],
-      ["24-hour response SLA", "Private & public tenders"],
-      ["Team collaboration", "Analytics dashboard"],
-    ],
-    cta: "Start free trial",
-  },
-};
-
-function Pricing2() {
-  const [activeTab, setActiveTab] = useState<"free" | "always">("free");
-  const plan = pricingData[activeTab];
-  return (
-    <section className="px-6 py-16 md:px-16 md:py-28 bg-Color-Scheme-1-Background">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="max-w-3xl mx-auto text-center mb-12 md:mb-16">
-          <span className="text-Color-Scheme-1-Text text-base font-semibold font-inter leading-6">
-            Pricing
-          </span>
-          <h2 className="mt-3 text-4xl md:text-5xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight md:leading-[62.4px]">
-            Simple transparent pricing
-          </h2>
-          <p className="mt-4 text-lg font-normal font-inter text-Color-Scheme-1-Text leading-7">
-            No hidden costs, no commitments
-          </p>
-        </div>
-
-        {/* Pricing Card */}
-        <div className="max-w-3xl mx-auto">
-          <div
-            className="p-8 md:p-10 bg-Color-Scheme-1-Foreground rounded-2xl border border-Color-Scheme-1-Border/20
-                         "
-          >
-            {/* Header */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-full bg-Color-Matisse/10 flex items-center justify-center flex-shrink-0">
-                  <Check size={28} className="text-Color-Matisse" />
-                </div>
-                <div>
-                  <h3 className="text-3xl md:text-4xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight">
-                    {plan.title}
-                  </h3>
-                  <p className="mt-1 text-base font-normal font-inter text-Color-Scheme-1-Text/80 leading-6">
-                    {plan.description}
-                  </p>
-                </div>
-              </div>
-
-              <div className="text-right">
-                <div className="text-6xl md:text-7xl font-medium font-outfit text-Color-Scheme-1-Text leading-none">
-                  {plan.price}
-                </div>
-                {activeTab === "always" && (
-                  <div className="text-sm font-normal font-inter text-Color-Scheme-1-Text/70 mt-1">
-                    per month
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <hr className="border-t border-Color-Scheme-1-Border/20 mb-8" />
-
-            {/* Features */}
-            <div className="mb-8">
-              <p className="text-base font-normal font-inter text-Color-Scheme-1-Text mb-4">
-                Includes
-              </p>
-              <div className="space-y-4">
-                {plan.features.map((row, rowIdx) => (
-                  <div key={rowIdx} className="flex gap-6">
-                    {row.map((feature, colIdx) => (
-                      <div
-                        key={colIdx}
-                        className="flex-1 flex items-start gap-3"
-                      >
-                        <Check
-                          size={20}
-                          className="text-Color-Matisse flex-shrink-0 mt-0.5"
-                        />
-                        <span className="text-base font-normal font-inter text-Color-Scheme-1-Text leading-6">
-                          {feature}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <hr className="border-t border-Color-Scheme-1-Border/20 mb-8" />
-
-            {/* CTA */}
-            <button
-              className="w-full px-6 py-3 bg-Color-Matisse text-Color-White text-base font-medium font-inter
-                               rounded-lg hover:bg-Color-Matisse/90 transition-all flex items-center justify-center gap-2
-                               "
-            >
-              <span>{plan.cta}</span>
-              {activeTab === "always" && <ArrowRight size={20} />}
-            </button>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-function CTA2() {
-  return (
-    <section className="self-stretch px-16 py-28 bg-Color-Scheme-1-Background flex flex-col justify-start items-center gap-20 overflow-hidden">
-      <div className="w-full max-w-[1280px] flex flex-col justify-start items-start gap-20">
-        <div className="self-stretch p-16 bg-Color-Scheme-1-Foreground outline outline-1 outline-offset-[-1px] outline-Color-Scheme-1-Border/20 flex flex-col justify-center items-center gap-2">
-          <div className="w-full max-w-[768px] flex flex-col justify-start items-center gap-8">
-            <div className="self-stretch flex flex-col justify-start items-center gap-6">
-              <h2 className="self-stretch text-center text-Color-Scheme-1-Text text-5xl font-medium font-outfit leading-[62.40px]">
-                Get better quotes faster
-              </h2>
-              <p className="self-stretch text-center text-Color-Scheme-1-Text text-lg font-normal font-inter leading-7">
-                Simplify your procurement process with instant, transparent
-                bidding
-              </p>
-            </div>
-            <div className="flex justify-start items-start gap-4">
-              <button className="px-3 py-1.5 bg-Color-Matisse outline outline-1 outline-Color-Matisse text-Color-White text-base font-medium font-inter leading-6 hover:bg-opacity-90 transition-all">
-                Post tender
-              </button>
-              <button className="px-3 py-1.5 bg-Opacity-Neutral-Darkest-5 outline outline-1 outline-Opacity-Transparent text-Color-Neutral-Darkest text-base font-medium font-inter leading-6 hover:bg-opacity-70 transition-all">
-                Browse tenders
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
 const faqs = [
   {
     question: "How does Gotenderly work?",
@@ -1653,10 +929,10 @@ function Problems() {
                       <td className="px-6 py-5 text-sm font-medium text-foreground align-top min-w-[180px]">
                         {label}
                       </td>
-                      <td className="px-6 py-5 text-sm font-normal  text-blue-600/70 align-top min-w-[220px]">
+                      <td className="px-6 py-5 text-sm font-normal   align-top min-w-[220px]">
                         <span className="block break-words">{gotenderly}</span>
                       </td>
-                      <td className="px-6 py-5 text-sm font-normal  text-red-800/70  align-top min-w-[220px]">
+                      <td className="px-6 py-5 text-sm font-normal align-top min-w-[220px]">
                         <span className="block break-words">{other}</span>
                       </td>
                     </tr>
@@ -1748,7 +1024,7 @@ function PricingSection() {
 
                 <Button
                   variant="outline"
-                  className="w-full font-semibold rounded-lg"
+                  className="w-full font-semibold rounded-md"
                 >
                   Start Posting Tenders
                 </Button>
@@ -1771,7 +1047,7 @@ function PricingSection() {
                   </p>
                 </div>
 
-                <div className="border border-border rounded-lg p-6 mb-8 bg-muted/50">
+                <div className="border border-border rounded-md p-6 mb-8 bg-muted/50">
                   <p className="font-medium">Transparent & Risk-Free</p>
                   <p className="text-muted-foreground mt-2">
                     You only pay when a tender is worth bidding on. Access all
@@ -1799,7 +1075,7 @@ function PricingSection() {
 
                 <Button
                   variant="outline"
-                  className="w-full font-semibold rounded-lg"
+                  className="w-full font-semibold rounded-md"
                 >
                   Browse Tenders to Bid
                 </Button>
@@ -1817,20 +1093,22 @@ function PricingSection() {
 export default function Home() {
   return (
     <div className="min-h-screen">
-      <Navbarlanding />
-      <Hero />
-      <About />
-      <Process />
-      <Features />
-      <Services />
-      <Problems />
-      <Testimonials />
-      <KeyFeatures />
-      <PricingSection />
-      {/* <HowItWorksDetailed /> */}
-      <FAQ2 />
-      <CTA />
-      <Footer />
+      <PageTransitionWrapper>
+        <Navbarlanding />
+        <Hero />
+        <About />
+        <Process />
+        <Features />
+        <Services />
+        <Problems />
+        <Testimonials />
+        {/* <KeyFeatures /> */}
+        <PricingSection />
+        {/* <HowItWorksDetailed /> */}
+        <FAQ2 />
+        <CTA />
+        <Footer />
+      </PageTransitionWrapper>
     </div>
   );
 }
