@@ -1,1573 +1,1689 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
-  ArrowRight,
-  Check,
-  Briefcase,
-  Zap,
-  Lock,
-  EyeOff,
-  Shield,
-  Bell,
-  Search,
-  FileText,
-  MessageSquare,
-  Users,
-  FilePlus,
-  MessagesSquare,
-  Trophy,
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+  Button,
+  Checkbox,
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+  Input,
+  Label,
+  Textarea,
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@relume_io/relume-ui";
+import {
+  ChevronRight,
+  Facebook,
+  Instagram,
+  Linkedin,
+  Play,
   Star,
-  Car,
-  PartyPopper,
-  Hammer,
-  Building2,
-  Laptop,
-  Award,
-  Plus,
-  HomeIcon,
+  Twitter,
+  Youtube,
 } from "lucide-react";
-import Hero from "@/components/Hero";
-import NavbarLanding from "@/components/Navbarladning";
+import clsx from "clsx";
 
-// ---------------------------------------------------------------------
-//  Component Definitions (cleaned and consistent)
-// ---------------------------------------------------------------------
+// --------------------------------------------------
+// ConditionalRender (from Navbar22)
+// --------------------------------------------------
+const ConditionalRender = ({
+  condition,
+  children,
+}: {
+  condition: boolean;
+  children: React.ReactNode;
+}) => {
+  return condition ? <>{children}</> : null;
+};
 
-function TrustedBy() {
-  const partners = [
-    { name: "Lusail Residents" },
-    { name: "Doha SMEs" },
-    { name: "Al Wakrah Events" },
-    { name: "Pearl Qatar" },
-    { name: "West Bay Offices" },
-    { name: "Qatar Garages" },
-  ];
+// --------------------------------------------------
+// useNavbarRelume (renamed from useRelume in Navbar22)
+// --------------------------------------------------
+const useNavbarRelume = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const toggleMenu = () => setIsMenuOpen((prev) => !prev);
+  const toggleDropdown = () => setIsDropdownOpen((prev) => !prev);
+  const openDropdown = () => setIsDropdownOpen(true);
+  const closeDropdown = () => setIsDropdownOpen(false);
+  const animateMenu = isMenuOpen
+    ? { menu: "open", menu2: "openSecond" }
+    : { menu: "close", menu2: "closeSecond" };
+  const animateDropdownMenu = isDropdownOpen ? "open" : "close";
+  const animateDropdownMenuIcon = isDropdownOpen ? "rotated" : "initial";
 
-  return (
-    <section className="py-16 md:py-20 bg-Opacity-White-5 border-y border-Opacity-Neutral-Darkest-10">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          className="text-center mb-10 md:mb-12"
-        >
-          <p className="text-base md:text-lg text-Color-Scheme-1-Text/70 font-medium font-inter">
-            Used by individuals and businesses across Qatar
-          </p>
-        </motion.div>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 lg:gap-8 items-center">
-          {partners.map((p, i) => (
-            <motion.div
-              key={p.name}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: i * 0.1 }}
-              className="flex items-center justify-center"
-            >
-              <div className="w-32 h-12 bg-Opacity-White-10 rounded-xl flex items-center justify-center hover:bg-Opacity-White-20 transition-colors sm">
-                <span className="text-xs font-medium text-Color-Scheme-1-Text/70 text-center px-3">
-                  {p.name}
-                </span>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
+  return {
+    isDropdownOpen,
+    toggleMenu,
+    toggleDropdown,
+    openDropdown,
+    closeDropdown,
+    animateMenu,
+    animateDropdownMenu,
+    animateDropdownMenuIcon,
+    isMenuOpen,
+  };
+};
 
-const processSteps = [
-  {
-    label: "Post",
-    title: "Submit comprehensive tender with clear requirements",
-    description: "Define project scope, budget, and critical details",
-    linkText: "View details",
-    bgImage:
-      "https://images.pexels.com/photos/3184360/pexels-photo-3184360.jpeg?auto=compress&cs=tinysrgb&w=384&h=630",
-  },
-  {
-    label: "Bids",
-    title: "Receive and compare structured proposals from qualified vendors",
-    description:
-      "Evaluate competitive bids with transparent pricing and timelines",
-    linkText: "Compare now",
-    bgImage:
-      "https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=384&h=630",
-  },
-  {
-    label: "Award",
-    title: "Negotiate and finalize with your preferred vendor",
-    description:
-      "Communicate securely and select the best match for your project",
-    linkText: "Select winner",
-    bgImage:
-      "https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg?auto=compress&cs=tinysrgb&w=384&h=630",
-  },
-];
+// --------------------------------------------------
+// useForm (from Navbar22)
+// --------------------------------------------------
+const useForm = () => {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+  const [acceptTerms, setAcceptTerms] = useState(false);
 
-function Process() {
-  return (
-    <section className="py-16 md:py-28 bg-Opacity-White-5">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="max-w-3xl mx-auto text-center mb-12 md:mb-16">
-          <span className="text-base font-semibold font-inter text-Color-Scheme-1-Text">
-            Process
-          </span>
-          <h2 className="mt-3 text-4xl md:text-5xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight md:leading-[62.4px]">
-            How gotenderly works
-          </h2>
-          <p className="mt-4 text-lg font-normal font-inter text-Color-Scheme-1-Text/70">
-            Create detailed project specifications in minutes
-          </p>
-        </div>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-          {processSteps.map((step, index) => (
-            <div
-              key={index}
-              className="group relative h-[480px] md:h-[540px] rounded-xl overflow-hidden md hover:xl transition-all hover:scale-[1.02]"
-              style={{
-                backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.7)), url('${step.bgImage}')`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-              }}
-            >
-              <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 text-white z-10">
-                <span className="text-sm font-semibold font-inter uppercase opacity-90">
-                  {step.label}
-                </span>
-                <h3 className="mt-1 text-2xl md:text-3xl font-medium font-outfit leading-tight">
-                  {step.title}
-                </h3>
-                <p className="mt-3 text-base font-normal font-inter leading-relaxed opacity-95">
-                  {step.description}
-                </p>
-                <button className="mt-6 flex items-center gap-2 text-sm md:text-base font-medium font-inter hover:gap-3 transition-all">
-                  <span>{step.linkText}</span>
-                  <ArrowRight
-                    size={18}
-                    className="transition-transform group-hover:translate-x-1"
-                  />
-                </button>
-              </div>
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
+  const handleSetName = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setName(event.target.value);
+  };
 
-const problems = [
-  {
-    title: "Hard to find all options; vendors are fragmented.",
-    icon: Search,
-    audience: "For tenderers",
-  },
-  {
-    title: "Unclear requirements lead to wrong quotes and rework.",
-    icon: FileText,
-    audience: "For tenderers",
-  },
-  {
-    title: "Repeating the same brief to each vendor takes time.",
-    icon: MessageSquare,
-    audience: "For tenderers",
-  },
-  {
-    title: "Specs are vague; quoting feels risky or time-wasting.",
-    icon: FileText,
-    audience: "For bidders (suppliers)",
-  },
-  {
-    title: "Hard to find real, ready buyers; leads aren’t qualified.",
-    icon: Users,
-    audience: "For bidders (suppliers)",
-  },
-  {
-    title: "Negotiations spread across calls/emails and get lost.",
-    icon: MessageSquare,
-    audience: "For bidders (suppliers)",
-  },
-];
+  const handleSetEmail = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(event.target.value);
+  };
 
-function Problems() {
-  return (
-    <section id="problems" className="py-16 md:py-28 bg-Opacity-White-5">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-12 md:mb-16"
-        >
-          <h2 className="text-4xl md:text-5xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight">
-            The procurement struggle is real.
-          </h2>
-          <p className="mt-4 text-lg md:text-xl font-normal font-inter text-Color-Scheme-1-Text/70 max-w-2xl mx-auto">
-            Whether you're posting or bidding, traditional methods waste time
-            and lead to mismatched outcomes.
-          </p>
-        </motion.div>
-        <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
-          {["For tenderers", "For bidders (suppliers)"].map((audience) => {
-            const filtered = problems.filter((p) => p.audience === audience);
-            return (
-              <div key={audience} className="flex flex-col">
-                <h3 className="text-2xl md:text-3xl font-medium font-outfit text-Color-Scheme-1-Text mb-6 text-center md:text-left">
-                  {audience}
-                </h3>
-                <div className="space-y-4">
-                  {filtered.map((p, i) => {
-                    const Icon = p.icon;
-                    return (
-                      <motion.div
-                        key={p.title}
-                        initial={{ opacity: 0, x: -30 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.5, delay: i * 0.12 }}
-                        className="group flex items-start gap-4 p-4 rounded-xl hover:bg-Opacity-White-10 transition-all"
-                      >
-                        <div className="w-10 h-10 rounded-xl bg-red-100/80 flex items-center justify-center flex-shrink-0 ring-2 ring-red-100/50 group-hover:bg-red-100 transition-colors">
-                          <Icon size={20} className="text-red-600" />
-                        </div>
-                        <p className="text-base font-normal font-inter text-Color-Scheme-1-Text/80 leading-relaxed">
-                          {p.title}
-                        </p>
-                      </motion.div>
-                    );
-                  })}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    </section>
-  );
-}
+  const handleSetMessage = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setMessage(event.target.value);
+  };
 
-const outcomes = [
-  {
-    title: "Post once and reach many bidders at once.",
-    icon: Zap,
-    audience: "For tenderers — Outcomes with Tenderly",
-  },
-  {
-    title: "Use built-in Q/A to clarify missing details before award.",
-    icon: MessageSquare,
-    audience: "For tenderers — Outcomes with Tenderly",
-  },
-  {
-    title: "Compare apples-to-apples (price, ETA, notes) in one view.",
-    icon: Award,
-    audience: "For tenderers — Outcomes with Tenderly",
-  },
-  {
-    title: "Stay anonymous until award; choose the best fit faster.",
-    icon: EyeOff,
-    audience: "For tenderers — Outcomes with Tenderly",
-  },
-  {
-    title: "Ask/answer clarifying questions publicly on the tender.",
-    icon: MessageSquare,
-    audience: "For bidders — Outcomes with Tenderly",
-  },
-  {
-    title: "See all required fields up front; submit a clear, competitive bid.",
-    icon: FileText,
-    audience: "For bidders — Outcomes with Tenderly",
-  },
-  {
-    title: "Keep negotiations in one private thread; get awarded faster.",
-    icon: Lock,
-    audience: "For bidders — Outcomes with Tenderly",
-  },
-];
+  const handleSetCheckbox = (checked: boolean) => {
+    setAcceptTerms(checked);
+  };
 
-function Outcomes() {
-  return (
-    <section id="outcomes" className="py-16 md:py-28 bg-Opacity-White-5">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-12 md:mb-16"
-        >
-          <h2 className="text-4xl md:text-5xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight">
-            Better outcomes with Tenderly.
-          </h2>
-          <p className="mt-4 text-lg md:text-xl font-normal font-inter text-Color-Scheme-1-Text/70 max-w-2xl mx-auto">
-            Eliminate friction, get clarity, and close deals faster — for both
-            sides.
-          </p>
-        </motion.div>
-        <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
-          {[
-            "For tenderers — Outcomes with Tenderly",
-            "For bidders — Outcomes with Tenderly",
-          ].map((audience) => (
-            <div key={audience} className="flex flex-col">
-              <h3 className="text-2xl md:text-3xl font-medium font-outfit text-Color-Scheme-1-Text mb-6 text-center md:text-left">
-                {audience}
-              </h3>
-              <div className="space-y-4">
-                {outcomes
-                  .filter((o) => o.audience === audience)
-                  .map((o, i) => {
-                    const Icon = o.icon;
-                    return (
-                      <motion.div
-                        key={o.title}
-                        initial={{ opacity: 0, x: 30 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.5, delay: i * 0.12 }}
-                        className="group flex items-start gap-4 p-4 rounded-xl hover:bg-Opacity-White-10 transition-all"
-                      >
-                        <div className="w-10 h-10 rounded-xl bg-Color-Matisse/10 flex items-center justify-center flex-shrink-0 ring-2 ring-Color-Matisse/20 group-hover:bg-Color-Matisse/15 transition-colors">
-                          <Icon size={20} className="text-Color-Matisse" />
-                        </div>
-                        <p className="text-base font-normal font-inter text-Color-Scheme-1-Text/80 leading-relaxed">
-                          {o.title}
-                        </p>
-                      </motion.div>
-                    );
-                  })}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    console.log({ name, email, message, acceptTerms });
+  };
 
-const steps = [
-  {
-    title: "Create Your Tender",
-    description:
-      "Fill out a structured form with scope, timeline, budget, and attachments. Takes under 10 minutes.",
-    icon: FilePlus,
-  },
-  {
-    title: "Receive Bids",
-    description:
-      "Verified local vendors submit detailed, comparable proposals directly in the platform.",
-    icon: MessagesSquare,
-  },
-  {
-    title: "Award & Track",
-    description:
-      "Compare bids side-by-side, award the best, and manage progress, payments, and deliverables.",
-    icon: Trophy,
-  },
-];
+  return {
+    name,
+    email,
+    message,
+    acceptTerms,
+    handleSubmit,
+    handleSetName,
+    handleSetEmail,
+    handleSetMessage,
+    handleSetCheckbox,
+  };
+};
 
-function HowItWorks() {
-  return (
-    <section id="how-it-works" className="py-16 md:py-28 bg-Opacity-White-5">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-12 md:mb-16"
-        >
-          <h2 className="text-4xl md:text-5xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight">
-            How it works in 3 steps.
-          </h2>
-          <p className="mt-4 text-lg md:text-xl font-normal font-inter text-Color-Scheme-1-Text/70 max-w-2xl mx-auto">
-            Simple, transparent, and fast — from post to award.
-          </p>
-        </motion.div>
-        <div className="grid md:grid-cols-3 gap-8 lg:gap-12">
-          {steps.map((step, i) => {
-            const Icon = step.icon;
-            return (
-              <motion.div
-                key={step.title}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: i * 0.15 }}
-                className="group text-center"
-              >
-                <div className="relative inline-block mb-6">
-                  <motion.div
-                    whileHover={{ scale: 1.08 }}
-                    className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-Color-Matisse flex items-center justify-center md group-hover:xl transition-all group-hover:bg-Color-Matisse/90"
-                  >
-                    <Icon size={32} className="text-white" />
-                  </motion.div>
-                  <div className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-Opacity-White-10 flex items-center justify-center text-sm font-bold text-Color-Scheme-1-Text ring-2 ring-Opacity-White-5">
-                    {i + 1}
-                  </div>
-                </div>
-                <h3 className="text-xl md:text-2xl font-medium font-outfit text-Color-Scheme-1-Text mb-3">
-                  {step.title}
-                </h3>
-                <p className="text-base md:text-lg font-normal font-inter text-Color-Scheme-1-Text/70 leading-relaxed">
-                  {step.description}
-                </p>
-              </motion.div>
-            );
-          })}
-        </div>
-        <div className="hidden md:block mt-8">
-          <div className="flex justify-center items-center gap-12 max-w-4xl mx-auto">
-            {steps.slice(0, -1).map((_, i) => (
-              <div key={i} className="flex-1 h-0.5 bg-Color-Matisse/30" />
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-const cases = [
-  {
-    title: "Home services (cleaning & maintenance)",
-    scenario:
-      "NA is moving out of an apartment in Lusail and needs a deep clean on a specific date. Calling companies one by one was slow and prices varied wildly. On Tenderly, NA posted once with the date, apartment size, and checklist. Through Q/A, bidders confirmed building access and timings. NA received multiple quotes the same day, compared inclusions (steam, windows, oven), and awarded the best match—done.",
-    icon: HomeIcon,
-  },
-  {
-    title: "Automotive services (repair, detailing, tires)",
-    scenario:
-      "HM’s SUV needs brake pads and a full detail. Not sure of fair pricing or downtime. HM posted the plate/model and preferred time window. Garages responded with parts options (OEM/aftermarket), ETAs, and warranty notes; a detailer asked in Q/A about interior shampoo vs. quick wash. HM picked a garage that offered pick-up/drop-off and a detail combo—problem solved in one go.",
-    icon: Car,
-  },
-  {
-    title: "Events (weddings, corporate, birthdays)",
-    scenario:
-      "MA is planning a small wedding in Al Wakrah: catering for 120, décor, DJ, and photo/video. Vendors were scattered and hard to coordinate. MA posted the budget range, menu style, and venue restrictions. Using Q/A, suppliers clarified power load and layout. MA quickly compared package breakdowns, shortlisted two, negotiated extras (LED dance floor), and awarded a single vendor bundle.",
-    icon: PartyPopper,
-  },
-  {
-    title: "Construction & renovation (small works, fit-outs, repairs)",
-    scenario:
-      "AA wants a kitchen refresh—cabinet re-facing and new countertop. Past quotes were inconsistent and missed measurements. AA posted with drawings/photos and a rough timeline. Contractors used Q/A to ask about materials and site access; AA added dimensions. Comparable bids arrived with line-item costs and lead times. AA awarded one contractor and arranged a site visit after award.",
-    icon: Hammer,
-  },
-  {
-    title: "Facilities management & building maintenance",
-    scenario:
-      "LT needs a combined soft/hard FM contract: daily cleaning plus quarterly HVAC maintenance. Previous suppliers covered only part of the scope. LT posted a single tender with SLAs and KPIs. In Q/A, bidders confirmed consumables, call-out times, and preventive schedules. LT compared consolidated proposals, checked references, and awarded one provider for the whole site.",
-    icon: Building2,
-  },
-  {
-    title: "IT & managed services (support, cloud, networking)",
-    scenario:
-      "KR’s team needs 24/7 helpdesk, endpoint security, and cloud backups. Cold outreach was noisy; scopes didn’t match. KR posted requirements (users, devices, response times, compliance needs). MSPs asked in Q/A about current stack and ticket volume, then submitted structured bids with SLAs and onboarding plans. KR compared like-for-like, negotiated onboarding fees, and awarded the best-fit MSP.",
-    icon: Laptop,
-  },
-];
-
-function UseCases() {
-  return (
-    <section id="use-cases" className="py-16 md:py-28 bg-Opacity-White-5">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-12 md:mb-16"
-        >
-          <h2 className="text-4xl md:text-5xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight">
-            Real use cases in Qatar.
-          </h2>
-          <p className="mt-4 text-lg md:text-xl font-normal font-inter text-Color-Scheme-1-Text/70 max-w-2xl mx-auto">
-            From home cleaning to enterprise IT — see how Tenderly works in
-            practice.
-          </p>
-        </motion.div>
-        <div className="grid md:grid-cols-2 gap-6 lg:gap-8">
-          {cases.map((c, i) => {
-            const Icon = c.icon;
-            return (
-              <motion.div
-                key={c.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
-                whileHover={{ y: -4 }}
-                className="group"
-              >
-                <div className="h-full p-6 rounded-2xl bg-Opacity-White-10 backdrop-blur-sm border border-Opacity-Neutral-Darkest-10 hover:border-Color-Matisse/30 hover:md transition-all">
-                  <div className="flex items-start gap-4 mb-4">
-                    <div className="w-10 h-10 rounded-xl bg-Color-Matisse/10 flex items-center justify-center ring-2 ring-Color-Matisse/20 group-hover:bg-Color-Matisse/20 transition-colors">
-                      <Icon size={24} className="text-Color-Matisse" />
-                    </div>
-                    <h3 className="text-xl font-medium font-outfit text-Color-Scheme-1-Text">
-                      {c.title}
-                    </h3>
-                  </div>
-                  <p className="text-base font-normal font-inter text-Color-Scheme-1-Text/80 leading-relaxed">
-                    {c.scenario}
-                  </p>
-                </div>
-              </motion.div>
-            );
-          })}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-const detailedSteps = [
-  {
-    audience: "For tenderers (buyers)",
-    items: [
-      "Post your tender (title, category, deadline, optional budget, deliverables).",
-      "Use Q/A to clarify specs or request revisions—without revealing identity.",
-      "Compare & shortlist side-by-side, then award the winner (identities reveal after award).",
-    ],
-  },
-  {
-    audience: "For bidders (suppliers)",
-    items: [
-      "Register & browse matching tenders.",
-      "Submit your bid (price, ETA, terms, attachments); update anytime before the deadline.",
-      "Negotiate privately until the tenderer awards; identities reveal post-award for contracting.",
-    ],
-  },
-];
-
-function HowItWorksDetailed() {
+// --------------------------------------------------
+// Navbar22
+// --------------------------------------------------
+const Navbar22 = () => {
+  const formState = useForm();
+  const useActive = useNavbarRelume();
   return (
     <section
-      id="how-it-works-detailed"
-      className="py-16 md:py-28 bg-Opacity-White-5"
+      id="relume"
+      className="sticky top-0 z-[999] flex min-h-16 w-full items-center border-b border-b-border-primary bg-background-primary px-[5%] md:min-h-18"
     >
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-12 md:mb-16"
-        >
-          <h2 className="text-4xl md:text-5xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight">
-            How it works — step by step.
-          </h2>
-          <p className="mt-4 text-lg md:text-xl font-normal font-inter text-Color-Scheme-1-Text/70 max-w-2xl mx-auto">
-            Clear actions for both tenderers and bidders.
-          </p>
-        </motion.div>
-        <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
-          {detailedSteps.map((s, i) => (
-            <motion.div
-              key={s.audience}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: i * 0.2 }}
-              className="flex flex-col"
-            >
-              <h3 className="text-2xl md:text-3xl font-medium font-outfit text-Color-Scheme-1-Text mb-6">
-                {s.audience}
-              </h3>
-              <ol className="space-y-4">
-                {s.items.map((item, idx) => (
-                  <li
-                    key={idx}
-                    className="flex items-start gap-3 text-base font-normal font-inter text-Color-Scheme-1-Text/80"
-                  >
-                    <span className="flex-shrink-0 w-8 h-8 rounded-full bg-Color-Matisse/10 text-Color-Matisse text-sm font-medium flex items-center justify-center ring-2 ring-Color-Matisse/20">
-                      {idx + 1}
-                    </span>
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ol>
-            </motion.div>
-          ))}
+      <div className="mx-auto flex size-full items-center justify-between">
+        <a href="#" className="relative z-50">
+          <img
+            src="https://d22po4pjz3o32e.cloudfront.net/logo-image.svg"
+            alt="Relume placeholder logo"
+          />
+        </a>
+        <div className="hidden lg:flex lg:items-center lg:justify-center lg:overflow-hidden lg:px-0 lg:text-center">
+          <a
+            href="#"
+            className="block py-3 text-md lg:px-4 lg:py-2 lg:text-base"
+          >
+            Services
+          </a>
+          <a
+            href="#"
+            className="block py-3 text-md lg:px-4 lg:py-2 lg:text-base"
+          >
+            About
+          </a>
+          <a
+            href="#"
+            className="block py-3 text-md lg:px-4 lg:py-2 lg:text-base"
+          >
+            Blog
+          </a>
         </div>
-      </div>
-    </section>
-  );
-}
-
-const keyFeatures = [
-  {
-    icon: Zap,
-    title: "One-to-Many Quotes",
-    description: "Post once, reach many bidders instantly.",
-  },
-  {
-    icon: Lock,
-    title: "Private Chat & Negotiation",
-    description: "Clarify details without sharing identity.",
-  },
-  {
-    icon: EyeOff,
-    title: "Anonymity by Default",
-    description: "Both sides stay anonymous until award.",
-  },
-  {
-    icon: Shield,
-    title: "Profiles & Verification",
-    description: "KYC/business verification and ratings.",
-  },
-  {
-    icon: Bell,
-    title: "Notifications",
-    description: "Alerts for new bids and messages.",
-  },
-];
-
-function KeyFeatures() {
-  return (
-    <section id="features" className="py-16 md:py-28 bg-Opacity-White-5">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-12 md:mb-16"
-        >
-          <h2 className="text-4xl md:text-5xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight">
-            Key features.
-          </h2>
-          <p className="mt-4 text-lg md:text-xl font-normal font-inter text-Color-Scheme-1-Text/70 max-w-2xl mx-auto">
-            Everything you need to post, bid, and award — securely and
-            efficiently.
-          </p>
-        </motion.div>
-        <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 lg:gap-8">
-          {keyFeatures.map((f, i) => {
-            const Icon = f.icon;
-            return (
-              <motion.div
-                key={f.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
-                whileHover={{ y: -4 }}
-                className="group"
-              >
-                <div className="h-full p-6 rounded-2xl bg-Opacity-White-10 backdrop-blur-sm border border-Opacity-Neutral-Darkest-10 hover:border-Color-Matisse/30 hover:md transition-all text-center">
-                  <div className="w-12 h-12 rounded-2xl bg-Color-Matisse flex items-center justify-center mb-4 mx-auto group-hover:scale-110 transition-transform sm">
-                    <Icon size={24} className="text-white" />
-                  </div>
-                  <h3 className="text-lg font-medium font-outfit text-Color-Scheme-1-Text mb-2">
-                    {f.title}
-                  </h3>
-                  <p className="text-sm font-normal font-inter text-Color-Scheme-1-Text/70 leading-relaxed">
-                    {f.description}
-                  </p>
-                </div>
-              </motion.div>
-            );
-          })}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function Pricing() {
-  return (
-    <section id="pricing" className="py-16 md:py-28 bg-Opacity-White-5">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-12 md:mb-16"
-        >
-          <h2 className="text-4xl md:text-5xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight">
-            Free to post. Free to bid.
-          </h2>
-          <p className="mt-4 text-lg md:text-xl font-normal font-inter text-Color-Scheme-1-Text/70 max-w-2xl mx-auto">
-            We’re just the platform: No involvement in contracts, custody, or
-            payments.
-          </p>
-        </motion.div>
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="max-w-md mx-auto bg-Opacity-White-10 rounded-3xl p-8 md:p-12 border border-Color-Matisse/30 md"
-        >
-          <div className="text-5xl md:text-6xl font-medium font-outfit text-Color-Matisse mb-4">
-            Free
-          </div>
-          <p className="text-base md:text-lg font-normal font-inter text-Color-Scheme-1-Text/70 mb-8">
-            Unlimited posts and bids. No hidden fees.
-          </p>
-          <button className="w-full py-3 bg-Color-Matisse text-white rounded-lg font-medium hover:bg-Color-Matisse/90 transition-all">
-            Post your first tender
-          </button>
-        </motion.div>
-      </div>
-    </section>
-  );
-}
-
-const testimonials = [
-  {
-    name: "NA",
-    role: "Resident, Lusail",
-    content:
-      "I posted my apartment cleaning once and got 5 solid quotes in hours — picked the best one without calling anyone.",
-    rating: 5,
-  },
-  {
-    name: "HM",
-    role: "Car Owner, Doha",
-    content:
-      "Got brake repair + detailing from one garage with pick-up. Saved time and money — all through Tenderly.",
-    rating: 5,
-  },
-];
-
-function Testimonials() {
-  return (
-    <section id="testimonials" className="py-16 md:py-28 bg-Opacity-White-5">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-12 md:mb-16"
-        >
-          <h2 className="text-4xl md:text-5xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight">
-            Loved by users in Qatar.
-          </h2>
-          <p className="mt-4 text-lg md:text-xl font-normal font-inter text-Color-Scheme-1-Text/70 max-w-2xl mx-auto">
-            Real people getting real results — faster and fairer.
-          </p>
-        </motion.div>
-        <div className="grid md:grid-cols-2 gap-6 lg:gap-8">
-          {testimonials.map((t, i) => (
-            <motion.div
-              key={t.name}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: i * 0.2 }}
-              whileHover={{ y: -4 }}
-              className="group"
-            >
-              <div className="h-full p-6 rounded-2xl bg-Opacity-White-10 backdrop-blur-sm border border-Opacity-Neutral-Darkest-10 hover:border-Color-Matisse/30 hover:md transition-all">
-                <div className="flex gap-1 mb-4">
-                  {[...Array(t.rating)].map((_, i) => (
-                    <Star
-                      key={i}
-                      size={18}
-                      className="fill-Color-Matisse text-Color-Matisse"
-                    />
-                  ))}
-                </div>
-                <blockquote className="mb-6">
-                  <p className="text-base font-normal font-inter text-Color-Scheme-1-Text/80 leading-relaxed italic">
-                    "{t.content}"
-                  </p>
-                </blockquote>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-Opacity-Neutral-Darkest-10 flex items-center justify-center">
-                    <span className="text-base font-medium text-Color-Scheme-1-Text">
-                      {t.name.charAt(0)}
-                    </span>
-                  </div>
-                  <div>
-                    <p className="font-medium text-Color-Scheme-1-Text">
-                      {t.name}
-                    </p>
-                    <p className="text-sm font-normal text-Color-Scheme-1-Text/70">
-                      {t.role}
-                    </p>
-                  </div>
+        <AnimatePresence>
+          <ConditionalRender condition={true}>
+            <div>
+              <div className="grid grid-cols-1 gap-y-2">
+                <Label htmlFor="name">Name</Label>
+                <Input
+                  type="text"
+                  id="name"
+                  value={formState.name}
+                  onChange={formState.handleSetName}
+                />
+              </div>
+              <div className="grid grid-cols-1 gap-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  type="email"
+                  id="email"
+                  value={formState.email}
+                  onChange={formState.handleSetEmail}
+                />
+              </div>
+              <div className="grid grid-cols-1 gap-y-2">
+                <Label htmlFor="message">Message</Label>
+                <Textarea
+                  id="message"
+                  placeholder="Write your inquiry here"
+                  className="min-h-[11.25rem] overflow-auto"
+                  value={formState.message}
+                  onChange={formState.handleSetMessage}
+                />
+              </div>
+              <div className="mb-3 flex items-center md:mb-4">
+                <Checkbox
+                  id="terms"
+                  checked={formState.acceptTerms}
+                  onCheckedChange={formState.handleSetCheckbox}
+                  className="mr-2"
+                />
+                <Label htmlFor="terms" className="cursor-pointer">
+                  <span className="text-sm">
+                    I accept the{" "}
+                    <a href="#" className="underline">
+                      Terms
+                    </a>
+                  </span>
+                </Label>
+              </div>
+              <Button title="Login" className="mr-auto">
+                Login
+              </Button>
+            </div>
+            <div className="flex flex-col gap-y-6 px-[5vw] lg:absolute lg:inset-[auto_auto_3rem_5vw] lg:px-0">
+              <div className="flex flex-col gap-y-0.5">
+                <a href="#" className="mb-1 block text-sm underline">
+                  Learn about our mission and vision
+                </a>
+                <a href="#" className="mb-1 block text-sm underline">
+                  info@relume.io
+                </a>
+                <p className="text-sm">Get in touch with us</p>
+                <div className="mt-5 flex items-center gap-3 md:mt-6">
+                  <a href="#">
+                    <Facebook className="size-6" />
+                  </a>
+                  <a href="#">
+                    <Instagram className="size-6" />
+                  </a>
+                  <a href="#">
+                    <Twitter className="size-6" />
+                  </a>
+                  <a href="#">
+                    <Linkedin className="size-6" />
+                  </a>
+                  <a href="#">
+                    <Youtube className="size-6" />
+                  </a>
                 </div>
               </div>
-            </motion.div>
-          ))}
-        </div>
+            </div>
+          </ConditionalRender>
+        </AnimatePresence>
       </div>
     </section>
   );
-}
+};
 
-const faqs2 = [
-  {
-    question: "I’m not sure how to write requirements.",
-    answer:
-      "Use Tenderly’s Q/A feature: bidders and tenderers can ask and answer clarifying questions on the tender page to surface any unknown or missing details (scope, deliverables, timeline, acceptance criteria). This keeps everything transparent, comparable, and helps you receive accurate quotes—no guided templates needed.",
-  },
-  {
-    question: "What is Tenderly?",
-    answer:
-      "Qatar’s open tender platform. Post projects, get bids, pick the best.",
-  },
-  {
-    question: "Is it really anonymous?",
-    answer:
-      "Yes. Your profile and contact details are hidden until you choose a winner. After award, both parties can share details.",
-  },
-  {
-    question: "Who can bid?",
-    answer: "Registered companies only.",
-  },
-  {
-    question: "How do I post?",
-    answer: "Register → create a new tender and publish → view bids and award.",
-  },
-  {
-    question: "Any fees?",
-    answer: "No. Posting and bidding are free.",
-  },
-  {
-    question: "Do you handle contracts or payments?",
-    answer:
-      "No. We’re a neutral platform. You finalize contracts and payments directly with the other party.",
-  },
-  {
-    question: "Who can use Tenderly?",
-    answer: "Anyone—individuals and businesses of any size.",
-  },
-  {
-    question: "What categories are allowed?",
-    answer: "Anything.",
-  },
-];
-
-function FAQ() {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-
-  const toggleFAQ = (i: number) => setOpenIndex(openIndex === i ? null : i);
+// --------------------------------------------------
+// TabItem (general, used in all Layout491 variants and Layout494)
+// --------------------------------------------------
+const TabItem = ({ tabItem, index, activeTab }: any) => {
+  if (index !== activeTab) return null;
 
   return (
-    <section id="faq" className="py-16 md:py-28 bg-Opacity-White-5">
-      <div className="max-w-4xl mx-auto px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-12 md:mb-16"
-        >
-          <h2 className="text-4xl md:text-5xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight">
-            Frequently asked.
-          </h2>
-          <p className="mt-4 text-lg md:text-xl font-normal font-inter text-Color-Scheme-1-Text/70">
-            Got questions? We’ve got answers.
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+    >
+      {tabItem.image && (
+        <img
+          src={tabItem.image.src}
+          alt={tabItem.image.alt}
+          className="object-cover size-full"
+        />
+      )}
+      {tabItem.video && (
+        <Dialog>
+          <DialogTrigger className="relative flex items-center justify-center w-full">
+            <img
+              src={tabItem.video.image.src}
+              alt={tabItem.video.image.alt}
+              className="object-cover size-full"
+            />
+            <span className="absolute inset-0 z-10 bg-black/50" />
+            <Play className="absolute z-20 text-white size-16" />
+          </DialogTrigger>
+          <DialogContent>
+            <iframe
+              className="w-full aspect-video"
+              src={tabItem.video.url}
+              title="Video"
+              allowFullScreen
+            />
+          </DialogContent>
+        </Dialog>
+      )}
+    </motion.div>
+  );
+};
+
+// --------------------------------------------------
+// useRelume (general for tabs)
+// --------------------------------------------------
+const useRelume = () => {
+  const [activeTab, setActiveTab] = useState(0);
+  const setActiveTabSetter = (index: number) => () => setActiveTab(index);
+  const getActiveTabButtonStyles = (index: number) =>
+    clsx("cursor-pointer border-b border-border-primary py-6", {
+      "opacity-100": activeTab === index,
+      "opacity-25": activeTab !== index,
+    });
+  const getActiveTabButtonContentStyles = (index: number) => ({
+    height: activeTab === index ? "auto" : 0,
+    opacity: activeTab === index ? 1 : 0,
+  });
+  return {
+    setActiveTabSetter,
+    getActiveTabButtonStyles,
+    getActiveTabButtonContentStyles,
+    activeTab,
+  };
+};
+
+// --------------------------------------------------
+// Layout491
+// --------------------------------------------------
+const Layout491 = () => {
+  const useActive = useRelume();
+  return (
+    <section id="relume" className="px-[5%] py-16 md:py-24 lg:py-28">
+      <div className="container">
+        <div className="mx-auto mb-12 max-w-lg text-center md:mb-18 lg:mb-20">
+          <p className="mb-3 font-semibold md:mb-4">Problems</p>
+          <h1 className="mb-5 text-5xl font-bold md:mb-6 md:text-7xl lg:text-8xl">
+            Challenges for tenderers
+          </h1>
+          <p className="md:text-md">
+            Finding the right vendors can be complex and time-consuming.
+            Traditional methods leave you searching through fragmented markets.
           </p>
-        </motion.div>
-        <div className="space-y-4">
-          {faqs2.map((faq, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: i * 0.05 }}
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-4 md:mt-8">
+            <Button title="Learn more" variant="secondary">
+              Learn more
+            </Button>
+            <Button
+              title="How it works"
+              variant="link"
+              size="link"
+              iconRight={<ChevronRight />}
             >
-              <button
-                onClick={() => toggleFAQ(i)}
-                className="w-full p-6 rounded-2xl bg-Opacity-White-10 border border-Opacity-Neutral-Darkest-10 hover:border-Color-Matisse/30 transition-all text-left sm"
+              How it works
+            </Button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 items-center gap-x-12 md:grid-cols-2 lg:gap-x-20">
+          <div className="relative mb-8 grid auto-cols-fr grid-cols-1 grid-rows-[auto_auto] items-start md:mb-0 md:items-stretch">
+            {[0, 1, 2].map((i) => (
+              <div
+                key={i}
+                onClick={useActive.setActiveTabSetter(i)}
+                className={useActive.getActiveTabButtonStyles(i)}
               >
-                <div className="flex items-center justify-between gap-4">
-                  <h3 className="text-lg font-medium font-outfit text-Color-Scheme-1-Text pr-8">
-                    {faq.question}
-                  </h3>
-                  <motion.div
-                    animate={{ rotate: openIndex === i ? 45 : 0 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <Plus size={20} className="text-Color-Matisse" />
-                  </motion.div>
-                </div>
+                <h2 className="text-2xl font-bold md:text-3xl md:leading-[1.3] lg:text-4xl">
+                  Fragmented market
+                </h2>
                 <motion.div
                   initial={false}
-                  animate={{
-                    height: openIndex === i ? "auto" : 0,
-                    opacity: openIndex === i ? 1 : 0,
-                  }}
-                  transition={{ duration: 0.3 }}
+                  animate={useActive.getActiveTabButtonContentStyles(i)}
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
                   className="overflow-hidden"
                 >
-                  <p className="mt-4 text-base font-normal font-inter text-Color-Scheme-1-Text/70 pr-8 leading-relaxed">
-                    {faq.answer}
+                  <p className="mt-3 md:mt-4">
+                    Vendors are scattered across different platforms and
+                    locations. Finding the right match requires extensive
+                    research.
                   </p>
                 </motion.div>
-              </button>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function CTA() {
-  return (
-    <section className="py-16 md:py-28 bg-Opacity-White-5">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="relative overflow-hidden bg-Color-Matisse rounded-3xl p-8 md:p-12 lg:p-16 text-center"
-        >
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-4xl md:text-5xl font-medium font-outfit text-white mb-6 leading-tight"
-          >
-            Get better quotes without the back-and-forth.
-          </motion.h2>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4"
-          >
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="px-8 py-3 bg-white text-Color-Matisse rounded-lg font-medium hover:bg-white/90 transition-all flex items-center gap-2 md"
-            >
-              Post your tender for free <ArrowRight size={20} />
-            </motion.button>
-          </motion.div>
-          <motion.p
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.6 }}
-            className="mt-6 text-sm text-white/80"
-          >
-            Anonymous until award • No fees • Takes ~2 minutes
-          </motion.p>
-        </motion.div>
-      </div>
-    </section>
-  );
-}
-
-function Footer() {
-  const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
-
-  const footerLinks = [
-    {
-      title: "Platform",
-      links: [
-        { name: "How it works", href: "#how-it-works" },
-        { name: "Use cases", href: "#use-cases" },
-        { name: "FAQ", href: "#faq" },
-      ],
-    },
-    {
-      title: "Company",
-      links: [
-        { name: "About", href: "#about" },
-        { name: "Contact", href: "#contact" },
-      ],
-    },
-    {
-      title: "Legal",
-      links: [
-        { name: "Privacy", href: "#privacy" },
-        { name: "Terms", href: "#terms" },
-      ],
-    },
-  ];
-
-  return (
-    <footer className="bg-Opacity-White-5 border-t border-Opacity-Neutral-Darkest-10">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-12 md:py-16">
-        <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-8 md:gap-12 mb-8 md:mb-12">
-          <div className="lg:col-span-2">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 bg-Color-Matisse rounded-lg flex items-center justify-center">
-                <span className="text-white font-medium">T</span>
               </div>
-              <span className="text-lg font-medium text-Color-Scheme-1-Text">
-                Tenderly
-              </span>
-            </div>
-            <p className="text-base font-normal font-inter text-Color-Scheme-1-Text/70 max-w-md">
-              Qatar’s open tender platform — post once, get competitive bids,
-              award the best.
-            </p>
+            ))}
           </div>
-          {footerLinks.map((section) => (
-            <div key={section.title}>
-              <h3 className="text-base font-medium text-Color-Scheme-1-Text mb-4">
-                {section.title}
-              </h3>
-              <ul className="space-y-3">
-                {section.links.map((l) => (
-                  <li key={l.name}>
-                    <a
-                      href={l.href}
-                      className="text-sm font-normal text-Color-Scheme-1-Text/70 hover:text-Color-Matisse transition-colors"
-                    >
-                      {l.name}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-        <div className="border-t border-Opacity-Neutral-Darkest-10 pt-8">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm font-normal font-inter text-Color-Scheme-1-Text/70">
-            <p>© {new Date().getFullYear()} Tenderly. All rights reserved.</p>
-            <div className="flex gap-6">
-              <a
-                href="#"
-                className="hover:text-Color-Matisse transition-colors"
-              >
-                English
-              </a>
-              <a
-                href="#"
-                className="hover:text-Color-Matisse transition-colors"
-              >
-                العربية
-              </a>
-            </div>
+
+          <div className="flex max-h-full w-full items-center justify-center overflow-hidden">
+            <AnimatePresence initial={false}>
+              <TabItem
+                tabItem={{
+                  heading: "Short heading goes here",
+                  description:
+                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum tristique. Duis cursus, mi quis viverra ornare, eros dolor interdum nulla, ut commodo diam libero vitae erat.",
+                  image: {
+                    src: "https://d22po4pjz3o32e.cloudfront.net/placeholder-image.svg",
+                    alt: "Relume placeholder image 1",
+                  },
+                }}
+                index={0}
+                activeTab={useActive.activeTab}
+              />
+              <TabItem
+                tabItem={{
+                  heading: "Short heading goes here",
+                  description:
+                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum tristique. Duis cursus, mi quis viverra ornare, eros dolor interdum nulla, ut commodo diam libero vitae erat.",
+                  video: {
+                    image: {
+                      src: "https://d22po4pjz3o32e.cloudfront.net/placeholder-video-thumbnail.svg",
+                      alt: "Relume placeholder image 2",
+                    },
+                    url: "https://www.youtube.com/embed/8DKLYsikxTs?si=Ch9W0KrDWWUiCMMW",
+                  },
+                }}
+                index={1}
+                activeTab={useActive.activeTab}
+              />
+              <TabItem
+                tabItem={{
+                  heading: "Short heading goes here",
+                  description:
+                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum tristique. Duis cursus, mi quis viverra ornare, eros dolor interdum nulla, ut commodo diam libero vitae erat.",
+                  image: {
+                    src: "https://d22po4pjz3o32e.cloudfront.net/placeholder-image.svg",
+                    alt: "Relume placeholder image 3",
+                  },
+                }}
+                index={2}
+                activeTab={useActive.activeTab}
+              />
+            </AnimatePresence>
           </div>
         </div>
       </div>
-      <motion.button
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        onClick={scrollToTop}
-        className="fixed bottom-6 right-6 w-12 h-12 bg-Color-Matisse rounded-full lg flex items-center justify-center hover:bg-Color-Matisse/90 transition-all"
-      >
-        <ArrowRight size={20} className="text-white rotate-[-90deg]" />
-      </motion.button>
-    </footer>
+    </section>
   );
-}
+};
 
-const features = [
-  {
-    icon: MessageSquare,
-    title: "One-to-many quote generation",
-    description:
-      "Instantly reach multiple qualified vendors with a single tender submission",
-  },
-  {
-    icon: Users,
-    title: "Private negotiation platform",
-    description: "Secure communication channel for direct vendor interactions",
-  },
-  {
-    icon: Shield,
-    title: "Anonymity by default",
-    description: "Protect sensitive information until you're ready to award",
-  },
-  {
-    icon: Award,
-    title: "Trusted profiles",
-    description: "Verified business credentials ensure quality and reliability",
-  },
-];
-
-function Features() {
+// --------------------------------------------------
+// Layout491_1
+// --------------------------------------------------
+const Layout491_1 = () => {
+  const useActive = useRelume();
   return (
-    <section className="py-16 md:py-28 bg-Opacity-White-5">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="max-w-3xl mx-auto text-left md:text-center mb-12 md:mb-16">
-          <span className="text-base font-semibold font-inter text-Color-Scheme-1-Text">
-            Features
-          </span>
-          <h2 className="mt-3 text-4xl md:text-5xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight">
-            Powerful tools for seamless tendering
-          </h2>
-          <p className="mt-4 text-lg font-normal font-inter text-Color-Scheme-1-Text/70">
-            Designed to simplify your procurement and bidding experience
+    <section id="relume" className="px-[5%] py-16 md:py-24 lg:py-28">
+      <div className="container">
+        <div className="mx-auto mb-12 max-w-lg text-center md:mb-18 lg:mb-20">
+          <p className="mb-3 font-semibold md:mb-4">Solutions</p>
+          <h1 className="mb-5 text-5xl font-bold md:mb-6 md:text-7xl lg:text-8xl">
+            Streamline your tender process
+          </h1>
+          <p className="md:text-md">
+            Tenderly transforms how you find and select vendors. Our platform
+            simplifies complex procurement challenges.
           </p>
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-4 md:mt-8">
+            <Button title="Get started" variant="secondary">
+              Get started
+            </Button>
+            <Button
+              title="Explore features"
+              variant="link"
+              size="link"
+              iconRight={<ChevronRight />}
+            >
+              Explore features
+            </Button>
+          </div>
         </div>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {features.map((feature, i) => {
-            const Icon = feature.icon;
-            return (
-              <motion.div
+        <div className="grid grid-cols-1 items-center gap-x-12 md:grid-cols-2 lg:gap-x-20">
+          <div className="relative mb-8 grid auto-cols-fr grid-cols-1 grid-rows-[auto_auto] items-start md:mb-0 md:items-stretch">
+            {[0, 1, 2].map((i) => (
+              <div
                 key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
-                className="group p-6 rounded-2xl bg-Opacity-White-10 backdrop-blur-sm border border-Opacity-Neutral-Darkest-10 hover:border-Color-Matisse/30 hover:md transition-all"
+                onClick={useActive.setActiveTabSetter(i)}
+                className={useActive.getActiveTabButtonStyles(i)}
               >
-                <div className="w-12 h-12 rounded-full bg-Color-Matisse/10 flex items-center justify-center mb-4 group-hover:bg-Color-Matisse/20 transition-colors">
-                  <Icon size={28} className="text-Color-Matisse" />
-                </div>
-                <h3 className="text-xl font-medium font-outfit text-Color-Scheme-1-Text mb-2">
-                  {feature.title}
-                </h3>
-                <p className="text-base font-normal font-inter text-Color-Scheme-1-Text/70 leading-relaxed">
-                  {feature.description}
-                </p>
-              </motion.div>
-            );
-          })}
-        </div>
-        <div className="mt-12 flex flex-wrap gap-4 justify-center">
-          <button className="px-6 py-3 bg-Opacity-Neutral-Darkest-5 border border-Opacity-Neutral-Darkest-10 text-Color-Scheme-1-Text font-medium font-inter rounded-lg hover:bg-Opacity-Neutral-Darkest-10 transition-all">
-            Learn more
-          </button>
-          <button className="px-6 py-3 flex items-center gap-2 text-Color-Scheme-1-Text font-medium font-inter hover:gap-3 transition-all">
-            Explore <ArrowRight size={20} />
-          </button>
+                <h2 className="text-2xl font-bold md:text-3xl md:leading-[1.3] lg:text-4xl">
+                  Reach multiple bidders
+                </h2>
+                <motion.div
+                  initial={false}
+                  animate={useActive.getActiveTabButtonContentStyles(i)}
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                  className="overflow-hidden"
+                >
+                  <p className="mt-3 md:mt-4">
+                    Post your tender once and instantly connect with multiple
+                    qualified suppliers. No more endless phone calls.
+                  </p>
+                </motion.div>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex max-h-full w-full items-center justify-center overflow-hidden">
+            <AnimatePresence initial={false}>
+              <TabItem
+                tabItem={{
+                  heading: "Short heading goes here",
+                  description:
+                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum tristique. Duis cursus, mi quis viverra ornare, eros dolor interdum nulla, ut commodo diam libero vitae erat.",
+                  image: {
+                    src: "https://d22po4pjz3o32e.cloudfront.net/placeholder-image.svg",
+                    alt: "Relume placeholder image 1",
+                  },
+                }}
+                index={0}
+                activeTab={useActive.activeTab}
+              />
+              <TabItem
+                tabItem={{
+                  heading: "Short heading goes here",
+                  description:
+                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum tristique. Duis cursus, mi quis viverra ornare, eros dolor interdum nulla, ut commodo diam libero vitae erat.",
+                  video: {
+                    image: {
+                      src: "https://d22po4pjz3o32e.cloudfront.net/placeholder-video-thumbnail.svg",
+                      alt: "Relume placeholder image 2",
+                    },
+                    url: "https://www.youtube.com/embed/8DKLYsikxTs?si=Ch9W0KrDWWUiCMMW",
+                  },
+                }}
+                index={1}
+                activeTab={useActive.activeTab}
+              />
+              <TabItem
+                tabItem={{
+                  heading: "Short heading goes here",
+                  description:
+                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum tristique. Duis cursus, mi quis viverra ornare, eros dolor interdum nulla, ut commodo diam libero vitae erat.",
+                  image: {
+                    src: "https://d22po4pjz3o32e.cloudfront.net/placeholder-image.svg",
+                    alt: "Relume placeholder image 3",
+                  },
+                }}
+                index={2}
+                activeTab={useActive.activeTab}
+              />
+            </AnimatePresence>
+          </div>
         </div>
       </div>
     </section>
   );
-}
+};
 
-function About() {
+// --------------------------------------------------
+// Layout491_2
+// --------------------------------------------------
+const Layout491_2 = () => {
+  const useActive = useRelume();
   return (
-    <section className="py-16 md:py-28 bg-Opacity-White-5">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="grid lg:grid-cols-2 gap-12 items-start">
-          <div className="flex flex-col gap-8">
-            <span className="text-base font-semibold font-inter text-Color-Scheme-1-Text">
-              Tender
-            </span>
-            <h2 className="text-4xl md:text-5xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight">
-              Solve the friction of finding and awarding local vendors
-            </h2>
-            <p className="text-lg font-normal font-inter text-Color-Scheme-1-Text/70 leading-relaxed">
-              Streamline your procurement process with a platform designed for
-              Qatar's dynamic market.
-            </p>
-            <div className="grid sm:grid-cols-2 gap-8">
-              <div className="flex flex-col gap-3">
-                <h3 className="text-xl font-medium font-outfit text-Color-Scheme-1-Text">
-                  For tenderers
-                </h3>
-                <p className="text-base font-normal font-inter text-Color-Scheme-1-Text/70">
-                  Cut through complexity. Get precise bids from verified local
-                  professionals without endless email chains.
-                </p>
+    <section id="relume" className="px-[5%] py-16 md:py-24 lg:py-28">
+      <div className="container">
+        <div className="mx-auto mb-12 max-w-lg text-center md:mb-18 lg:mb-20">
+          <p className="mb-3 font-semibold md:mb-4">Benefits</p>
+          <h1 className="mb-5 text-5xl font-bold md:mb-6 md:text-7xl lg:text-8xl">
+            Empower your bidding strategy
+          </h1>
+          <p className="md:text-md">
+            Tenderly provides tools that help suppliers submit competitive,
+            precise bids efficiently.
+          </p>
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-4 md:mt-8">
+            <Button title="Get started" variant="secondary">
+              Get started
+            </Button>
+            <Button
+              title="Explore platform"
+              variant="link"
+              size="link"
+              iconRight={<ChevronRight />}
+            >
+              Explore platform
+            </Button>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 items-center gap-x-12 md:grid-cols-2 lg:gap-x-20">
+          <div className="relative mb-8 grid auto-cols-fr grid-cols-1 grid-rows-[auto_auto] items-start md:mb-0 md:items-stretch">
+            {[0, 1, 2].map((i) => (
+              <div
+                key={i}
+                onClick={useActive.setActiveTabSetter(i)}
+                className={useActive.getActiveTabButtonStyles(i)}
+              >
+                <h2 className="text-2xl font-bold md:text-3xl md:leading-[1.3] lg:text-4xl">
+                  Clarify project details
+                </h2>
+                <motion.div
+                  initial={false}
+                  animate={useActive.getActiveTabButtonContentStyles(i)}
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                  className="overflow-hidden"
+                >
+                  <p className="mt-3 md:mt-4">
+                    Ask and answer questions publicly to understand project
+                    requirements fully.
+                  </p>
+                </motion.div>
               </div>
-              <div className="flex flex-col gap-3">
-                <h3 className="text-xl font-medium font-outfit text-Color-Scheme-1-Text">
-                  For bidders
-                </h3>
-                <p className="text-base font-normal font-inter text-Color-Scheme-1-Text/70">
-                  Access quality projects directly. Showcase your skills to the
-                  right clients with transparent, structured opportunities.
-                </p>
+            ))}
+          </div>
+
+          <div className="flex max-h-full w-full items-center justify-center overflow-hidden">
+            <AnimatePresence initial={false}>
+              <TabItem
+                tabItem={{
+                  heading: "Short heading goes here",
+                  description:
+                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum tristique. Duis cursus, mi quis viverra ornare, eros dolor interdum nulla, ut commodo diam libero vitae erat.",
+                  image: {
+                    src: "https://d22po4pjz3o32e.cloudfront.net/placeholder-image.svg",
+                    alt: "Relume placeholder image 1",
+                  },
+                }}
+                index={0}
+                activeTab={useActive.activeTab}
+              />
+              <TabItem
+                tabItem={{
+                  heading: "Short heading goes here",
+                  description:
+                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum tristique. Duis cursus, mi quis viverra ornare, eros dolor interdum nulla, ut commodo diam libero vitae erat.",
+                  video: {
+                    image: {
+                      src: "https://d22po4pjz3o32e.cloudfront.net/placeholder-video-thumbnail.svg",
+                      alt: "Relume placeholder image 2",
+                    },
+                    url: "https://www.youtube.com/embed/8DKLYsikxTs?si=Ch9W0KrDWWUiCMMW",
+                  },
+                }}
+                index={1}
+                activeTab={useActive.activeTab}
+              />
+              <TabItem
+                tabItem={{
+                  heading: "Short heading goes here",
+                  description:
+                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum tristique. Duis cursus, mi quis viverra ornare, eros dolor interdum nulla, ut commodo diam libero vitae erat.",
+                  image: {
+                    src: "https://d22po4pjz3o32e.cloudfront.net/placeholder-image.svg",
+                    alt: "Relume placeholder image 3",
+                  },
+                }}
+                index={2}
+                activeTab={useActive.activeTab}
+              />
+            </AnimatePresence>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// --------------------------------------------------
+// useCarousel (from Testimonial16)
+// --------------------------------------------------
+const useCarousel = () => {
+  const [api, setApi] = useState<any>();
+  const [current, setCurrent] = useState(0);
+
+  useEffect(() => {
+    if (!api) {
+      return;
+    }
+    setCurrent(api.selectedScrollSnap() + 1);
+    api.on("select", () => {
+      setCurrent(api.selectedScrollSnap() + 1);
+    });
+  }, [api]);
+
+  const handleDotClick = (index: number) => () => {
+    if (api) {
+      api.scrollTo(index);
+    }
+  };
+
+  const dotClassName = (index: number) => {
+    return `mx-[3px] inline-block size-2 rounded-full ${
+      current === index + 1 ? "bg-black" : "bg-neutral-light"
+    }`;
+  };
+
+  return { api, setApi, current, handleDotClick, dotClassName };
+};
+
+// --------------------------------------------------
+// Testimonial16
+// --------------------------------------------------
+const Testimonial16 = () => {
+  const carousel = useCarousel();
+  return (
+    <section
+      id="relume"
+      className="overflow-hidden px-[5%] py-16 md:py-24 lg:py-28"
+    >
+      <div className="container">
+        <Carousel
+          setApi={carousel.setApi}
+          opts={{ loop: true, align: "start" }}
+          className="overflow-hidden"
+        >
+          <div className="relative pt-20 md:pb-20 md:pt-0">
+            <CarouselContent className="ml-0">
+              <CarouselItem className="pl-0">
+                <div className="grid w-full auto-cols-fr grid-cols-1 items-center justify-center gap-12 md:grid-cols-2 md:gap-10 lg:gap-x-20">
+                  <div className="order-last md:order-first">
+                    <Dialog>
+                      <DialogTrigger className="relative flex w-full items-center justify-center">
+                        <img
+                          src="https://d22po4pjz3o32e.cloudfront.net/placeholder-video-thumbnail.svg"
+                          alt="Testimonial image 1"
+                          className="size-full object-cover"
+                        />
+                        <span className="absolute inset-0 z-10 bg-black/50" />
+                        <Play className="absolute z-20 size-16 text-white" />
+                      </DialogTrigger>
+                      <DialogContent>
+                        <iframe
+                          className="w-full aspect-video"
+                          src="https://www.youtube.com/embed/8DKLYsikxTs?si=Ch9W0KrDWWUiCMMW"
+                          title="Video"
+                          allowFullScreen
+                        />
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+                  <div className="flex flex-col items-start">
+                    <div className="mb-6 flex md:mb-8">
+                      <Star className="size-6" />
+                      <Star className="size-6" />
+                      <Star className="size-6" />
+                      <Star className="size-6" />
+                      <Star className="size-6" />
+                    </div>
+                    <blockquote className="text-xl font-bold md:text-2xl">
+                      Tenderly transformed our procurement process from weeks of
+                      back-and-forth to a streamlined, transparent experience.
+                    </blockquote>
+                    <div className="mt-6 flex flex-nowrap items-center gap-5 md:mt-8">
+                      <div>
+                        <p className="font-semibold">Mohammed Al-Thani</p>
+                        <p>Procurement Manager, Gulf Enterprises</p>
+                      </div>
+                      <div className="mx-4 w-px self-stretch bg-background-alternative sm:mx-0" />
+                      <div>
+                        <img
+                          src="https://d22po4pjz3o32e.cloudfront.net/webflow-logo.svg"
+                          alt="Webflow logo 1"
+                          className="max-h-12"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CarouselItem>
+              <CarouselItem className="pl-0">
+                <div className="grid w-full auto-cols-fr grid-cols-1 items-center justify-center gap-12 md:grid-cols-2 md:gap-10 lg:gap-x-20">
+                  <div className="order-last md:order-first">
+                    <Dialog>
+                      <DialogTrigger className="relative flex w-full items-center justify-center">
+                        <img
+                          src="https://d22po4pjz3o32e.cloudfront.net/placeholder-video-thumbnail.svg"
+                          alt="Testimonial image 1"
+                          className="size-full object-cover"
+                        />
+                        <span className="absolute inset-0 z-10 bg-black/50" />
+                        <Play className="absolute z-20 size-16 text-white" />
+                      </DialogTrigger>
+                      <DialogContent>
+                        <iframe
+                          className="w-full aspect-video"
+                          src="https://www.youtube.com/embed/8DKLYsikxTs?si=Ch9W0KrDWWUiCMMW"
+                          title="Video"
+                          allowFullScreen
+                        />
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+                  <div className="flex flex-col items-start">
+                    <div className="mb-6 flex md:mb-8">
+                      <Star className="size-6" />
+                      <Star className="size-6" />
+                      <Star className="size-6" />
+                      <Star className="size-6" />
+                      <Star className="size-6" />
+                    </div>
+                    <blockquote className="text-xl font-bold md:text-2xl">
+                      Tenderly transformed our procurement process from weeks of
+                      back-and-forth to a streamlined, transparent experience.
+                    </blockquote>
+                    <div className="mt-6 flex flex-nowrap items-center gap-5 md:mt-8">
+                      <div>
+                        <p className="font-semibold">Mohammed Al-Thani</p>
+                        <p>Procurement Manager, Gulf Enterprises</p>
+                      </div>
+                      <div className="mx-4 w-px self-stretch bg-background-alternative sm:mx-0" />
+                      <div>
+                        <img
+                          src="https://d22po4pjz3o32e.cloudfront.net/webflow-logo.svg"
+                          alt="Webflow logo 1"
+                          className="max-h-12"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CarouselItem>
+            </CarouselContent>
+            <div className="absolute top-0 flex w-full items-start justify-between md:bottom-0 md:top-auto md:items-end">
+              <div className="mt-2.5 flex w-full items-start justify-start md:mb-2.5 md:mt-0">
+                <button
+                  onClick={carousel.handleDotClick(0)}
+                  className={carousel.dotClassName(0)}
+                />
+                <button
+                  onClick={carousel.handleDotClick(1)}
+                  className={carousel.dotClassName(1)}
+                />
               </div>
-            </div>
-            <div className="flex flex-wrap gap-4">
-              <button className="px-6 py-3 bg-Opacity-Neutral-Darkest-5 border border-Opacity-Neutral-Darkest-10 text-Color-Scheme-1-Text font-medium font-inter rounded-lg hover:bg-Opacity-Neutral-Darkest-10 transition-all">
-                Learn more
-              </button>
-              <button className="px-6 py-3 flex items-center gap-2 text-Color-Scheme-1-Text font-medium font-inter hover:gap-3 transition-all">
-                Get started <ArrowRight size={20} />
-              </button>
+              <div className="flex items-end justify-end gap-2 md:gap-4">
+                <CarouselPrevious className="static right-0 top-0 size-12 -translate-y-0" />
+                <CarouselNext className="static right-0 top-0 size-12 -translate-y-0" />
+              </div>
             </div>
           </div>
+        </Carousel>
+      </div>
+    </section>
+  );
+};
+
+// --------------------------------------------------
+// Stats55
+// --------------------------------------------------
+const Stats55 = () => (
+  <section id="relume" className="px-[5%] py-16 md:py-24 lg:py-28">
+    <div className="container">
+      <div className="grid grid-cols-1 gap-y-12 lg:grid-cols-[0.5fr_1fr] lg:items-center lg:gap-x-20">
+        <div>
+          <p className="mb-3 font-semibold md:mb-4">Impact</p>
+          <h2 className="mb-5 text-5xl font-bold md:mb-6 md:text-7xl lg:text-8xl">
+            Tenderly's growth and market transformation
+          </h2>
+          <p className="md:text-md">
+            Our platform continues to expand, connecting more businesses and
+            delivering tangible results across industries.
+          </p>
+          <div className="mt-6 flex flex-wrap items-center gap-4 md:mt-8">
+            <Button title="Explore" variant="secondary">
+              Explore
+            </Button>
+            <Button
+              title="Learn"
+              variant="link"
+              size="link"
+              iconRight={<ChevronRight />}
+            >
+              Learn
+            </Button>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 gap-8 py-2 md:grid-cols-2">
+          <div className="flex flex-col justify-center border border-border-primary p-8 text-center">
+            <p className="mb-2 text-10xl font-bold leading-[1.3] md:text-[4rem] lg:text-[5rem]">
+              500+
+            </p>
+            <h3 className="text-md font-bold leading-[1.4] md:text-xl">
+              Tenders posted monthly
+            </h3>
+          </div>
+          <div className="flex flex-col justify-center border border-border-primary p-8 text-center">
+            <p className="mb-2 text-10xl font-bold leading-[1.3] md:text-[4rem] lg:text-[5rem]">
+              250+
+            </p>
+            <h3 className="text-md font-bold leading-[1.4] md:text-xl">
+              Active suppliers
+            </h3>
+          </div>
+          <div className="flex flex-col justify-center border border-border-primary p-8 text-center">
+            <p className="mb-2 text-10xl font-bold leading-[1.3] md:text-[4rem] lg:text-[5rem]">
+              85%
+            </p>
+            <h3 className="text-md font-bold leading-[1.4] md:text-xl">
+              User satisfaction rate
+            </h3>
+          </div>
+          <div className="flex flex-col justify-center border border-border-primary p-8 text-center">
+            <p className="mb-2 text-10xl font-bold leading-[1.3] md:text-[4rem] lg:text-[5rem]">
+              3 days
+            </p>
+            <h3 className="text-md font-bold leading-[1.4] md:text-xl">
+              Average tender resolution time
+            </h3>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+);
+
+// --------------------------------------------------
+// Layout494
+// --------------------------------------------------
+const Layout494 = () => {
+  const useActive = useRelume();
+  return (
+    <section id="relume" className="px-[5%] py-16 md:py-24 lg:py-28">
+      <div className="container">
+        <div className="relative flex flex-col md:flex-row">
+          <div className="w-full md:w-1/2 md:pr-6 lg:pr-10">
+            <div className="order-last md:order-first">
+              <div className="mb-8 md:hidden">
+                <p className="mb-3 font-semibold md:mb-4">Tagline</p>
+                <h1 className="mb-5 text-5xl font-bold md:mb-6 md:text-7xl lg:text-8xl">
+                  Medium length section heading goes here
+                </h1>
+                <p className="md:text-md">
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                  Suspendisse varius enim in eros elementum tristique. Duis
+                  cursus, mi quis viverra ornare, eros dolor interdum nulla, ut
+                  commodo diam libero vitae erat.
+                </p>
+              </div>
+            </div>
+            <div className="static flex flex-col flex-wrap justify-stretch md:block">
+              <div className="relative grid auto-cols-fr grid-cols-1 grid-rows-[auto_auto] items-start md:mb-0 md:items-stretch">
+                {[0, 1, 2].map((i) => (
+                  <div
+                    key={i}
+                    onClick={useActive.setActiveTabSetter(i)}
+                    className={clsx(
+                      "cursor-pointer border-b border-border-primary py-4",
+                      {
+                        "opacity-100": useActive.activeTab === i,
+                        "opacity-25": useActive.activeTab !== i,
+                      }
+                    )}
+                  >
+                    <h2 className="text-xl font-bold md:text-2xl">
+                      Vague specifications
+                    </h2>
+                    <motion.div
+                      initial={false}
+                      animate={useActive.getActiveTabButtonContentStyles(i)}
+                      transition={{ duration: 0.3, ease: "easeInOut" }}
+                      className="overflow-hidden"
+                    >
+                      <p className="mt-2">
+                        Unclear project requirements make quoting risky and
+                        time-consuming for suppliers.
+                      </p>
+                    </motion.div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="mt-6 flex flex-wrap items-center gap-4 md:mt-8">
+              <Button title="Learn more" variant="secondary">
+                Learn more
+              </Button>
+              <Button
+                title="How it works"
+                variant="link"
+                size="link"
+                iconRight={<ChevronRight />}
+              >
+                How it works
+              </Button>
+            </div>
+          </div>
+          <div className="w-full md:w-1/2 flex max-h-full items-center justify-center overflow-hidden">
+            <AnimatePresence initial={false}>
+              <TabItem
+                tabItem={{
+                  heading: "Short heading goes here",
+                  description:
+                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum tristique.",
+                  image: {
+                    src: "https://d22po4pjz3o32e.cloudfront.net/placeholder-image.svg",
+                    alt: "Relume placeholder image 1",
+                  },
+                }}
+                index={0}
+                activeTab={useActive.activeTab}
+              />
+              <TabItem
+                tabItem={{
+                  heading: "Short heading goes here",
+                  description:
+                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum tristique.",
+                  video: {
+                    image: {
+                      src: "https://d22po4pjz3o32e.cloudfront.net/placeholder-video-thumbnail.svg",
+                      alt: "Relume placeholder image 2",
+                    },
+                    url: "https://www.youtube.com/embed/8DKLYsikxTs?si=Ch9W0KrDWWUiCMMW",
+                  },
+                }}
+                index={1}
+                activeTab={useActive.activeTab}
+              />
+              <TabItem
+                tabItem={{
+                  heading: "Short heading goes here",
+                  description:
+                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum tristique.",
+                  image: {
+                    src: "https://d22po4pjz3o32e.cloudfront.net/placeholder-image.svg",
+                    alt: "Relume placeholder image 3",
+                  },
+                }}
+                index={2}
+                activeTab={useActive.activeTab}
+              />
+            </AnimatePresence>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// --------------------------------------------------
+// Cta1
+// --------------------------------------------------
+const Cta1 = () => (
+  <section id="relume" className="px-[5%] py-16 md:py-24 lg:py-28">
+    <div className="container">
+      <div className="grid grid-cols-1 gap-x-20 gap-y-12 md:gap-y-16 lg:grid-cols-2 lg:items-center">
+        <div>
+          <h2 className="rb-5 mb-5 text-5xl font-bold md:mb-6 md:text-7xl lg:text-8xl">
+            Transform your tendering journey
+          </h2>
+          <p className="md:text-md">
+            Take the first step towards simplified procurement and connect with
+            the right suppliers in minutes.
+          </p>
+          <div className="mt-6 flex flex-wrap gap-4 md:mt-8">
+            <Button title="Post">Post</Button>
+            <Button title="Button" variant="secondary">
+              Button
+            </Button>
+          </div>
+        </div>
+        <div>
           <img
-            src="https://images.pexels.com/photos/3184338/pexels-photo-3184338.jpeg?auto=compress&cs=tinysrgb&w=600&h=640"
-            alt="Professional workspace"
-            className="w-full h-[400px] md:h-[500px] object-cover rounded-2xl md lg:lg"
+            src="https://d22po4pjz3o32e.cloudfront.net/placeholder-image-landscape.svg"
+            className="w-full object-cover"
+            alt="Relume placeholder image"
           />
         </div>
       </div>
-    </section>
-  );
-}
+    </div>
+  </section>
+);
 
-const smallServices = [
-  {
-    title: "Automotive services",
-    description: "Connect with mechanics, dealers, and auto specialists",
-    linkText: "Browse",
-    bgImage:
-      "https://images.pexels.com/photos/279949/pexels-photo-279949.jpeg?auto=compress&cs=tinysrgb&w=600",
-  },
-  {
-    title: "Events and hospitality",
-    description:
-      "Source vendors for conferences, weddings, and corporate events",
-    linkText: "View details",
-    bgImage:
-      "https://images.pexels.com/photos/1190298/pexels-photo-1190298.jpeg?auto=compress&cs=tinysrgb&w=600",
-  },
-  {
-    title: "Construction solutions",
-    description:
-      "Find contractors, suppliers, and specialized construction services",
-    linkText: "Compare now",
-    bgImage:
-      "https://images.pexels.com/photos/1216589/pexels-photo-1216589.jpeg?auto=compress&cs=tinysrgb&w=600",
-  },
-  {
-    title: "Facilities management",
-    description:
-      "Streamline maintenance and operational support for businesses",
-    linkText: "Get started",
-    bgImage:
-      "https://images.pexels.com/photos/416405/pexels-photo-416405.jpeg?auto=compress&cs=tinysrgb&w=600",
-  },
-];
-
-function Services() {
-  return (
-    <section className="py-16 md:py-28 bg-Opacity-White-5">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="max-w-3xl mx-auto text-center mb-12 md:mb-16">
-          <span className="text-base font-semibold font-inter text-Color-Scheme-1-Text">
-            Services
-          </span>
-          <h2 className="mt-3 text-4xl md:text-5xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight">
-            Tenders across Qatar's key industries
-          </h2>
-          <p className="mt-4 text-lg font-normal font-inter text-Color-Scheme-1-Text/70">
-            Find the right solution for every project need
+// --------------------------------------------------
+// Header84
+// --------------------------------------------------
+const Header84 = () => (
+  <section id="relume" className="px-[5%] py-12 md:py-16 lg:py-20">
+    <div className="container">
+      <div className="grid auto-cols-fr grid-cols-1 border border-border-primary lg:grid-cols-2">
+        <div className="flex flex-col justify-center p-8 md:p-12">
+          <h1 className="mb-5 text-6xl font-bold md:mb-6 md:text-9xl lg:text-10xl">
+            Post once. Get multiple quotes.
+          </h1>
+          <p className="md:text-md">
+            A centralized tender marketplace connecting individuals and
+            businesses. Describe your project, and watch bidders reply
+            instantly.
           </p>
+          <div className="mt-6 flex flex-wrap items-center gap-4 md:mt-8">
+            <Button title="Post tender" variant="primary">
+              Post tender
+            </Button>
+            <Button title="Browse tenders" variant="secondary">
+              Browse tenders
+            </Button>
+          </div>
         </div>
-        <div className="grid lg:grid-cols-2 gap-8">
-          <div
-            className="group relative h-[400px] md:h-[480px] p-8 rounded-2xl overflow-hidden md hover:xl transition-all hover:scale-[1.02] bg-cover bg-center"
-            style={{
-              backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('https://images.pexels.com/photos/4246120/pexels-photo-4246120.jpeg?auto=compress&cs=tinysrgb&w=800')`,
-            }}
-          >
-            <div className="flex flex-col justify-end h-full gap-6 text-white">
-              <div>
-                <span className="text-sm font-semibold font-inter uppercase opacity-90">
-                  Individuals
-                </span>
-                <h3 className="mt-1 text-3xl md:text-4xl font-medium font-outfit leading-tight">
-                  Home services and personal projects
-                </h3>
-                <p className="mt-3 text-base font-normal font-inter leading-relaxed opacity-95">
-                  Quickly find skilled professionals for home repairs,
-                  renovations, and personal tasks
-                </p>
-              </div>
-              <div className="flex gap-4">
-                <button className="px-5 py-2 bg-white/10 border border-white/20 rounded-md hover:bg-white/20 transition-all">
-                  See sample tender
-                </button>
-                <button className="flex items-center gap-2 hover:gap-3 transition-all">
-                  Explore{" "}
-                  <ArrowRight
-                    size={20}
-                    className="transition-transform group-hover:translate-x-1"
-                  />
-                </button>
-              </div>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {smallServices.map((service, i) => (
-              <div
-                key={i}
-                className="group relative h-64 p-6 rounded-2xl overflow-hidden md hover:xl transition-all hover:scale-[1.03] bg-cover bg-center"
-                style={{
-                  backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('${service.bgImage}')`,
-                }}
-              >
-                <div className="flex flex-col justify-between h-full text-white">
-                  <div className="flex flex-col gap-3">
-                    <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
-                      <Briefcase size={24} className="text-white" />
-                    </div>
-                    <h4 className="text-xl font-medium font-outfit leading-tight">
-                      {service.title}
-                    </h4>
-                    <p className="text-sm font-normal font-inter leading-relaxed opacity-95">
-                      {service.description}
-                    </p>
-                  </div>
-                  <button className="flex items-center gap-2 text-sm font-normal hover:gap-3 transition-all mt-2">
-                    {service.linkText}{" "}
-                    <ArrowRight
-                      size={18}
-                      className="transition-transform group-hover:translate-x-1"
-                    />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+        <div className="flex items-center justify-center">
+          <img
+            src="https://d22po4pjz3o32e.cloudfront.net/placeholder-image.svg"
+            className="w-full object-cover"
+            alt="Relume placeholder image"
+          />
         </div>
       </div>
-    </section>
-  );
-}
+    </div>
+  </section>
+);
 
-const pricingData = {
-  free: {
-    title: "Basic tender posting",
-    description: "Perfect for individual and small business needs",
-    price: "$0",
-    features: [
-      ["Post up to 3 tenders per month", "Receive up to 10 bids per tender"],
-      ["Basic project specifications", "Email support"],
-      ["Standard response time", "Public tender visibility"],
-    ],
-    cta: "Start now",
-  },
-  always: {
-    title: "Unlimited tendering",
-    description: "For growing teams and frequent procurement needs",
-    price: "$49",
-    features: [
-      ["Unlimited tender posts", "Unlimited bids received"],
-      ["Advanced specs & attachments", "Priority email + chat support"],
-      ["24-hour response SLA", "Private & public tenders"],
-      ["Team collaboration", "Analytics dashboard"],
-    ],
-    cta: "Start free trial",
-  },
-};
-
-function Pricing2() {
-  const [activeTab, setActiveTab] = useState<"free" | "always">("free");
-  const plan = pricingData[activeTab];
-
-  return (
-    <section className="py-16 md:py-28 bg-Opacity-White-5">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="max-w-3xl mx-auto text-center mb-12 md:mb-16">
-          <span className="text-base font-semibold font-inter text-Color-Scheme-1-Text">
-            Pricing
-          </span>
-          <h2 className="mt-3 text-4xl md:text-5xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight">
-            Simple transparent pricing
+// --------------------------------------------------
+// Layout370_1
+// --------------------------------------------------
+const Layout370_1 = () => (
+  <section id="relume" className="px-[5%] py-16 md:py-24 lg:py-28">
+    <div className="container">
+      <div className="rb-12 mb-12 md:mb-18 lg:mb-20">
+        <div className="mx-auto max-w-lg text-center">
+          <p className="mb-3 font-semibold md:mb-4">Discover</p>
+          <h2 className="mb-5 text-5xl font-bold md:mb-6 md:text-7xl lg:text-8xl">
+            How Tenderly transforms procurement
           </h2>
-          <p className="mt-4 text-lg font-normal font-inter text-Color-Scheme-1-Text/70">
-            No hidden costs, no commitments
+          <p className="md:text-md">
+            A simple platform connecting buyers and suppliers with unprecedented
+            efficiency
           </p>
         </div>
-        <div className="max-w-md mx-auto mb-10">
-          <div className="p-1 bg-Opacity-White-10 rounded-lg border border-Opacity-Neutral-Darkest-10 flex">
-            {(["free", "always"] as const).map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`flex-1 py-2.5 rounded-md text-base font-medium font-inter transition-all
-                  ${
-                    activeTab === tab
-                      ? "bg-Opacity-White-5 text-Color-Scheme-1-Text"
-                      : "text-Color-Scheme-1-Text/70 hover:text-Color-Scheme-1-Text"
-                  }`}
-              >
-                {tab.charAt(0).toUpperCase() + tab.slice(1)}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className="max-w-3xl mx-auto bg-Opacity-White-10 rounded-2xl border border-Opacity-Neutral-Darkest-10 p-8 md:p-10 md">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-full bg-Color-Matisse/10 flex items-center justify-center">
-                <Check size={28} className="text-Color-Matisse" />
-              </div>
-              <div>
-                <h3 className="text-3xl md:text-4xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight">
-                  {plan.title}
-                </h3>
-                <p className="mt-1 text-base font-normal font-inter text-Color-Scheme-1-Text/70">
-                  {plan.description}
-                </p>
-              </div>
-            </div>
-            <div className="text-right">
-              <div className="text-6xl font-medium font-outfit text-Color-Scheme-1-Text">
-                {plan.price}
-              </div>
-              {activeTab === "always" && (
-                <div className="text-sm font-normal text-Color-Scheme-1-Text/70 mt-1">
-                  per month
-                </div>
-              )}
-            </div>
-          </div>
-          <hr className="border-Opacity-Neutral-Darkest-10 mb-8" />
-          <div className="mb-8">
-            <p className="text-base font-normal font-inter text-Color-Scheme-1-Text mb-4">
-              Includes
-            </p>
-            <div className="space-y-4">
-              {plan.features.map((row, rowIdx) => (
-                <div key={rowIdx} className="flex gap-6">
-                  {row.map((feature, colIdx) => (
-                    <div key={colIdx} className="flex-1 flex items-start gap-3">
-                      <Check
-                        size={20}
-                        className="text-Color-Matisse mt-1 flex-shrink-0"
-                      />
-                      <span className="text-base font-normal font-inter text-Color-Scheme-1-Text/80">
-                        {feature}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              ))}
-            </div>
-          </div>
-          <hr className="border-Opacity-Neutral-Darkest-10 mb-8" />
-          <button className="w-full py-3 bg-Color-Matisse text-white rounded-lg font-medium hover:bg-Color-Matisse/90 transition-all flex items-center justify-center gap-2">
-            {plan.cta}
-            {activeTab === "always" && <ArrowRight size={20} />}
-          </button>
-        </div>
       </div>
-    </section>
-  );
-}
 
-function CTA2() {
-  return (
-    <section className="py-16 md:py-28 bg-Opacity-White-5">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="p-8 md:p-12 bg-Opacity-White-10 rounded-2xl border border-Opacity-Neutral-Darkest-10 text-center md">
-          <div className="max-w-2xl mx-auto">
-            <h2 className="text-4xl md:text-5xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight mb-6">
-              Get better quotes faster
-            </h2>
-            <p className="text-lg font-normal font-inter text-Color-Scheme-1-Text/70 mb-8">
-              Simplify your procurement process with instant, transparent
-              bidding
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="px-6 py-3 bg-Color-Matisse text-white rounded-lg font-medium hover:bg-Color-Matisse/90 transition-all">
-                Post tender
-              </button>
-              <button className="px-6 py-3 bg-Opacity-Neutral-Darkest-5 border border-Opacity-Neutral-Darkest-10 text-Color-Scheme-1-Text rounded-lg font-medium hover:bg-Opacity-Neutral-Darkest-10 transition-all">
-                Browse tenders
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-const faqs = [
-  {
-    question: "How does Gotenderly work?",
-    answer:
-      "Gotenderly connects businesses and service providers through a simple, transparent tender process. Post your project, receive bids, and select the best vendor quickly and securely.",
-  },
-  {
-    question: "Is posting a tender free?",
-    answer:
-      "Yes, posting tenders is completely free for all users. We believe in removing barriers to finding great local talent.",
-  },
-  {
-    question: "How long do tenders remain open?",
-    answer:
-      "Tenders typically remain open for 7-14 days, depending on the project complexity. You can adjust the deadline when posting.",
-  },
-  {
-    question: "Are vendors verified?",
-    answer:
-      "We conduct basic verification for all vendors and provide transparent profiles to help you make informed decisions.",
-  },
-  {
-    question: "Can I communicate with bidders?",
-    answer:
-      "Our platform offers secure, private messaging to discuss project details directly with potential vendors.",
-  },
-];
-
-function FAQ2() {
-  return (
-    <section className="py-16 md:py-28 bg-Opacity-White-5">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="max-w-3xl mx-auto text-center mb-12 md:mb-16">
-          <h2 className="text-4xl md:text-5xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight">
-            FAQs
-          </h2>
-          <p className="mt-4 text-lg font-normal font-inter text-Color-Scheme-1-Text/70">
-            Common questions about tendering on Gotenderly
-          </p>
-        </div>
-        <div className="max-w-3xl mx-auto space-y-6">
-          {faqs.map((faq, i) => (
+      <div className="grid grid-cols-1 gap-6 md:gap-8">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:gap-8 lg:grid-cols-4">
+          {[
+            {
+              tag: "Smart",
+              title: "Post your tender",
+              desc: "Create detailed project requirements in minutes",
+              link: "Learn",
+            },
+            {
+              tag: "Smart",
+              title: "Post your tender",
+              desc: "Create detailed project requirements in minutes",
+              link: "Learn",
+            },
+          ].map((item) => (
             <div
-              key={i}
-              className="p-6 rounded-2xl bg-Opacity-White-10 border border-Opacity-Neutral-Darkest-10 md"
+              key={item.title}
+              className="flex flex-col border border-border-primary"
             >
-              <h3 className="text-lg font-medium font-outfit text-Color-Scheme-1-Text mb-3">
-                {faq.question}
+              <div className="flex items-center justify-center">
+                <img
+                  src="https://d22po4pjz3o32e.cloudfront.net/placeholder-image-landscape.svg"
+                  alt="Relume placeholder image"
+                  className="w-full object-cover"
+                />
+              </div>
+              <div className="flex flex-col justify-center p-6">
+                <div>
+                  <p className="mb-2 text-sm font-semibold">{item.tag}</p>
+                  <h3 className="mb-2 text-xl font-bold md:text-2xl">
+                    {item.title}
+                  </h3>
+                  <p>{item.desc}</p>
+                </div>
+                <div className="mt-5 flex items-center gap-4 md:mt-6">
+                  <Button
+                    title={item.link}
+                    variant="link"
+                    size="link"
+                    iconRight={<ChevronRight />}
+                  >
+                    {item.link}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          ))}
+
+          <div className="grid grid-cols-1 border border-border-primary sm:col-span-2 sm:row-span-1 sm:grid-cols-2">
+            <div className="flex items-center justify-center">
+              <img
+                src="https://d22po4pjz3o32e.cloudfront.net/placeholder-image-portrait.svg"
+                alt="Relume placeholder image 3"
+                className="size-full object-cover"
+              />
+            </div>
+            <div className="flex flex-1 flex-col justify-center p-6">
+              <div>
+                <p className="mb-2 text-sm font-semibold">Secure</p>
+                <h3 className="mb-2 text-xl font-bold md:text-2xl">
+                  Complete your project with confidence
+                </h3>
+                <p>Negotiate and award the best supplier for your needs</p>
+              </div>
+              <div className="mt-5 flex flex-wrap items-center gap-4 md:mt-6">
+                <Button
+                  title="Award"
+                  variant="link"
+                  size="link"
+                  iconRight={<ChevronRight />}
+                >
+                  Award
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+);
+
+// --------------------------------------------------
+// Layout370
+// --------------------------------------------------
+const Layout370 = () => (
+  <section id="relume" className="px-[5%] py-16 md:py-24 lg:py-28">
+    <div className="container">
+      <div className="rb-12 mb-12 md:mb-18 lg:mb-20">
+        <div className="mx-auto max-w-lg text-center">
+          <p className="mb-3 font-semibold md:mb-4">Process</p>
+          <h2 className="mb-5 text-5xl font-bold md:mb-6 md:text-7xl lg:text-8xl">
+            How Tenderly works
+          </h2>
+          <p className="md:text-md">
+            Three simple steps to transform your tendering experience.
+          </p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-6 md:gap-8">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:gap-8 lg:grid-cols-4">
+          {[
+            {
+              step: "Step 1",
+              title: "Post your tender",
+              desc: "Describe your project with clear, concise details.",
+              link: "Learn more",
+            },
+            {
+              step: "Step 1",
+              title: "Post your tender",
+              desc: "Describe your project with clear, concise details.",
+              link: "Learn more",
+            },
+          ].map((item) => (
+            <div
+              key={item.title}
+              className="flex flex-col border border-border-primary"
+            >
+              <div className="flex items-center justify-center">
+                <img
+                  src="https://d22po4pjz3o32e.cloudfront.net/placeholder-image-landscape.svg"
+                  alt="Relume placeholder image"
+                  className="w-full object-cover"
+                />
+              </div>
+              <div className="flex flex-col justify-center p-6">
+                <div>
+                  <p className="mb-2 text-sm font-semibold">{item.step}</p>
+                  <h3 className="mb-2 text-xl font-bold md:text-2xl">
+                    {item.title}
+                  </h3>
+                  <p>{item.desc}</p>
+                </div>
+                <div className="mt-5 flex items-center gap-4 md:mt-6">
+                  <Button
+                    title={item.link}
+                    variant="link"
+                    size="link"
+                    iconRight={<ChevronRight />}
+                  >
+                    {item.link}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          ))}
+
+          <div className="grid grid-cols-1 border border-border-primary sm:col-span-2 sm:row-span-1 sm:grid-cols-2">
+            <div className="flex items-center justify-center">
+              <img
+                src="https://d22po4pjz3o32e.cloudfront.net/placeholder-image-portrait.svg"
+                alt="Relume placeholder image 3"
+                className="size-full object-cover"
+              />
+            </div>
+            <div className="flex flex-1 flex-col justify-center p-6">
+              <div>
+                <p className="mb-2 text-sm font-semibold">Step 3</p>
+                <h3 className="mb-2 text-xl font-bold md:text-2xl">
+                  Award and communicate
+                </h3>
+                <p>Select the best bidder and finalize your project details.</p>
+              </div>
+              <div className="mt-5 flex flex-wrap items-center gap-4 md:mt-6">
+                <Button
+                  title="Learn more"
+                  variant="link"
+                  size="link"
+                  iconRight={<ChevronRight />}
+                >
+                  Learn more
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+);
+
+// --------------------------------------------------
+// Layout237
+// --------------------------------------------------
+const Layout237 = () => (
+  <section id="relume" className="px-[5%] py-16 md:py-24 lg:py-28">
+    <div className="container">
+      <div className="flex flex-col items-center">
+        <div className="rb-12 mb-12 w-full max-w-lg text-center md:mb-18 lg:mb-20">
+          <p className="mb-3 font-semibold md:mb-4">Process</p>
+          <h2 className="rb-5 mb-5 text-5xl font-bold md:mb-6 md:text-7xl lg:text-8xl">
+            How Tenderly transforms tendering
+          </h2>
+          <p className="md:text-md">
+            We simplify complex procurement with a clear, transparent platform.
+            Connect, compare, and contract seamlessly.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 items-start justify-center gap-y-12 md:grid-cols-3 md:gap-x-8 md:gap-y-16 lg:gap-x-12">
+          {[
+            {
+              title: "For tenderers",
+              desc: "Post detailed project requirements with confidence.",
+            },
+            {
+              title: "For suppliers",
+              desc: "Submit precise bids matching exact project specifications.",
+            },
+            {
+              title: "Award process",
+              desc: "Select the most suitable vendor through transparent evaluation.",
+            },
+          ].map((item) => (
+            <div
+              key={item.title}
+              className="flex w-full flex-col items-center text-center"
+            >
+              <div className="rb-5 mb-5 md:mb-6">
+                <img
+                  src="https://d22po4pjz3o32e.cloudfront.net/relume-icon.svg"
+                  alt="Relume logo 1"
+                  className="size-12"
+                />
+              </div>
+              <h3 className="mb-5 text-2xl font-bold md:mb-6 md:text-3xl md:leading-[1.3] lg:text-4xl">
+                {item.title}
               </h3>
-              <p className="text-base font-normal font-inter text-Color-Scheme-1-Text/70 leading-relaxed">
-                {faq.answer}
-              </p>
+              <p>{item.desc}</p>
             </div>
           ))}
         </div>
-        <div className="mt-12 max-w-md mx-auto text-center">
-          <h3 className="text-3xl font-medium font-outfit text-Color-Scheme-1-Text mb-4">
-            Need more help?
-          </h3>
-          <p className="text-lg font-normal font-inter text-Color-Scheme-1-Text/70 mb-6">
-            Our support team is ready to answer any additional questions
-          </p>
-          <button className="px-6 py-3 bg-Opacity-Neutral-Darkest-5 border border-Opacity-Neutral-Darkest-10 text-Color-Scheme-1-Text font-medium font-inter rounded-lg hover:bg-Opacity-Neutral-Darkest-10 transition-all">
-            Contact us
-          </button>
+
+        <div className="mt-10 flex items-center gap-4 md:mt-14 lg:mt-16">
+          <Button variant="secondary">Learn more</Button>
+          <Button iconRight={<ChevronRight />} variant="link" size="link">
+            Get started
+          </Button>
         </div>
       </div>
-    </section>
-  );
-}
-
-// ---------------------------------------------------------------------
-//  Main Home Page
-// ---------------------------------------------------------------------
-
-export default function Home() {
-  return (
-    <div className="min-h-screen bg-Opacity-White-5">
-      <NavbarLanding />
-      <Hero />
-      <TrustedBy />
-      <About />
-      <Process />
-      <Features />
-      <Services />
-      <Problems />
-      <Outcomes />
-      <HowItWorks />
-      <UseCases />
-      <HowItWorksDetailed />
-      <KeyFeatures />
-      <Pricing2 />
-      <Testimonials />
-      <FAQ2 />
-      <CTA2 />
-      <Footer />
     </div>
+  </section>
+);
+
+// --------------------------------------------------
+// Layout399
+// --------------------------------------------------
+const Layout399 = () => (
+  <section id="relume" className="px-[5%] py-16 md:py-24 lg:py-28">
+    <div className="container">
+      <div className="mb-12 md:mb-18 lg:mb-20">
+        <div className="mx-auto max-w-lg text-center">
+          <p className="mb-3 font-semibold md:mb-4">Use cases</p>
+          <h2 className="mb-5 text-5xl font-bold md:mb-6 md:text-7xl lg:text-8xl">
+            Real projects in Qatar
+          </h2>
+          <p className="md:text-md">
+            Discover how Tenderly transforms local service procurement across
+            multiple industries.
+          </p>
+        </div>
+      </div>
+
+      <div className="grid auto-cols-fr grid-cols-1 gap-6 sm:grid-cols-2 md:gap-8 lg:grid-cols-4">
+        {[
+          {
+            tag: "Home",
+            title: "Home services simplified",
+            desc: "Clean apartments without the hassle of endless phone calls.",
+            link: "Explore",
+          },
+          {
+            tag: "Automotive",
+            title: "Car services made transparent",
+            desc: "Get precise quotes from mechanics who understand your vehicle.",
+            link: "Learn",
+          },
+          {
+            tag: "Events",
+            title: "Wedding and corporate event planning",
+            desc: "Connect with vendors who match your exact event requirements.",
+            link: "Discover",
+          },
+          {
+            tag: "Construction",
+            title: "Home renovation made easy",
+            desc: "Find contractors who understand your specific renovation needs.",
+            link: "View",
+          },
+        ].map((item) => (
+          <div
+            key={item.title}
+            className="flex flex-col border border-border-primary"
+          >
+            <div className="flex flex-1 flex-col justify-center p-6">
+              <div>
+                <p className="mb-2 text-sm font-semibold">{item.tag}</p>
+                <h3 className="mb-2 text-lg font-bold leading-[1.4] md:text-2xl">
+                  {item.title}
+                </h3>
+                <p>{item.desc}</p>
+              </div>
+              <div className="mt-5 md:mt-6">
+                <Button
+                  title={item.link}
+                  variant="link"
+                  size="link"
+                  iconRight={<ChevronRight />}
+                >
+                  {item.link}
+                </Button>
+              </div>
+            </div>
+            <div className="flex w-full flex-col items-center justify-center self-start">
+              <img
+                src="https://d22po4pjz3o32e.cloudfront.net/placeholder-image-landscape.svg"
+                alt="Relume placeholder image 1"
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+);
+
+// --------------------------------------------------
+// Layout312
+// --------------------------------------------------
+const Layout312 = () => (
+  <section id="relume" className="px-[5%] py-16 md:py-24 lg:py-28">
+    <div className="container">
+      <div className="mb-12 grid grid-cols-1 gap-5 md:mb-18 md:grid-cols-2 md:gap-x-12 md:gap-y-8 lg:mb-20 lg:gap-x-20">
+        <div>
+          <p className="mb-3 font-semibold md:mb-4">Business</p>
+          <h2 className="text-5xl font-bold md:text-7xl lg:text-8xl">
+            Professional solutions for enterprise needs
+          </h2>
+        </div>
+        <div>
+          <p className="md:text-md">
+            Streamline your procurement process with targeted, efficient
+            tendering. We help businesses find the right partners quickly and
+            transparently.
+          </p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-y-12 md:grid-cols-2 md:gap-x-8 md:gap-y-16 lg:grid-cols-4">
+        {[
+          {
+            title: "Facilities management",
+            desc: "Comprehensive maintenance solutions for modern workspaces.",
+          },
+          {
+            title: "IT services",
+            desc: "Technology support tailored to your specific infrastructure.",
+          },
+          {
+            title: "Cloud solutions",
+            desc: "Scalable and secure cloud infrastructure for growing businesses.",
+          },
+          {
+            title: "Network management",
+            desc: "Robust connectivity solutions designed for enterprise performance.",
+          },
+        ].map((item) => (
+          <div key={item.title}>
+            <div className="mb-5 flex justify-center md:mb-6">
+              <img
+                src="https://d22po4pjz3o32e.cloudfront.net/placeholder-image-landscape.svg"
+                alt="Relume placeholder image 1"
+              />
+            </div>
+            <h3 className="mb-3 text-xl font-bold md:mb-4 md:text-2xl">
+              {item.title}
+            </h3>
+            <p>{item.desc}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-12 flex flex-wrap items-center gap-4 md:mt-18 lg:mt-20">
+        <Button title="Learn more" variant="secondary">
+          Learn more
+        </Button>
+        <Button
+          title="Get started"
+          variant="link"
+          size="link"
+          iconRight={<ChevronRight />}
+        >
+          Get started
+        </Button>
+      </div>
+    </div>
+  </section>
+);
+
+// --------------------------------------------------
+// Faq2
+// --------------------------------------------------
+const Faq2 = () => (
+  <section id="relume" className="px-[5%] py-16 md:py-24 lg:py-28">
+    <div className="container">
+      <div className="rb-12 mb-12 w-full max-w-lg md:mb-18 lg:mb-20">
+        <h2 className="rb-5 mb-5 text-5xl font-bold md:mb-6 md:text-7xl lg:text-8xl">
+          FAQs
+        </h2>
+        <p className="md:text-md">
+          Get answers to the most common questions about our tender marketplace
+        </p>
+      </div>
+
+      <Accordion type="multiple">
+        {[
+          {
+            q: "How does Tenderly work?",
+            a: "Tenderly connects buyers and suppliers through a digital platform where you can post projects, receive bids, and negotiate terms anonymously until award",
+          },
+          {
+            q: "Is the platform free?",
+            a: "Posting tenders and browsing opportunities is free. We charge a small commission only when a project is successfully awarded",
+          },
+          {
+            q: "How secure is my information?",
+            a: "We use advanced encryption and privacy protocols to protect user data and ensure confidential communications",
+          },
+          {
+            q: "Can I use Tenderly for any project?",
+            a: "Our platform supports a wide range of services from home maintenance to complex business procurement",
+          },
+          {
+            q: "How quickly can I get bids?",
+            a: "Most tenders receive multiple competitive bids within 24 to 48 hours of posting",
+          },
+        ].map((item, i) => (
+          <AccordionItem key={i} value={`item-${i}`}>
+            <AccordionTrigger className="md:py-5 md:text-md">
+              {item.q}
+            </AccordionTrigger>
+            <AccordionContent className="md:pb-6">{item.a}</AccordionContent>
+          </AccordionItem>
+        ))}
+      </Accordion>
+
+      <div className="mt-12 md:mt-18 lg:mt-20">
+        <h4 className="mb-3 text-2xl font-bold md:mb-4 md:text-3xl md:leading-[1.3] lg:text-4xl">
+          Need more information?
+        </h4>
+        <p className="md:text-md">
+          Our support team is ready to help you navigate the platform
+        </p>
+        <div className="mt-6 md:mt-8">
+          <Button title="Contact" variant="secondary">
+            Contact
+          </Button>
+        </div>
+      </div>
+    </div>
+  </section>
+);
+
+// --------------------------------------------------
+// Footer3
+// --------------------------------------------------
+const Footer3 = () => (
+  <footer id="relume" className="px-[5%] py-12 md:py-18 lg:py-20">
+    <div className="container">
+      <div className="grid grid-cols-1 gap-x-[4vw] gap-y-12 pb-12 md:gap-y-16 md:pb-18 lg:grid-cols-[1fr_0.5fr] lg:gap-y-4 lg:pb-20">
+        <div>
+          <div className="mb-6 md:mb-8">
+            <a href="#">
+              <img
+                src="https://d22po4pjz3o32e.cloudfront.net/logo-image.svg"
+                alt="Logo image"
+                className="inline-block"
+              />
+            </a>
+          </div>
+          <div className="mb-6 md:mb-8">
+            <p className="mb-1 text-sm font-semibold">Address</p>
+            <p className="mb-5 text-sm md:mb-6">
+              Level 1, 12 Tender Street, Sydney NSW 2000
+            </p>
+            <p className="mb-1 text-sm font-semibold">Contact</p>
+            <a
+              href="tel:1800 123 4567"
+              className="block text-sm underline decoration-black underline-offset-1"
+            >
+              1800 Tender Help
+            </a>
+            <a
+              href="mailto:info@relume.io"
+              className="block text-sm underline decoration-black underline-offset-1"
+            >
+              info@relume.io
+            </a>
+          </div>
+          <div className="grid grid-flow-col grid-cols-[max-content] items-start justify-start gap-x-3">
+            <a href="#">
+              <Facebook className="size-6" />
+            </a>
+            <a href="#">
+              <Instagram className="size-6" />
+            </a>
+            <a href="#">
+              <Twitter className="size-6 p-0.5" />
+            </a>
+            <a href="#">
+              <Linkedin className="size-6" />
+            </a>
+            <a href="#">
+              <Youtube className="size-6" />
+            </a>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 items-start gap-x-6 gap-y-10 md:grid-cols-2 md:gap-x-8 md:gap-y-4">
+          <ul>
+            {["Home", "About us", "Services", "Blog", "Pricing"].map((link) => (
+              <li key={link} className="py-2 text-sm font-semibold">
+                <a href="#">{link}</a>
+              </li>
+            ))}
+          </ul>
+          <ul>
+            {[
+              "Careers",
+              "Partners",
+              "Resources",
+              "Community",
+              "Help center",
+            ].map((link) => (
+              <li key={link} className="py-2 text-sm font-semibold">
+                <a href="#">{link}</a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      <div className="h-px w-full bg-black" />
+      <div className="flex flex-col-reverse items-start justify-between pb-4 pt-6 text-sm md:flex-row md:items-center md:pb-0 md:pt-8">
+        <p className="mt-8 md:mt-0">© 2024 Relume. All rights reserved.</p>
+        <ul className="grid grid-flow-row grid-cols-[max-content] justify-center gap-y-4 text-sm md:grid-flow-col md:gap-x-6 md:gap-y-0">
+          <li className="underline">
+            <a href="#">Privacy policy</a>
+          </li>
+          <li className="underline">
+            <a href="#">Terms of service</a>
+          </li>
+          <li className="underline">
+            <a href="#">Cookie settings</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+);
+
+// --------------------------------------------------
+// Main App Component
+// --------------------------------------------------
+export default function App() {
+  return (
+    <>
+      <Navbar22 />
+      <Header84 />
+      <Layout491 />
+      <Layout491_1 />
+      <Layout491_2 />
+      <Layout494 />
+      <Layout370 />
+      <Layout370_1 />
+      <Layout237 />
+      <Layout399 />
+      <Layout312 />
+      <Testimonial16 />
+      <Stats55 />
+      <Cta1 />
+      <Faq2 />
+      <Footer3 />
+    </>
   );
 }
