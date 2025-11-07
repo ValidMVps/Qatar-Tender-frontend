@@ -1,1668 +1,1836 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import {
+  motion,
+  AnimatePresence,
+  useInView,
+  useMotionValue,
+  useSpring,
+} from "framer-motion";
+import { useState, useEffect, useRef } from "react";
+import {
+  ArrowRight,
+  ArrowUp,
+  Check,
+  Plus,
+  Minus,
+  Menu,
+  X,
+  Star,
+  MessageSquare,
+  Shield,
+  EyeOff,
+  Bell,
+  Users,
+  Search,
+  Award,
+  FileText,
+  Lock,
+  Zap,
+  Briefcase,
+  Trophy,
+  MessagesSquare,
+  FilePlus,
+  Car,
+  PartyPopper,
+  Hammer,
+  Laptop,
+  Building2,
+  HelpCircle,
+  BookOpen,
+  Upload,
+  BarChart3,
+  Facebook,
+  Instagram,
+  Twitter,
+  Linkedin,
+  Youtube,
+  Handshake,
+} from "lucide-react";
+import logo from "../media/logo.png";
+import Hero from "@/components/Hero";
+import Navbarlanding from "@/components/Navbarladning";
+import Image from "next/image";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
-const QatarTenderPlatform = () => {
-  const [activeTab, setActiveTab] = useState(0);
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
+/* -------------------------------------------------------------------------- */
+/*                                 COMPONENTS                                 */
+/* -------------------------------------------------------------------------- */
 
-  // Handle scroll effect for header
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  // Auto-rotate testimonials
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev === 1 ? 0 : prev + 1));
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const features = [
-    {
-      title: "Fragmented vendors",
-      description:
-        "Vendors are scattered across different platforms and locations. Finding the right match requires extensive research.",
-    },
-    {
-      title: "Unclear requirements",
-      description: "Vague specs lead to wrong quotes and rework.",
-    },
-    {
-      title: "Time-consuming process",
-      description: "Repeating the same brief to each vendor takes time.",
-    },
+/* ----------------------------- TrustedBy ---------------------------------- */
+function TrustedBy() {
+  const partners = [
+    { name: "Lusail Residents", width: "w-32" },
+    { name: "Doha SMEs", width: "w-28" },
+    { name: "Al Wakrah Events", width: "w-32" },
+    { name: "Pearl Qatar", width: "w-28" },
+    { name: "West Bay Offices", width: "w-32" },
+    { name: "Qatar Garages", width: "w-32" },
   ];
 
+  return (
+    <section className="py-20 bg-white border-y border-[#d2d2d7]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          className="text-center mb-12"
+        >
+          <p className="text-lg text-[#86868b] font-medium">
+            Used by individuals and businesses across Qatar
+          </p>
+        </motion.div>
+
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 items-center">
+          {partners.map((p, i) => (
+            <motion.div
+              key={p.name}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: i * 0.08 }}
+              className="flex items-center justify-center"
+            >
+              <div
+                className={`${p.width} h-12 bg-[#f5f5f7] rounded-xl flex items-center justify-center hover:bg-[#e8e8ed] transition-colors`}
+              >
+                <span className="text-xs font-medium text-[#86868b] text-center px-2">
+                  {p.name}
+                </span>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+const processSteps = [
+  {
+    label: "Post",
+    title: "Submit comprehensive tender with clear requirements",
+    description: "Define project scope, budget, and critical details",
+    linkText: "View details",
+    bgImage:
+      "https://images.pexels.com/photos/3184360/pexels-photo-3184360.jpeg?auto=compress&cs=tinysrgb&w=384&h=630",
+  },
+  {
+    label: "Bids",
+    title: "Receive and compare structured proposals from qualified vendors",
+    description:
+      "Evaluate competitive bids with transparent pricing and timelines",
+    linkText: "Compare now",
+    bgImage:
+      "https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=384&h=630",
+  },
+  {
+    label: "Award",
+    title: "Negotiate and finalize with your preferred vendor",
+    description:
+      "Communicate securely and select the best match for your project",
+    linkText: "Select winner",
+    bgImage:
+      "https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg?auto=compress&cs=tinysrgb&w=384&h=630",
+  },
+];
+
+function Process() {
+  return (
+    <section className="px-6 py-16 md:px-16 md:py-28 bg-Color-Scheme-1-Background">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="max-w-3xl mx-auto text-center mb-16">
+          <span className="text-Color-Scheme-1-Text text-base font-semibold font-inter leading-6">
+            Process
+          </span>
+          <h2 className="mt-2 text-4xl md:text-5xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight md:leading-[62.4px]">
+            How gotenderly works
+          </h2>
+          <p className="mt-4 text-lg font-normal font-inter text-Color-Scheme-1-Text leading-7">
+            Create detailed project specifications in minutes
+          </p>
+        </div>
+
+        {/* Process Steps - Responsive Grid */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+          {processSteps.map((step, index) => (
+            <div
+              key={index}
+              className="group relative h-[540px] md:h-[580px] rounded-xl overflow-hidden shadow-lg transition-transform hover:scale-[1.02]"
+              style={{
+                backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.7)), url('${step.bgImage}')`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+              }}
+            >
+              {/* Content */}
+              <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 text-white z-10">
+                <div className="flex flex-col gap-3">
+                  <span className="text-sm md:text-base font-semibold font-inter uppercase tracking-wider opacity-90">
+                    {step.label}
+                  </span>
+                  <h3 className="text-2xl md:text-3xl lg:text-4xl font-medium font-outfit leading-tight">
+                    {step.title}
+                  </h3>
+                </div>
+
+                <p className="mt-4 text-sm md:text-base font-normal font-inter leading-relaxed opacity-95">
+                  {step.description}
+                </p>
+
+                <button className="mt-6 flex items-center gap-2 text-white text-sm md:text-base font-medium font-inter leading-6 hover:gap-3 transition-all">
+                  <span>{step.linkText}</span>
+                  <ArrowRight
+                    size={18}
+                    className="transition-transform group-hover:translate-x-1"
+                  />
+                </button>
+              </div>
+
+              {/* Optional: Subtle overlay on hover */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ------------------------------- Outcomes --------------------------------- */
+function Outcomes() {
   const outcomes = [
     {
-      title: "Reach many bidders",
-      description:
-        "Post once and instantly connect with multiple qualified suppliers. No more endless phone calls.",
+      title: "Post once and reach many bidders at once.",
+      icon: Zap,
+      audience: "For tenderers ,  Outcomes with Tenderly",
     },
     {
-      title: "Built-in Q/A",
-      description: "Use built-in Q/A to clarify missing details before award.",
+      title: "Use built-in Q/A to clarify missing details before award.",
+      icon: MessageSquare,
+      audience: "For tenderers ,  Outcomes with Tenderly",
     },
     {
-      title: "Compare apples-to-apples",
-      description: "Compare apples-to-apples (price, ETA, notes) in one view.",
-    },
-  ];
-
-  const bidderFeatures = [
-    {
-      title: "Vague specs",
-      description: "Specs are vague; quoting feels risky or time-wasting.",
+      title: "Compare apples-to-apples (price, ETA, notes) in one view.",
+      icon: Award,
+      audience: "For tenderers ,  Outcomes with Tenderly",
     },
     {
-      title: "Unqualified leads",
-      description: "Hard to find real, ready buyers; leads aren’t qualified.",
+      title: "Stay anonymous until award; choose the best fit faster.",
+      icon: EyeOff,
+      audience: "For tenderers ,  Outcomes with Tenderly",
     },
     {
-      title: "Disorganized negotiations",
-      description: "Negotiations spread across calls/emails and get lost.",
-    },
-  ];
-
-  const bidderOutcomes = [
-    {
-      title: "Clarify specs",
-      description:
-        "Ask and answer questions publicly to understand project requirements fully.",
+      title: "Ask/answer clarifying questions publicly on the tender.",
+      icon: MessageSquare,
+      audience: "For bidders ,  Outcomes with Tenderly",
     },
     {
-      title: "Clear requirements",
-      description:
+      title:
         "See all required fields up front; submit a clear, competitive bid.",
+      icon: FileText,
+      audience: "For bidders ,  Outcomes with Tenderly",
     },
     {
-      title: "Private negotiations",
-      description:
-        "Keep negotiations in one private thread; get awarded faster.",
-    },
-  ];
-
-  const testimonials = [
-    {
-      quote:
-        "Tenderly transformed our procurement process from weeks of back-and-forth to a streamlined, transparent experience.",
-      author: "Mohammed Al-Thani",
-      role: "Procurement Manager, Gulf Enterprises",
-      logo: "https://d22po4pjz3o32e.cloudfront.net/webflow-logo.svg",
-    },
-    {
-      quote:
-        "The platform has saved us countless hours and helped us find better suppliers at competitive prices.",
-      author: "Fatima Al-Kuwari",
-      role: "Operations Director, Doha Logistics",
-      logo: "https://d22po4pjz3o32e.cloudfront.net/webflow-logo.svg",
-    },
-  ];
-
-  const faqs = [
-    {
-      question: "How does the tender process work?",
-      answer:
-        "The tender process involves posting your project requirements, receiving bids from suppliers, and awarding the contract to the most suitable bidder.",
-    },
-    {
-      question: "Is my information kept confidential?",
-      answer:
-        "Yes, your identity remains anonymous until you choose to award the contract.",
-    },
-    {
-      question: "Are there any fees to use the platform?",
-      answer:
-        "Posting tenders is completely free. There are no fees for either tenderers or bidders.",
+      title: "Keep negotiations in one private thread; get awarded faster.",
+      icon: Lock,
+      audience: "For bidders ,  Outcomes with Tenderly",
     },
   ];
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Header */}
-      <header
-        className={`sticky top-0 z-50 flex min-h-16 w-full items-center border-b transition-all duration-300 ${
-          isScrolled
-            ? "bg-white/90 backdrop-blur-md border-gray-200"
-            : "bg-white/80 backdrop-blur-sm border-transparent"
-        } px-4 md:px-6 lg:px-[5%]`}
-      >
-        <div className="mx-auto flex size-full items-center justify-between">
-          <a href="#" className="relative z-50">
-            <img
-              src="https://d22po4pjz3o32e.cloudfront.net/logo-image.svg"
-              alt="Relume placeholder logo"
-              className="h-auto w-auto max-h-10"
-            />
-          </a>
-          <div
-            className={`hidden lg:flex lg:items-center lg:justify-center lg:overflow-hidden lg:px-0 lg:text-center transition-all duration-300 ${
-              isMenuOpen ? "opacity-100" : "opacity-100"
-            }`}
-          >
-            <a
-              href="#"
-              className="block py-3 text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors px-4"
-            >
-              Services
-            </a>
-            <a
-              href="#"
-              className="block py-3 text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors px-4"
-            >
-              About
-            </a>
-            <a
-              href="#"
-              className="block py-3 text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors px-4"
-            >
-              Blog
-            </a>
-            <nav>
-              <button className="flex w-full items-center justify-center gap-4 py-3 text-center text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors px-4">
-                <span>More</span>
-                <span>
-                  <svg
-                    stroke="currentColor"
-                    fill="none"
-                    stroke-width="0"
-                    viewBox="0 0 15 15"
-                    height="1em"
-                    width="1em"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      clipRule="evenodd"
-                      d="M3.13523 6.15803C3.3241 5.95657 3.64052 5.94637 3.84197 6.13523L7.5 9.56464L11.158 6.13523C11.3595 5.94637 11.6759 5.95657 11.8648 6.15803C12.0536 6.35949 12.0434 6.67591 11.842 6.86477L7.84197 10.6148C7.64964 10.7951 7.35036 10.7951 7.15803 10.6148L3.15803 6.86477C2.95657 6.67591 2.94637 6.35949 3.13523 6.15803Z"
-                      fill="currentColor"
-                    ></path>
-                  </svg>
-                </span>
-              </button>
-            </nav>
-          </div>
-          <div className="relative z-50 flex items-center justify-center gap-2 lg:gap-4">
-            <button
-              className="-mr-2 flex size-12 flex-col items-center justify-center justify-self-end lg:mr-0"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-            >
-              <span className="relative flex size-6 flex-col items-center justify-center">
-                <span
-                  className={`absolute top-[3px] h-0.5 w-full bg-gray-900 transition-all duration-300 ${
-                    isMenuOpen ? "rotate-45 translate-y-1.5" : "rotate-0"
-                  }`}
-                ></span>
-                <span
-                  className={`absolute h-0.5 w-full bg-gray-900 transition-all duration-300 ${
-                    isMenuOpen ? "opacity-0" : "opacity-100"
-                  }`}
-                ></span>
-                <span
-                  className={`absolute h-0.5 w-full bg-gray-900 transition-all duration-300 ${
-                    isMenuOpen ? "-rotate-45 -translate-y-1.5" : "rotate-0"
-                  }`}
-                ></span>
-                <span
-                  className={`absolute bottom-[3px] h-0.5 w-full bg-gray-900 transition-all duration-300 ${
-                    isMenuOpen ? "opacity-0" : "opacity-100"
-                  }`}
-                ></span>
-              </span>
-            </button>
-          </div>
-        </div>
-      </header>
+    <section id="outcomes" className="py-24 sm:py-32 bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-16"
+        >
+          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-[#1d1d1f] mb-4">
+            Better outcomes with Tenderly.
+          </h2>
+          <p className="text-xl text-[#6e6e73] max-w-2xl mx-auto">
+            Eliminate friction, get clarity, and close deals faster , for both
+            sides.
+          </p>
+        </motion.div>
 
-      {/* Hero Section */}
-      <section className="px-[5%] py-12 md:py-16 lg:py-20 bg-gradient-to-br from-blue-50 to-indigo-50">
-        <div className="container mx-auto">
-          <div className="grid auto-cols-fr grid-cols-1 border border-gray-200 rounded-2xl overflow-hidden lg:grid-cols-2">
-            <div className="flex flex-col justify-center p-8 md:p-12 bg-white">
-              <h1 className="mb-5 text-4xl font-bold text-gray-900 md:mb-6 md:text-5xl lg:text-6xl transition-all duration-500 hover:scale-[1.02]">
-                Post once. Get multiple quotes.
-              </h1>
-              <p className="text-gray-700 mb-4 text-lg">
-                A centralized tender marketplace for individuals and
-                businesses—describe, bidders reply instantly, you compare,
-                negotiate, and award.
-              </p>
-              <div className="mt-6 flex flex-wrap items-center gap-4 md:mt-8">
-                <button className="focus:ring-blue-500 inline-flex gap-3 items-center justify-center whitespace-nowrap ring-offset-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-transparent bg-gray-900 text-white px-6 py-3 rounded-xl hover:bg-gray-800 hover:shadow-lg transform hover:-translate-y-0.5">
-                  Post your tender for free
-                </button>
-                <button className="focus:ring-blue-500 inline-flex gap-3 items-center justify-center whitespace-nowrap ring-offset-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-gray-300 text-gray-900 bg-white px-6 py-3 rounded-xl hover:bg-gray-50 hover:shadow-md">
-                  Browse open tenders
-                </button>
-              </div>
-              <div className="mt-4 text-sm text-gray-600">
-                <p>Anonymous until award • No fees • Takes ~2 minutes</p>
-              </div>
-            </div>
-            <div className="flex items-center justify-center bg-gray-50 p-8">
-              <img
-                src="https://d22po4pjz3o32e.cloudfront.net/placeholder-image.svg"
-                className="w-full object-cover rounded-lg shadow-lg transition-transform duration-500 hover:scale-105"
-                alt="Relume placeholder image"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Feature Section: For tenderers - Problems */}
-      <section className="px-[5%] py-16 md:py-24 lg:py-28 bg-white">
-        <div className="container mx-auto">
-          <div className="mx-auto mb-12 max-w-lg text-center md:mb-18 lg:mb-20">
-            <p className="mb-3 font-semibold md:mb-4 text-blue-600 text-lg">
-              Problems
-            </p>
-            <h1 className="mb-5 text-4xl font-bold text-gray-900 md:mb-6 md:text-5xl lg:text-6xl">
-              For tenderers
-            </h1>
-            <p className="text-gray-700 text-lg">
-              Hard to find all options; vendors are fragmented. Unclear
-              requirements lead to wrong quotes and rework. Repeating the same
-              brief to each vendor takes time.
-            </p>
-            <div className="mt-6 flex flex-wrap items-center justify-center gap-4 md:mt-8">
-              <button className="focus:ring-blue-500 inline-flex gap-3 items-center justify-center whitespace-nowrap ring-offset-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-gray-300 text-gray-900 bg-white px-6 py-3 rounded-xl hover:bg-gray-50 hover:shadow-md">
-                Learn More
-              </button>
-              <button className="focus:ring-blue-500 inline-flex items-center justify-center whitespace-nowrap ring-offset-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border-0 text-gray-900 gap-2 p-0 hover:text-blue-600">
-                Get Started
-                <svg
-                  stroke="currentColor"
-                  fill="none"
-                  stroke-width="0"
-                  viewBox="0 0 15 15"
-                  height="1em"
-                  width="1em"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    fillRule="evenodd"
-                    clipRule="evenodd"
-                    d="M6.1584 3.13508C6.35985 2.94621 6.67627 2.95642 6.86514 3.15788L10.6151 7.15788C10.7954 7.3502 10.7954 7.64949 10.6151 7.84182L6.86514 11.8418C6.67627 12.0433 6.35985 12.0535 6.1584 11.8646C5.95694 11.6757 5.94673 11.3593 6.1356 11.1579L9.565 7.49985L6.1356 3.84182C5.94673 3.64036 5.95694 3.32394 6.1584 3.13508Z"
-                    fill="currentColor"
-                  ></path>
-                </svg>
-              </button>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 items-center gap-x-12 md:grid-cols-2 lg:gap-x-20">
-            <div className="relative mb-8 grid auto-cols-fr grid-cols-1 grid-rows-[auto_auto] items-start md:mb-0 md:items-stretch">
-              {features.map((feature, index) => (
-                <div
-                  key={index}
-                  className={`cursor-pointer border-b border-gray-200 py-6 transition-all duration-300 ${
-                    activeTab === index
-                      ? "opacity-100"
-                      : "opacity-25 hover:opacity-75"
-                  }`}
-                  onClick={() => setActiveTab(index)}
-                >
-                  <h2 className="text-2xl font-bold text-gray-900 md:text-3xl md:leading-[1.3] lg:text-4xl">
-                    {feature.title}
-                  </h2>
-                  <div
-                    className={`overflow-hidden transition-all duration-500 ${
-                      activeTab === index
-                        ? "max-h-96 opacity-100"
-                        : "max-h-0 opacity-0"
-                    }`}
-                  >
-                    <p className="mt-3 text-gray-700 md:mt-4">
-                      {feature.description}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="flex max-h-full w-full items-center justify-center overflow-hidden">
-              <div style={{ opacity: 1 }}>
-                <img
-                  src="https://d22po4pjz3o32e.cloudfront.net/placeholder-image.svg"
-                  alt="Relume placeholder image 1"
-                  className="size-full object-cover rounded-lg shadow-lg transition-transform duration-500 hover:scale-105"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Feature Section: For tenderers - Outcomes */}
-      <section className="px-[5%] py-16 md:py-24 lg:py-28 bg-gray-50">
-        <div className="container mx-auto">
-          <div className="mx-auto mb-12 max-w-lg text-center md:mb-18 lg:mb-20">
-            <p className="mb-3 font-semibold md:mb-4 text-green-600 text-lg">
-              Outcomes with Tenderly
-            </p>
-            <h1 className="mb-5 text-4xl font-bold text-gray-900 md:mb-6 md:text-5xl lg:text-6xl">
-              For tenderers
-            </h1>
-            <p className="text-gray-700 text-lg">
-              Post once and reach many bidders at once. Use built-in Q/A to
-              clarify missing details before award. Compare apples-to-apples
-              (price, ETA, notes) in one view. Stay anonymous until award;
-              choose the best fit faster.
-            </p>
-            <div className="mt-6 flex flex-wrap items-center justify-center gap-4 md:mt-8">
-              <button className="focus:ring-blue-500 inline-flex gap-3 items-center justify-center whitespace-nowrap ring-offset-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-gray-300 text-gray-900 bg-white px-6 py-3 rounded-xl hover:bg-gray-50 hover:shadow-md">
-                Learn More
-              </button>
-              <button className="focus:ring-blue-500 inline-flex items-center justify-center whitespace-nowrap ring-offset-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border-0 text-gray-900 gap-2 p-0 hover:text-blue-600">
-                Get Started
-                <svg
-                  stroke="currentColor"
-                  fill="none"
-                  stroke-width="0"
-                  viewBox="0 0 15 15"
-                  height="1em"
-                  width="1em"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    fillRule="evenodd"
-                    clipRule="evenodd"
-                    d="M6.1584 3.13508C6.35985 2.94621 6.67627 2.95642 6.86514 3.15788L10.6151 7.15788C10.7954 7.3502 10.7954 7.64949 10.6151 7.84182L6.86514 11.8418C6.67627 12.0433 6.35985 12.0535 6.1584 11.8646C5.95694 11.6757 5.94673 11.3593 6.1356 11.1579L9.565 7.49985L6.1356 3.84182C5.94673 3.64036 5.95694 3.32394 6.1584 3.13508Z"
-                    fill="currentColor"
-                  ></path>
-                </svg>
-              </button>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 items-center gap-x-12 md:grid-cols-2 lg:gap-x-20">
-            <div className="relative mb-8 grid auto-cols-fr grid-cols-1 grid-rows-[auto_auto] items-start md:mb-0 md:items-stretch">
-              {outcomes.map((outcome, index) => (
-                <div
-                  key={index}
-                  className={`cursor-pointer border-b border-gray-200 py-6 transition-all duration-300 ${
-                    activeTab === index
-                      ? "opacity-100"
-                      : "opacity-25 hover:opacity-75"
-                  }`}
-                  onClick={() => setActiveTab(index)}
-                >
-                  <h2 className="text-2xl font-bold text-gray-900 md:text-3xl md:leading-[1.3] lg:text-4xl">
-                    {outcome.title}
-                  </h2>
-                  <div
-                    className={`overflow-hidden transition-all duration-500 ${
-                      activeTab === index
-                        ? "max-h-96 opacity-100"
-                        : "max-h-0 opacity-0"
-                    }`}
-                  >
-                    <p className="mt-3 text-gray-700 md:mt-4">
-                      {outcome.description}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="flex max-h-full w-full items-center justify-center overflow-hidden">
-              <div style={{ opacity: 1 }}>
-                <img
-                  src="https://d22po4pjz3o32e.cloudfront.net/placeholder-image.svg"
-                  alt="Relume placeholder image 1"
-                  className="size-full object-cover rounded-lg shadow-lg transition-transform duration-500 hover:scale-105"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Feature Section: For bidders - Problems */}
-      <section className="px-[5%] py-16 md:py-24 lg:py-28 bg-white">
-        <div className="container mx-auto">
-          <div className="relative flex flex-col md:flex-row">
-            <div className="w-full md:w-1/2 md:pr-6 lg:pr-10">
-              <div className="mb-8 md:hidden">
-                <p className="mb-3 font-semibold md:mb-4 text-blue-600 text-lg">
-                  Problems
-                </p>
-                <h1 className="mb-5 text-4xl font-bold text-gray-900 md:mb-6 md:text-5xl lg:text-6xl">
-                  For bidders
-                </h1>
-                <p className="text-gray-700 text-lg">
-                  Specs are vague; quoting feels risky or time-wasting. Hard to
-                  find real, ready buyers; leads aren’t qualified. Negotiations
-                  spread across calls/emails and get lost.
-                </p>
-              </div>
-              <div
-                className="relative flex size-full items-center justify-center"
-                style={{ opacity: 1 }}
-              >
-                <img
-                  src="https://d22po4pjz3o32e.cloudfront.net/placeholder-image.svg"
-                  alt="Relume placeholder image 1"
-                  className="mb-6 size-full md:mb-0 rounded-lg shadow-lg transition-transform duration-500 hover:scale-105"
-                />
-              </div>
-            </div>
-            <div className="w-full md:w-1/2 md:pl-6 lg:pl-10">
-              <div className="mb-8 hidden md:block">
-                <p className="mb-3 font-semibold md:mb-4 text-blue-600 text-lg">
-                  Problems
-                </p>
-                <h1 className="mb-5 text-4xl font-bold text-gray-900 md:mb-6 md:text-5xl lg:text-6xl">
-                  For bidders
-                </h1>
-                <p className="text-gray-700 text-lg">
-                  Specs are vague; quoting feels risky or time-wasting. Hard to
-                  find real, ready buyers; leads aren’t qualified. Negotiations
-                  spread across calls/emails and get lost.
-                </p>
-              </div>
-              <div className="static flex flex-col flex-wrap justify-stretch md:block">
-                <div className="relative grid auto-cols-fr grid-cols-1 grid-rows-[auto_auto] items-start md:mb-0 md:items-stretch">
-                  {bidderFeatures.map((feature, index) => (
-                    <div
-                      key={index}
-                      className={`cursor-pointer border-b border-gray-200 py-4 transition-all duration-300 ${
-                        activeTab === index
-                          ? "opacity-100"
-                          : "opacity-25 hover:opacity-75"
-                      }`}
-                      onClick={() => setActiveTab(index)}
-                    >
-                      <h2 className="text-xl font-bold text-gray-900 md:text-2xl">
-                        {feature.title}
-                      </h2>
-                      <div
-                        className={`overflow-hidden transition-all duration-500 ${
-                          activeTab === index
-                            ? "max-h-96 opacity-100"
-                            : "max-h-0 opacity-0"
-                        }`}
-                      >
-                        <p className="mt-2 text-gray-700">
-                          {feature.description}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div className="mt-6 flex flex-wrap items-center gap-4 md:mt-8">
-                <button className="focus:ring-blue-500 inline-flex gap-3 items-center justify-center whitespace-nowrap ring-offset-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-gray-300 text-gray-900 bg-white px-6 py-3 rounded-xl hover:bg-gray-50 hover:shadow-md">
-                  Learn More
-                </button>
-                <button className="focus:ring-blue-500 inline-flex items-center justify-center whitespace-nowrap ring-offset-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border-0 text-gray-900 gap-2 p-0 hover:text-blue-600">
-                  Get Started
-                  <svg
-                    stroke="currentColor"
-                    fill="none"
-                    stroke-width="0"
-                    viewBox="0 0 15 15"
-                    height="1em"
-                    width="1em"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      clipRule="evenodd"
-                      d="M6.1584 3.13508C6.35985 2.94621 6.67627 2.95642 6.86514 3.15788L10.6151 7.15788C10.7954 7.3502 10.7954 7.64949 10.6151 7.84182L6.86514 11.8418C6.67627 12.0433 6.35985 12.0535 6.1584 11.8646C5.95694 11.6757 5.94673 11.3593 6.1356 11.1579L9.565 7.49985L6.1356 3.84182C5.94673 3.64036 5.95694 3.32394 6.1584 3.13508Z"
-                      fill="currentColor"
-                    ></path>
-                  </svg>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Feature Section: For bidders - Outcomes */}
-      <section className="px-[5%] py-16 md:py-24 lg:py-28 bg-gray-50">
-        <div className="container mx-auto">
-          <div className="mx-auto mb-12 max-w-lg text-center md:mb-18 lg:mb-20">
-            <p className="mb-3 font-semibold md:mb-4 text-green-600 text-lg">
-              Outcomes with Tenderly
-            </p>
-            <h1 className="mb-5 text-4xl font-bold text-gray-900 md:mb-6 md:text-5xl lg:text-6xl">
-              For bidders
-            </h1>
-            <p className="text-gray-700 text-lg">
-              Ask/answer clarifying questions publicly on the tender. See all
-              required fields up front; submit a clear, competitive bid. Keep
-              negotiations in one private thread; get awarded faster.
-            </p>
-            <div className="mt-6 flex flex-wrap items-center justify-center gap-4 md:mt-8">
-              <button className="focus:ring-blue-500 inline-flex gap-3 items-center justify-center whitespace-nowrap ring-offset-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-gray-300 text-gray-900 bg-white px-6 py-3 rounded-xl hover:bg-gray-50 hover:shadow-md">
-                Learn More
-              </button>
-              <button className="focus:ring-blue-500 inline-flex items-center justify-center whitespace-nowrap ring-offset-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border-0 text-gray-900 gap-2 p-0 hover:text-blue-600">
-                Get Started
-                <svg
-                  stroke="currentColor"
-                  fill="none"
-                  stroke-width="0"
-                  viewBox="0 0 15 15"
-                  height="1em"
-                  width="1em"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    fillRule="evenodd"
-                    clipRule="evenodd"
-                    d="M6.1584 3.13508C6.35985 2.94621 6.67627 2.95642 6.86514 3.15788L10.6151 7.15788C10.7954 7.3502 10.7954 7.64949 10.6151 7.84182L6.86514 11.8418C6.67627 12.0433 6.35985 12.0535 6.1584 11.8646C5.95694 11.6757 5.94673 11.3593 6.1356 11.1579L9.565 7.49985L6.1356 3.84182C5.94673 3.64036 5.95694 3.32394 6.1584 3.13508Z"
-                    fill="currentColor"
-                  ></path>
-                </svg>
-              </button>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 items-center gap-x-12 md:grid-cols-2 lg:gap-x-20">
-            <div className="relative mb-8 grid auto-cols-fr grid-cols-1 grid-rows-[auto_auto] items-start md:mb-0 md:items-stretch">
-              {bidderOutcomes.map((outcome, index) => (
-                <div
-                  key={index}
-                  className={`cursor-pointer border-b border-gray-200 py-6 transition-all duration-300 ${
-                    activeTab === index
-                      ? "opacity-100"
-                      : "opacity-25 hover:opacity-75"
-                  }`}
-                  onClick={() => setActiveTab(index)}
-                >
-                  <h2 className="text-2xl font-bold text-gray-900 md:text-3xl md:leading-[1.3] lg:text-4xl">
-                    {outcome.title}
-                  </h2>
-                  <div
-                    className={`overflow-hidden transition-all duration-500 ${
-                      activeTab === index
-                        ? "max-h-96 opacity-100"
-                        : "max-h-0 opacity-0"
-                    }`}
-                  >
-                    <p className="mt-3 text-gray-700 md:mt-4">
-                      {outcome.description}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="flex max-h-full w-full items-center justify-center overflow-hidden">
-              <div style={{ opacity: 1 }}>
-                <img
-                  src="https://d22po4pjz3o32e.cloudfront.net/placeholder-image.svg"
-                  alt="Relume placeholder image 1"
-                  className="size-full object-cover rounded-lg shadow-lg transition-transform duration-500 hover:scale-105"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="px-[5%] py-16 md:py-24 lg:py-28 bg-white">
-        <div className="container mx-auto">
-          <div className="grid grid-cols-1 gap-y-12 lg:grid-cols-[0.5fr_1fr] lg:items-center lg:gap-x-20">
-            <div>
-              <p className="mb-3 font-semibold md:mb-4 text-blue-600 text-lg">
-                By the Numbers
-              </p>
-              <h2 className="mb-5 text-4xl font-bold text-gray-900 md:mb-6 md:text-5xl lg:text-6xl">
-                Key Statistics
-              </h2>
-              <p className="text-gray-700 text-lg">
-                Display key statistics such as the number of tenders posted, the
-                number of suppliers registered, average time to receive bids,
-                and user satisfaction rates to demonstrate the platform's
-                success and reliability.
-              </p>
-              <div className="mt-6 flex flex-wrap items-center gap-4 md:mt-8">
-                <button className="focus:ring-blue-500 inline-flex gap-3 items-center justify-center whitespace-nowrap ring-offset-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-gray-300 text-gray-900 bg-white px-6 py-3 rounded-xl hover:bg-gray-50 hover:shadow-md">
-                  Learn More
-                </button>
-                <button className="focus:ring-blue-500 inline-flex items-center justify-center whitespace-nowrap ring-offset-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border-0 text-gray-900 gap-2 p-0 hover:text-blue-600">
-                  Get Started
-                  <svg
-                    stroke="currentColor"
-                    fill="none"
-                    stroke-width="0"
-                    viewBox="0 0 15 15"
-                    height="1em"
-                    width="1em"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      clipRule="evenodd"
-                      d="M6.1584 3.13508C6.35985 2.94621 6.67627 2.95642 6.86514 3.15788L10.6151 7.15788C10.7954 7.3502 10.7954 7.64949 10.6151 7.84182L6.86514 11.8418C6.67627 12.0433 6.35985 12.0535 6.1584 11.8646C5.95694 11.6757 5.94673 11.3593 6.1356 11.1579L9.565 7.49985L6.1356 3.84182C5.94673 3.64036 5.95694 3.32394 6.1584 3.13508Z"
-                      fill="currentColor"
-                    ></path>
-                  </svg>
-                </button>
-              </div>
-            </div>
-            <div className="grid grid-cols-1 gap-8 py-2 md:grid-cols-2">
-              <div className="flex flex-col justify-center border border-gray-200 p-8 text-center rounded-2xl bg-white shadow-sm hover:shadow-md transition-shadow duration-300">
-                <p className="mb-2 text-6xl font-bold text-gray-900 md:text-7xl lg:text-8xl">
-                  500+
-                </p>
-                <h3 className="text-lg font-bold text-gray-900 md:text-xl">
-                  Tenders posted monthly
-                </h3>
-              </div>
-              <div className="flex flex-col justify-center border border-gray-200 p-8 text-center rounded-2xl bg-white shadow-sm hover:shadow-md transition-shadow duration-300">
-                <p className="mb-2 text-6xl font-bold text-gray-900 md:text-7xl lg:text-8xl">
-                  250+
-                </p>
-                <h3 className="text-lg font-bold text-gray-900 md:text-xl">
-                  Active suppliers
-                </h3>
-              </div>
-              <div className="flex flex-col justify-center border border-gray-200 p-8 text-center rounded-2xl bg-white shadow-sm hover:shadow-md transition-shadow duration-300">
-                <p className="mb-2 text-6xl font-bold text-gray-900 md:text-7xl lg:text-8xl">
-                  85%
-                </p>
-                <h3 className="text-lg font-bold text-gray-900 md:text-xl">
-                  User satisfaction rate
-                </h3>
-              </div>
-              <div className="flex flex-col justify-center border border-gray-200 p-8 text-center rounded-2xl bg-white shadow-sm hover:shadow-md transition-shadow duration-300">
-                <p className="mb-2 text-6xl font-bold text-gray-900 md:text-7xl lg:text-8xl">
-                  3 days
-                </p>
-                <h3 className="text-lg font-bold text-gray-900 md:text-xl">
-                  Average tender resolution time
-                </h3>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works Section: 3 steps */}
-      <section className="px-[5%] py-16 md:py-24 lg:py-28 bg-gray-50">
-        <div className="container mx-auto">
-          <div className="mb-12 md:mb-18 lg:mb-20">
-            <div className="mx-auto max-w-lg text-center">
-              <p className="mb-3 font-semibold md:mb-4 text-blue-600 text-lg">
-                Process
-              </p>
-              <h2 className="mb-5 text-4xl font-bold text-gray-900 md:mb-6 md:text-5xl lg:text-6xl">
-                How it works
-              </h2>
-              <p className="text-gray-700 text-lg">
-                Post. Receive & compare bids. Chat & award—identities revealed
-                only after award.
-              </p>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 gap-6 md:gap-8">
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:gap-8 lg:grid-cols-4">
-              <div className="flex flex-col border border-gray-200 rounded-2xl overflow-hidden bg-white hover:shadow-lg transition-shadow duration-300">
-                <div className="flex items-center justify-center bg-gray-50 p-6">
-                  <img
-                    src="https://d22po4pjz3o32e.cloudfront.net/placeholder-image-landscape.svg"
-                    alt="Relume placeholder image 1"
-                    className="w-full object-cover rounded-lg"
-                  />
-                </div>
-                <div className="flex flex-col justify-center p-6">
-                  <div>
-                    <p className="mb-2 text-sm font-semibold text-blue-600">
-                      Step 1
-                    </p>
-                    <h3 className="mb-2 text-xl font-bold text-gray-900 md:text-2xl">
-                      Post
-                    </h3>
-                    <p className="text-gray-700">
-                      Describe your project with clear, concise details.
-                    </p>
-                  </div>
-                  <div className="mt-5 flex items-center gap-4 md:mt-6">
-                    <button className="focus:ring-blue-500 inline-flex items-center justify-center whitespace-nowrap ring-offset-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border-0 text-gray-900 gap-2 p-0 hover:text-blue-600">
-                      Learn more
-                      <svg
-                        stroke="currentColor"
-                        fill="none"
-                        stroke-width="0"
-                        viewBox="0 0 15 15"
-                        height="1em"
-                        width="1em"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          clipRule="evenodd"
-                          d="M6.1584 3.13508C6.35985 2.94621 6.67627 2.95642 6.86514 3.15788L10.6151 7.15788C10.7954 7.3502 10.7954 7.64949 10.6151 7.84182L6.86514 11.8418C6.67627 12.0433 6.35985 12.0535 6.1584 11.8646C5.95694 11.6757 5.94673 11.3593 6.1356 11.1579L9.565 7.49985L6.1356 3.84182C5.94673 3.64036 5.95694 3.32394 6.1584 3.13508Z"
-                          fill="currentColor"
-                        ></path>
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <div className="flex flex-col border border-gray-200 rounded-2xl overflow-hidden bg-white hover:shadow-lg transition-shadow duration-300">
-                <div className="flex items-center justify-center bg-gray-50 p-6">
-                  <img
-                    src="https://d22po4pjz3o32e.cloudfront.net/placeholder-image-landscape.svg"
-                    alt="Relume placeholder image 2"
-                    className="w-full object-cover rounded-lg"
-                  />
-                </div>
-                <div className="flex flex-col justify-center p-6">
-                  <div>
-                    <p className="mb-2 text-sm font-semibold text-blue-600">
-                      Step 2
-                    </p>
-                    <h3 className="mb-2 text-xl font-bold text-gray-900 md:text-2xl">
-                      Receive & compare bids
-                    </h3>
-                    <p className="text-gray-700">
-                      Compare apples-to-apples (price, ETA, notes) in one view.
-                    </p>
-                  </div>
-                  <div className="mt-5 flex items-center gap-4 md:mt-6">
-                    <button className="focus:ring-blue-500 inline-flex items-center justify-center whitespace-nowrap ring-offset-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border-0 text-gray-900 gap-2 p-0 hover:text-blue-600">
-                      Learn more
-                      <svg
-                        stroke="currentColor"
-                        fill="none"
-                        stroke-width="0"
-                        viewBox="0 0 15 15"
-                        height="1em"
-                        width="1em"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          clipRule="evenodd"
-                          d="M6.1584 3.13508C6.35985 2.94621 6.67627 2.95642 6.86514 3.15788L10.6151 7.15788C10.7954 7.3502 10.7954 7.64949 10.6151 7.84182L6.86514 11.8418C6.67627 12.0433 6.35985 12.0535 6.1584 11.8646C5.95694 11.6757 5.94673 11.3593 6.1356 11.1579L9.565 7.49985L6.1356 3.84182C5.94673 3.64036 5.95694 3.32394 6.1584 3.13508Z"
-                          fill="currentColor"
-                        ></path>
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <div className="grid grid-cols-1 border border-gray-200 rounded-2xl overflow-hidden sm:col-span-2 sm:row-span-1 sm:grid-cols-2 bg-white hover:shadow-lg transition-shadow duration-300">
-                <div className="flex items-center justify-center bg-gray-50 p-6">
-                  <img
-                    src="https://d22po4pjz3o32e.cloudfront.net/placeholder-image-portrait.svg"
-                    alt="Relume placeholder image 3"
-                    className="size-full object-cover rounded-lg"
-                  />
-                </div>
-                <div className="flex flex-1 flex-col justify-center p-6">
-                  <div>
-                    <p className="mb-2 text-sm font-semibold text-blue-600">
-                      Step 3
-                    </p>
-                    <h3 className="mb-2 text-xl font-bold text-gray-900 md:text-2xl">
-                      Chat & award
-                    </h3>
-                    <p className="text-gray-700">
-                      Keep negotiations in one private thread; get awarded
-                      faster.
-                    </p>
-                  </div>
-                  <div className="mt-5 flex flex-wrap items-center gap-4 md:mt-6">
-                    <button className="focus:ring-blue-500 inline-flex items-center justify-center whitespace-nowrap ring-offset-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border-0 text-gray-900 gap-2 p-0 hover:text-blue-600">
-                      Button
-                      <svg
-                        stroke="currentColor"
-                        fill="none"
-                        stroke-width="0"
-                        viewBox="0 0 15 15"
-                        height="1em"
-                        width="1em"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          clipRule="evenodd"
-                          d="M6.1584 3.13508C6.35985 2.94621 6.67627 2.95642 6.86514 3.15788L10.6151 7.15788C10.7954 7.3502 10.7954 7.64949 10.6151 7.84182L6.86514 11.8418C6.67627 12.0433 6.35985 12.0535 6.1584 11.8646C5.95694 11.6757 5.94673 11.3593 6.1356 11.1579L9.565 7.49985L6.1356 3.84182C5.94673 3.64036 5.95694 3.32394 6.1584 3.13508Z"
-                          fill="currentColor"
-                        ></path>
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Features List Section: Use cases (Qatar) */}
-      <section className="px-[5%] py-16 md:py-24 lg:py-28 bg-white">
-        <div className="container mx-auto">
-          <div className="mb-12 md:mb-18 lg:mb-20">
-            <div className="mx-auto max-w-lg text-center">
-              <p className="mb-3 font-semibold md:mb-4 text-blue-600 text-lg">
-                Use cases (Qatar)
-              </p>
-              <h2 className="mb-5 text-4xl font-bold text-gray-900 md:mb-6 md:text-5xl lg:text-6xl">
-                For individuals
-              </h2>
-              <p className="text-gray-700 text-lg">
-                Home services (cleaning & maintenance). Automotive services
-                (repair, detailing, tires). Events (weddings, corporate,
-                birthdays). Construction & renovation (small works, fit-outs,
-                repairs).
-              </p>
-            </div>
-          </div>
-          <div className="grid auto-cols-fr grid-cols-1 gap-6 sm:grid-cols-2 md:gap-8 lg:grid-cols-4">
-            {[...Array(4)].map((_, index) => (
-              <div
-                key={index}
-                className="flex flex-col border border-gray-200 rounded-2xl overflow-hidden bg-white hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
-              >
-                <div className="flex flex-1 flex-col justify-center p-6">
-                  <div>
-                    <p className="mb-2 text-sm font-semibold text-blue-600">
-                      {index === 0 && "Home"}
-                      {index === 1 && "Automotive"}
-                      {index === 2 && "Events"}
-                      {index === 3 && "Construction"}
-                    </p>
-                    <h3 className="mb-2 text-lg font-bold text-gray-900 leading-[1.4] md:text-xl">
-                      {index === 0 && "Home services simplified"}
-                      {index === 1 && "Car services made transparent"}
-                      {index === 2 && "Wedding and corporate event planning"}
-                      {index === 3 && "Home renovation made easy"}
-                    </h3>
-                    <p className="text-gray-700">
-                      {index === 0 &&
-                        "Clean apartments without the hassle of endless phone calls."}
-                      {index === 1 &&
-                        "Get precise quotes from mechanics who understand your vehicle."}
-                      {index === 2 &&
-                        "Connect with vendors who match your exact event requirements."}
-                      {index === 3 &&
-                        "Find contractors who understand your specific renovation needs."}
-                    </p>
-                  </div>
-                  <div className="mt-5 md:mt-6">
-                    <button className="focus:ring-blue-500 inline-flex items-center justify-center whitespace-nowrap ring-offset-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border-0 text-gray-900 gap-2 p-0 hover:text-blue-600">
-                      {index === 0 && "Explore"}
-                      {index === 1 && "Learn"}
-                      {index === 2 && "Discover"}
-                      {index === 3 && "View"}
-                      <svg
-                        stroke="currentColor"
-                        fill="none"
-                        stroke-width="0"
-                        viewBox="0 0 15 15"
-                        height="1em"
-                        width="1em"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          clipRule="evenodd"
-                          d="M6.1584 3.13508C6.35985 2.94621 6.67627 2.95642 6.86514 3.15788L10.6151 7.15788C10.7954 7.3502 10.7954 7.64949 10.6151 7.84182L6.86514 11.8418C6.67627 12.0433 6.35985 12.0535 6.1584 11.8646C5.95694 11.6757 5.94673 11.3593 6.1356 11.1579L9.565 7.49985L6.1356 3.84182C5.94673 3.64036 5.95694 3.32394 6.1584 3.13508Z"
-                          fill="currentColor"
-                        ></path>
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-                <div className="flex w-full flex-col items-center justify-center self-start p-6 bg-gray-50">
-                  <img
-                    src="https://d22po4pjz3o32e.cloudfront.net/placeholder-image-landscape.svg"
-                    alt="Relume placeholder image 1"
-                    className="rounded-lg shadow-sm"
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works Section: For tenderers & bidders */}
-      <section className="px-[5%] py-16 md:py-24 lg:py-28 bg-gray-50">
-        <div className="container mx-auto">
-          <div className="mb-12 grid grid-cols-1 gap-5 md:mb-18 md:grid-cols-2 md:gap-x-12 md:gap-y-8 lg:mb-20 lg:gap-x-20">
-            <div>
-              <p className="mb-3 font-semibold md:mb-4 text-blue-600 text-lg">
-                For tenderers (buyers)
-              </p>
-              <h2 className="text-4xl font-bold text-gray-900 md:text-5xl lg:text-6xl">
-                How it works
-              </h2>
-            </div>
-            <div>
-              <p className="text-gray-700 text-lg">
-                Post your tender (title, category, deadline, optional budget,
-                deliverables). Use Q/A to clarify specs or request
-                revisions—without revealing identity. Compare & shortlist
-                side-by-side, then award the winner (identities reveal after
-                award).
-              </p>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 gap-y-12 md:grid-cols-2 md:gap-x-8 md:gap-y-16 lg:grid-cols-4">
-            <div className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300">
-              <div className="mb-5 flex justify-center md:mb-6">
-                <img
-                  src="https://d22po4pjz3o32e.cloudfront.net/placeholder-image-landscape.svg"
-                  alt="Relume placeholder image 1"
-                  className="rounded-lg shadow-sm"
-                />
-              </div>
-              <h3 className="mb-3 text-xl font-bold text-gray-900 md:mb-4 md:text-2xl">
-                How it works
+        <div className="grid md:grid-cols-2 gap-8">
+          {[
+            "For tenderers ,  Outcomes with Tenderly",
+            "For bidders ,  Outcomes with Tenderly",
+          ].map((audience) => (
+            <div key={audience}>
+              <h3 className="text-2xl font-semibold text-[#1d1d1f] mb-6 text-center md:text-left">
+                {audience}
               </h3>
-              <p className="text-gray-700">
-                Post your tender (title, category, deadline, optional budget,
-                deliverables). Use Q/A to clarify specs or request
-                revisions—without revealing identity. Compare & shortlist
-                side-by-side, then award the winner (identities reveal after
-                award).
-              </p>
+              <div className="space-y-6">
+                {outcomes
+                  .filter((o) => o.audience === audience)
+                  .map((o, i) => {
+                    const Icon = o.icon;
+                    return (
+                      <motion.div
+                        key={o.title}
+                        initial={{ opacity: 0, x: 20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.45, delay: i * 0.1 }}
+                        className="flex items-start gap-4"
+                      >
+                        <div className="w-10 h-10 rounded-xl bg-[#38b6ff]/10 flex items-center justify-center flex-shrink-0">
+                          <Icon className="w-5 h-5 text-[#38b6ff]" />
+                        </div>
+                        <p className="text-base text-[#6e6e73] leading-relaxed">
+                          {o.title}
+                        </p>
+                      </motion.div>
+                    );
+                  })}
+              </div>
             </div>
-          </div>
-          <div className="mt-12 flex flex-wrap items-center gap-4 md:mt-18 lg:mt-20">
-            <button className="focus:ring-blue-500 inline-flex gap-3 items-center justify-center whitespace-nowrap ring-offset-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-gray-300 text-gray-900 bg-white px-6 py-3 rounded-xl hover:bg-gray-50 hover:shadow-md">
-              Learn more
-            </button>
-            <button className="focus:ring-blue-500 inline-flex items-center justify-center whitespace-nowrap ring-offset-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border-0 text-gray-900 gap-2 p-0 hover:text-blue-600">
-              Get started
-              <svg
-                stroke="currentColor"
-                fill="none"
-                stroke-width="0"
-                viewBox="0 0 15 15"
-                height="1em"
-                width="1em"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  fillRule="evenodd"
-                  clipRule="evenodd"
-                  d="M6.1584 3.13508C6.35985 2.94621 6.67627 2.95642 6.86514 3.15788L10.6151 7.15788C10.7954 7.3502 10.7954 7.64949 10.6151 7.84182L6.86514 11.8418C6.67627 12.0433 6.35985 12.0535 6.1584 11.8646C5.95694 11.6757 5.94673 11.3593 6.1356 11.1579L9.565 7.49985L6.1356 3.84182C5.94673 3.64036 5.95694 3.32394 6.1584 3.13508Z"
-                  fill="currentColor"
-                ></path>
-              </svg>
-            </button>
-          </div>
+          ))}
         </div>
-      </section>
+      </div>
+    </section>
+  );
+}
 
-      {/* How It Works Section: For bidders */}
-      <section className="px-[5%] py-16 md:py-24 lg:py-28 bg-white">
-        <div className="container mx-auto">
-          <div className="flex flex-col items-center">
-            <div className="mb-12 w-full max-w-lg text-center md:mb-18 lg:mb-20">
-              <p className="mb-3 font-semibold md:mb-4 text-blue-600 text-lg">
-                For bidders (suppliers)
-              </p>
-              <h2 className="mb-5 text-4xl font-bold text-gray-900 md:mb-6 md:text-5xl lg:text-6xl">
-                How it works
+// /* ------------------------------ UseCases ---------------------------------- */
+// function UseCases() {
+//   const cases = [
+//     {
+//       title: "Home services (cleaning & maintenance)",
+//       scenario:
+//         "NA is moving out of an apartment in Lusail and needs a deep clean on a specific date. Calling companies one by one was slow and prices varied wildly. On Tenderly, NA posted once with the date, apartment size, and checklist. Through Q/A, bidders confirmed building access and timings. NA received multiple quotes the same day, compared inclusions (steam, windows, oven), and awarded the best match, done.",
+//       icon: Home,
+//     },
+//     {
+//       title: "Automotive services (repair, detailing, tires)",
+//       scenario:
+//         "HM’s SUV needs brake pads and a full detail. Not sure of fair pricing or downtime. HM posted the plate/model and preferred time window. Garages responded with parts options (OEM/aftermarket), ETAs, and warranty notes; a detailer asked in Q/A about interior shampoo vs. quick wash. HM picked a garage that offered pick-up/drop-off and a detail combo, problem solved in one go.",
+//       icon: Car,
+//     },
+//     {
+//       title: "Events (weddings, corporate, birthdays)",
+//       scenario:
+//         "MA is planning a small wedding in Al Wakrah: catering for 120, décor, DJ, and photo/video. Vendors were scattered and hard to coordinate. MA posted the budget range, menu style, and venue restrictions. Using Q/A, suppliers clarified power load and layout. MA quickly compared package breakdowns, shortlisted two, negotiated extras (LED dance floor), and awarded a single vendor bundle.",
+//       icon: PartyPopper,
+//     },
+//     {
+//       title: "Construction & renovation (small works, fit-outs, repairs)",
+//       scenario:
+//         "AA wants a kitchen refresh, cabinet re-facing and new countertop. Past quotes were inconsistent and missed measurements. AA posted with drawings/photos and a rough timeline. Contractors used Q/A to ask about materials and site access; AA added dimensions. Comparable bids arrived with line-item costs and lead times. AA awarded one contractor and arranged a site visit after award.",
+//       icon: Hammer,
+//     },
+//     {
+//       title: "Facilities management & building maintenance",
+//       scenario:
+//         "LT needs a combined soft/hard FM contract: daily cleaning plus quarterly HVAC maintenance. Previous suppliers covered only part of the scope. LT posted a single tender with SLAs and KPIs. In Q/A, bidders confirmed consumables, call-out times, and preventive schedules. LT compared consolidated proposals, checked references, and awarded one provider for the whole site.",
+//       icon: Building2,
+//     },
+//     {
+//       title: "IT & managed services (support, cloud, networking)",
+//       scenario:
+//         "KR’s team needs 24/7 helpdesk, endpoint security, and cloud backups. Cold outreach was noisy; scopes didn’t match. KR posted requirements (users, devices, response times, compliance needs). MSPs asked in Q/A about current stack and ticket volume, then submitted structured bids with SLAs and onboarding plans. KR compared like-for-like, negotiated onboarding fees, and awarded the best-fit MSP.",
+//       icon: Laptop,
+//     },
+//   ];
+//   return (
+//     <section
+//       id="use-cases"
+//       className="py-16 md:py-24 lg:py-32 bg-Opacity-White-5"
+//     >
+//       <div className="max-w-7xl mx-auto px-6 lg:px-8">
+//         {/* Header */}
+//         <motion.div
+//           initial={{ opacity: 0, y: 20 }}
+//           whileInView={{ opacity: 1, y: 0 }}
+//           viewport={{ once: true }}
+//           transition={{ duration: 0.8 }}
+//           className="text-center mb-12 md:mb-16"
+//         >
+//           <h2 className="text-4xl sm:text-5xl lg:text-6xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight">
+//             Real use cases in Qatar.
+//           </h2>
+//           <p className="mt-4 text-lg md:text-xl font-normal font-inter text-Color-Scheme-1-Text/70 max-w-2xl mx-auto leading-relaxed">
+//             From home cleaning to enterprise IT ,  see how Tenderly works in
+//             practice.
+//           </p>
+//         </motion.div>
+
+//         {/* Use Cases Grid */}
+//         <div className="grid md:grid-cols-2 gap-6 lg:gap-8">
+//           {cases.map((c, i) => {
+//             const Icon = c.icon;
+//             return (
+//               <motion.div
+//                 key={c.title}
+//                 initial={{ opacity: 0, y: 20 }}
+//                 whileInView={{ opacity: 1, y: 0 }}
+//                 viewport={{ once: true }}
+//                 transition={{ duration: 0.5, delay: i * 0.08 }}
+//                 whileHover={{ y: -6 }}
+//                 className="group"
+//               >
+//                 <div
+//                   className="h-full p-6 md:p-8 rounded-2xl bg-Opacity-White-5 backdrop-blur-sm
+//                              border border-Opacity-Neutral-Darkest-10
+//                              transition-all duration-300
+//                              hover:shadow-xl hover:border-Color-Matisse/30"
+//                 >
+//                   {/* Icon + Title */}
+//                   <div className="flex items-start gap-4 mb-5">
+//                     <div
+//                       className="w-12 h-12 rounded-xl bg-Color-Matisse/10 flex items-center justify-center flex-shrink-0
+//                                     ring-4 ring-Color-Matisse/20 group-hover:bg-Color-Matisse/15 transition-colors"
+//                     >
+//                       <Icon size={28} className="text-Color-Matisse" />
+//                     </div>
+//                     <h3 className="text-xl md:text-2xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight">
+//                       {c.title}
+//                     </h3>
+//                   </div>
+
+//                   {/* Scenario */}
+//                   <p className="text-base md:text-lg font-normal font-inter text-Color-Scheme-1-Text/80 leading-relaxed">
+//                     {c.scenario}
+//                   </p>
+//                 </div>
+//               </motion.div>
+//             );
+//           })}
+//         </div>
+//       </div>
+//     </section>
+//   );
+// }
+
+/* --------------------------- HowItWorksDetailed --------------------------- */
+function HowItWorksDetailed() {
+  const steps = [
+    {
+      audience: "For tenderers (buyers)",
+      items: [
+        "Post your tender (title, category, deadline, optional budget, deliverables).",
+        "Use Q/A to clarify specs or request revisions, without revealing identity.",
+        "Compare & shortlist side-by-side, then award the winner (identities reveal after award).",
+      ],
+    },
+    {
+      audience: "For bidders (suppliers)",
+      items: [
+        "Register & browse matching tenders.",
+        "Submit your bid (price, ETA, terms, attachments); update anytime before the deadline.",
+        "Negotiate privately until the tenderer awards; identities reveal post-award for contracting.",
+      ],
+    },
+  ];
+
+  return (
+    <section id="how-it-works-detailed" className="py-24 sm:py-32 bg-[#fbfbfd]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-16"
+        >
+          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-[#1d1d1f] mb-4">
+            How it works , step by step.
+          </h2>
+          <p className="text-xl text-[#6e6e73] max-w-2xl mx-auto">
+            Clear actions for both tenderers and bidders.
+          </p>
+        </motion.div>
+
+        <div className="grid md:grid-cols-2 gap-8">
+          {steps.map((s, i) => (
+            <motion.div
+              key={s.audience}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: i * 0.1 }}
+            >
+              <h3 className="text-2xl font-semibold text-[#1d1d1f] mb-6">
+                {s.audience}
+              </h3>
+              <ol className="space-y-4">
+                {s.items.map((item, idx) => (
+                  <li
+                    key={idx}
+                    className="flex items-start gap-3 text-base text-[#6e6e73]"
+                  >
+                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[#38b6ff] text-white text-sm font-medium flex items-center justify-center">
+                      {idx + 1}
+                    </span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ol>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ------------------------------ KeyFeatures ------------------------------- */
+function KeyFeatures() {
+  return (
+    <>
+      <section className="py-16 px-4 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-start">
+            {/* Left Column - Main Insight */}
+            <div className="flex-1 lg:max-w-md">
+              <div className="flex items-center gap-2 text-sm font-medium text-gray-600 mb-3">
+                <span className="inline-flex items-center justify-center w-6 h-6">
+                  <div className="w-full h-px bg-gray-400"></div>
+                </span>
+                <span>Insights</span>
+              </div>
+              <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4 leading-tight">
+                Navigate tender complexities with confidence
               </h2>
-              <p className="text-gray-700 text-lg">
-                Register & browse matching tenders. Submit your bid (price, ETA,
-                terms, attachments); update anytime before the deadline.
-                Negotiate privately until the tenderer awards; identities reveal
-                post-award for contracting.
+              <p className="text-base text-gray-600 mb-6 leading-relaxed">
+                Navigate the complexities of business bidding with confidence
+                and clarity.
               </p>
-            </div>
-            <div className="grid grid-cols-1 items-start justify-center gap-y-12 md:grid-cols-3 md:gap-x-8 md:gap-y-16 lg:gap-x-12">
-              {[
-                {
-                  title: "Register & browse",
-                  desc: "Register & browse matching tenders.",
-                },
-                {
-                  title: "Submit your bid",
-                  desc: "Submit your bid (price, ETA, terms, attachments); update anytime before the deadline.",
-                },
-                {
-                  title: "Negotiate & award",
-                  desc: "Negotiate privately until the tenderer awards; identities reveal post-award for contracting.",
-                },
-              ].map((item, index) => (
-                <div
-                  key={index}
-                  className="flex w-full flex-col items-center text-center"
-                >
-                  <div className="mb-5 md:mb-6">
-                    <img
-                      src="https://d22po4pjz3o32e.cloudfront.net/relume-icon.svg"
-                      alt="Relume logo 1"
-                      className="size-12 mx-auto"
-                    />
-                  </div>
-                  <h3 className="mb-5 text-2xl font-bold text-gray-900 md:mb-6 md:text-3xl md:leading-[1.3] lg:text-4xl">
-                    {item.title}
-                  </h3>
-                  <p className="text-gray-700">{item.desc}</p>
-                </div>
-              ))}
-            </div>
-            <div className="mt-10 flex items-center gap-4 md:mt-14 lg:mt-16">
-              <button className="focus:ring-blue-500 inline-flex gap-3 items-center justify-center whitespace-nowrap ring-offset-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-gray-300 text-gray-900 bg-white px-6 py-3 rounded-xl hover:bg-gray-50 hover:shadow-md">
-                Learn more
-              </button>
-              <button className="focus:ring-blue-500 inline-flex items-center justify-center whitespace-nowrap ring-offset-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border-0 text-gray-900 gap-2 p-0 hover:text-blue-600">
-                Get started
-                <svg
-                  stroke="currentColor"
-                  fill="none"
-                  stroke-width="0"
-                  viewBox="0 0 15 15"
-                  height="1em"
-                  width="1em"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    fillRule="evenodd"
-                    clipRule="evenodd"
-                    d="M6.1584 3.13508C6.35985 2.94621 6.67627 2.95642 6.86514 3.15788L10.6151 7.15788C10.7954 7.3502 10.7954 7.64949 10.6151 7.84182L6.86514 11.8418C6.67627 12.0433 6.35985 12.0535 6.1584 11.8646C5.95694 11.6757 5.94673 11.3593 6.1356 11.1579L9.565 7.49985L6.1356 3.84182C5.94673 3.64036 5.95694 3.32394 6.1584 3.13508Z"
-                    fill="currentColor"
-                  ></path>
-                </svg>
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonial Section */}
-      <section className="overflow-hidden px-[5%] py-16 md:py-24 lg:py-28 bg-gray-50">
-        <div className="container mx-auto">
-          <div
-            className="relative overflow-hidden"
-            role="region"
-            aria-roledescription="carousel"
-          >
-            <div className="relative pt-20 md:pb-20 md:pt-0">
-              <div>
-                <div className="flex ml-0">
-                  {testimonials.map((testimonial, index) => (
-                    <div
-                      key={index}
-                      role="group"
-                      aria-roledescription="slide"
-                      className={`min-w-0 shrink-0 grow-0 basis-full pl-0 transition-opacity duration-500 ${
-                        currentSlide === index
-                          ? "opacity-100"
-                          : "opacity-0 absolute"
-                      }`}
-                    >
-                      <div className="grid w-full auto-cols-fr grid-cols-1 items-center justify-center gap-12 md:grid-cols-2 md:gap-10 lg:gap-x-20">
-                        <div className="order-last md:order-first">
-                          <button
-                            type="button"
-                            aria-haspopup="dialog"
-                            aria-expanded="false"
-                            aria-controls={`radix-${index}`}
-                            data-state="closed"
-                            className="relative flex w-full items-center justify-center"
-                          >
-                            <img
-                              src="https://d22po4pjz3o32e.cloudfront.net/placeholder-video-thumbnail.svg"
-                              alt="Testimonial image 1"
-                              className="size-full object-cover rounded-lg"
-                            />
-                            <span className="absolute inset-0 z-10 bg-black/50 rounded-lg"></span>
-                            <svg
-                              stroke="currentColor"
-                              fill="currentColor"
-                              stroke-width="0"
-                              viewBox="0 0 512 512"
-                              className="absolute z-20 size-16 text-white"
-                              height="1em"
-                              width="1em"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path d="M0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zM188.3 147.1c-7.6 4.2-12.3 12.3-12.3 20.9V344c0 8.7 4.7 16.7 12.3 20.9s16.8 4.1 24.3-.5l144-88c7.1-4.4 11.5-12.1 11.5-20.5s-4.4-16.1-11.5-20.5l-144-88c-7.4-4.5-16.7-4.7-24.3-.5z"></path>
-                            </svg>
-                          </button>
-                        </div>
-                        <div className="flex flex-col items-start">
-                          <div className="mb-6 flex md:mb-8">
-                            {[...Array(5)].map((_, i) => (
-                              <svg
-                                key={i}
-                                stroke="currentColor"
-                                fill="currentColor"
-                                stroke-width="0"
-                                viewBox="0 0 24 24"
-                                className="size-6 text-yellow-400"
-                                height="1em"
-                                width="1em"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path d="M21.947 9.179a1.001 1.001 0 0 0-.868-.676l-5.701-.453-2.467-5.461a.998.998 0 0 0-1.822-.001L8.622 8.05l-5.701.453a1 1 0 0 0-.619 1.713l4.213 4.107-1.49 6.452a1 1 0 0 0 1.53 1.057L12 18.202l5.445 3.63a1.001 1.001 0 0 0 1.517-1.106l-1.829-6.4 4.536-4.082c.297-.268.406-.686.278-1.065z"></path>
-                              </svg>
-                            ))}
-                          </div>
-                          <blockquote className="text-2xl font-bold text-gray-900 md:text-3xl">
-                            {testimonial.quote}
-                          </blockquote>
-                          <div className="mt-6 flex flex-nowrap items-center gap-5 md:mt-8">
-                            <div>
-                              <p className="font-semibold text-gray-900">
-                                {testimonial.author}
-                              </p>
-                              <p className="text-gray-700">
-                                {testimonial.role}
-                              </p>
-                            </div>
-                            <div className="mx-4 w-px self-stretch bg-gray-200 sm:mx-0"></div>
-                            <div>
-                              <img
-                                src={testimonial.logo}
-                                alt="Webflow logo 1"
-                                className="max-h-12"
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div className="absolute top-0 flex w-full items-start justify-between md:bottom-0 md:top-auto md:items-end">
-                <div className="mt-2.5 flex w-full items-start justify-start md:mb-2.5 md:mt-0">
-                  {testimonials.map((_, index) => (
-                    <button
-                      key={index}
-                      className={`mx-[3px] inline-block size-2 rounded-full ${
-                        currentSlide === index ? "bg-blue-600" : "bg-gray-300"
-                      }`}
-                      onClick={() => setCurrentSlide(index)}
-                    ></button>
-                  ))}
-                </div>
-                <div className="flex items-end justify-end gap-2 md:gap-4">
-                  <button
-                    className="focus:ring-blue-500 inline-flex gap-3 items-center justify-center whitespace-nowrap ring-offset-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-gray-300 text-gray-900 rounded-full bg-white left-0 static right-0 top-0 size-12 -translate-y-0 hover:bg-gray-50"
-                    onClick={() =>
-                      setCurrentSlide((prev) =>
-                        prev === 0 ? testimonials.length - 1 : prev - 1
-                      )
-                    }
-                  >
-                    <svg
-                      stroke="currentColor"
-                      fill="none"
-                      stroke-width="0"
-                      viewBox="0 0 24 24"
-                      className="size-6"
-                      height="1em"
-                      width="1em"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path d="M12.707 17.293 8.414 13H18v-2H8.414l4.293-4.293-1.414-1.414L4.586 12l6.707 6.707z"></path>
-                    </svg>
-                    <span className="sr-only">Previous slide</span>
-                  </button>
-                  <button
-                    className="focus:ring-blue-500 inline-flex gap-3 items-center justify-center whitespace-nowrap ring-offset-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-gray-300 text-gray-900 rounded-full bg-white static right-0 top-0 size-12 -translate-y-0 hover:bg-gray-50"
-                    onClick={() =>
-                      setCurrentSlide((prev) =>
-                        prev === testimonials.length - 1 ? 0 : prev + 1
-                      )
-                    }
-                  >
-                    <svg
-                      stroke="currentColor"
-                      fill="none"
-                      stroke-width="0"
-                      viewBox="0 0 24 24"
-                      className="size-6"
-                      height="1em"
-                      width="1em"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path d="m11.293 17.293 1.414 1.414L19.414 12l-6.707-6.707-1.414 1.414L15.586 11H6v2h9.586z"></path>
-                    </svg>
-                    <span className="sr-only">Next slide</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ Section */}
-      <section className="px-[5%] py-16 md:py-24 lg:py-28 bg-white">
-        <div className="container mx-auto">
-          <div className="mb-12 w-full max-w-lg md:mb-18 lg:mb-20">
-            <h2 className="mb-5 text-4xl font-bold text-gray-900 md:mb-6 md:text-5xl lg:text-6xl">
-              FAQs
-            </h2>
-            <p className="text-gray-700 text-lg">
-              Frequently asked questions about the Tenderly platform and how to
-              get started.
-            </p>
-          </div>
-
-          <div className="space-y-4">
-            {faqs.map((faq, index) => (
-              <div
-                key={index}
-                className="border border-gray-200 rounded-2xl overflow-hidden"
-              >
-                <button
-                  className="w-full p-6 text-left flex justify-between items-center bg-gray-50 hover:bg-gray-100 transition-colors"
-                  onClick={() => setActiveTab(index === activeTab ? -1 : index)}
-                >
-                  <span className="font-semibold text-gray-900">
-                    {faq.question}
-                  </span>
+              <div className="flex gap-3">
+                <button className="px-5 py-2.5 border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors">
+                  Explore
+                </button>
+                <button className="px-5 py-2.5 border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors flex items-center gap-2">
+                  Learn
                   <svg
-                    className={`w-5 h-5 text-gray-600 transform transition-transform ${
-                      activeTab === index ? "rotate-180" : ""
-                    }`}
+                    className="w-4 h-4"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
                   >
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M19 9l-7 7-7-7"
-                    ></path>
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
+                    />
                   </svg>
                 </button>
-                <div
-                  className={`overflow-hidden transition-all duration-500 ${
-                    activeTab === index
-                      ? "max-h-96 opacity-100"
-                      : "max-h-0 opacity-0"
-                  }`}
+              </div>
+            </div>
+
+            {/* Right Column - Feature Cards */}
+            <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Card 1 */}
+              <div className="bg-white p-6 rounded-lg hover:shadow-sm transition-shadow">
+                <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mb-4">
+                  <HelpCircle className="w-6 h-6 text-gray-700" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  Your tender questions answered
+                </h3>
+                <p className="text-sm text-gray-600 leading-relaxed">
+                  Navigate the complexities of business bidding with confidence
+                  and clarity.
+                </p>
+              </div>
+
+              {/* Card 2 */}
+              <div className="bg-white p-6 rounded-lg  hover:shadow-sm transition-shadow">
+                <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mb-4">
+                  <BookOpen className="w-6 h-6 text-gray-700" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  Streamline your tendering process
+                </h3>
+                <p className="text-sm text-gray-600 leading-relaxed">
+                  Our platform provides intuitive tools that simplify complex
+                  procurement workflows and reduce administrative burden.
+                </p>
+              </div>
+
+              {/* Card 3 */}
+              <div className="bg-white p-6 rounded-lg  hover:shadow-sm transition-shadow">
+                <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mb-4">
+                  <Shield className="w-6 h-6 text-gray-700" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  Secure and transparent
+                </h3>
+                <p className="text-sm text-gray-600 leading-relaxed">
+                  We ensure complete confidentiality and verification for every
+                  interaction, protecting your business interests.
+                </p>
+              </div>
+
+              {/* Card 4 */}
+              <div className="bg-white p-6 rounded-lg  hover:shadow-sm transition-shadow">
+                <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mb-4">
+                  <Zap className="w-6 h-6 text-gray-700" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  Secure your competitive edge
+                </h3>
+                <p className="text-sm text-gray-600 leading-relaxed">
+                  Streamline your bidding strategy with intelligent tools and
+                  expert support.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}
+
+/* ------------------------------- Pricing ---------------------------------- */
+function Pricing() {
+  return (
+    <section id="pricing" className="py-24 sm:py-32 bg-[#fbfbfd]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-16"
+        >
+          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-[#1d1d1f] mb-4">
+            Free to post. Free to bid.
+          </h2>
+          <p className="text-xl text-[#6e6e73] max-w-2xl mx-auto">
+            We’re just the platform: No involvement in contracts, custody, or
+            payments.
+          </p>
+        </motion.div>
+
+        <div className="max-w-md mx-auto">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="bg-white rounded-[32px] p-12 border-2 border-[#38b6ff] text-center"
+          >
+            <div className="text-6xl font-bold text-[#38b6ff] mb-2">Free</div>
+            <p className="text-lg text-[#6e6e73] mb-8">
+              Unlimited posts and bids. No hidden fees.
+            </p>
+            <button className="w-full h-14 bg-[#38b6ff] hover:bg-[#0077ed] text-white rounded-xl font-medium">
+              Post your first tender
+            </button>
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ----------------------------- Testimonials ------------------------------- */
+function Testimonials() {
+  return (
+    <div className="bg-white py-16 px-8">
+      <div className="max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 items-start gap-12">
+          {/* Left Image */}
+          <div className="w-full h-full bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden">
+            <div className="relative w-full h-[600px]">
+              <Image
+                src="https://www.shutterstock.com/image-photo/positive-handsome-arabic-businessman-beard-600nw-2510267591.jpg"
+                alt="Arabic businessman smiling in office"
+                fill
+                className="object-cover rounded-lg"
+                sizes="(max-width: 768px) 100vw, 50vw"
+              />
+            </div>
+          </div>
+
+          {/* Right Content */}
+          <div className="flex flex-col justify-between h-full">
+            {/* Centered Content */}
+            <div className="flex flex-col justify-center flex-1">
+              {/* Star Rating */}
+              <div className="flex gap-1 mb-6">
+                {[...Array(5)].map((_, i) => (
+                  <svg
+                    key={i}
+                    className="w-5 h-5 text-gray-900"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                ))}
+              </div>
+
+              {/* Quote */}
+              <p className="text-3xl leading-relaxed text-gray-900 mb-6 text-center md:text-left">
+                “Our tender platform cut through bureaucratic barriers like a
+                sharp knife through paper. We won contracts we never thought
+                possible.”
+              </p>
+
+              {/* Author */}
+              <div className="flex items-center justify-center md:justify-start gap-4">
+                <div>
+                  <p className="font-medium text-lg text-gray-900">
+                    Michael Roberts
+                  </p>
+                  <p className="text-md text-gray-600">
+                    CEO, Global Construction
+                  </p>
+                </div>
+                <div className="flex items-center">
+                  <span className="text-gray-900 text-5xl mx-3">|</span>
+                  <svg
+                    className="w-auto h-full text-gray-900"
+                    viewBox="0 0 80 20"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M0 10L5 10L10 5L15 15L20 0L25 10L30 10L35 5L40 15L45 0L50 10L55 10L60 5L65 15L70 0L75 10L80 10"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    />
+                  </svg>
+                  <span className="ml-1 text-sm font-medium text-gray-900">
+                    Webflow
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom Navigation */}
+            <div className="flex items-center justify-between mt-12">
+              <div className="flex gap-2">
+                <div className="w-2 h-2 bg-gray-900 rounded-full"></div>
+                <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
+                <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
+              </div>
+
+              <div className="flex gap-2">
+                <button className="p-2 border border-gray-300 rounded-md hover:bg-gray-50 transition">
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 19l-7-7 7-7"
+                    />
+                  </svg>
+                </button>
+                <button className="p-2 border border-gray-300 rounded-md hover:bg-gray-50 transition">
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* --------------------------------- FAQ ------------------------------------ */
+function FAQ() {
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const faqs = [
+    {
+      question: "I’m not sure how to write requirements.",
+      answer:
+        "Use Tenderly’s Q/A feature: bidders and tenderers can ask and answer clarifying questions on the tender page to surface any unknown or missing details (scope, deliverables, timeline, acceptance criteria). This keeps everything transparent, comparable, and helps you receive accurate quotes, no guided templates needed.",
+    },
+    {
+      question: "What is Tenderly?",
+      answer:
+        "Qatar’s open tender platform. Post projects, get bids, pick the best.",
+    },
+    {
+      question: "Is it really anonymous?",
+      answer:
+        "Yes. Your profile and contact details are hidden until you choose a winner. After award, both parties can share details.",
+    },
+    {
+      question: "Who can bid?",
+      answer: "Registered companies only.",
+    },
+    {
+      question: "How do I post?",
+      answer:
+        "Register → create a new tender and publish → view bids and award.",
+    },
+    {
+      question: "Any fees?",
+      answer: "No. Posting and bidding are free.",
+    },
+    {
+      question: "Do you handle contracts or payments?",
+      answer:
+        "No. We’re a neutral platform. You finalize contracts and payments directly with the other party.",
+    },
+    {
+      question: "Who can use Tenderly?",
+      answer: "Anyone, individuals and businesses of any size.",
+    },
+    {
+      question: "What categories are allowed?",
+      answer: "Anything.",
+    },
+  ];
+
+  const toggleFAQ = (i: number) => setOpenIndex(openIndex === i ? null : i);
+
+  return (
+    <section id="faq" className="py-24 sm:py-32 bg-[#fbfbfd]">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-16"
+        >
+          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-[#1d1d1f] mb-4">
+            Frequently asked.
+          </h2>
+          <p className="text-xl text-[#6e6e73]">
+            Got questions? We’ve got answers.
+          </p>
+        </motion.div>
+
+        <div className="space-y-4">
+          {faqs.map((faq, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.45, delay: i * 0.05 }}
+            >
+              <button
+                onClick={() => toggleFAQ(i)}
+                className="w-full bg-white rounded-[20px] p-6 border border-[#d2d2d7] hover:border-[#38b6ff]/30 transition-all text-left"
+              >
+                <div className="flex items-center justify-between gap-4">
+                  <h3 className="text-lg font-semibold text-[#1d1d1f] pr-8">
+                    {faq.question}
+                  </h3>
+                  <motion.div
+                    animate={{ rotate: openIndex === i ? 180 : 0 }}
+                    transition={{ duration: 0.28 }}
+                  >
+                    {openIndex === i ? (
+                      <Minus className="w-5 h-5 text-[#38b6ff]" />
+                    ) : (
+                      <Plus className="w-5 h-5 text-[#38b6ff]" />
+                    )}
+                  </motion.div>
+                </div>
+
+                <AnimatePresence>
+                  {openIndex === i && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.28 }}
+                      className="overflow-hidden"
+                    >
+                      <p className="text-[#6e6e73] leading-relaxed mt-4 pr-8">
+                        {faq.answer}
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </button>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* --------------------------------- CTA ------------------------------------ */
+function CTA() {
+  return (
+    <section className="py-24 sm:py-32 bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+        >
+          <div className="relative overflow-hidden bg-gradient-to-br from-[#38b6ff] to-[#0077ed] rounded-[48px] p-12 sm:p-16 lg:p-20">
+            <div className="relative z-10 max-w-3xl mx-auto text-center">
+              <motion.h2
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-white mb-6 leading-tight"
+              >
+                Get better quotes without the back-and-forth.
+              </motion.h2>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+                className="flex flex-col sm:flex-row items-center justify-center gap-4"
+              >
+                <motion.a
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  href="/post"
+                  className="bg-white text-[#38b6ff] hover:bg-white/90 rounded-full px-8 h-14 text-lg font-medium shadow-lg flex items-center gap-2"
                 >
-                  <div className="p-6 bg-white">
-                    <p className="text-gray-700">{faq.answer}</p>
+                  Post your tender for free <ArrowRight className="w-5 h-5" />
+                </motion.a>
+              </motion.div>
+
+              <motion.p
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.5 }}
+                className="text-sm text-white/70 mt-8"
+              >
+                Anonymous until award • No fees • Takes ~2 minutes
+              </motion.p>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
+/* -------------------------------- Footer ---------------------------------- */
+function Footer() {
+  const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
+
+  const footerLinks = {
+    platform: [
+      { name: "How it works", href: "#how-it-works" },
+      { name: "Use cases", href: "#use-cases" },
+      { name: "FAQ", href: "#faq" },
+    ],
+    company: [
+      { name: "About", href: "#about" },
+      { name: "Contact", href: "#contact" },
+    ],
+    legal: [
+      { name: "Privacy", href: "#privacy" },
+      { name: "Terms", href: "#terms" },
+    ],
+  };
+
+  return (
+    <footer className="bg-white border-t border-gray-200">
+      <div className="max-w-screen-2xl mx-auto px-6 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
+          {/* Left Column - Logo, Location, Contact */}
+          <div className="flex flex-col">
+            <span className="text-sm font-medium text-gray-900 mb-4">Logo</span>
+
+            <div className="space-y-4 text-sm text-gray-600">
+              <p className="font-semibold text-gray-900">Location</p>
+              <p>Level 1, 123 Innovation Drive, Sydney NSW 2000</p>
+
+              <p className="font-semibold text-gray-900 mt-6">Connect</p>
+              <p>1800 tender help@hello@tenderplatform.com</p>
+            </div>
+
+            <div className="flex space-x-4 mt-6">
+              <Facebook className="w-5 h-5 text-gray-600 cursor-pointer hover:text-blue-600" />
+              <Instagram className="w-5 h-5 text-gray-600 cursor-pointer hover:text-pink-600" />
+              <Twitter className="w-5 h-5 text-gray-600 cursor-pointer hover:text-blue-400" />
+              <Linkedin className="w-5 h-5 text-gray-600 cursor-pointer hover:text-blue-700" />
+              <Youtube className="w-5 h-5 text-gray-600 cursor-pointer hover:text-red-600" />
+            </div>
+          </div>
+
+          {/* Right Column - Links */}
+          <div className="grid grid-cols-2 gap-x-12 gap-y-6 text-sm">
+            <div>
+              <p className="font-semibold text-gray-900 mb-3">
+                Platform insights
+              </p>
+              <ul className="space-y-2 text-gray-600">
+                <li className="hover:text-gray-900 cursor-pointer">
+                  Industry guides
+                </li>
+                <li className="hover:text-gray-900 cursor-pointer">
+                  Case studies
+                </li>
+                <li className="hover:text-gray-900 cursor-pointer">
+                  Integration docs
+                </li>
+                <li className="hover:text-gray-900 cursor-pointer">
+                  Support center
+                </li>
+              </ul>
+            </div>
+
+            <div>
+              <p className="font-semibold text-gray-900 mb-3">About mission</p>
+              <ul className="space-y-2 text-gray-600">
+                <li className="hover:text-gray-900 cursor-pointer">
+                  Our story
+                </li>
+                <li className="hover:text-gray-900 cursor-pointer">
+                  Join team
+                </li>
+                <li className="hover:text-gray-900 cursor-pointer">
+                  Media kit
+                </li>
+                <li className="hover:text-gray-900 cursor-pointer">
+                  Get in touch
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Bar */}
+        <div className="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-gray-200 text-sm text-gray-600">
+          <div>© 2024 Tender Platform. All rights reserved.</div>
+          <div className="flex space-x-6 mt-4 md:mt-0">
+            <span className="hover:text-gray-900 cursor-pointer">
+              Privacy policy
+            </span>
+            <span className="hover:text-gray-900 cursor-pointer">
+              Terms of service
+            </span>
+            <span className="hover:text-gray-900 cursor-pointer">
+              Cookies settings
+            </span>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+const features = [
+  {
+    icon: MessageSquare,
+    title: "One-to-many quote generation",
+    description:
+      "Instantly reach multiple qualified vendors with a single tender submission",
+  },
+  {
+    icon: Users,
+    title: "Private negotiation platform",
+    description: "Secure communication channel for direct vendor interactions",
+  },
+  {
+    icon: Shield,
+    title: "Anonymity by default",
+    description: "Protect sensitive information until you're ready to award",
+  },
+  {
+    icon: Award,
+    title: "Trusted profiles",
+    description: "Verified business credentials ensure quality and reliability",
+  },
+];
+
+function Features() {
+  return (
+    <section className="self-stretch px-16 py-28 bg-Color-Scheme-1-Background flex flex-col justify-start items-center gap-20 overflow-hidden">
+      <div className="w-full max-w-[1280px] flex flex-col justify-start items-start gap-20">
+        <div className="w-full max-w-[768px] flex flex-col justify-start items-start gap-4">
+          <div className="flex justify-start items-center">
+            <span className="text-Color-Scheme-1-Text text-base font-semibold font-inter leading-6">
+              Features
+            </span>
+          </div>
+          <div className="self-stretch flex flex-col justify-start items-start gap-6">
+            <h2 className="self-stretch text-Color-Scheme-1-Text text-5xl font-medium font-outfit leading-[62.40px]">
+              Powerful tools for seamless tendering
+            </h2>
+            <p className="self-stretch text-Color-Scheme-1-Text text-lg font-normal font-inter leading-7">
+              Designed to simplify your procurement and bidding experience
+            </p>
+          </div>
+        </div>
+
+        <div className="self-stretch flex flex-col justify-start items-start gap-16">
+          <div className="self-stretch flex justify-start items-start gap-8">
+            {features.map((feature, index) => {
+              const Icon = feature.icon;
+              return (
+                <div
+                  key={index}
+                  className="flex-1 flex flex-col justify-start items-start gap-6"
+                >
+                  <div className="w-12 h-12 flex items-center justify-center">
+                    <Icon size={40} className="text-Color-Scheme-1-Text" />
                   </div>
+                  <div className="self-stretch flex flex-col justify-start items-start gap-4">
+                    <h3 className="self-stretch text-Color-Scheme-1-Text text-3xl font-medium font-outfit leading-10">
+                      {feature.title}
+                    </h3>
+                    <p className="self-stretch text-Color-Scheme-1-Text text-base font-normal font-inter leading-6">
+                      {feature.description}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="flex justify-start items-center gap-6">
+          <button className="px-3 py-1.5 bg-Opacity-Neutral-Darkest-5 outline outline-1 outline-Opacity-Transparent text-Color-Neutral-Darkest text-base font-medium font-inter leading-6 hover:bg-opacity-70 transition-all overflow-hidden">
+            Learn more
+          </button>
+          <button className="flex justify-center items-center gap-2 text-Color-Neutral-Darkest text-base font-medium font-inter leading-6 hover:gap-3 transition-all overflow-hidden">
+            <span>Explore</span>
+            <ArrowRight size={20} />
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function About() {
+  return (
+    <section className="px-6 py-16 md:px-16 md:py-28 bg-Color-Scheme-1-Background">
+      <div className="max-w-7xl mx-auto">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-start">
+          {/* Text Content */}
+          <div className="flex flex-col gap-8">
+            {/* Header */}
+            <div className="flex flex-col gap-6">
+              <span className="text-Color-Scheme-1-Text text-base font-semibold font-inter leading-6">
+                Tender
+              </span>
+              <h2 className="text-4xl md:text-5xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight md:leading-[62.4px]">
+                Solve the friction of finding and awarding local vendors
+              </h2>
+              <p className="text-lg font-normal font-inter text-Color-Scheme-1-Text leading-7">
+                Streamline your procurement process with a platform designed for
+                Qatar's dynamic market.
+              </p>
+            </div>
+
+            {/* For Tenderers & Bidders */}
+            <div className="grid sm:grid-cols-2 gap-8 py-4">
+              <div className="flex flex-col gap-3">
+                <h3 className="text-xl font-medium font-outfit text-Color-Scheme-1-Text leading-8">
+                  For tenderers
+                </h3>
+                <p className="text-base font-normal font-inter text-Color-Scheme-1-Text leading-6">
+                  Cut through complexity. Get precise bids from verified local
+                  professionals without endless email chains.
+                </p>
+              </div>
+              <div className="flex flex-col gap-3">
+                <h3 className="text-xl font-medium font-outfit text-Color-Scheme-1-Text leading-8">
+                  For bidders
+                </h3>
+                <p className="text-base font-normal font-inter text-Color-Scheme-1-Text leading-6">
+                  Access quality projects directly. Showcase your skills to the
+                  right clients with transparent, structured opportunities.
+                </p>
+              </div>
+            </div>
+
+            {/* CTA Buttons */}
+            <div className="flex flex-wrap items-center gap-4">
+              <button className="px-4 py-2 bg-Opacity-Neutral-Darkest-5 outline outline-1 outline-Opacity-Transparent text-Color-Neutral-Darkest text-base font-medium font-inter leading-6 rounded-md hover:bg-opacity-70 transition-all">
+                Learn more
+              </button>
+              <button className="flex items-center gap-2 text-Color-Neutral-Darkest text-base font-medium font-inter leading-6 hover:gap-3 transition-all">
+                <span>Get started</span>
+                <ArrowRight size={20} />
+              </button>
+            </div>
+          </div>
+
+          {/* Image */}
+          <div className="hidden lg:block">
+            <img
+              src="https://images.pexels.com/photos/3184338/pexels-photo-3184338.jpeg?auto=compress&cs=tinysrgb&w=600&h=640"
+              alt="Professional workspace"
+              className="w-full h-[540px] md:h-[600px] object-cover rounded-lg shadow-lg"
+            />
+          </div>
+        </div>
+
+        {/* Mobile Image (optional - show below on small screens) */}
+        <div className="lg:hidden mt-12">
+          <img
+            src="https://images.pexels.com/photos/3184338/pexels-photo-3184338.jpeg?auto=compress&cs=tinysrgb&w=600&h=640"
+            alt="Professional workspace"
+            className="w-full h-80 object-cover rounded-lg shadow-md"
+          />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+const smallServices = [
+  {
+    title: "Automotive services",
+    description: "Connect with mechanics, dealers, and auto specialists",
+    linkText: "Browse",
+    bgImage:
+      "https://images.pexels.com/photos/279949/pexels-photo-279949.jpeg?auto=compress&cs=tinysrgb&w=600",
+  },
+  {
+    title: "Events and hospitality",
+    description:
+      "Source vendors for conferences, weddings, and corporate events",
+    linkText: "View details",
+    bgImage:
+      "https://images.pexels.com/photos/1190298/pexels-photo-1190298.jpeg?auto=compress&cs=tinysrgb&w=600",
+  },
+  {
+    title: "Construction solutions",
+    description:
+      "Find contractors, suppliers, and specialized construction services",
+    linkText: "Compare now",
+    bgImage:
+      "https://images.pexels.com/photos/1216589/pexels-photo-1216589.jpeg?auto=compress&cs=tinysrgb&w=600",
+  },
+  {
+    title: "Facilities management",
+    description:
+      "Streamline maintenance and operational support for businesses",
+    linkText: "Get started",
+    bgImage:
+      "https://images.pexels.com/photos/416405/pexels-photo-416405.jpeg?auto=compress&cs=tinysrgb&w=600",
+  },
+];
+
+function Services() {
+  return (
+    <section className="px-6 py-16 md:px-16 md:py-28 bg-Color-Scheme-1-Background">
+      <div className="max-w-7xl mx-auto">
+        {/* ---------- Header ---------- */}
+        <div className="max-w-3xl mx-auto text-center mb-12 md:mb-16">
+          <span className="text-Color-Scheme-1-Text text-base font-semibold font-inter leading-6">
+            Services
+          </span>
+          <h2 className="mt-3 text-4xl md:text-5xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight md:leading-[62.4px]">
+            Tenders across Qatar's key industries
+          </h2>
+          <p className="mt-4 text-lg font-normal font-inter text-Color-Scheme-1-Text leading-7">
+            Find the right solution for every project need
+          </p>
+        </div>
+
+        {/* ---------- Layout: Large + Grid of 4 ---------- */}
+        <div className="grid lg:grid-cols-2 gap-8">
+          {/* Large Card (Individuals) */}
+          <div
+            className="group relative h-[500px] md:h-full p-8 md:p-12 rounded-xl overflow-hidden
+                       bg-cover bg-center transition-transform hover:scale-[1.01]"
+            style={{
+              backgroundImage: `
+                linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.7)),
+                url('https://images.pexels.com/photos/4246120/pexels-photo-4246120.jpeg?auto=compress&cs=tinysrgb&w=800')
+              `,
+            }}
+          >
+            <div className="flex flex-col justify-end h-full gap-6 text-white">
+              <div>
+                <span className="text-sm md:text-base font-semibold font-inter uppercase tracking-wider opacity-90">
+                  Individuals
+                </span>
+                <h3 className="mt-1 text-4xl md:text-5xl font-medium font-outfit leading-tight">
+                  Home services and personal projects
+                </h3>
+                <p className="mt-3 text-base md:text-lg font-normal font-inter leading-relaxed opacity-95">
+                  Quickly find skilled professionals for home repairs,
+                  renovations, and personal tasks
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-4">
+                <button className="px-5 py-2.5 bg-white/10 backdrop-blur-sm border border-white/20 text-white text-base font-medium rounded-md hover:bg-white/20 transition-all">
+                  See sample tender
+                </button>
+                <button className="flex items-center gap-2 text-white text-base font-normal hover:gap-3 transition-all">
+                  <span>Explore</span>
+                  <ArrowRight
+                    size={20}
+                    className="transition-transform group-hover:translate-x-1"
+                  />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Small Cards Grid (2x2) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {smallServices.map((service, idx) => (
+              <div
+                key={idx}
+                className="group relative h-72 md:h-80 p-6 rounded-xl overflow-hidden bg-cover bg-center
+                           transition-transform hover:scale-[1.03] shadow-lg"
+                style={{
+                  backgroundImage: `
+                    linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.65)),
+                    url('${service.bgImage}')
+                  `,
+                }}
+              >
+                <div className="flex flex-col justify-between h-full text-white">
+                  <div className="flex flex-col gap-4">
+                    <div className="w-12 h-12 flex items-center justify-center rounded-full bg-white/10 backdrop-blur-sm">
+                      <Briefcase size={28} className="text-white" />
+                    </div>
+                    <div>
+                      <h4 className="text-2xl md:text-3xl font-medium font-outfit leading-tight">
+                        {service.title}
+                      </h4>
+                      <p className="mt-2 text-sm md:text-base font-normal font-inter leading-relaxed opacity-95">
+                        {service.description}
+                      </p>
+                    </div>
+                  </div>
+
+                  <button className="flex items-center gap-2 text-white text-sm md:text-base font-normal hover:gap-3 transition-all mt-4">
+                    <span>{service.linkText}</span>
+                    <ArrowRight
+                      size={18}
+                      className="transition-transform group-hover:translate-x-1"
+                    />
+                  </button>
                 </div>
               </div>
             ))}
           </div>
+        </div>
+      </div>
+    </section>
+  );
+}
 
-          <div className="mt-12 md:mt-18 lg:mt-20">
-            <h4 className="mb-3 text-2xl font-bold text-gray-900 md:mb-4 md:text-3xl md:leading-[1.3] lg:text-4xl">
-              Still have questions?
-            </h4>
-            <p className="text-gray-700 text-lg">
-              Contact our support team for more information.
-            </p>
-            <div className="mt-6 md:mt-8">
-              <button className="focus:ring-blue-500 inline-flex gap-3 items-center justify-center whitespace-nowrap ring-offset-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-gray-300 text-gray-900 bg-white px-6 py-3 rounded-xl hover:bg-gray-50 hover:shadow-md">
-                Contact
+const features2 = [
+  ["Unlimited tender postings", "Basic vendor matching"],
+  ["Standard support", "Community access"],
+  ["Email notifications", "Basic profile"],
+  ["Community forums", "Standard security"],
+  ["Mobile access", "Basic analytics"],
+];
+const pricingData = {
+  free: {
+    title: "Basic tender posting",
+    description: "Perfect for individual and small business needs",
+    price: "$0",
+    features: [
+      ["Post up to 3 tenders per month", "Receive up to 10 bids per tender"],
+      ["Basic project specifications", "Email support"],
+      ["Standard response time", "Public tender visibility"],
+    ],
+    cta: "Start now",
+  },
+  always: {
+    title: "Unlimited tendering",
+    description: "For growing teams and frequent procurement needs",
+    price: "$49",
+    features: [
+      ["Unlimited tender posts", "Unlimited bids received"],
+      ["Advanced specs & attachments", "Priority email + chat support"],
+      ["24-hour response SLA", "Private & public tenders"],
+      ["Team collaboration", "Analytics dashboard"],
+    ],
+    cta: "Start free trial",
+  },
+};
+
+function Pricing2() {
+  const [activeTab, setActiveTab] = useState<"free" | "always">("free");
+  const plan = pricingData[activeTab];
+  return (
+    <section className="px-6 py-16 md:px-16 md:py-28 bg-Color-Scheme-1-Background">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="max-w-3xl mx-auto text-center mb-12 md:mb-16">
+          <span className="text-Color-Scheme-1-Text text-base font-semibold font-inter leading-6">
+            Pricing
+          </span>
+          <h2 className="mt-3 text-4xl md:text-5xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight md:leading-[62.4px]">
+            Simple transparent pricing
+          </h2>
+          <p className="mt-4 text-lg font-normal font-inter text-Color-Scheme-1-Text leading-7">
+            No hidden costs, no commitments
+          </p>
+        </div>
+
+        {/* Pricing Card */}
+        <div className="max-w-3xl mx-auto">
+          <div
+            className="p-8 md:p-10 bg-Color-Scheme-1-Foreground rounded-2xl border border-Color-Scheme-1-Border/20
+                         "
+          >
+            {/* Header */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-full bg-Color-Matisse/10 flex items-center justify-center flex-shrink-0">
+                  <Check size={28} className="text-Color-Matisse" />
+                </div>
+                <div>
+                  <h3 className="text-3xl md:text-4xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight">
+                    {plan.title}
+                  </h3>
+                  <p className="mt-1 text-base font-normal font-inter text-Color-Scheme-1-Text/80 leading-6">
+                    {plan.description}
+                  </p>
+                </div>
+              </div>
+
+              <div className="text-right">
+                <div className="text-6xl md:text-7xl font-medium font-outfit text-Color-Scheme-1-Text leading-none">
+                  {plan.price}
+                </div>
+                {activeTab === "always" && (
+                  <div className="text-sm font-normal font-inter text-Color-Scheme-1-Text/70 mt-1">
+                    per month
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <hr className="border-t border-Color-Scheme-1-Border/20 mb-8" />
+
+            {/* Features */}
+            <div className="mb-8">
+              <p className="text-base font-normal font-inter text-Color-Scheme-1-Text mb-4">
+                Includes
+              </p>
+              <div className="space-y-4">
+                {plan.features.map((row, rowIdx) => (
+                  <div key={rowIdx} className="flex gap-6">
+                    {row.map((feature, colIdx) => (
+                      <div
+                        key={colIdx}
+                        className="flex-1 flex items-start gap-3"
+                      >
+                        <Check
+                          size={20}
+                          className="text-Color-Matisse flex-shrink-0 mt-0.5"
+                        />
+                        <span className="text-base font-normal font-inter text-Color-Scheme-1-Text leading-6">
+                          {feature}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <hr className="border-t border-Color-Scheme-1-Border/20 mb-8" />
+
+            {/* CTA */}
+            <button
+              className="w-full px-6 py-3 bg-Color-Matisse text-Color-White text-base font-medium font-inter
+                               rounded-lg hover:bg-Color-Matisse/90 transition-all flex items-center justify-center gap-2
+                               "
+            >
+              <span>{plan.cta}</span>
+              {activeTab === "always" && <ArrowRight size={20} />}
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+function CTA2() {
+  return (
+    <section className="self-stretch px-16 py-28 bg-Color-Scheme-1-Background flex flex-col justify-start items-center gap-20 overflow-hidden">
+      <div className="w-full max-w-[1280px] flex flex-col justify-start items-start gap-20">
+        <div className="self-stretch p-16 bg-Color-Scheme-1-Foreground outline outline-1 outline-offset-[-1px] outline-Color-Scheme-1-Border/20 flex flex-col justify-center items-center gap-2">
+          <div className="w-full max-w-[768px] flex flex-col justify-start items-center gap-8">
+            <div className="self-stretch flex flex-col justify-start items-center gap-6">
+              <h2 className="self-stretch text-center text-Color-Scheme-1-Text text-5xl font-medium font-outfit leading-[62.40px]">
+                Get better quotes faster
+              </h2>
+              <p className="self-stretch text-center text-Color-Scheme-1-Text text-lg font-normal font-inter leading-7">
+                Simplify your procurement process with instant, transparent
+                bidding
+              </p>
+            </div>
+            <div className="flex justify-start items-start gap-4">
+              <button className="px-3 py-1.5 bg-Color-Matisse outline outline-1 outline-Color-Matisse text-Color-White text-base font-medium font-inter leading-6 hover:bg-opacity-90 transition-all">
+                Post tender
+              </button>
+              <button className="px-3 py-1.5 bg-Opacity-Neutral-Darkest-5 outline outline-1 outline-Opacity-Transparent text-Color-Neutral-Darkest text-base font-medium font-inter leading-6 hover:bg-opacity-70 transition-all">
+                Browse tenders
               </button>
             </div>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
+  );
+}
+const faqs = [
+  {
+    question: "How does Gotenderly work?",
+    answer:
+      "Gotenderly connects businesses and service providers through a simple, transparent tender process. Post your project, receive bids, and select the best vendor quickly and securely.",
+  },
+  {
+    question: "Is posting a tender free?",
+    answer:
+      "Yes, posting tenders is completely free for all users. We believe in removing barriers to finding great local talent.",
+  },
+  {
+    question: "How long do tenders remain open?",
+    answer:
+      "Tenders typically remain open for 7-14 days, depending on the project complexity. You can adjust the deadline when posting.",
+  },
+  {
+    question: "Are vendors verified?",
+    answer:
+      "We conduct basic verification for all vendors and provide transparent profiles to help you make informed decisions.",
+  },
+  {
+    question: "Can I communicate with bidders?",
+    answer:
+      "Our platform offers secure, private messaging to discuss project details directly with potential vendors.",
+  },
+];
 
-      {/* How It Works Section: How It Works */}
-      <section className="px-[5%] py-16 md:py-24 lg:py-28 bg-gray-50">
-        <div className="container mx-auto">
-          <div className="mb-12 md:mb-18 lg:mb-20">
-            <div className="mx-auto max-w-lg text-center">
-              <p className="mb-3 font-semibold md:mb-4 text-blue-600 text-lg">
-                Process
-              </p>
-              <h2 className="mb-5 text-4xl font-bold text-gray-900 md:mb-6 md:text-5xl lg:text-6xl">
-                How It Works
-              </h2>
-              <p className="text-gray-700 text-lg">
-                Learn how to use the Tenderly platform to post tenders or submit
-                bids.
-              </p>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 gap-6 md:gap-8">
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:gap-8 lg:grid-cols-4">
-              <div className="flex flex-col border border-gray-200 rounded-2xl overflow-hidden bg-white hover:shadow-lg transition-shadow duration-300">
-                <div className="flex items-center justify-center bg-gray-50 p-6">
-                  <img
-                    src="https://d22po4pjz3o32e.cloudfront.net/placeholder-image-landscape.svg"
-                    alt="Relume placeholder image 1"
-                    className="w-full object-cover rounded-lg"
-                  />
-                </div>
-                <div className="flex flex-col justify-center p-6">
-                  <div>
-                    <p className="mb-2 text-sm font-semibold text-blue-600">
-                      Step 1
-                    </p>
-                    <h3 className="mb-2 text-xl font-bold text-gray-900 md:text-2xl">
-                      Sign up
-                    </h3>
-                    <p className="text-gray-700">
-                      Create an account as a tenderer or bidder.
-                    </p>
-                  </div>
-                  <div className="mt-5 flex items-center gap-4 md:mt-6">
-                    <button className="focus:ring-blue-500 inline-flex items-center justify-center whitespace-nowrap ring-offset-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border-0 text-gray-900 gap-2 p-0 hover:text-blue-600">
-                      Learn
-                      <svg
-                        stroke="currentColor"
-                        fill="none"
-                        stroke-width="0"
-                        viewBox="0 0 15 15"
-                        height="1em"
-                        width="1em"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          clipRule="evenodd"
-                          d="M6.1584 3.13508C6.35985 2.94621 6.67627 2.95642 6.86514 3.15788L10.6151 7.15788C10.7954 7.3502 10.7954 7.64949 10.6151 7.84182L6.86514 11.8418C6.67627 12.0433 6.35985 12.0535 6.1584 11.8646C5.95694 11.6757 5.94673 11.3593 6.1356 11.1579L9.565 7.49985L6.1356 3.84182C5.94673 3.64036 5.95694 3.32394 6.1584 3.13508Z"
-                          fill="currentColor"
-                        ></path>
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <div className="flex flex-col border border-gray-200 rounded-2xl overflow-hidden bg-white hover:shadow-lg transition-shadow duration-300">
-                <div className="flex items-center justify-center bg-gray-50 p-6">
-                  <img
-                    src="https://d22po4pjz3o32e.cloudfront.net/placeholder-image-landscape.svg"
-                    alt="Relume placeholder image 2"
-                    className="w-full object-cover rounded-lg"
-                  />
-                </div>
-                <div className="flex flex-col justify-center p-6">
-                  <div>
-                    <p className="mb-2 text-sm font-semibold text-blue-600">
-                      Step 2
-                    </p>
-                    <h3 className="mb-2 text-xl font-bold text-gray-900 md:text-2xl">
-                      Post or browse
-                    </h3>
-                    <p className="text-gray-700">
-                      Post your tender or browse available tenders.
-                    </p>
-                  </div>
-                  <div className="mt-5 flex items-center gap-4 md:mt-6">
-                    <button className="focus:ring-blue-500 inline-flex items-center justify-center whitespace-nowrap ring-offset-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border-0 text-gray-900 gap-2 p-0 hover:text-blue-600">
-                      Learn
-                      <svg
-                        stroke="currentColor"
-                        fill="none"
-                        stroke-width="0"
-                        viewBox="0 0 15 15"
-                        height="1em"
-                        width="1em"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          clipRule="evenodd"
-                          d="M6.1584 3.13508C6.35985 2.94621 6.67627 2.95642 6.86514 3.15788L10.6151 7.15788C10.7954 7.3502 10.7954 7.64949 10.6151 7.84182L6.86514 11.8418C6.67627 12.0433 6.35985 12.0535 6.1584 11.8646C5.95694 11.6757 5.94673 11.3593 6.1356 11.1579L9.565 7.49985L6.1356 3.84182C5.94673 3.64036 5.95694 3.32394 6.1584 3.13508Z"
-                          fill="currentColor"
-                        ></path>
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <div className="grid grid-cols-1 border border-gray-200 rounded-2xl overflow-hidden sm:col-span-2 sm:row-span-1 sm:grid-cols-2 bg-white hover:shadow-lg transition-shadow duration-300">
-                <div className="flex items-center justify-center bg-gray-50 p-6">
-                  <img
-                    src="https://d22po4pjz3o32e.cloudfront.net/placeholder-image-portrait.svg"
-                    alt="Relume placeholder image 3"
-                    className="size-full object-cover rounded-lg"
-                  />
-                </div>
-                <div className="flex flex-1 flex-col justify-center p-6">
-                  <div>
-                    <p className="mb-2 text-sm font-semibold text-blue-600">
-                      Step 3
-                    </p>
-                    <h3 className="mb-2 text-xl font-bold text-gray-900 md:text-2xl">
-                      Negotiate & award
-                    </h3>
-                    <p className="text-gray-700">
-                      Negotiate and award the best bid.
-                    </p>
-                  </div>
-                  <div className="mt-5 flex flex-wrap items-center gap-4 md:mt-6">
-                    <button className="focus:ring-blue-500 inline-flex items-center justify-center whitespace-nowrap ring-offset-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border-0 text-gray-900 gap-2 p-0 hover:text-blue-600">
-                      Button
-                      <svg
-                        stroke="currentColor"
-                        fill="none"
-                        stroke-width="0"
-                        viewBox="0 0 15 15"
-                        height="1em"
-                        width="1em"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          clipRule="evenodd"
-                          d="M6.1584 3.13508C6.35985 2.94621 6.67627 2.95642 6.86514 3.15788L10.6151 7.15788C10.7954 7.3502 10.7954 7.64949 10.6151 7.84182L6.86514 11.8418C6.67627 12.0433 6.35985 12.0535 6.1584 11.8646C5.95694 11.6757 5.94673 11.3593 6.1356 11.1579L9.565 7.49985L6.1356 3.84182C5.94673 3.64036 5.95694 3.32394 6.1584 3.13508Z"
-                          fill="currentColor"
-                        ></path>
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+function FAQ2() {
+  return (
+    <section className="self-stretch px-16 py-28 bg-Color-Scheme-1-Background flex flex-col justify-start items-center gap-20 overflow-hidden">
+      <div className="w-full max-w-[1280px] flex flex-col justify-start items-center gap-20">
+        <div className="w-full max-w-[768px] flex flex-col justify-start items-center gap-6">
+          <h2 className="self-stretch text-center text-Color-Scheme-1-Text text-5xl font-medium font-outfit leading-[62.40px]">
+            FAQs
+          </h2>
+          <p className="self-stretch text-center text-Color-Scheme-1-Text text-lg font-normal font-inter leading-7">
+            Common questions about tendering on Gotenderly
+          </p>
         </div>
-      </section>
 
-      {/* CTA Section */}
-      <section className="px-[5%] py-16 md:py-24 lg:py-28 bg-gradient-to-r from-blue-600 to-indigo-600">
-        <div className="container mx-auto">
-          <div className="grid grid-cols-1 gap-x-20 gap-y-12 md:gap-y-16 lg:grid-cols-2 lg:items-center">
-            <div>
-              <h2 className="mb-5 text-4xl font-bold text-white md:mb-6 md:text-5xl lg:text-6xl">
-                Join Us
-              </h2>
-              <p className="text-white text-lg">
-                Whether you are buyers looking to post your first tender or
-                suppliers ready to start bidding on opportunities, join our
-                platform today.
+        <div className="w-full max-w-[768px] flex flex-col justify-start items-start gap-12 overflow-hidden">
+          {faqs.map((faq, index) => (
+            <div
+              key={index}
+              className="self-stretch flex flex-col justify-start items-start gap-4"
+            >
+              <h3 className="self-stretch text-Color-Scheme-1-Text text-lg font-bold font-inter leading-7">
+                {faq.question}
+              </h3>
+              <p className="self-stretch text-Color-Scheme-1-Text text-base font-normal font-inter leading-6">
+                {faq.answer}
               </p>
-              <div className="mt-6 flex flex-wrap gap-4 md:mt-8">
-                <button className="focus:ring-blue-500 inline-flex gap-3 items-center justify-center whitespace-nowrap ring-offset-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-white bg-white text-blue-600 px-6 py-3 rounded-xl hover:bg-gray-100 hover:shadow-lg">
-                  Sign Up
-                </button>
-                <button className="focus:ring-blue-500 inline-flex gap-3 items-center justify-center whitespace-nowrap ring-offset-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-white text-white bg-transparent px-6 py-3 rounded-xl hover:bg-blue-700 hover:shadow-lg">
-                  Learn More
-                </button>
-              </div>
             </div>
-            <div>
-              <img
-                src="https://d22po4pjz3o32e.cloudfront.net/placeholder-image-landscape.svg"
-                className="w-full object-cover rounded-lg shadow-lg transition-transform duration-500 hover:scale-105"
-                alt="Relume placeholder image"
-              />
-            </div>
-          </div>
+          ))}
         </div>
-      </section>
+      </div>
+    </section>
+  );
+}
 
-      {/* Footer */}
-      <footer className="px-[5%] py-12 md:py-18 lg:py-20 bg-gray-900 text-white">
-        <div className="container mx-auto">
-          <div className="grid grid-cols-1 gap-x-[4vw] gap-y-12 pb-12 md:gap-y-16 md:pb-18 lg:grid-cols-[1fr_0.5fr] lg:gap-y-4 lg:pb-20">
-            <div>
-              <div className="mb-6 md:mb-8">
-                <a href="#">
-                  <img
-                    src="https://d22po4pjz3o32e.cloudfront.net/logo-image.svg"
-                    alt="Logo image"
-                    className="inline-block"
-                  />
-                </a>
-              </div>
-              <div className="mb-6 md:mb-8">
-                <p className="mb-1 text-sm font-semibold">Address:</p>
-                <p className="mb-5 text-sm md:mb-6">
-                  Level 1, 12 Sample St, Sydney NSW 2000
-                </p>
-                <p className="mb-1 text-sm font-semibold">Contact:</p>
-                <a
-                  href="tel:1800 123 4567"
-                  className="block text-sm underline decoration-white underline-offset-1 hover:text-blue-300 transition-colors"
+function Problems() {
+  return (
+    <section className="max-w-7xl mx-auto px-6 py-20">
+      <div className="max-w-3xl mx-auto text-center mb-12 md:mb-16">
+        <span className="text-Color-Scheme-1-Text text-base font-semibold font-inter leading-6">
+          Why Choose Us
+        </span>
+        <h2 className="mt-3 text-4xl md:text-5xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight md:leading-[62.4px]">
+          The smarter way to handle <br /> procurement in Qatar
+        </h2>
+        <p className="mt-4 text-lg font-normal font-inter text-Color-Scheme-1-Text leading-7">
+          We Are Better Than Every Other Tendering Platform
+        </p>
+      </div>
+
+      <div className="mt-12">
+        <Card className="shadow-none border-muted overflow-hidden">
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                {/* Table Header with Legend */}
+                <thead>
+                  <tr className="border-b bg-muted/10">
+                    <th className="px-6 py-4 text-sm font-medium text-muted-foreground w-1/3 min-w-[180px]">
+                      Feature
+                    </th>
+                    <th className="px-6 py-4 text-sm font-medium text-primary w-1/3 min-w-[220px]">
+                      <div className="flex items-center gap-2">
+                        <span>Gotenderly</span>
+                      </div>
+                    </th>
+                    <th className="px-6 py-4 text-sm font-medium text-muted-foreground w-1/3 min-w-[220px]">
+                      <div className="flex items-center gap-2">
+                        <span>Traditional Platforms</span>
+                      </div>
+                    </th>
+                  </tr>
+                </thead>
+
+                {/* Table Body */}
+                <tbody>
+                  {[
+                    [
+                      "Vendor discovery",
+                      "Smart AI matching connects you with verified vendors in seconds",
+                      "Manual search across multiple directories",
+                    ],
+                    [
+                      "Tender posting process",
+                      "One unified dashboard for publishing, tracking, and managing all tenders",
+                      "Scattered communication through emails and PDFs",
+                    ],
+                    [
+                      "Requirement clarity",
+                      "Built-in templates and guided forms prevent vague specs or missing info",
+                      "Open-ended briefs often lead to wrong quotes and rework",
+                    ],
+                    [
+                      "Bid management",
+                      "Live analytics show quote ranges, vendor engagement, and performance",
+                      "No visibility until bids close decisions made blind",
+                    ],
+                    [
+                      "Communication",
+                      "All chat, negotiation, and updates happen inside the platform no lost emails",
+                      "Negotiations spread across calls and emails",
+                    ],
+                    [
+                      "Verification and trust",
+                      "Vendor KYC, ratings, and performance history built-in",
+                      "Little to no verification hard to identify reliable partners",
+                    ],
+                    [
+                      "Support & response time",
+                      "Local Qatar-based support with real-time chat",
+                      "Generic or delayed ticket based support",
+                    ],
+                  ].map(([label, gotenderly, other], i) => (
+                    <tr
+                      key={label}
+                      className={`border-b last:border-b-0 transition-colors hover:bg-muted/50 ${
+                        i % 2 === 0 ? "bg-muted/30" : "bg-background"
+                      }`}
+                    >
+                      <td className="px-6 py-5 text-sm font-medium text-foreground align-top min-w-[180px]">
+                        {label}
+                      </td>
+                      <td className="px-6 py-5 text-sm font-normal  text-blue-600/70 align-top min-w-[220px]">
+                        <span className="block break-words">{gotenderly}</span>
+                      </td>
+                      <td className="px-6 py-5 text-sm font-normal  text-red-800/70  align-top min-w-[220px]">
+                        <span className="block break-words">{other}</span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </section>
+  );
+}
+function PricingSection() {
+  const [activeTab, setActiveTab] = useState<"tender" | "bid">("tender");
+
+  return (
+    <>
+      <section className="py-20 px-6 bg-background text-foreground">
+        <div className="max-w-7xl mx-auto">
+          {/* Header */}
+          <div className="text-center mb-16 max-w-3xl mx-auto">
+            <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-2">
+              Pricing
+            </p>
+            <h2 className="text-4xl font-semibold mb-4">
+              Flexible procurement solutions
+            </h2>
+            <p className="text-base text-muted-foreground">
+              Scale your tender strategy with transparent, adaptable pricing for
+              every business need.
+            </p>
+          </div>
+
+          {/* Two Pricing Cards Side by Side */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+            {/* Tender Plan */}
+            <Card className="border border-border bg-muted/40 shadow-none">
+              <CardContent className="p-8">
+                <div className="mb-8">
+                  <h3 className="text-2xl font-semibold mb-2">Starter Plan</h3>
+                  <div className="flex items-baseline">
+                    <span className="text-5xl font-bold">Free</span>
+                    <span className="ml-2 text-muted-foreground">forever</span>
+                  </div>
+                  <p className="mt-4 text-muted-foreground">
+                    Launch your procurement journey with unlimited tender
+                    postings at no cost.
+                  </p>
+                </div>
+
+                <div className="space-y-6 mb-8">
+                  <div>
+                    <h4 className="font-semibold mb-3">Includes</h4>
+                    <ul className="space-y-3">
+                      {[
+                        "3 active tender postings",
+                        "Standard communication tools",
+                        "Basic reporting metrics",
+                        "Essential security protocols",
+                        "Limited integration options",
+                      ].map((item) => (
+                        <li key={item} className="flex items-start">
+                          <Check className="w-5 h-5 text-foreground mr-3 mt-0.5" />
+                          <span className="text-muted-foreground">{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div>
+                    <h4 className="font-semibold mb-3">Support</h4>
+                    <ul className="space-y-3">
+                      {[
+                        "Basic vendor profile access",
+                        "Community support channel",
+                        "Single user account",
+                        "Platform onboarding guide",
+                        "Monthly performance insights",
+                      ].map((item) => (
+                        <li key={item} className="flex items-start">
+                          <Check className="w-5 h-5 text-foreground mr-3 mt-0.5" />
+                          <span className="text-muted-foreground">{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                <Button
+                  variant="outline"
+                  className="w-full font-semibold rounded-lg"
                 >
-                  1800 123 4567
-                </a>
-                <a
-                  href="mailto:info@relume.io"
-                  className="block text-sm underline decoration-white underline-offset-1 hover:text-blue-300 transition-colors"
+                  Start Posting Tenders
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Bid Plan */}
+            <Card className="border border-border bg-muted/10 shadow-none">
+              <CardContent className="p-8">
+                <div className="mb-8">
+                  <h3 className="text-2xl font-semibold mb-2">Pay-per-Bid</h3>
+                  <div className="flex items-baseline">
+                    <span className="text-5xl font-bold">100</span>
+                    <span className="text-2xl ml-1 font-medium">QAR</span>
+                    <span className="ml-2 text-muted-foreground">per bid</span>
+                  </div>
+                  <p className="mt-4 text-muted-foreground">
+                    Only pay when you submit a bid. No subscriptions, no hidden
+                    fees.
+                  </p>
+                </div>
+
+                <div className="border border-border rounded-lg p-6 mb-8 bg-muted/50">
+                  <p className="font-medium">Transparent & Risk-Free</p>
+                  <p className="text-muted-foreground mt-2">
+                    You only pay when a tender is worth bidding on. Access all
+                    browsing, matching, and analytics features completely free.
+                  </p>
+                </div>
+
+                <div className="space-y-4 mb-8">
+                  <h4 className="font-semibold">What you get with every bid</h4>
+                  <ul className="space-y-3">
+                    {[
+                      "Full access to tender specifications & documents",
+                      "Smart vendor matching & quote templates",
+                      "Secure submission with audit trail",
+                      "Direct communication with tender owner",
+                      "Bid performance analytics post-submission",
+                    ].map((item) => (
+                      <li key={item} className="flex items-start">
+                        <Check className="w-5 h-5 text-foreground mr-3 mt-0.5" />
+                        <span className="text-muted-foreground">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <Button
+                  variant="outline"
+                  className="w-full font-semibold rounded-lg"
                 >
-                  info@relume.io
-                </a>
-              </div>
-              <div className="grid grid-flow-col grid-cols-[max-content] items-start justify-start gap-x-3">
-                <a href="#" className="hover:text-blue-300 transition-colors">
-                  <svg
-                    stroke="currentColor"
-                    fill="currentColor"
-                    stroke-width="0"
-                    viewBox="0 0 24 24"
-                    className="size-6"
-                    height="1em"
-                    width="1em"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path d="M12.001 2.002c-5.522 0-9.999 4.477-9.999 9.999 0 4.99 3.656 9.126 8.437 9.879v-6.988h-2.54v-2.891h2.54V9.798c0-2.508 1.493-3.891 3.776-3.891 1.094 0 2.24.195 2.24.195v2.459h-1.264c-1.24 0-1.628.772-1.628 1.563v1.875h2.771l-.443 2.891h-2.328v6.988C18.344 21.129 22 16.992 22 12.001c0-5.522-4.477-9.999-9.999-9.999z"></path>
-                  </svg>
-                </a>
-                <a href="#" className="hover:text-blue-300 transition-colors">
-                  <svg
-                    stroke="currentColor"
-                    fill="currentColor"
-                    stroke-width="0"
-                    viewBox="0 0 24 24"
-                    className="size-6"
-                    height="1em"
-                    width="1em"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path d="M11.999 7.377a4.623 4.623 0 1 0 0 9.248 4.623 4.623 0 0 0 0-9.248zm0 7.627a3.004 3.004 0 1 1 0-6.008 3.004 3.004 0 0 1 0 6.008z"></path>
-                    <circle cx="16.806" cy="7.207" r="1.078"></circle>
-                    <path d="M20.533 6.111A4.605 4.605 0 0 0 17.9 3.479a6.606 6.606 0 0 0-2.186-.42c-.963-.042-1.268-.054-3.71-.054s-2.755 0-3.71.054a6.554 6.554 0 0 0-2.184.42 4.6 4.6 0 0 0-2.633 2.632 6.585 6.585 0 0 0-.419 2.186c-.043.962-.056 1.267-.056 3.71 0 2.442 0 2.753.056 3.71.015.748.156 1.486.419 2.187a4.61 4.61 0 0 0 2.634 2.632 6.584 6.584 0 0 0 2.185.45c.963.042 1.268.055 3.71.055s2.755 0 3.71-.055a6.615 6.615 0 0 0 2.186-.419 4.613 4.613 0 0 0 2.633-2.633c.263-.7.404-1.438.419-2.186.043-.962.056-1.267.056-3.71s0-2.753-.056-3.71a6.581 6.581 0 0 0-.421-2.217zm-1.218 9.532a5.043 5.043 0 0 1-.311 1.688 2.987 2.987 0 0 1-1.712 1.711 4.985 4.985 0 0 1-1.67.311c-.95.044-1.218.055-3.654.055-2.438 0-2.687 0-3.655-.055a4.96 4.96 0 0 1-1.669-.311 2.985 2.985 0 0 1-1.719-1.711 5.08 5.08 0 0 1-.311-1.669c-.043-.95-.053-1.218-.053-3.654 0-2.437 0-2.686.053-3.655a5.038 5.038 0 0 1 .311-1.687c.305-.789.93-1.41 1.719-1.712a5.01 5.01 0 0 1 1.669-.311c.951-.043 1.218-.055 3.655-.055s2.687 0 3.654.055a4.96 4.96 0 0 1 1.67.311 2.991 2.991 0 0 1 1.712 1.712 5.08 5.08 0 0 1 .311 1.669c.043.951.054 1.218.054 3.655 0 2.436 0 2.698-.043 3.654h-.011z"></path>
-                  </svg>
-                </a>
-                <a href="#" className="hover:text-blue-300 transition-colors">
-                  <svg
-                    stroke="currentColor"
-                    fill="currentColor"
-                    stroke-width="0"
-                    viewBox="0 0 512 512"
-                    className="size-6 p-0.5"
-                    height="1em"
-                    width="1em"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z"></path>
-                  </svg>
-                </a>
-                <a href="#" className="hover:text-blue-300 transition-colors">
-                  <svg
-                    stroke="currentColor"
-                    fill="currentColor"
-                    stroke-width="0"
-                    viewBox="0 0 24 24"
-                    className="size-6"
-                    height="1em"
-                    width="1em"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path d="M20 3H4a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1zM8.339 18.337H5.667v-8.59h2.672v8.59zM7.003 8.574a1.548 1.548 0 1 1 0-3.096 1.548 1.548 0 0 1 0 3.096zm11.335 9.763h-2.669V14.16c0-.996-.018-2.277-1.388-2.277-1.39 0-1.601 1.086-1.601 2.207v4.248h-2.667v-8.59h2.56v1.174h.037c.355-.675 1.227-1.387 2.524-1.387 2.704 0 3.203 1.778 3.203 4.092v4.71z"></path>
-                  </svg>
-                </a>
-                <a href="#" className="hover:text-blue-300 transition-colors">
-                  <svg
-                    stroke="currentColor"
-                    fill="currentColor"
-                    stroke-width="0"
-                    viewBox="0 0 24 24"
-                    className="size-6"
-                    height="1em"
-                    width="1em"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path d="M21.593 7.203a2.506 2.506 0 0 0-1.762-1.766C18.265 5.007 12 5 12 5s-6.264-.007-7.831.404a2.56 2.56 0 0 0-1.766 1.778c-.413 1.566-.417 4.814-.417 4.814s-.004 3.264.406 4.814c.23.857.905 1.534 1.763 1.765 1.582.43 7.83.437 7.83.437s6.265.007 7.831-.403a2.515 2.515 0 0 0 1.767-1.763c.414-1.565.417-4.812.417-4.812s.02-3.265-.407-4.831zM9.996 15.005l.005-6 5.207 3.005-5.212 2.995z"></path>
-                  </svg>
-                </a>
-              </div>
-            </div>
-            <div className="grid grid-cols-1 items-start gap-x-6 gap-y-10 md:grid-cols-2 md:gap-x-8 md:gap-y-4">
-              <ul>
-                <li className="py-2 text-sm font-semibold hover:text-blue-300 transition-colors">
-                  <a href="#">Link One</a>
-                </li>
-                <li className="py-2 text-sm font-semibold hover:text-blue-300 transition-colors">
-                  <a href="#">Link Two</a>
-                </li>
-                <li className="py-2 text-sm font-semibold hover:text-blue-300 transition-colors">
-                  <a href="#">Link Three</a>
-                </li>
-                <li className="py-2 text-sm font-semibold hover:text-blue-300 transition-colors">
-                  <a href="#">Link Four</a>
-                </li>
-                <li className="py-2 text-sm font-semibold hover:text-blue-300 transition-colors">
-                  <a href="#">Link Five</a>
-                </li>
-              </ul>
-              <ul>
-                <li className="py-2 text-sm font-semibold hover:text-blue-300 transition-colors">
-                  <a href="#">Link Six</a>
-                </li>
-                <li className="py-2 text-sm font-semibold hover:text-blue-300 transition-colors">
-                  <a href="#">Link Seven</a>
-                </li>
-                <li className="py-2 text-sm font-semibold hover:text-blue-300 transition-colors">
-                  <a href="#">Link Eight</a>
-                </li>
-                <li className="py-2 text-sm font-semibold hover:text-blue-300 transition-colors">
-                  <a href="#">Link Nine</a>
-                </li>
-                <li className="py-2 text-sm font-semibold hover:text-blue-300 transition-colors">
-                  <a href="#">Link Ten</a>
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div className="h-px w-full bg-gray-700"></div>
-          <div className="flex flex-col-reverse items-start justify-between pb-4 pt-6 text-sm md:flex-row md:items-center md:pb-0 md:pt-8">
-            <p className="mt-8 md:mt-0">© 2024 Relume. All rights reserved.</p>
-            <ul className="grid grid-flow-row grid-cols-[max-content] justify-center gap-y-4 text-sm md:grid-flow-col md:gap-x-6 md:gap-y-0">
-              <li className="underline hover:text-blue-300 transition-colors">
-                <a href="#">Privacy Policy</a>
-              </li>
-              <li className="underline hover:text-blue-300 transition-colors">
-                <a href="#">Terms of Service</a>
-              </li>
-              <li className="underline hover:text-blue-300 transition-colors">
-                <a href="#">Cookies Settings</a>
-              </li>
-            </ul>
+                  Browse Tenders to Bid
+                </Button>
+              </CardContent>
+            </Card>
           </div>
         </div>
-      </footer>
+      </section>
+    </>
+  );
+}
+/* -------------------------------------------------------------------------- */
+/*                                 PAGE EXPORT                                */
+/* -------------------------------------------------------------------------- */
+export default function Home() {
+  return (
+    <div className="min-h-screen">
+      <Navbarlanding />
+      <Hero />
+      <About />
+      <Process />
+      <Features />
+      <Services />
+      <Problems />
+      <Testimonials />
+      <KeyFeatures />
+      <PricingSection />
+      {/* <HowItWorksDetailed /> */}
+      <FAQ2 />
+      <CTA />
+      <Footer />
     </div>
   );
-};
-
-export default QatarTenderPlatform;
+}
