@@ -272,7 +272,7 @@ export default function TenderDetailPage() {
         );
         setReturnForRevision({ open: false, bidId: null });
         setRevisionReason("");
-        toast.success("Bid returned for revision successfully!");
+        toast("Bid returned for revision successfully!");
       } else {
         throw new Error(result.error || "Failed to return bid for revision");
       }

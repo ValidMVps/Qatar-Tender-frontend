@@ -8,6 +8,7 @@ import { LanguageProvider } from "@/components/LanguageProvider";
 import { AuthProvider } from "@/context/AuthContext";
 import { ThemeProvider } from "@/components/DarkFilterController";
 import { NotificationProvider } from "@/context/NotificationContext";
+import { Toaster } from "@/components/ui/toaster";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -44,6 +45,7 @@ export default function RootLayout({
         <ThemeProvider>
           <AuthProvider>
             <NotificationProvider>
+              <Toaster />
               <LanguageProvider>{children}</LanguageProvider>
             </NotificationProvider>
           </AuthProvider>

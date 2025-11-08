@@ -166,7 +166,7 @@ export default function AppleStyleSettings() {
       if (profile.autoLock) setAutoLock(profile.autoLock);
     } catch (err) {
       console.error("Failed to load profile:", err);
-      toast.error(
+      toast(
         t("failed_to_load_profile_settings") ||
           "Failed to load profile settings"
       );
@@ -184,7 +184,7 @@ export default function AppleStyleSettings() {
         [field]: value,
       });
 
-      toast.success(successMessage);
+      toast(successMessage);
 
       // Update local state based on field
       switch (field) {

@@ -27,6 +27,7 @@ import PageTransitionWrapper from "@/components/animations/PageTransitionWrapper
 import LenisScroll from "@/components/LenisWrapper";
 import Footer from "@/components/Footer";
 import tender1 from "../media/tender1.png";
+import tender2 from "../media/tender2.png";
 
 const processSteps = [
   {
@@ -71,8 +72,7 @@ const tenderSteps = [
     title: "Receive and compare bids",
     description: "Get multiple quotes and compare them side by side.",
     linkText: "Compare bids",
-    bgImage:
-      "https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=384&h=630",
+    bgImage: tender2.src,
   },
   {
     label: "Chat & award",
