@@ -24,6 +24,7 @@ import Image from "next/image";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import PageTransitionWrapper from "@/components/animations/PageTransitionWrapper";
+import LenisScroll from "@/components/LenisWrapper";
 
 const processSteps = [
   {
@@ -1133,23 +1134,23 @@ function PricingSection() {
 /* -------------------------------------------------------------------------- */
 export default function Home() {
   return (
-    <div className="min-h-screen">
-      <PageTransitionWrapper>
-        <Navbarlanding />
-        <Hero />
-        <About />
-        <Process />
-        <Features />
-        <Services />
-        <Problems />
-        <Testimonials />
-        {/* <KeyFeatures /> */}
-        <PricingSection />
-        {/* <HowItWorksDetailed /> */}
-        <FAQ2 />
-        <CTA />
-        <Footer />
-      </PageTransitionWrapper>
-    </div>
+    <LenisScroll>
+      <div className="min-h-screen">
+        <PageTransitionWrapper>
+          <Navbarlanding />
+          <Hero />
+          <About />
+          <Process />
+          <Features />
+          <Services />
+          <Problems />
+          <Testimonials />
+          <PricingSection />
+          <FAQ2 />
+          <CTA />
+          <Footer />
+        </PageTransitionWrapper>
+      </div>
+    </LenisScroll>
   );
 }
