@@ -128,7 +128,7 @@ export default function ForgotPasswordForm() {
 
                       <Button
                         type="submit"
-                        className="w-full bg-blue-600 text-white hover:bg-blue-700 rounded-md"
+                        className="w-full bg-gray-900 text-white hover:bg-gray-950 rounded-md"
                         disabled={isPending}
                       >
                         {isPending ? "Sending..." : "Send OTP"}
@@ -138,7 +138,7 @@ export default function ForgotPasswordForm() {
                         Remembered your password?{" "}
                         <Link
                           href="/login"
-                          className="font-medium text-blue-600 hover:underline"
+                          className="font-medium text-black hover:underline"
                         >
                           Back to login
                         </Link>

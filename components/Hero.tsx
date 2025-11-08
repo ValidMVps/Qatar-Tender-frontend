@@ -293,7 +293,7 @@ export default function Hero() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20 w-full">
         {/* Side-by-Side Layout (responsive) */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 items-center">
           {/* Left: Hero Text */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -319,7 +319,7 @@ export default function Hero() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 href="/signup"
-                className="px-5 sm:px-6 h-12 text-black hover:bg-black/5 rounded-full font-medium flex items-center gap-2 justify-center"
+                className="px-5 sm:px-6 h-12 text-black hover:bg-black/5 rounded-md font-medium flex items-center gap-2 justify-center"
               >
                 Get started
               </motion.a>
@@ -328,7 +328,7 @@ export default function Hero() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={openForm}
-                className="px-5 sm:px-6 h-12 bg-black hover:bg-neutral-900 text-white rounded-full font-medium flex items-center gap-2 justify-center"
+                className="px-5 sm:px-6 h-12 bg-black hover:bg-neutral-900 text-white rounded-md font-medium flex items-center gap-2 justify-center"
               >
                 Create a tender
               </motion.button>
@@ -352,7 +352,7 @@ export default function Hero() {
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 50 }}
-              className="bg-white rounded-[24px] border border-[#d2d2d7] p-6 md:p-8 max-h-[88vh] overflow-y-auto relative md:sticky md:top-24"
+              className="bg-white rounded-md border border-[#d2d2d7] p-6 md:p-8 max-h-[88vh] overflow-y-auto relative md:sticky md:top-24"
             >
               {/* Close Button */}
               <button
@@ -374,7 +374,7 @@ export default function Hero() {
                         scale: i === currentStep ? 1.06 : 1,
                       }}
                       className={cn(
-                        "flex items-center justify-center rounded-full",
+                        "flex items-center justify-center rounded-md",
                         i === currentStep ? "w-10 h-10" : "w-8 h-8"
                       )}
                     >
@@ -442,7 +442,7 @@ export default function Hero() {
                               onChange={handleChange}
                               placeholder={field.label}
                               className={cn(
-                                "w-full h-28 sm:h-32 bg-[#f5f5f7] rounded-xl border px-4 py-3 text-sm outline-none transition-colors resize-none",
+                                "w-full h-28 sm:h-32 bg-[#f5f5f7] rounded-md border px-4 py-3 text-sm outline-none transition-colors resize-none",
                                 errors[field.name]
                                   ? "border-red-500"
                                   : "border-transparent hover:border-black/20 focus:border-black"
@@ -460,7 +460,7 @@ export default function Hero() {
                               <PopoverTrigger asChild>
                                 <button
                                   className={cn(
-                                    "w-full h-12 bg-[#f5f5f7] rounded-xl border px-4 text-sm text-left font-normal flex items-center justify-between transition-colors",
+                                    "w-full h-12 bg-[#f5f5f7] rounded-md border px-4 text-sm text-left font-normal flex items-center justify-between transition-colors",
                                     errors.deadline
                                       ? "border-red-500"
                                       : "border-transparent hover:border-black/20 focus:border-black",
@@ -535,7 +535,7 @@ export default function Hero() {
                               onChange={handleChange}
                               placeholder={field.label}
                               className={cn(
-                                "w-full h-12 bg-[#f5f5f7] rounded-xl border px-4 text-sm outline-none transition-colors",
+                                "w-full h-12 bg-[#f5f5f7] rounded-md border px-4 text-sm outline-none transition-colors",
                                 errors[field.name]
                                   ? "border-red-500"
                                   : "border-transparent hover:border-black/20 focus:border-black"
@@ -558,7 +558,7 @@ export default function Hero() {
                     animate={{ opacity: 1, y: 0 }}
                     className="space-y-6 text-center py-8 md:py-12"
                   >
-                    <div className="mx-auto w-20 h-20 bg-black/10 rounded-full flex items-center justify-center">
+                    <div className="mx-auto w-20 h-20 bg-black/10 rounded-md flex items-center justify-center">
                       <Check className="w-10 h-10 text-black" />
                     </div>
                     <div className="space-y-3">
@@ -579,7 +579,7 @@ export default function Hero() {
                 {!showSignupScreen && currentStep > 0 && (
                   <button
                     onClick={prevStep}
-                    className="w-full sm:flex-1 h-12 rounded-xl text-black hover:bg-black/5 transition-colors"
+                    className="w-full sm:flex-1 h-12 rounded-md text-black hover:bg-black/5 transition-colors"
                   >
                     Back
                   </button>
@@ -591,7 +591,7 @@ export default function Hero() {
                         ? handlePostTender()
                         : nextStep()
                     }
-                    className="w-full sm:flex-1 bg-black hover:bg-neutral-900 text-white h-12 rounded-xl font-medium flex items-center justify-center gap-2 transition-colors"
+                    className="w-full sm:flex-1 bg-black hover:bg-neutral-900 text-white h-12 rounded-md font-medium flex items-center justify-center gap-2 transition-colors"
                   >
                     {currentStep === steps.length - 1
                       ? "Save & Continue"
@@ -606,7 +606,7 @@ export default function Hero() {
                         setCurrentStep(0);
                         setIsSaved(false);
                       }}
-                      className="w-full sm:flex-1 h-12 rounded-xl border border-[#d2d2d7] text-[#1d1d1f] hover:bg-[#f5f5f7]"
+                      className="w-full sm:flex-1 h-12 rounded-md border border-[#d2d2d7] text-[#1d1d1f] hover:bg-[#f5f5f7]"
                     >
                       Edit Tender
                     </button>
@@ -614,7 +614,7 @@ export default function Hero() {
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       href="/signup"
-                      className="w-full sm:flex-1 bg-black hover:bg-neutral-900 text-white h-12 rounded-xl font-medium flex items-center justify-center gap-2"
+                      className="w-full sm:flex-1 bg-black hover:bg-neutral-900 text-white h-12 rounded-md font-medium flex items-center justify-center gap-2"
                     >
                       Sign up now
                     </motion.a>
@@ -640,9 +640,9 @@ export default function Hero() {
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="bg-white rounded-2xl p-6 max-w-md w-full space-y-6 text-center"
+            className="bg-white rounded-md p-6 max-w-md w-full space-y-6 text-center"
           >
-            <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
+            <div className="mx-auto w-16 h-16 bg-red-100 rounded-md flex items-center justify-center">
               <X className="w-8 h-8 text-red-600" />
             </div>
             <div>
@@ -656,13 +656,13 @@ export default function Hero() {
             <div className="flex flex-col sm:flex-row gap-3">
               <button
                 onClick={() => setPendingClose(false)}
-                className="flex-1 h-12 rounded-xl border border-[#d2d2d7] text-[#1d1d1f] hover:bg-[#f5f5f7]"
+                className="flex-1 h-12 rounded-md border border-[#d2d2d7] text-[#1d1d1f] hover:bg-[#f5f5f7]"
               >
                 Cancel
               </button>
               <button
                 onClick={performClose}
-                className="flex-1 h-12 rounded-xl bg-red-500 hover:bg-red-600 text-white"
+                className="flex-1 h-12 rounded-md bg-red-500 hover:bg-red-600 text-white"
               >
                 Discard
               </button>

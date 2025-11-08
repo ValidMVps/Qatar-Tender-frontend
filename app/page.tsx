@@ -15,6 +15,7 @@ import {
   Linkedin,
   Youtube,
   Handshake,
+  Calendar,
 } from "lucide-react";
 import logo from "../media/logo.png";
 import Hero from "@/components/Hero";
@@ -24,6 +25,8 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import PageTransitionWrapper from "@/components/animations/PageTransitionWrapper";
 import LenisScroll from "@/components/LenisWrapper";
+import Footer from "@/components/Footer";
+import tender1 from "../media/tender1.png";
 
 const processSteps = [
   {
@@ -54,7 +57,68 @@ const processSteps = [
   },
 ];
 
+const tenderSteps = [
+  {
+    label: "Post",
+    title: "Post your tender",
+    description:
+      "Describe your requirements, set deadline, and publish instantly.",
+    linkText: "Post now",
+    bgImage: tender1.src,
+  },
+  {
+    label: "Receive & compare bids",
+    title: "Receive and compare bids",
+    description: "Get multiple quotes and compare them side by side.",
+    linkText: "Compare bids",
+    bgImage:
+      "https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=384&h=630",
+  },
+  {
+    label: "Chat & award",
+    title: "Chat and award",
+    description:
+      "Negotiate and award the tender, identities revealed only after award.",
+    linkText: "Award tender",
+    bgImage:
+      "https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg?auto=compress&cs=tinysrgb&w=384&h=630",
+  },
+];
+
+const bidderSteps = [
+  {
+    label: "Discover",
+    title: "Find relevant tenders",
+    description:
+      "Smart matching surfaces tenders that fit your services, budget and timeline.",
+    linkText: "Browse tenders",
+    bgImage:
+      "https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=384&h=630",
+  },
+  {
+    label: "Prepare",
+    title: "Prepare your quote",
+    description:
+      "Use templates and analytics to produce competitive, accurate proposals quickly.",
+    linkText: "Create quote",
+    bgImage:
+      "https://images.pexels.com/photos/3184410/pexels-photo-3184410.jpeg?auto=compress&cs=tinysrgb&w=384&h=630",
+  },
+  {
+    label: "Submit",
+    title: "Submit your bid securely",
+    description:
+      "Send a secure submission with audit trail and track status in one place.",
+    linkText: "Submit bid",
+    bgImage:
+      "https://images.pexels.com/photos/3184434/pexels-photo-3184434.jpeg?auto=compress&cs=tinysrgb&w=384&h=630",
+  },
+];
+
 function Process() {
+  const [tab, setTab] = useState<"tender" | "bidder">("tender");
+  const steps = tab === "tender" ? tenderSteps : bidderSteps;
+
   return (
     <section
       id="process"
@@ -62,25 +126,64 @@ function Process() {
     >
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="max-w-3xl mx-auto text-center mb-16">
+        <div className="max-w-3xl mx-auto text-center mb-8">
           <span className="text-Color-Scheme-1-Text text-sm md:text-base font-semibold font-inter leading-6">
             Process
           </span>
           <h2 className="mt-2 text-3xl sm:text-4xl md:text-5xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight">
             How Tenderly works
           </h2>
+
+          {/* Tabs */}
+          <div className="mt-6 flex items-center justify-center gap-3">
+            <div
+              role="tablist"
+              aria-label="Process tabs"
+              className="inline-flex rounded-md bg-white/30 p-1"
+            >
+              <button
+                role="tab"
+                aria-selected={tab === "tender"}
+                onClick={() => setTab("tender")}
+                className={`px-4 py-2 rounded-md text-sm md:text-base font-medium ${
+                  tab === "tender"
+                    ? "bg-white shadow-sm text-Color-Scheme-1-Text"
+                    : "text-muted-foreground hover:bg-white/60"
+                } transition`}
+              >
+                Tenderer
+              </button>
+              <button
+                role="tab"
+                aria-selected={tab === "bidder"}
+                onClick={() => setTab("bidder")}
+                className={`px-4 py-2 rounded-md text-sm md:text-base font-medium ${
+                  tab === "bidder"
+                    ? "bg-white shadow-sm text-Color-Scheme-1-Text"
+                    : "text-muted-foreground hover:bg-white/60"
+                } transition`}
+              >
+                Bidder
+              </button>
+            </div>
+          </div>
+
+          {/* Tab-specific intro */}
           <p className="mt-4 text-base md:text-lg font-normal font-inter text-Color-Scheme-1-Text leading-7">
-            Create detailed project specifications in minutes
+            {tab === "tender"
+              ? "Create detailed project specifications in minutes and receive qualified bids from verified suppliers."
+              : "Browse tailored tender opportunities, prepare accurate quotes with templates and submit bids with confidence."}
           </p>
         </div>
+
         {/* Process Steps - Responsive Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-          {processSteps.map((step, index) => (
+          {steps.map((step, index) => (
             <div
               key={index}
               className="group relative min-h-[400px] sm:min-h-[500px] md:min-h-[540px] lg:min-h-[580px] rounded-md overflow-hidden shadow-lg transition-transform hover:scale-[1.02]"
               style={{
-                backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.7)), url('${step.bgImage}')`,
+                backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.1)), url('${step.bgImage}')`,
                 backgroundSize: "cover",
                 backgroundPosition: "center",
               }}
@@ -106,7 +209,7 @@ function Process() {
                   />
                 </button>
               </div>
-              {/* Optional: Subtle overlay on hover */}
+              {/* Hover overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
           ))}
@@ -365,110 +468,6 @@ function CTA() {
 }
 
 /* -------------------------------- Footer ---------------------------------- */
-function Footer() {
-  const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
-  const footerLinks = {
-    platform: [
-      { name: "How it works", href: "#how-it-works-detailed" },
-      { name: "Use cases", href: "#services" },
-      { name: "FAQ", href: "#faq" },
-    ],
-    company: [
-      { name: "About", href: "#about" },
-      { name: "Contact", href: "#contact" },
-    ],
-    legal: [
-      { name: "Privacy", href: "#privacy" },
-      { name: "Terms", href: "#terms" },
-    ],
-  };
-  return (
-    <footer
-      id="footer"
-      className="bg-gray-50 border-t border-gray-200 py-16 md:py-24 lg:py-32"
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
-          {/* Left Column - Logo, Location, Contact */}
-          <div className="flex flex-col ">
-            <span className="text-xs md:text-sm font-medium text-gray-900 mb-4">
-              Logo
-            </span>
-            <div className="space-y-4 text-xs md:text-sm text-gray-600 leading-5">
-              <p className="font-semibold text-gray-900">Location</p>
-              <p>Level 1, 123 Innovation Drive, Doha, Qatar</p>
-              <p className="font-semibold text-gray-900 mt-6">Connect</p>
-              <p>1800 tender • help@tenderly.com</p>
-            </div>
-            <div className="flex space-x-4 mt-6">
-              <Facebook className="w-5 h-5 text-gray-600 cursor-pointer hover:text-gray-900" />
-              <Instagram className="w-5 h-5 text-gray-600 cursor-pointer hover:text-gray-900" />
-              <Twitter className="w-5 h-5 text-gray-600 cursor-pointer hover:text-gray-900" />
-              <Linkedin className="w-5 h-5 text-gray-600 cursor-pointer hover:text-gray-900" />
-              <Youtube className="w-5 h-5 text-gray-600 cursor-pointer hover:text-gray-900" />
-            </div>
-          </div>
-          {/* Right Column - Links */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 justify-items-start text-xs md:text-sm leading-5">
-            <div>
-              <p className="font-semibold text-gray-900 mb-3">
-                Platform insights
-              </p>
-              <ul className="space-y-2 text-gray-600">
-                <li className="hover:text-gray-900 cursor-pointer">
-                  Industry guides
-                </li>
-                <li className="hover:text-gray-900 cursor-pointer">
-                  Case studies
-                </li>
-                <li className="hover:text-gray-900 cursor-pointer">
-                  Integration docs
-                </li>
-                <li className="hover:text-gray-900 cursor-pointer">
-                  Support center
-                </li>
-              </ul>
-            </div>
-            <div>
-              <p className="font-semibold text-gray-900 mb-3">About mission</p>
-              <ul className="space-y-2 text-gray-600">
-                <li className="hover:text-gray-900 cursor-pointer">
-                  Our story
-                </li>
-                <li className="hover:text-gray-900 cursor-pointer">
-                  Join team
-                </li>
-                <li className="hover:text-gray-900 cursor-pointer">
-                  Media kit
-                </li>
-                <li className="hover:text-gray-900 cursor-pointer">
-                  Get in touch
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        {/* Bottom Bar */}
-        <div className="pt-2">
-          <div className="flex flex-col md:flex-row justify-between items-center border-t border-gray-200 pt-6 text-xs md:text-sm text-gray-600 leading-5">
-            <div>© 2024 Tender Platform. All rights reserved.</div>
-            <div className="flex space-x-6 mt-4 md:mt-0">
-              <span className="hover:text-gray-900 cursor-pointer">
-                Privacy policy
-              </span>
-              <span className="hover:text-gray-900 cursor-pointer">
-                Terms of service
-              </span>
-              <span className="hover:text-gray-900 cursor-pointer">
-                Cookies settings
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </footer>
-  );
-}
 
 const features = [
   {
@@ -670,6 +669,33 @@ const smallServices = [
   },
 ];
 
+const services = [
+  {
+    icon: Calendar,
+    title: "Events and hospitality",
+    subtitle: "Source vendors for conferences, weddings, and corporate events",
+    linkText: "View details",
+  },
+  {
+    icon: Calendar,
+    title: "Construction & Infrastructure",
+    subtitle: "Tenders for building materials, machinery, and labor services",
+    linkText: "View details",
+  },
+  {
+    icon: Calendar,
+    title: "Healthcare Services",
+    subtitle: "Medical equipment, staffing, and facility maintenance",
+    linkText: "View details",
+  },
+  {
+    icon: Calendar,
+    title: "IT & Technology",
+    subtitle: "Software, hardware, cloud services, and cybersecurity solutions",
+    linkText: "View details",
+  },
+];
+
 function Services() {
   return (
     <section
@@ -689,68 +715,104 @@ function Services() {
             Find the right solution for every project need
           </p>
         </div>
-        {/* ---------- Layout: Large + Grid of 4 ---------- */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Large Card (Individuals) */}
-          <div
-            className="group relative min-h-[400px] sm:min-h-[500px] p-6 sm:p-8 md:p-12 rounded-md overflow-hidden
-                       bg-cover bg-center transition-transform hover:scale-[1.01]"
-            style={{
-              backgroundImage: `
-                linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.7)),
-                url('https://images.pexels.com/photos/4246120/pexels-photo-4246120.jpeg?auto=compress&cs=tinysrgb&w=800')
-              `,
-            }}
-          >
-            <div className="flex flex-col justify-end h-full gap-6 text-white">
-              <div>
-                <span className="text-xs md:text-sm font-semibold font-inter uppercase tracking-wider opacity-90">
-                  For individuals
-                </span>
-                <h3 className="mt-1 text-3xl sm:text-4xl md:text-5xl font-medium font-outfit leading-tight">
-                  Home services (cleaning & maintenance)
+
+        {/* ---------- Uniform Card Grid ---------- */}
+        <div className="grid grid-cols-1 sm:grid-cols-2  gap-3">
+          <div className="flex flex-col gap-3 h-full">
+            <div className="group relative bg-white rounded-2xl transition-all duration-300 overflow-hidden border border-gray-100 flex flex-col">
+              {/* Top Text Section */}
+              <div className="p-6 sm:p-8 flex-1">
+                <div className="mb-4">
+                  <span className="inline-block px-3 py-1 text-xs font-semibold text-gray-700 bg-gray-100 rounded-full">
+                    Individuals
+                  </span>
+                </div>
+
+                <h3 className="text-2xl sm:text-3xl font-medium font-outfit text-gray-900 leading-tight mb-3">
+                  Home services and personal projects
                 </h3>
+
+                <p className="text-sm sm:text-base font-normal font-inter text-gray-600 leading-relaxed">
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                  Suspendisse varius enim in eros elementum tristique.
+                </p>
+
+                <div className="mt-6 flex flex-wrap items-center gap-3">
+                  <button className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors">
+                    See sample tender
+                  </button>
+                  <button className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:gap-3 transition-all">
+                    <span>Explore</span>
+                    <ArrowRight
+                      size={16}
+                      className="transition-transform group-hover:translate-x-1"
+                    />
+                  </button>
+                </div>
               </div>
-              <div className="flex flex-wrap items-center gap-4">
-                <button className="px-5 py-2.5 bg-white/10 backdrop-blur-sm border border-white/20 text-white text-sm md:text-base font-medium rounded-md hover:bg-white/20 transition-all">
-                  See sample tender
-                </button>
-                <button className="flex items-center gap-2 text-white text-sm md:text-base font-normal hover:gap-3 transition-all">
-                  <span>Explore</span>
-                  <ArrowRight
-                    size={20}
-                    className="transition-transform group-hover:translate-x-1"
-                  />
-                </button>
+
+              {/* Bottom Image Section */}
+            </div>
+            <div className="group relative bg-white rounded-2xl transition-all duration-300 overflow-hidden border border-gray-100 flex flex-col ">
+              {/* Top Text Section */}
+              <div className="p-6 sm:p-8 flex-1">
+                <div className="mb-4">
+                  <span className="inline-block px-3 py-1 text-xs font-semibold text-gray-700 bg-gray-100 rounded-full">
+                    Individuals
+                  </span>
+                </div>
+
+                <h3 className="text-2xl sm:text-3xl font-medium font-outfit text-gray-900 leading-tight mb-3">
+                  Home services and personal projects
+                </h3>
+
+                <p className="text-sm sm:text-base font-normal font-inter text-gray-600 leading-relaxed">
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                  Suspendisse varius enim in eros elementum tristique.
+                </p>
+
+                <div className="mt-6 flex flex-wrap items-center gap-3">
+                  <button className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors">
+                    See sample tender
+                  </button>
+                  <button className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:gap-3 transition-all">
+                    <span>Explore</span>
+                    <ArrowRight
+                      size={16}
+                      className="transition-transform group-hover:translate-x-1"
+                    />
+                  </button>
+                </div>
               </div>
+
+              {/* Bottom Image Section */}
             </div>
           </div>
-          {/* Small Cards Grid (2x2) */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {smallServices.map((service, idx) => (
-              <div
-                key={idx}
-                className="group relative min-h-72 md:min-h-80 p-6 rounded-md overflow-hidden bg-cover bg-center
-                           transition-transform hover:scale-[1.03] shadow-lg"
-                style={{
-                  backgroundImage: `
-                    linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.65)),
-                    url('${service.bgImage}')
-                  `,
-                }}
-              >
-                <div className="flex flex-col justify-between h-full text-white">
-                  <div className="flex flex-col gap-4">
-                    <div className="w-12 h-12 flex items-center justify-center rounded-full bg-white/10 backdrop-blur-sm">
-                      <Briefcase size={28} className="text-white" />
-                    </div>
-                    <div>
-                      <h4 className="text-xl sm:text-2xl md:text-3xl font-medium font-outfit leading-tight">
-                        {service.title}
-                      </h4>
-                    </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {services.map((service, idx) => {
+              const Icon = service.icon;
+              return (
+                <div
+                  key={idx}
+                  className="group bg-white rounded-xl  transition-all duration-300 p-6 flex flex-col h-full border border-gray-100"
+                >
+                  {/* Icon */}
+                  <div className="w-12 h-12 flex items-center justify-center rounded-full bg-gray-100 text-gray-700 mb-5">
+                    <Icon size={24} />
                   </div>
-                  <button className="flex items-center gap-2 text-white text-xs md:text-sm lg:text-base font-normal hover:gap-3 transition-all mt-4">
+
+                  {/* Title */}
+                  <h3 className="text-xl md:text-2xl font-medium font-outfit text-gray-900 leading-tight mb-2">
+                    {service.title}
+                  </h3>
+
+                  {/* Subtitle */}
+                  <p className="text-sm md:text-base font-normal font-inter text-gray-600 leading-relaxed flex-grow">
+                    {service.subtitle}
+                  </p>
+
+                  {/* Link */}
+                  <button className="mt-6 flex items-center gap-2 text-gray-700 text-sm md:text-base font-medium hover:gap-3 transition-all">
                     <span>{service.linkText}</span>
                     <ArrowRight
                       size={18}
@@ -758,8 +820,8 @@ function Services() {
                     />
                   </button>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>
@@ -1108,7 +1170,112 @@ function PricingSection() {
     </section>
   );
 }
+const supplierCards = [
+  {
+    title: "Register",
+    subtitle: "Tagline",
+    desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+    cta: "Button",
+  },
+  {
+    title: "Browse tenders",
+    subtitle: "Tagline",
+    desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+    cta: "Button",
+  },
+  {
+    title: "Submit bid",
+    subtitle: "Tagline",
+    desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+    cta: "Button",
+  },
+];
 
+function Suppliers() {
+  return (
+    <section
+      id="suppliers"
+      className="px-4 sm:px-6 md:px-8 py-16 bg-background text-foreground"
+    >
+      <div className="max-w-7xl mx-auto text-center">
+        <div className="mb-6">
+          <span className="block text-sm font-semibold text-muted-foreground">
+            Suppliers
+          </span>
+          <h2 className="mt-3 text-3xl sm:text-4xl font-medium">
+            Bid on relevant tenders
+          </h2>
+          <p className="mt-2 text-sm sm:text-base text-muted-foreground">
+            Connect with genuine buyers and showcase your services effectively.
+          </p>
+        </div>
+
+        <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {supplierCards.map((card, i) => (
+            <article
+              key={i}
+              className="flex flex-col bg-white border rounded-md overflow-hidden shadow-sm"
+            >
+              {/* Image / visual area */}
+              <div className="h-56 bg-gray-100 flex items-center justify-center">
+                {/* Replace with <img src={...} /> or Next/Image if you have an asset */}
+                <svg
+                  className="w-14 h-14 text-gray-300"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="1.5"
+                    d="M3 7a2 2 0 012-2h3l2 3h6a2 2 0 012 2v7a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"
+                  />
+                </svg>
+              </div>
+
+              {/* Body */}
+              <div className="p-5 flex-1 flex flex-col justify-between">
+                <div>
+                  <span className="text-xs text-muted-foreground block mb-2">
+                    {card.subtitle}
+                  </span>
+                  <h3 className="text-lg font-medium mb-2">{card.title}</h3>
+                  <p className="text-sm text-muted-foreground">{card.desc}</p>
+                </div>
+
+                <div className="mt-4">
+                  <button
+                    type="button"
+                    className="inline-flex items-center text-sm font-medium text-primary hover:underline focus:outline-none"
+                    aria-label={`${card.cta} ${card.title}`}
+                  >
+                    <span>{card.cta}</span>
+                    <svg
+                      className="ml-2 w-4 h-4"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M9 5l7 7-7 7"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
 /* -------------------------------------------------------------------------- */
 /* PAGE EXPORT */
 /* -------------------------------------------------------------------------- */
@@ -1121,6 +1288,7 @@ export default function Home() {
           <Hero />
           <About />
           <Process />
+
           <Features />
           <Services />
           <Problems />

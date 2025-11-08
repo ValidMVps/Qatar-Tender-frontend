@@ -197,7 +197,7 @@ export default function TenderDetailPage() {
       const bidsData = await getTenderBids(tenderId);
       const questionsData = await getQuestionsForTender(tenderId);
       setTender(tenderData);
-      console.log(tenderData);
+      console.log(bidsData);
       setBids(bidsData);
       setQuestions(questionsData as unknown as Question[]);
     } catch (err: any) {
@@ -656,9 +656,11 @@ export default function TenderDetailPage() {
                               <div className="flex-1 min-w-0">
                                 <div className="flex flex-wrap items-center gap-2 mb-4">
                                   <h3 className="font-semibold text-gray-900 text-base sm:text-lg truncate">
-                                    {(!bid.bidder.profile?.anonymousBidding ||
-                                      bid.status === "accepted" ||
-                                      bid.status === "completed") && (
+                                    {bid.bidder.profile?.anonymousBidding &&
+                                    bid.status !== "accepted" &&
+                                    bid.status !== "completed" ? (
+                                      <>Anonymous</>
+                                    ) : (
                                       <>
                                         {bid.bidder.profile?.fullName ||
                                           bid.bidder.profile?.companyName ||

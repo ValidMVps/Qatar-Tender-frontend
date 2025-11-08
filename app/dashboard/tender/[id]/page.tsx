@@ -50,6 +50,7 @@ import { toast } from "sonner";
 interface Tender {
   _id: string;
   title: string;
+  closeReason: string;
   description: string;
   estimatedBudget: number;
   deadline: string;
@@ -59,7 +60,8 @@ interface Tender {
     | "pending_approval"
     | "closed"
     | "awarded"
-    | "completed";
+    | "completed"
+    | "rejected";
   category: { _id: string; name?: string; description: string };
   location: string;
   contactEmail: string;
@@ -195,6 +197,7 @@ export default function TenderDetailPage() {
       const bidsData = await getTenderBids(tenderId);
       const questionsData = await getQuestionsForTender(tenderId);
       setTender(tenderData);
+      console.log(bidsData);
       setBids(bidsData);
       setQuestions(questionsData as unknown as Question[]);
     } catch (err: any) {
@@ -446,7 +449,21 @@ export default function TenderDetailPage() {
               </div>
             </div>
           )}
-
+          {tender.closeReason && (
+            <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <div className="flex items-start gap-2">
+                <AlertTriangle className="h-5 w-5 text-red-600 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="text-sm font-medium text-red-900">
+                    {t("tender_closed_reason")}
+                  </p>
+                  <p className="mt-1 text-sm text-red-700 whitespace-pre-wrap">
+                    {tender.closeReason}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
           <div className="bg-white rounded-md shadow-none border border-gray-100 p-6 sm:p-8 mb-8">
             <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
               <div className="flex-1">
@@ -639,9 +656,11 @@ export default function TenderDetailPage() {
                               <div className="flex-1 min-w-0">
                                 <div className="flex flex-wrap items-center gap-2 mb-4">
                                   <h3 className="font-semibold text-gray-900 text-base sm:text-lg truncate">
-                                    {(!bid.bidder.profile?.anonymousBidding ||
-                                      bid.status === "accepted" ||
-                                      bid.status === "completed") && (
+                                    {bid.bidder.profile?.anonymousBidding &&
+                                    bid.status !== "accepted" &&
+                                    bid.status !== "completed" ? (
+                                      <>Anonymous</>
+                                    ) : (
                                       <>
                                         {bid.bidder.profile?.fullName ||
                                           bid.bidder.profile?.companyName ||
@@ -743,6 +762,7 @@ export default function TenderDetailPage() {
                               </div>
                               <div className="flex flex-wrap gap-2">
                                 {bid.status === "submitted" &&
+                                  tender.status !== "rejected" &&
                                   !hasAwardedBid && (
                                     <div className="flex flex-wrap gap-2">
                                       <Button

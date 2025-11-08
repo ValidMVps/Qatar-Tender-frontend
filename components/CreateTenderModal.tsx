@@ -794,7 +794,6 @@ const CreateTenderModal = ({
                   </motion.p>
                 ) : (
                   <div className="flex justify-between text-xs text-gray-400">
-                    <span>{t("be_descriptive_and_specific")}</span>
                     <span>
                       {formData.title.length}/{VALIDATION_RULES.title.max}
                     </span>

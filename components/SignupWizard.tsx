@@ -409,7 +409,7 @@ export default function SignupWizard() {
             {step === 1 && (
               <Button
                 onClick={onContinue}
-                className="bg-blue-600 ms-auto text-white px-4 py-2 sm:px-6 sm:py-2.5 w-full sm:w-auto hover:bg-blue-700"
+                className="bg-black ms-auto text-white px-4 py-2 sm:px-6 sm:py-2.5 w-full sm:w-auto hover:bg-black"
                 disabled={isSubmitting}
               >
                 {t("continue")} <ArrowRight className="ml-2 h-4 w-4" />
@@ -419,7 +419,7 @@ export default function SignupWizard() {
             {step === 2 && (
               <Button
                 onClick={onSubmit}
-                className="bg-blue-600 text-white px-4 py-2 sm:px-6 sm:py-2.5 w-full sm:w-auto hover:bg-blue-700"
+                className="bg-black text-white px-4 py-2 sm:px-6 sm:py-2.5 w-full sm:w-auto hover:bg-black"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? (
@@ -459,10 +459,7 @@ export default function SignupWizard() {
 
       <div className="mt-6 text-center text-sm text-muted-foreground">
         Already have an account?{" "}
-        <Link
-          href="/login"
-          className="font-medium text-blue-600 hover:underline"
-        >
+        <Link href="/login" className="font-medium text-black hover:underline">
           {t("login")}
         </Link>
       </div>
@@ -528,15 +525,15 @@ function SelectableCard({
         "group flex gap-4 sm:gap-6 relative text-left",
         "rounded-xl border bg-white p-4 sm:p-5 transition-all",
         " focus-visible:outline-none",
-        selected ? "border-blue-400" : "border-neutral-200"
+        selected ? "border-gray-400" : "border-neutral-200"
       )}
     >
       <div
         className={cn(
           "flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full transition-colors",
           selected
-            ? "bg-blue-600 text-white"
-            : "bg-blue-50 text-blue-700 group-hover:bg-blue-100"
+            ? "bg-black text-white"
+            : "bg-gray-50 text-black group-hover:bg-gray-100"
         )}
       >
         {icon}
@@ -563,7 +560,8 @@ function StepTwo({
   const { t } = useTranslation();
 
   return (
-    <div className="space-y-5">
+    // grid: 1 column on mobile, 2 columns on sm+
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       {isBiz ? (
         <>
           <div className="space-y-2">
@@ -584,6 +582,7 @@ function StepTwo({
               <p className="text-sm text-red-600 mt-1">{errors.name}</p>
             )}
           </div>
+
           <div className="space-y-2">
             <Label htmlFor="companyEmail" className="text-base font-medium">
               Company email
@@ -624,6 +623,7 @@ function StepTwo({
               <p className="text-sm text-red-600 mt-1">{errors.name}</p>
             )}
           </div>
+
           <div className="space-y-2">
             <Label htmlFor="email" className="text-base font-medium">
               {t("email")}
@@ -646,7 +646,8 @@ function StepTwo({
         </>
       )}
 
-      <div className="space-y-2">
+      {/* Date of Birth - span full width */}
+      <div className="space-y-2 sm:col-span-2">
         <Label htmlFor="dateOfBirth" className="text-base font-medium">
           Date of Birth
         </Label>
@@ -666,16 +667,17 @@ function StepTwo({
         )}
       </div>
 
+      {/* Phone: select + input (left/right in their grid cell) */}
       <div className="space-y-2">
         <Label htmlFor="phone" className="text-base font-medium">
           {t("phone")}
         </Label>
-        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-1">
+        <div className="flex flex-row gap-2 mt-1">
           <Select
             value={form.countryCode}
             onValueChange={(v) => onChange({ countryCode: v })}
           >
-            <SelectTrigger className="w-full sm:w-[140px] py-2.5 sm:py-3">
+            <SelectTrigger className="w-[140px] py-2.5 sm:py-3">
               <SelectValue placeholder={t("code")} />
             </SelectTrigger>
             <SelectContent>
@@ -706,7 +708,8 @@ function StepTwo({
         )}
       </div>
 
-      <div className="space-y-2">
+      {/* Password - span full width for readability */}
+      <div className="space-y-2 sm:col-span-2">
         <Label htmlFor="password" className="text-base font-medium">
           {t("password")}
         </Label>
@@ -726,13 +729,11 @@ function StepTwo({
             <p>{errors.password}</p>
           </div>
         )}
-        <p className="text-xs text-muted-foreground mt-1">
-          Password must be at least 8 characters with letters, numbers, and
-          special characters.
-        </p>
+
       </div>
 
-      <div className="space-y-2">
+      {/* Terms - span full width */}
+      <div className="space-y-2 sm:col-span-2 mt-3">
         <div className="flex items-start space-x-2">
           <Checkbox
             id="agreeToTerms"
@@ -745,11 +746,11 @@ function StepTwo({
           >
             By continuing, you confirm authority to bind your organization and
             agree to the{" "}
-            <Link href="/terms" className="text-blue-600 hover:underline">
+            <Link href="/terms" className="text-black hover:underline">
               Terms of Service
             </Link>{" "}
             and acknowledge the{" "}
-            <Link href="/privacy" className="text-blue-600 hover:underline">
+            <Link href="/privacy" className="text-black hover:underline">
               Privacy Policy
             </Link>
             . You consent to electronic communications and e-signatures.
@@ -848,9 +849,9 @@ function StepHeader({ current }: { current: Step }) {
                 className={cn(
                   "flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full text-xs sm:text-sm font-medium transition-colors relative z-10 bg-white",
                   isComplete
-                    ? "bg-blue-600 text-white"
+                    ? "bg-black text-white"
                     : isActive
-                    ? "bg-blue-100 text-blue-700 ring-2 ring-blue-200"
+                    ? "bg-gray-100 text-black ring-2 ring-gray-200"
                     : "bg-muted text-muted-foreground"
                 )}
                 aria-current={isActive ? "step" : undefined}

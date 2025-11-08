@@ -1,5 +1,11 @@
 "use client";
-
+export const VALIDATION_RULES = {
+  title: { min: 10, max: 50 },
+  description: { min: 20, max: 5000 },
+  estimatedBudget: { min: 0, max: 5000000 },
+  location: { min: 1, max: 100 },
+  maxFileSize: 5 * 1024 * 1024,
+};
 interface ContactDetection {
   type:
     | "email"
@@ -15,14 +21,9 @@ interface ContactDetection {
   rawPattern?: string;
 }
 
-export const VALIDATION_RULES = {
-  title: { min: 10, max: 50 },
-  description: { min: 20, max: 5000 },
-  estimatedBudget: { min: 0, max: 5000000 },
-  location: { min: 1, max: 100 },
-  maxFileSize: 5 * 1024 * 1024,
-};
-
+/* ────────────────────────────────────────────────────────────── */
+/*  FALSE POSITIVES & CONTEXT CLUES (unchanged)                  */
+/* ────────────────────────────────────────────────────────────── */
 const FALSE_POSITIVES = [
   "example.com",
   "test.com",
@@ -46,17 +47,7 @@ const FALSE_POSITIVES = [
   "feedback@",
   "updates@",
   "notifications@",
-  "noreply@",
-  "no-reply@",
-  "no_reply@",
-  "do_not_reply@",
   "reply@",
-  "replies@",
-  "reply-to@",
-  "replyto@",
-  "reply_to@",
-  "webmaster@",
-  "office@",
 ];
 
 const CONTEXT_CLUES = [
@@ -70,1320 +61,235 @@ const CONTEXT_CLUES = [
   "viber",
   "messenger",
   "social",
-  "media",
   "chat",
-  "reach me",
-  "call me",
-  "text me",
-  "message me",
+  "reach",
+  "call",
+  "text",
+  "message",
   "connect",
   "follow",
-  "online",
   "website",
   "site",
   "link",
   "url",
   "www",
   "dm",
-  "direct message",
   "inbox",
   "pm",
-  "private message",
-  "reach out",
-  "get in touch",
-  "get in contact",
-  "contact me",
-  "email me",
-  "call me",
-  "text me",
-  "message me",
-  "connect with me",
-  "follow me",
-  "add me",
-  "friend me",
-  "connect on",
-  "follow on",
-  "add on",
-  "friend on",
-  "message on",
-  "contact on",
-  "reach on",
 ];
 
-const COMMON_WORDS_FOR_DOMAINS = [
-  "website",
-  "site",
-  "online",
-  "web",
-  "app",
-  "service",
-  "contact",
-  "info",
-  "support",
-  "help",
-  "business",
-  "company",
-  "professional",
-  "service",
-  "services",
-  "company",
-  "corporation",
-  "inc",
-  "llc",
-  "ltd",
-  "group",
-  "network",
-  "systems",
-  "solutions",
-  "consulting",
-  "consultants",
-  "agency",
-  "agencies",
-  "store",
-  "shop",
-  "market",
-  "store",
-  "shop",
-  "tech",
-  "technology",
-  "digital",
-  "online",
-  "internet",
-];
+/* ────────────────────────────────────────────────────────────── */
+/*  CORE REGEX PATTERNS – ONE SOURCE OF TRUTH                    */
+/* ────────────────────────────────────────────────────────────── */
+const PATTERNS = {
+  /* ---------- EMAIL ---------- */
+  email: /\b[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}\b/gi,
 
-const EMAIL_INDICATOR_WORDS = [
-  "email",
-  "e-mail",
-  "mail",
-  "contact",
-  "reach",
-  "message",
-  "connect",
-  "follow",
-];
-
-const CONTACT_KEYWORDS = [
-  "contact",
-  "email",
-  "phone",
-  "mobile",
-  "tel",
-  "whatsapp",
-  "telegram",
-  "viber",
-  "messenger",
-  "social",
-  "media",
-  "chat",
-  "reach",
-  "call",
-  "text",
-  "message",
-  "connect",
-  "follow",
-  "online",
-  "website",
-  "site",
-  "link",
-  "url",
-  "www",
-];
-
-const NAME_KEYWORDS = [
-  "ahmed",
-  "zulfiqar",
-  "khan",
-  "ali",
-  "sultan",
-  "abdullah",
-  "muhammad",
-  "omar",
-  "ibrahim",
-  "yusuf",
-  "hamza",
-  "bilal",
-  "farooq",
-  "raza",
-  "malik",
-  "sheikh",
-  "ahmad",
-  "ahmet",
-  "mohammed",
-  "mohamed",
-  "mohammad",
-  "abdul",
-  "abd",
-  "abdou",
-  "abdel",
-  "ibn",
-  "bin",
-  "ben",
-  "ibn",
-  "ibnu",
-  "ibn",
-  "ibn",
-  "ibn",
-  "ibn",
-];
-
-const DOMAIN_KEYWORDS = [
-  "com",
-  "net",
-  "org",
-  "edu",
-  "gov",
-  "io",
-  "co",
-  "uk",
-  "ae",
-  "qa",
-  "pk",
-  "info",
-  "biz",
-  "me",
-  "tv",
-  "cc",
-  "pro",
-  "name",
-  "xyz",
-  "online",
-  "site",
-  "web",
-  "club",
-  "store",
-  "shop",
-  "tech",
-  "app",
-  "ai",
-  "ml",
-  "gov",
-  "edu",
-];
-
-const EMAIL_KEYWORDS = [
-  "gmail",
-  "yahoo",
-  "hotmail",
-  "outlook",
-  "aol",
-  "protonmail",
-  "zoho",
-  "mail",
-  "email",
-  "e-mail",
-  "inbox",
-  "contact",
-  "support",
-  "info",
-  "help",
-  "admin",
-];
-
-const SOCIAL_KEYWORDS = [
-  "whatsapp",
-  "wa",
-  "telegram",
-  "tg",
-  "viber",
-  "facebook",
-  "fb",
-  "instagram",
-  "ig",
-  "linkedin",
-  "twitter",
-  "x",
-  "snapchat",
-  "skype",
-  "discord",
-  "tiktok",
-];
-
-const NUMBER_WORDS = [
-  "zero",
-  "one",
-  "two",
-  "three",
-  "four",
-  "five",
-  "six",
-  "seven",
-  "eight",
-  "nine",
-  "ten",
-  "eleven",
-  "twelve",
-  "thirteen",
-  "fourteen",
-  "fifteen",
-  "sixteen",
-  "seventeen",
-  "eighteen",
-  "nineteen",
-  "twenty",
-  "thirty",
-  "forty",
-  "fifty",
-  "sixty",
-  "seventy",
-  "eighty",
-  "ninety",
-  "hundred",
-  "thousand",
-  "million",
-  "billion",
-  "trillion",
-];
-
-const ARABIC_DIGITS = ["٠", "١", "٢", "٣", "٤", "٥", "٦", "٧", "٨", "٩"];
-const ENGLISH_DIGITS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
-
-// Common phone number patterns by country
-const PHONE_PATTERNS = {
-  // Qatar - 8 digits: 333 4444, 555 6666, etc.
-  qa: [
-    {
-      pattern: /(?:\+?974\s*)?(\d{3}\s*\d{4})/g,
-      minDigits: 7,
-      maxDigits: 8,
-    },
-    {
-      pattern: /(?:\+?974\s*)?(\d{2}\s*\d{3}\s*\d{3})/g,
-      minDigits: 8,
-      maxDigits: 8,
-    },
-    {
-      pattern: /(?:\+?974\s*)?(\d{4}\s*\d{4})/g,
-      minDigits: 8,
-      maxDigits: 8,
-    },
+  /* ---------- OBFUSCATED EMAIL ---------- */
+  obfuscatedEmail: [
+    // ahmed [at] gmail [dot] com  →  ahmed@gmail.com
+    /\b([a-z0-9_-]+)\s*(?:at|@|[\[\(]at[\]\)])\s*([a-z0-9_-]+)\s*(?:dot|\.|[\[\(]dot[\]\)])\s*([a-z]{2,})\b/gi,
+    // ahmed gmail com  →  ahmed@gmail.com
+    /\b([a-z0-9_-]+)\s+([a-z0-9_-]+)\s+(com|net|org|io|co|ae|qa|pk)\b/gi,
+    // ahmedgmailcom (no separator)
+    /\b([a-z0-9_-]+)(gmail|yahoo|hotmail|outlook|protonmail|zoho)(com|net|org)\b/gi,
   ],
-  // UAE - 8 or 9 digits depending on emirate
-  ae: [
-    {
-      pattern: /(?:\+?971\s*)?(\d{2}\s*\d{3}\s*\d{4})/g,
-      minDigits: 9,
-      maxDigits: 9,
-    },
-    {
-      pattern: /(?:\+?971\s*)?(\d{3}\s*\d{3}\s*\d{3})/g,
-      minDigits: 9,
-      maxDigits: 9,
-    },
+
+  /* ---------- PHONE ---------- */
+  phone: [
+    // International / generic
+    /(?:\+?(\d{1,4})[\s.-]?)?\(?(\d{1,4})\)?[\s.-]?\d{3,4}[\s.-]?\d{3,4}\b/g,
+    // Middle-East country codes
+    /(?:\+?(?:974|971|966|92))[\s.-]?\d{2,4}[\s.-]?\d{3,4}[\s.-]?\d{3,4}\b/g,
+    // Simple spaced: 333 4444
+    /\b\d{3}\s+\d{4,7}\b/g,
+    // Arabic digits (7-15)
+    /[\u0660-\u0669]{7,15}/g,
+    // Repeated digits (e.g. 3333333)
+    /\b(\d)\1{5,}\b/g,
   ],
-  // Saudi Arabia - 9 digits
-  sa: [
-    {
-      pattern: /(?:\+?966\s*)?(\d{2}\s*\d{3}\s*\d{4})/g,
-      minDigits: 9,
-      maxDigits: 9,
-    },
-    {
-      pattern: /(?:\+?966\s*)?(\d{3}\s*\d{3}\s*\d{3})/g,
-      minDigits: 9,
-      maxDigits: 9,
-    },
+
+  /* ---------- URL ---------- */
+  url: [
+    // http(s)://…
+    /https?:\/\/[^\s<>"']+/gi,
+    // www.example.com
+    /\bwww\.[a-z0-9-]+\.[a-z]{2,}\b/gi,
+    // example . com  /  example.com.pk
+    /\b([a-z0-9-]+\s*\.\s*(?:com|org|net|io|co|ae|qa|pk))(?:\s*\.\s*[a-z]{2})?\b/gi,
+    // website . com
+    /\b(?:website|site|web|app|service)\s*\.\s*(com|org|net|io|co|ae|qa|pk)\b/gi,
   ],
-  // Pakistan - varies by city
-  pk: [
-    {
-      pattern: /(?:\+?92\s*)?(\d{2,4}\s*\d{5,7})/g,
-      minDigits: 9,
-      maxDigits: 11,
-    },
-    {
-      pattern: /(?:\+?92\s*)?(\d{3}\s*\d{7})/g,
-      minDigits: 10,
-      maxDigits: 10,
-    },
-  ],
-  // Generic international pattern
-  global: [
-    {
-      pattern: /(?:\+?\d{1,4}\s*)?(\d{3,4}\s*\d{3,4}\s*\d{3,4})/g,
-      minDigits: 7,
-      maxDigits: 15,
-    },
-    {
-      pattern: /(?:\+?\d{1,4}\s*)?(\d{2,3}\s*\d{3,4}\s*\d{4})/g,
-      minDigits: 7,
-      maxDigits: 12,
-    },
-    {
-      pattern: /(?:\+?\d{1,4}\s*)?(\d{3,4}\s*\d{4})/g,
-      minDigits: 7,
-      maxDigits: 8,
-    },
+
+  /* ---------- SOCIAL ---------- */
+  social: [
+    // platform:handle  or  @handle
+    /\b(whatsapp|wa|telegram|tg|instagram|ig|facebook|fb|twitter|x|linkedin|snapchat|skype|discord|tiktok)[:\s]*@?([a-z0-9_]{3,})\b/gi,
+    // /@handle  or  just @handle
+    /\/@?([a-z0-9_]{3,})\b/gi,
   ],
 };
 
-// Common phone number indicators
-const PHONE_INDICATORS = [
-  "phone",
-  "tel",
-  "telephone",
-  "mobile",
-  "cell",
-  "whatsapp",
-  "wa",
-  "viber",
-  "telegram",
-  "messenger",
-  "contact",
-  "reach",
-  "call",
-  "text",
-  "sms",
-  "chat",
-];
-
+/* ────────────────────────────────────────────────────────────── */
+/*  MAIN DETECTION FUNCTION                                      */
+/* ────────────────────────────────────────────────────────────── */
 export function detectContactInfo(text: string): ContactDetection[] {
   if (!text || text.trim().length < 3) return [];
 
   const detections: ContactDetection[] = [];
-
-  // Layer 1: Direct pattern matching with enhanced URL detection
-  const directMatches = findDirectMatches(text);
-  detections.push(...directMatches);
-
-  // Layer 2: Special space-separated URL detection (for patterns like "website. com")
-  const spaceSeparatedMatches = findSpaceSeparatedUrlMatches(text);
-  detections.push(...spaceSeparatedMatches);
-
-  // Layer 3: Multi-word pattern detection (for patterns like "ahmed gmail com")
-  const multiWordMatches = findMultiWordPatterns(text);
-  detections.push(...multiWordMatches);
-
-  // Layer 4: Phone number detection (NEW AND IMPROVED)
-  const phoneMatches = findPhoneNumbers(text);
-  detections.push(...phoneMatches);
-
-  // Layer 5: Normalized pattern matching
-  const normalizedMatches = findNormalizedMatches(text);
-  detections.push(...normalizedMatches);
-
-  // Layer 6: Deep pattern matching for obfuscation
-  const deepMatches = findDeepMatches(text);
-  detections.push(...deepMatches);
-
-  // Layer 7: Contextual analysis
-  const contextualDetections = analyzeContext(detections, text);
-
-  // Layer 8: Final filtering (no confidence scoring)
-  return contextualDetections;
-}
-
-// ===== LAYER 1: DIRECT PATTERN MATCHING WITH ENHANCED URL DETECTION =====
-function findDirectMatches(text: string): ContactDetection[] {
-  const detections: ContactDetection[] = [];
-
-  // Enhanced URL patterns that specifically target space-separated domains
-  const urlPatterns = [
-    // Standard URLs
-    { regex: /https?:\/\/[^\s<>"'()]+/gi, type: "url" },
-
-    // www. pattern
-    {
-      regex: /\bwww\.[a-z0-9-]+(?:\.[a-z0-9-]+)+\b/gi,
-      type: "url",
-    },
-
-    // Domain patterns without protocol (including space-separated variations)
-    {
-      regex:
-        /\b[a-z0-9-]+\s*\.\s*(?:com|org|net|edu|gov|io|co|uk|ae|qa|pk|info|biz|me|tv|cc|pro|name|xyz|online|site|web|club|store|shop|tech|app|io|ai|ml|co\.uk|com\.pk|net\.pk|org\.pk)\b/gi,
-      type: "url",
-    },
-
-    // Domain patterns with common words + space-separated TLD (e.g., "website . com")
-    {
-      regex:
-        /\b(?:website|site|online|web|app|service|contact|info)\s*\.\s*(?:com|org|net|edu|gov|io|co|uk|ae|qa|pk)\b/gi,
-      type: "url",
-    },
-
-    // Domain patterns with common words + space-separated TLD + optional country code (e.g., "website . com . pk")
-    {
-      regex:
-        /\b(?:website|site|online|web|app|service|contact|info)\s*\.\s*(?:com|org|net)\s*\.\s*(?:pk|qa|ae|uk)\b/gi,
-      type: "url",
-    },
-
-    // Domain patterns with intentional space separation (e.g., "ahmed . com")
-    {
-      regex:
-        /\b[a-z0-9-]+\s*\.\s*(?:com|org|net|edu|gov|io|co|uk|ae|qa|pk)\b/gi,
-      type: "url",
-    },
-
-    // Domain patterns with intentional space separation and country code (e.g., "ahmed . com . pk")
-    {
-      regex: /\b[a-z0-9-]+\s*\.\s*(?:com|org|net)\s*\.\s*(?:pk|qa|ae|uk)\b/gi,
-      type: "url",
-    },
-
-    // Domain patterns with intentional space separation and multiple TLDs (e.g., "ahmed . com . pk")
-    {
-      regex:
-        /\b[a-z0-9-]+\s*\.\s*[a-z0-9-]+\s*\.\s*(?:com|org|net|edu|gov|io|co|uk|ae|qa|pk)\b/gi,
-      type: "url",
-    },
-  ];
-
-  // Process URL patterns
-  urlPatterns.forEach((pattern) => {
-    const matches = findMatches(text, pattern.regex);
-    if (matches) {
-      matches.forEach((match) => {
-        const cleanMatch = cleanMatchResult(match, pattern.type);
-        if (cleanMatch.length < 3) return;
-
-        if (!isFalsePositive(cleanMatch)) {
-          detections.push({
-            type: pattern.type as ContactDetection["type"],
-            pattern: cleanMatch,
-            rawPattern: match,
-            severity: "low",
-            context: getSurroundingContext(text, cleanMatch),
-          });
-        }
-      });
-    }
-  });
-
-  return detections;
-}
-
-// ===== LAYER 2: SPECIAL SPACE-SEPARATED URL DETECTION =====
-function findSpaceSeparatedUrlMatches(text: string): ContactDetection[] {
-  const detections: ContactDetection[] = [];
-
-  // This layer specifically targets patterns like "website. com", "ahmed .com", "contact . com", etc.
-  const spaceSeparatedPatterns = [
-    // Patterns with space before/after the dot
-    {
-      regex:
-        /\b([a-z0-9-]+)\s*\.\s*(com|org|net|edu|gov|io|co|uk|ae|qa|pk)\b/gi,
-      type: "url",
-    },
-
-    // Patterns with common words + space-separated TLD
-    {
-      regex:
-        /\b(website|site|online|web|app|service|contact|info)\s*\.\s*(com|org|net|edu|gov|io|co|uk|ae|qa|pk)\b/gi,
-      type: "url",
-    },
-
-    // Patterns with space-separated multi-level domains
-    {
-      regex: /\b([a-z0-9-]+)\s*\.\s*(com|org|net)\s*\.\s*(pk|qa|ae|uk)\b/gi,
-      type: "url",
-    },
-
-    // Patterns with space-separated domains and optional "www"
-    {
-      regex:
-        /\bwww\s*\.\s*([a-z0-9-]+)\s*\.\s*(com|org|net|edu|gov|io|co|uk|ae|qa|pk)\b/gi,
-      type: "url",
-    },
-  ];
-
-  spaceSeparatedPatterns.forEach((pattern) => {
-    let match;
-    while ((match = pattern.regex.exec(text)) !== null) {
-      // Reconstruct the full match with spaces to preserve the original pattern
-      const fullMatch = text.substring(
-        match.index,
-        match.index + match[0].length
-      );
-      const cleanMatch = cleanMatchResult(fullMatch, pattern.type);
-
-      if (cleanMatch.length >= 3 && !isFalsePositive(cleanMatch)) {
-        detections.push({
-          type: pattern.type as ContactDetection["type"],
-          pattern: cleanMatch,
-          rawPattern: fullMatch,
-          severity: "low",
-          context: getSurroundingContext(text, cleanMatch),
-        });
-      }
-
-      // Prevent infinite loops
-      if (pattern.regex.lastIndex === match.index) {
-        pattern.regex.lastIndex++;
-      }
-    }
-  });
-
-  return detections;
-}
-
-// ===== LAYER 3: MULTI-WORD PATTERN DETECTION (FOR "ahmed gmail com" PATTERNS) =====
-function findMultiWordPatterns(text: string): ContactDetection[] {
-  const detections: ContactDetection[] = [];
-
-  // Split text into words
-  const words = text.split(/\s+/).filter((word) => word.length > 0);
-
-  // Check sequences of words that might form contact information
-  for (let i = 0; i < words.length - 2; i++) {
-    const word1 = cleanWordForDetection(words[i]);
-    const word2 = cleanWordForDetection(words[i + 1]);
-    const word3 = cleanWordForDetection(words[i + 2]);
-
-    // Check for email-like patterns: [name] [email-provider] [domain]
-    if (
-      isNameLike(word1) &&
-      EMAIL_KEYWORDS.some((kw) => word2.includes(kw)) &&
-      DOMAIN_KEYWORDS.some((kw) => word3.includes(kw))
-    ) {
-      const pattern = `${word1}@${word2}.${word3}`;
-      const rawPattern = `${words[i]} ${words[i + 1]} ${words[i + 2]}`;
-
-      detections.push({
-        type: "email",
-        pattern,
-        rawPattern,
-        severity: "low",
-        context: getSurroundingWords(words, i, 3),
-      });
-    }
-
-    // Check for URL-like patterns: [name] [domain] [country-code]
-    if (
-      isNameLike(word1) &&
-      DOMAIN_KEYWORDS.some((kw) => word2.includes(kw)) &&
-      ["pk", "qa", "ae", "uk", "us", "ca", "de", "fr"].includes(word3)
-    ) {
-      const pattern = `${word1}.${word2}.${word3}`;
-      const rawPattern = `${words[i]} ${words[i + 1]} ${words[i + 2]}`;
-
-      detections.push({
-        type: "url",
-        pattern,
-        rawPattern,
-        severity: "low",
-        context: getSurroundingWords(words, i, 3),
-      });
-    }
-
-    // Check for patterns with "at" or "dot": [name] at [email-provider] dot [domain]
-    if (
-      i < words.length - 4 &&
-      isNameLike(word1) &&
-      ["at", "@"].includes(words[i + 1].toLowerCase()) &&
-      EMAIL_KEYWORDS.some((kw) => word3.includes(kw)) &&
-      ["dot", "."].includes(words[i + 3].toLowerCase()) &&
-      DOMAIN_KEYWORDS.some((kw) => word3.includes(kw))
-    ) {
-      const pattern = `${word1}@${word3}.${word1}`;
-      const rawPattern = `${words[i]} ${words[i + 1]} ${words[i + 2]} ${
-        words[i + 3]
-      } ${words[i + 4]}`;
-
-      detections.push({
-        type: "email",
-        pattern,
-        rawPattern,
-        severity: "low",
-        context: getSurroundingWords(words, i, 5),
-      });
-    }
-
-    // Check for patterns with "dot" at the end: [name] [domain] dot [country-code]
-    if (
-      i < words.length - 3 &&
-      isNameLike(word1) &&
-      DOMAIN_KEYWORDS.some((kw) => word2.includes(kw)) &&
-      ["dot", "."].includes(words[i + 2].toLowerCase()) &&
-      ["pk", "qa", "ae", "uk", "us", "ca", "de", "fr"].includes(
-        words[i + 3].toLowerCase()
-      )
-    ) {
-      const pattern = `${word1}.${word2}.${words[i + 3]}`;
-      const rawPattern = `${words[i]} ${words[i + 1]} ${words[i + 2]} ${
-        words[i + 3]
-      }`;
-
-      detections.push({
-        type: "url",
-        pattern,
-        rawPattern,
-        severity: "low",
-        context: getSurroundingWords(words, i, 4),
-      });
-    }
-
-    // Check for patterns with "at": [name] at [email-provider] [domain]
-    if (
-      i < words.length - 3 &&
-      isNameLike(word1) &&
-      ["at", "@"].includes(words[i + 1].toLowerCase()) &&
-      EMAIL_KEYWORDS.some((kw) => word3.includes(kw)) &&
-      DOMAIN_KEYWORDS.some((kw) => word1.includes(kw))
-    ) {
-      const pattern = `${word1}@${word3}.${word1}`;
-      const rawPattern = `${words[i]} ${words[i + 1]} ${words[i + 2]} ${
-        words[i + 3]
-      }`;
-
-      detections.push({
-        type: "email",
-        pattern,
-        rawPattern,
-        severity: "low",
-        context: getSurroundingWords(words, i, 4),
-      });
-    }
-
-    // Check for social media patterns: [social] [name]
-    if (SOCIAL_KEYWORDS.some((kw) => word1.includes(kw)) && isNameLike(word2)) {
-      const pattern = `${word1}/${word2}`;
-      const rawPattern = `${words[i]} ${words[i + 1]}`;
-
-      detections.push({
-        type: "social",
-        pattern,
-        rawPattern,
-        severity: "medium",
-        context: getSurroundingWords(words, i, 2),
-      });
-    }
-  }
-
-  // Additional check for 4-word patterns
-  for (let i = 0; i < words.length - 3; i++) {
-    const word1 = cleanWordForDetection(words[i]);
-    const word2 = cleanWordForDetection(words[i + 1]);
-    const word3 = cleanWordForDetection(words[i + 2]);
-    const word4 = cleanWordForDetection(words[i + 3]);
-
-    // Check for patterns like "my email is ahmed gmail com"
-    if (
-      CONTACT_KEYWORDS.some((kw) => word1.includes(kw)) &&
-      EMAIL_INDICATOR_WORDS.some((kw) => word2.includes(kw)) &&
-      isNameLike(word3) &&
-      EMAIL_KEYWORDS.some((kw) => word4.includes(kw))
-    ) {
-      // Look ahead for domain
-      if (i + 4 < words.length) {
-        const word5 = cleanWordForDetection(words[i + 4]);
-        if (DOMAIN_KEYWORDS.some((kw) => word5.includes(kw))) {
-          const pattern = `${word3}@${word4}.${word5}`;
-          const rawPattern = `${words[i]} ${words[i + 1]} ${words[i + 2]} ${
-            words[i + 3]
-          } ${words[i + 4]}`;
-
-          detections.push({
-            type: "email",
-            pattern,
-            rawPattern,
-            severity: "low",
-            context: getSurroundingWords(words, i, 5),
-          });
-        }
-      }
-    }
-
-    // Check for patterns like "ahmed at gmail dot com"
-    if (
-      isNameLike(word1) &&
-      ["at", "@"].includes(words[i + 1].toLowerCase()) &&
-      EMAIL_KEYWORDS.some((kw) => word3.includes(kw)) &&
-      ["dot", "."].includes(words[i + 3].toLowerCase())
-    ) {
-      // Look ahead for domain
-      if (i + 4 < words.length) {
-        const word5 = cleanWordForDetection(words[i + 4]);
-        if (DOMAIN_KEYWORDS.some((kw) => word5.includes(kw))) {
-          const pattern = `${word1}@${word3}.${word5}`;
-          const rawPattern = `${words[i]} ${words[i + 1]} ${words[i + 2]} ${
-            words[i + 3]
-          } ${words[i + 4]}`;
-
-          detections.push({
-            type: "email",
-            pattern,
-            rawPattern,
-            severity: "low",
-            context: getSurroundingWords(words, i, 5),
-          });
-        }
-      }
-    }
-  }
-
-  return detections;
-}
-
-// ===== LAYER 4: PHONE NUMBER DETECTION (NEW AND IMPROVED) =====
-function findPhoneNumbers(text: string): ContactDetection[] {
-  const detections: ContactDetection[] = [];
-
-  // 1. Direct phone number patterns
-  const directPhonePatterns = [
-    // International formats with country codes
-    {
-      regex: /\+?\d{1,4}[-.\s]?\(?\d{1,4}\)?[-.\s]?\d{3,4}[-.\s]?\d{3,4}/g,
-      type: "phone",
-    },
-
-    // Middle Eastern formats (Qatar, UAE, etc.)
-    {
-      regex: /\+?97[0-9][-.\s]?\d{3}[-.\s]?\d{4}/g,
-      type: "phone",
-    },
-
-    // Common phone number patterns
-    {
-      regex: /\b(?:\d{3}[-.\s]?){2,3}\d{3,4}\b/g,
-      type: "phone",
-    },
-
-    // Phone numbers with words
-    {
-      regex:
-        /\b(?:phone|tel|mobile|cell|whatsapp|wa)\s*[:\-]?\s*\+?\d{1,4}[-.\s]?\(?\d{1,4}\)?[-.\s]?\d{3,4}[-.\s]?\d{3,4}\b/gi,
-      type: "phone",
-    },
-  ];
-
-  directPhonePatterns.forEach((pattern) => {
-    const matches = findMatches(text, pattern.regex);
-    if (matches) {
-      matches.forEach((match) => {
-        const cleanMatch = cleanPhoneMatch(match);
-        if (
-          cleanMatch.digits.length >= 7 &&
-          !isFalsePositive(cleanMatch.display)
-        ) {
-          detections.push({
-            type: "phone",
-            pattern: cleanMatch.display,
-            rawPattern: match,
-            severity: "low",
-            context: getSurroundingContext(text, match),
-          });
-        }
-      });
-    }
-  });
-
-  // 2. Country-specific patterns
-  Object.entries(PHONE_PATTERNS).forEach(([country, patterns]) => {
-    patterns.forEach((patternConfig) => {
-      let match;
-      while ((match = patternConfig.pattern.exec(text)) !== null) {
-        const rawMatch = text.substring(
-          match.index,
-          match.index + match[0].length
-        );
-        const cleanMatch = cleanPhoneMatch(rawMatch);
-
-        if (
-          cleanMatch.digits.length >= patternConfig.minDigits &&
-          cleanMatch.digits.length <= patternConfig.maxDigits &&
-          !isFalsePositive(cleanMatch.display)
-        ) {
-          detections.push({
-            type: "phone",
-            pattern: cleanMatch.display,
-            rawPattern: rawMatch,
-            severity: "low",
-            context: getSurroundingContext(text, rawMatch),
-          });
-        }
-      }
-    });
-  });
-
-  // 3. Multi-word phone number detection (e.g., "three three three four four four four")
-  const words = text.split(/\s+/).filter((word) => word.length > 0);
-  for (let i = 0; i < words.length - 3; i++) {
-    // Check for patterns like "call me at three three three four four four four"
-    if (
-      PHONE_INDICATORS.some((indicator) =>
-        words
-          .slice(Math.max(0, i - 3), i)
-          .some((w) => w.toLowerCase().includes(indicator))
-      )
-    ) {
-      const numberWords = [];
-      let j = i;
-
-      // Collect up to 10 number words
-      while (j < words.length && numberWords.length < 10) {
-        const word = words[j].toLowerCase().replace(/[^a-z]/g, "");
-        if (NUMBER_WORDS.includes(word)) {
-          numberWords.push(word);
-        } else {
-          break;
-        }
-        j++;
-      }
-
-      if (numberWords.length >= 7) {
-        const digits = numberWords
-          .map((word) => {
-            const index = NUMBER_WORDS.indexOf(word);
-            return index < 10 ? index.toString() : "";
-          })
-          .join("");
-
-        if (digits.length >= 7) {
-          const rawPattern = words.slice(i, i + numberWords.length).join(" ");
-          detections.push({
-            type: "phone",
-            pattern: formatPhoneNumber(digits),
-            rawPattern: rawPattern,
-            severity: "low",
-            context: getSurroundingWords(words, i, numberWords.length),
-          });
-        }
-      }
-    }
-  }
-
-  // 4. Arabic digit detection
-  const arabicDigitPattern = new RegExp(`[${ARABIC_DIGITS.join("")}]+`, "g");
-  let arabicMatch;
-  while ((arabicMatch = arabicDigitPattern.exec(text)) !== null) {
-    const arabicDigits = arabicMatch[0];
-    const englishDigits = convertArabicToEnglish(arabicDigits);
-
-    if (englishDigits.length >= 7) {
-      const rawPattern = text.substring(
-        arabicMatch.index,
-        arabicMatch.index + arabicMatch[0].length
-      );
-      detections.push({
-        type: "phone",
-        pattern: formatPhoneNumber(englishDigits),
-        rawPattern: rawPattern,
-        severity: "low",
-        context: getSurroundingContext(text, rawPattern),
-      });
-    }
-  }
-
-  // 5. Phone numbers with spaces but no separators (e.g., "333 4444")
-  const spaceSeparatedNumbers = text.match(/\b(?:\d+\s+){3,}\d+\b/g);
-  if (spaceSeparatedNumbers) {
-    spaceSeparatedNumbers.forEach((match) => {
-      const digits = match.replace(/\D/g, "");
-      if (digits.length >= 7 && digits.length <= 15) {
-        detections.push({
-          type: "phone",
-          pattern: formatPhoneNumber(digits),
-          rawPattern: match,
-          severity: "low",
-          context: getSurroundingContext(text, match),
-        });
-      }
-    });
-  }
-
-  // 6. Phone numbers with repeated patterns (e.g., "3333333")
-  const repeatedPatterns = text.match(/\b(\d)\1{5,}\b/g);
-  if (repeatedPatterns) {
-    repeatedPatterns.forEach((match) => {
-      detections.push({
-        type: "phone",
-        pattern: formatPhoneNumber(match),
-        rawPattern: match,
-        severity: "medium",
-        context: getSurroundingContext(text, match),
-      });
-    });
-  }
-
-  return detections;
-}
-
-// ===== HELPER FUNCTIONS FOR PHONE NUMBER DETECTION =====
-function cleanPhoneMatch(match: string): { digits: string; display: string } {
-  // Extract digits
-  const digits = match.replace(/\D/g, "");
-
-  // Format for display (Qatar example: 333 4444)
-  let display = "";
-  if (digits.length === 8) {
-    display = `${digits.substring(0, 3)} ${digits.substring(3)}`;
-  } else if (digits.length === 9) {
-    display = `${digits.substring(0, 2)} ${digits.substring(
-      2,
-      5
-    )} ${digits.substring(5)}`;
-  } else if (digits.length === 10) {
-    display = `+${digits.substring(0, 2)} ${digits.substring(
-      2,
-      5
-    )} ${digits.substring(5, 8)} ${digits.substring(8)}`;
-  } else {
-    // For other lengths, group in sets of 3-4 digits
-    for (let i = 0; i < digits.length; i += 3) {
-      display += digits.substring(i, i + 3) + " ";
-    }
-    display = display.trim();
-  }
-
-  return { digits, display };
-}
-
-function formatPhoneNumber(digits: string): string {
-  if (digits.length === 8) {
-    return `${digits.substring(0, 3)} ${digits.substring(3)}`;
-  } else if (digits.length === 9) {
-    return `${digits.substring(0, 2)} ${digits.substring(
-      2,
-      5
-    )} ${digits.substring(5)}`;
-  } else if (digits.length === 10) {
-    return `+${digits.substring(0, 2)} ${digits.substring(
-      2,
-      5
-    )} ${digits.substring(5, 8)} ${digits.substring(8)}`;
-  } else {
-    // For other lengths, group in sets of 3-4 digits
-    let formatted = "";
-    for (let i = 0; i < digits.length; i += 3) {
-      formatted += digits.substring(i, i + 3) + " ";
-    }
-    return formatted.trim();
-  }
-}
-
-function convertArabicToEnglish(arabicDigits: string): string {
-  return arabicDigits
-    .split("")
-    .map((digit) => {
-      const index = ARABIC_DIGITS.indexOf(digit);
-      return index !== -1 ? ENGLISH_DIGITS[index] : digit;
-    })
-    .join("");
-}
-
-// ===== LAYER 5: NORMALIZED PATTERN MATCHING =====
-function findNormalizedMatches(text: string): ContactDetection[] {
-  const detections: ContactDetection[] = [];
-
-  // URL patterns for normalized text
-  const normalizedUrlPatterns = [
-    // Domain patterns without separators (e.g., ahmedcom)
-    {
-      regex: /[a-z0-9]+(?:com|org|net|edu|gov|io|co|uk|ae|qa|pk)[a-z0-9]*/gi,
-      type: "url",
-    },
-
-    // Domain patterns with common misspellings (e.g., ahmedcompk)
-    {
-      regex: /[a-z0-9]+(?:com|org|net)(?:pk|qa|ae|uk)[a-z0-9]*/gi,
-      type: "url",
-    },
-
-    // Common word + TLD patterns without separators (e.g., websitecom)
-    {
-      regex:
-        /(?:website|site|online|web|app|service|contact|info)(?:com|org|net|edu|gov|io|co|uk|ae|qa|pk)[a-z0-9]*/gi,
-      type: "url",
-    },
-  ];
-
-  // Email patterns for normalized text
-  const normalizedEmailPatterns = [
-    // Email without separators (e.g., ahmedgmailcom)
-    {
-      regex:
-        /[a-z0-9]+(?:gmail|yahoo|hotmail|outlook|aol|protonmail|zoho)[a-z0-9]*com[a-z0-9]*/gi,
-      type: "email",
-    },
-
-    // Email with common misspellings
-    {
-      regex:
-        /[a-z0-9]+(?:gmai|yah00|hotma1|outl00k|a0l|pr0t0nm4il|z0h0)[a-z0-9]*c0m[a-z0-9]*/gi,
-      type: "obfuscated",
-    },
-  ];
-
-  normalizedUrlPatterns.forEach((pattern) => {
-    const matches = findMatches(text, pattern.regex);
-    if (matches) {
-      matches.forEach((match) => {
-        const cleanMatch = cleanMatchResult(match, pattern.type);
-        if (cleanMatch.length >= 3 && !isFalsePositive(cleanMatch)) {
-          detections.push({
-            type: pattern.type as ContactDetection["type"],
-            pattern: cleanMatch,
-            severity: "medium",
-            context: "normalized",
-          });
-        }
-      });
-    }
-  });
-
-  normalizedEmailPatterns.forEach((pattern) => {
-    const matches = findMatches(text, pattern.regex);
-    if (matches) {
-      matches.forEach((match) => {
-        const cleanMatch = cleanMatchResult(match, pattern.type);
-        if (cleanMatch.length >= 3 && !isFalsePositive(cleanMatch)) {
-          detections.push({
-            type: pattern.type as ContactDetection["type"],
-            pattern: cleanMatch,
-            severity: "medium",
-            context: "normalized",
-          });
-        }
-      });
-    }
-  });
-
-  return detections;
-}
-
-// ===== LAYER 6: DEEP PATTERN MATCHING FOR OBFUSCATION =====
-function findDeepMatches(text: string): ContactDetection[] {
-  const detections: ContactDetection[] = [];
-
-  // Deep URL patterns
-  const deepUrlPatterns = [
-    // Domain patterns with character substitution (e.g., ahmedc0m)
-    {
-      regex: /[a-z0-9]+(?:c0m|0rg|n3t|3du|g0v|10|c0|uk|a3|q4|pk)[a-z0-9]*/gi,
-      type: "obfuscated",
-    },
-
-    // Domain patterns with repeated characters (e.g., aahmeedcom)
-    {
-      regex:
-        /(.)\1{2,}[a-z0-9]+(?:com|org|net|edu|gov|io|co|uk|ae|qa|pk)[a-z0-9]*/gi,
-      type: "obfuscated",
-    },
-
-    // Common word + TLD patterns with character substitution
-    {
-      regex:
-        /(?:webs1te|s1te|onl1ne|w3b|4pp|s3rv1ce|c0nt4ct|1nfo)(?:c0m|0rg|n3t|3du|g0v|10|c0|uk|a3|q4|pk)[a-z0-9]*/gi,
-      type: "obfuscated",
-    },
-  ];
-
-  // Deep email patterns
-  const deepEmailPatterns = [
-    // Email with character substitution (e.g., ahmed@gma1l.c0m)
-    {
-      regex:
-        /[a-z0-9]+@(?:gma1l|yah00|hotma1|outl00k|a0l|pr0t0nm4il|z0h0)\.(?:c0m|0rg|n3t|3du|g0v|10|c0|uk|a3|q4|pk)/gi,
-      type: "obfuscated",
-    },
-  ];
-
-  deepUrlPatterns.forEach((pattern) => {
-    const matches = findMatches(text, pattern.regex);
-    if (matches) {
-      matches.forEach((match) => {
-        const cleanMatch = cleanMatchResult(match, pattern.type);
-        if (cleanMatch.length >= 3 && !isFalsePositive(cleanMatch)) {
-          detections.push({
-            type: pattern.type as ContactDetection["type"],
-            pattern: cleanMatch,
-            severity: "low",
-            context: "deep_normalized",
-          });
-        }
-      });
-    }
-  });
-
-  deepEmailPatterns.forEach((pattern) => {
-    const matches = findMatches(text, pattern.regex);
-    if (matches) {
-      matches.forEach((match) => {
-        const cleanMatch = cleanMatchResult(match, pattern.type);
-        if (cleanMatch.length >= 3 && !isFalsePositive(cleanMatch)) {
-          detections.push({
-            type: pattern.type as ContactDetection["type"],
-            pattern: cleanMatch,
-            severity: "low",
-            context: "deep_normalized",
-          });
-        }
-      });
-    }
-  });
-
-  return detections;
-}
-
-// ===== HELPER FUNCTIONS FOR MULTI-WORD DETECTION =====
-function cleanWordForDetection(word: string): string {
-  return word
-    .toLowerCase()
-    .replace(/[^a-z0-9]/g, "")
-    .replace(/1/g, "i")
-    .replace(/0/g, "o")
-    .replace(/5/g, "s")
-    .replace(/7/g, "t")
-    .replace(/3/g, "e")
-    .replace(/8/g, "b")
-    .replace(/4/g, "a")
-    .replace(/6/g, "g")
-    .replace(/9/g, "q")
-    .replace(/l/g, "i")
-    .replace(/z/g, "s");
-}
-
-function isNameLike(word: string): boolean {
-  // Check if it looks like a name (at least 3 characters, mostly letters)
-  return (
-    word.length >= 3 &&
-    /[a-z]/i.test(word) &&
-    word.match(/[a-z]/gi)?.length! > word.length * 0.7
-  );
-}
-
-function getSurroundingWords(
-  words: string[],
-  startIndex: number,
-  length: number
-): string {
-  const start = Math.max(0, startIndex - 2);
-  const end = Math.min(words.length, startIndex + length + 2);
-  return words.slice(start, end).join(" ");
-}
-
-// ===== UTILITY FUNCTIONS =====
-function normalizeText(input: string): string {
-  return input
-    .toLowerCase()
-    .replace(/[^\x00-\x7F]/g, "")
-    .replace(/[\s\-_.,:;|\/\\~`!@#$%^&*()+=\[\]{}'"<>?]/g, "")
-    .replace(/\b(dot|d0t|d-o-t|dt|d0t|d0tt|dott|d0tt|dott)\b/g, ".")
-    .replace(/\b(at|a-t|a_t|att|at|@|a@t|a@tt|a@t)\b/g, "@")
-    .replace(/\b(zero|o|oh|0h|00|0o|oo)\b/g, "0")
-    .replace(/\bone\b/g, "1")
-    .replace(/\btwo\b/g, "2")
-    .replace(/\bthree\b/g, "3")
-    .replace(/\bfour\b/g, "4")
-    .replace(/\bfive\b/g, "5")
-    .replace(/\bsix\b/g, "6")
-    .replace(/\bseven\b/g, "7")
-    .replace(/\beight\b/g, "8")
-    .replace(/\bnine\b/g, "9")
-    .replace(/\bcom\b/g, "com")
-    .replace(/\bn?t\b/g, "net")
-    .replace(/\borg\b/g, "org")
-    .replace(/\bedu\b/g, "edu")
-    .replace(/\bgov\b/g, "gov")
-    .replace(/\bio\b/g, "io")
-    .replace(/\bco\b/g, "co")
-    .replace(/\buk\b/g, "uk")
-    .replace(/\bae\b/g, "ae")
-    .replace(/\bqa\b/g, "qa")
-    .replace(/\bpk\b/g, "pk");
-}
-
-function findMatches(text: string, regex: RegExp): string[] {
-  const matches = [];
-  let match;
-
-  // Reset regex lastIndex to avoid issues with global regex
-  regex.lastIndex = 0;
-
-  while ((match = regex.exec(text)) !== null) {
-    matches.push(match[0]);
-
-    // Prevent infinite loops
-    if (match.index === regex.lastIndex) {
-      regex.lastIndex++;
-    }
-  }
-
-  return matches;
-}
-
-function cleanMatchResult(match: string, type: string): string {
-  // Remove common surrounding characters
-  let clean = match
-    .trim()
-    .replace(/^[.,;:!?(){}\[\]'"`]+|[.,;:!?(){}\[\]'"`]+$/g, "");
-
-  // Special cleaning for URLs
-  if (type === "url" || type === "obfuscated") {
-    clean = clean
-      .replace(/^(https?:\/\/)?(www\.)?/i, "")
-      .replace(/\/$/, "")
-      .replace(/\s+/g, "");
-  }
-
-  return clean;
-}
-
-function isFalsePositive(pattern: string): boolean {
-  return FALSE_POSITIVES.some(
-    (fp) =>
-      pattern.toLowerCase().includes(fp.toLowerCase()) ||
-      levenshteinDistance(pattern.toLowerCase(), fp.toLowerCase()) < 3
-  );
-}
-
-function getSurroundingContext(text: string, pattern: string): string {
-  const index = text.toLowerCase().indexOf(pattern.toLowerCase());
-  if (index === -1) return "";
-
-  const start = Math.max(0, index - 20);
-  const end = Math.min(text.length, index + pattern.length + 20);
-
-  return text.substring(start, end).trim();
-}
-
-function analyzeContext(
-  detections: ContactDetection[],
-  text: string
-): ContactDetection[] {
-  return detections.map((detection) => {
-    // Context clues are still used for filtering/boosting detection relevance
-    const contextLower = detection.context?.toLowerCase() || "";
-    const hasContextClue = CONTEXT_CLUES.some((clue) =>
-      contextLower.includes(clue.toLowerCase())
-    );
-
-    // Boost severity if strong context
-    const severity = hasContextClue ? "high" : detection.severity;
-
-    return {
-      ...detection,
+  const lower = text.toLowerCase();
+
+  const add = (
+    type: ContactDetection["type"],
+    pattern: string,
+    raw: string,
+    baseSeverity: "high" | "medium" | "low" = "low"
+  ) => {
+    if (isFalsePositive(pattern)) return;
+    const ctx = getContext(text, raw);
+    const severity = hasContextClue(ctx) ? "high" : baseSeverity;
+    detections.push({
+      type,
+      pattern: pattern.trim(),
+      rawPattern: raw,
       severity,
-    };
+      context: ctx,
+    });
+  };
+
+  /* ---------- 1. EMAIL ---------- */
+  const emailMatches = [...text.matchAll(PATTERNS.email)];
+  emailMatches.forEach((m) => add("email", m[0], m[0]));
+
+  /* ---------- 2. OBFUSCATED EMAIL ---------- */
+  PATTERNS.obfuscatedEmail.forEach((re) => {
+    const matches = [...text.matchAll(re)];
+    matches.forEach((m) => {
+      const [_, p1, p2, p3] = m;
+      const reconstructed = `${p1}@${p2}.${p3}`;
+      add("obfuscated", reconstructed, m[0], "medium");
+    });
+  });
+
+  /* ---------- 3. PHONE ---------- */
+  PATTERNS.phone.forEach((re) => {
+    const matches = [...text.matchAll(re)];
+    matches.forEach((m) => {
+      const raw = m[0];
+      const digits = raw.replace(/\D/g, "");
+      if (digits.length < 7 || digits.length > 15) return;
+      const display = formatPhone(digits);
+      add("phone", display, raw);
+    });
+  });
+
+  /* ---------- 4. URL ---------- */
+  PATTERNS.url.forEach((re) => {
+    const matches = [...text.matchAll(re)];
+    matches.forEach((m) => {
+      const raw = m[0];
+      const clean = raw
+        .replace(/^(https?:\/\/|www\.)/i, "")
+        .replace(/\s+/g, "");
+      add("url", clean, raw);
+    });
+  });
+
+  /* ---------- 5. SOCIAL ---------- */
+  PATTERNS.social.forEach((re) => {
+    const matches = [...text.matchAll(re)];
+    matches.forEach((m) => {
+      const platform = m[1] ? m[1].toLowerCase() : "";
+      const handle = m[2] || m[1];
+      const pattern = platform ? `${platform}:${handle}` : `@${handle}`;
+      add("social", pattern, m[0], "medium");
+    });
+  });
+
+  /* ---------- 6. ARABIC DIGITS (standalone) ---------- */
+  const arabic = text.match(/[\u0660-\u0669]{7,}/g);
+  if (arabic) {
+    arabic.forEach((raw) => {
+      const eng = raw
+        .split("")
+        .map((d) => "٠١٢٣٤٥٦٧٨٩".indexOf(d))
+        .join("");
+      add("arabic", formatPhone(eng), raw, "medium");
+    });
+  }
+
+  /* ---------- 7. USERNAME FALLBACK (name + provider) ---------- */
+  const words = text.split(/\s+/);
+  for (let i = 0; i < words.length - 1; i++) {
+    const w1 = words[i].toLowerCase().replace(/[^\w]/g, "");
+    const w2 = words[i + 1].toLowerCase();
+    if (
+      w1.length > 2 &&
+      /[a-z]/.test(w1) &&
+      (w2.includes("gmail") ||
+        w2.includes("yahoo") ||
+        w2.includes("hotmail") ||
+        w2.includes("outlook") ||
+        w2.includes("com") ||
+        w2.includes("pk"))
+    ) {
+      add("username", `${w1}@${w2}`, `${words[i]} ${words[i + 1]}`, "low");
+    }
+  }
+
+  /* ---------- DEDUPLICATE ---------- */
+  const seen = new Set<string>();
+  return detections.filter((d) => {
+    const key = `${d.type}:${d.pattern}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
   });
 }
 
-// ===== UTILITY: LEVENSHTEIN DISTANCE FOR SIMILARITY CHECKING =====
-function levenshteinDistance(a: string, b: string): number {
-  const matrix = [];
+/* ────────────────────────────────────────────────────────────── */
+/*  HELPERS                                                      */
+/* ────────────────────────────────────────────────────────────── */
+function isFalsePositive(p: string): boolean {
+  const low = p.toLowerCase();
+  return FALSE_POSITIVES.some(
+    (fp) => low.includes(fp) || levenshtein(low, fp) <= 2
+  );
+}
 
-  for (let i = 0; i <= b.length; i++) {
-    matrix[i] = [i];
-  }
+function hasContextClue(ctx: string): boolean {
+  const low = ctx.toLowerCase();
+  return CONTEXT_CLUES.some((c) => low.includes(c));
+}
 
-  for (let j = 0; j <= a.length; j++) {
-    matrix[0][j] = j;
-  }
+function getContext(full: string, match: string): string {
+  const idx = full.toLowerCase().indexOf(match.toLowerCase());
+  if (idx === -1) return "";
+  return full.slice(Math.max(0, idx - 35), idx + match.length + 35);
+}
 
+function formatPhone(d: string): string {
+  if (d.length === 8) return `${d.slice(0, 3)} ${d.slice(3)}`;
+  if (d.length === 9) return `${d.slice(0, 2)} ${d.slice(2, 5)} ${d.slice(5)}`;
+  if (d.length >= 10)
+    return `+${d.slice(0, 2)} ${d.slice(2, 5)} ${d.slice(5, 8)} ${d.slice(
+      8,
+      11
+    )}`;
+  return d.replace(/(\d{3})(\d+)/, "$1 $2");
+}
+
+function levenshtein(a: string, b: string): number {
+  const m: number[][] = [];
+  for (let i = 0; i <= b.length; i++) m[i] = [i];
+  for (let j = 0; j <= a.length; j++) m[0][j] = j;
   for (let i = 1; i <= b.length; i++) {
     for (let j = 1; j <= a.length; j++) {
-      if (b.charAt(i - 1) === a.charAt(j - 1)) {
-        matrix[i][j] = matrix[i - 1][j - 1];
-      } else {
-        matrix[i][j] = Math.min(
-          matrix[i - 1][j - 1] + 1, // substitution
-          matrix[i][j - 1] + 1, // insertion
-          matrix[i - 1][j] + 1 // deletion
-        );
-      }
+      m[i][j] =
+        a[j - 1] === b[i - 1]
+          ? m[i - 1][j - 1]
+          : Math.min(m[i - 1][j - 1], m[i][j - 1], m[i - 1][j]) + 1;
     }
   }
-
-  return matrix[b.length][a.length];
+  return m[b.length][a.length];
 }

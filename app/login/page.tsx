@@ -1,63 +1,57 @@
-"use client";
-
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+// app/login/page.tsx (server component)
+import Image from "next/image";
+import Link from "next/link";
+import { Metadata } from "next";
 import LoginForm from "@/components/LoginForm";
-import useTranslation from "@/lib/hooks/useTranslation";
-import { useAuth } from "@/context/AuthContext";
-import Navbarlanding from "@/components/Navbarladning";
-import { LanguageProvider } from "@/components/LanguageProvider";
+import NavbarLanding from "@/components/Navbarladning";
+
+export const metadata: Metadata = {
+  title: "Log In",
+};
 
 export default function LoginPage() {
-  const { t } = useTranslation();
-  const router = useRouter();
-  const { user, isLoading } = useAuth();
-
-  // Redirect if already logged in
-  useEffect(() => {
-    if (!isLoading && user) {
-      router.push(
-        user.userType === "business" ? "/business-dashboard" : "/dashboard"
-      );
-    }
-  }, [user, isLoading, router]);
-
-  if (isLoading || user) {
-    // Optional: show nothing or a loader while redirecting
-    return null;
-  }
-
   return (
-    <LanguageProvider>
-      <div className="min-h-screen bg-gray-50 flex flex-col">
-        <Navbarlanding />
-        <main className="flex flex-1 items-center justify-center px-4 sm:px-6 lg:px-8 pt-24 pb-12">
-          <div className="max-w-6xl w-full grid grid-cols-1 items-center gap-10">
-            <div className="flex justify-center">
-              <Card className="w-full max-w-md border border-neutral-200 rounded-xl bg-white">
-                <CardHeader className="text-center space-y-1">
-                  <CardTitle className="text-lg lg:text-2xl font-semibold tracking-tight text-gray-900">
-                    {t("log_in_to_your_account")}
-                  </CardTitle>
-                  <CardDescription className="text-gray-500 text-sm lg:text-sm">
-                    {t("enter_your_credentials_to_access_your_dashboard")}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="lg:px-4 px-0 mt-0 pt-0">
-                  <LoginForm />
-                </CardContent>
-              </Card>
+    <>
+      {/* Preload Images */}
+      <link
+        rel="preload"
+        as="image"
+        href="https://d22po4pjz3o32e.cloudfront.net/logo-image.svg"
+      />
+      <link
+        rel="preload"
+        as="image"
+        href="https://d22po4pjz3o32e.cloudfront.net/placeholder-image.svg"
+      />
+
+      <section id="tender" className="relative min-h-screen">
+        <div className="grid min-h-screen grid-cols-1 overflow-auto">
+          <NavbarLanding />
+
+          {/* Login Form Section */}
+          <div className="flex items-center justify-center px-[5vw] pb-16 pt-20 md:pb-20 md:pt-24 lg:py-20">
+            <div className="mx-auto w-full max-w-sm">
+              <div className="mb-6 text-center md:mb-8">
+                <h1 className="mb-5 text-3xl font-bold md:mb-6 md:text-4xl">
+                  Log In
+                </h1>
+                <p className="text-sm md:text-base">
+                  Welcome back! Enter your email and password to access your
+                  account.
+                </p>
+              </div>
+
+              {/* Client-side Login Form */}
+              <LoginForm />
             </div>
           </div>
-        </main>
-      </div>
-    </LanguageProvider>
+
+          {/* Footer */}
+          <footer className="absolute bottom-0 left-0 right-0 flex h-16 w-full items-center justify-center px-[5%] text-sm md:h-18 lg:justify-start">
+            <p>© 2024 tender</p>
+          </footer>
+        </div>
+      </section>
+    </>
   );
 }

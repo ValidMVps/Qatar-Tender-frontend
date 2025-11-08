@@ -1,18 +1,18 @@
+// components/LoginForm.tsx (client component)
 "use client";
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import React, { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { MailCheck } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useTranslation } from "../lib/hooks/useTranslation";
+import useTranslation from "@/lib/hooks/useTranslation";
 import { useAuth } from "@/context/AuthContext";
 
 export default function LoginForm() {
   const { t } = useTranslation();
   const { toast } = useToast();
+  const router = useRouter();
   const { login } = useAuth();
 
   const [email, setEmail] = useState("");
@@ -26,16 +26,20 @@ export default function LoginForm() {
     try {
       const result = await login(email, password);
 
-      if (result.success) {
+      if (result?.success) {
         toast({
           title: "✅ Success",
           description: "Login successful! Redirecting...",
           variant: "default",
         });
+
+        // Redirect client-side after login (adjust path if you set user type in context)
+        // If your AuthContext exposes user immediately after login, you can inspect it and route accordingly.
+        router.push("/dashboard");
       } else {
         toast({
           title: "❌ Error",
-          description: result.error || "Invalid credentials",
+          description: result?.error || "Invalid credentials",
           variant: "destructive",
         });
       }
@@ -52,70 +56,72 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="w-full flex justify-center items-center">
-      <form
-        onSubmit={handleSubmit}
-        className="space-y-6 w-full max-w-md bg-white rounded-xl p-4 pt-0 sm:p-4"
-      >
-        {/* Email Field */}
-        <div className="space-y-2">
-          <Label htmlFor="email">{t("email")}</Label>
-          <Input
-            id="email"
-            name="email"
-            type="email"
-            placeholder="you@example.com"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            disabled={isPending}
-          />
-        </div>
-
-        {/* Password Field */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <Label htmlFor="password">{t("password")}</Label>
-            <Link
-              href="/forgot-password"
-              className="text-sm font-medium text-blue-600 hover:underline"
-            >
-              Forgot password?
-            </Link>
-          </div>
-          <Input
-            id="password"
-            name="password"
-            type="password"
-            placeholder="••••••••"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            disabled={isPending}
-          />
-        </div>
-
-        {/* Submit Button */}
-        <Button
-          type="submit"
-          className="w-full bg-blue-600 text-white hover:bg-blue-700 rounded-md"
+    <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-6 bg-white rounded-xl p-0 sm:p-0">
+      {/* Email */}
+      <div>
+        <label htmlFor="email" className="mb-2 block text-sm font-medium text-gray-900">
+          {t("email") || "Email*"}
+        </label>
+        <input
+          id="email"
+          name="email"
+          type="email"
+          placeholder="you@example.com"
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           disabled={isPending}
-        >
-          {isPending ? "Logging in..." : "Login"}
-          {!isPending && <MailCheck className="ml-2 h-4 w-4" />}
-        </Button>
+          className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2.5 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50"
+        />
+      </div>
 
-        {/* Signup Redirect */}
-        <div className="mt-4 text-center text-sm text-gray-600">
-          Don&apos;t have an account?{" "}
-          <Link
-            href="/signup"
-            className="font-medium text-blue-600 hover:underline"
-          >
-            {t('sign_up')}
+      {/* Password */}
+      <div>
+        <div className="flex items-center justify-between">
+          <label htmlFor="password" className="mb-2 block text-sm font-medium text-gray-900">
+            {t("password") || "Password*"}
+          </label>
+          <Link href="/forgot-password" className="text-sm underline hover:text-blue-600">
+            {t("forgot_password") || "Forgot your password?"}
           </Link>
         </div>
-      </form>
-    </div>
+
+        <input
+          id="password"
+          name="password"
+          type="password"
+          placeholder="••••••••"
+          required
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          disabled={isPending}
+          className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2.5 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50"
+        />
+      </div>
+
+      {/* Buttons */}
+      <div className="grid grid-cols-1 gap-4">
+        <button
+          type="submit"
+          disabled={isPending}
+          className="inline-flex items-center justify-center gap-3 whitespace-nowrap rounded-md border border-gray-300 bg-gray-900 px-6 py-3 text-white transition-colors hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+        >
+          {isPending ? "Logging in..." : "Log in"}
+          {!isPending && <MailCheck className="ml-2 h-4 w-4" />}
+        </button>
+
+       
+      </div>
+
+      {/* Signup */}
+      <div className="mt-5 flex items-center justify-center gap-x-1 text-center text-sm md:mt-6">
+        <p>
+          {t("dont_have_account") || "Don't have an account?"}{" "}
+          <Link href="/signup" className="font-medium underline">
+            {t("sign_up") || "Sign up"}
+          </Link>
+        </p>
+      </div>
+    </form>
   );
 }

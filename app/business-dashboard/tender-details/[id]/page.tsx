@@ -67,6 +67,7 @@ interface Tender {
     profile: any;
     completedTenders?: number;
     showPublicProfile?: boolean;
+    isDocumentVerified?: any;
   };
   createdAt: string;
   updatedAt: string;
@@ -343,10 +344,17 @@ export default function TenderDetailsPage({ params }: PageProps) {
                                   "Client"
                                 : "Anonymous Client"}
                             </h3>
-                            {tender.postedBy?.isVerified &&
-                              canviewtenderifno && (
-                                <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-blue-500 flex-shrink-0" />
-                              )}
+                            {tender.postedBy?.isDocumentVerified ? (
+                              <div className="flex justify-center ms-3 font-medium items-center gap-2 text-green-500">
+                                <CheckCircle className="h-3 w-3 sm:h-5 sm:w-5 text-green-500 flex-shrink-0" />{" "}
+                                Verefied
+                              </div>
+                            ) : (
+                              <div className="flex justify-center ms-3 font-medium items-center gap-2 text-red-500">
+                                <AlertCircle className="h-3 w-3 sm:h-5 sm:w-5 text-red-500 flex-shrink-0" />{" "}
+                                Not Verefied
+                              </div>
+                            )}
                           </div>
                           <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-1">
                             <p className="text-xs sm:text-sm text-gray-600">
