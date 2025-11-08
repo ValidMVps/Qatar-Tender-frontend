@@ -287,36 +287,36 @@ export default function Hero() {
   };
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-0 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 w-full">
-        {/* Side-by-Side Layout */}
-        <div className="grid lg:grid-cols-2 gap-12 items-start">
+    <section className="relative min-h-screen flex items-center justify-center overflow-visible pt-15 lg:pt-0 bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20 w-full">
+        {/* Side-by-Side Layout (responsive) */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 items-start">
           {/* Left: Hero Text */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="space-y-8 text-left"
+            className="space-y-6 md:space-y-8 text-left"
           >
-            <h1 className="text-5xl sm:text-6xl lg:text-6xl font-semibold tracking-tight text-[#1d1d1f] leading-[1.05]">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-semibold tracking-tight text-[#1d1d1f] leading-[1.05]">
               built for Qatar.
               <br />
               <span className="text-black">
                 Compliant. Transparent. Faster.
               </span>
             </h1>
-            <p className="text-xl sm:text-lg text-[#6e6e73] font-normal leading-relaxed">
+            <p className="text-base sm:text-lg text-[#6e6e73] font-normal leading-relaxed max-w-xl">
               GoTenderly is a secure e-tendering platform for Qatari
               organisations KYC-verified suppliers, audit-ready workflows, and
               built-in evaluation tools to shorten procurement cycles.
             </p>
 
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4">
               <motion.a
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 href="/signup"
-                className="px-6 h-12 text-black hover:bg-black/5 rounded-full font-medium  flex items-center gap-2"
+                className="px-5 sm:px-6 h-12 text-black hover:bg-black/5 rounded-full font-medium flex items-center gap-2 justify-center"
               >
                 Get started
               </motion.a>
@@ -325,13 +325,13 @@ export default function Hero() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={openForm}
-                className="px-6 h-12 bg-black hover:bg-neutral-900 text-white rounded-full font-medium flex items-center gap-5"
+                className="px-5 sm:px-6 h-12 bg-black hover:bg-neutral-900 text-white rounded-full font-medium flex items-center gap-2 justify-center"
               >
                 Create a tender
               </motion.button>
             </div>
 
-            <div className="flex flex-wrap gap-8 pt-4 text-sm text-[#6e6e73]">
+            <div className="flex flex-col sm:flex-row gap-4 pt-4 text-sm text-[#6e6e73]">
               <div className="flex items-center gap-2">
                 <Check className="w-5 h-5 text-black" />
                 KYC & company verification
@@ -349,19 +349,19 @@ export default function Hero() {
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 50 }}
-              className="bg-white rounded-[28px]  border border-[#d2d2d7] p-8 max-h-[90vh] overflow-y-auto sticky top-24"
+              className="bg-white rounded-[24px] border border-[#d2d2d7] p-6 md:p-8 max-h-[88vh] overflow-y-auto relative md:sticky md:top-24"
             >
               {/* Close Button */}
               <button
                 onClick={confirmClose}
-                className="absolute top-6 right-6 text-[#86868b] hover:text-[#1d1d1f] transition-colors z-10"
+                className="absolute top-4 right-4 text-[#86868b] hover:text-[#1d1d1f] transition-colors z-10"
                 aria-label="Close"
               >
-                <X className="w-6 h-6" />
+                <X className="w-5 h-5 md:w-6 md:h-6" />
               </button>
 
               {/* Progress Bar */}
-              <div className="flex items-center justify-center mb-8">
+              <div className="flex items-center justify-center mb-6 md:mb-8">
                 {steps.map((step, i) => (
                   <div key={step.id} className="flex items-center">
                     <motion.div
@@ -370,10 +370,13 @@ export default function Hero() {
                           i <= currentStep ? "#000000" : "#f5f5f7",
                         scale: i === currentStep ? 1.06 : 1,
                       }}
-                      className="w-10 h-10 rounded-full flex items-center justify-center"
+                      className={cn(
+                        "flex items-center justify-center rounded-full",
+                        i === currentStep ? "w-10 h-10" : "w-8 h-8"
+                      )}
                     >
                       {i < currentStep ? (
-                        <Check className="w-5 h-5 text-white" />
+                        <Check className="w-4 h-4 text-white" />
                       ) : (
                         <span
                           className={`text-sm font-semibold ${
@@ -390,7 +393,7 @@ export default function Hero() {
                           backgroundColor:
                             i < currentStep ? "#000000" : "#e5e5ea",
                         }}
-                        className="h-0.5 w-12 mx-2"
+                        className="h-0.5 w-8 sm:w-12 mx-2"
                       />
                     )}
                   </div>
@@ -404,9 +407,9 @@ export default function Hero() {
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -20 }}
-                    className="space-y-6"
+                    className="space-y-5 md:space-y-6"
                   >
-                    <h3 className="text-2xl font-semibold text-[#1d1d1f]">
+                    <h3 className="text-xl md:text-2xl font-semibold text-[#1d1d1f]">
                       {steps[currentStep].title}
                     </h3>
                     {steps[currentStep].fields.map((field, idx) => (
@@ -422,7 +425,6 @@ export default function Hero() {
                           {field.required && (
                             <span className="text-red-500 ml-1">*</span>
                           )}{" "}
-                          {/* asterisk removed */}
                         </label>
 
                         {field.type === "textarea" ? (
@@ -437,7 +439,7 @@ export default function Hero() {
                               onChange={handleChange}
                               placeholder={field.label}
                               className={cn(
-                                "w-full h-32 bg-[#f5f5f7] rounded-xl border px-4 py-3 text-sm outline-none transition-colors resize-none",
+                                "w-full h-28 sm:h-32 bg-[#f5f5f7] rounded-xl border px-4 py-3 text-sm outline-none transition-colors resize-none",
                                 errors[field.name]
                                   ? "border-red-500"
                                   : "border-transparent hover:border-black/20 focus:border-black"
@@ -471,7 +473,7 @@ export default function Hero() {
                                   <CalendarIcon className="mr-2 h-4 w-4" />
                                 </button>
                               </PopoverTrigger>
-                              <PopoverContent className="w-auto p-4 space-y-3">
+                              <PopoverContent className="w-full max-w-full sm:w-auto p-4 space-y-3">
                                 <Calendar
                                   mode="single"
                                   selected={formData.deadline || undefined}
@@ -551,16 +553,16 @@ export default function Hero() {
                     key="signup-screen"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="space-y-8 text-center py-12"
+                    className="space-y-6 text-center py-8 md:py-12"
                   >
-                    <div className="mx-auto w-24 h-24 bg-black/10 rounded-full flex items-center justify-center">
-                      <Check className="w-12 h-12 text-black" />
+                    <div className="mx-auto w-20 h-20 bg-black/10 rounded-full flex items-center justify-center">
+                      <Check className="w-10 h-10 text-black" />
                     </div>
-                    <div className="space-y-4">
-                      <h3 className="text-3xl font-semibold text-[#1d1d1f]">
+                    <div className="space-y-3">
+                      <h3 className="text-2xl md:text-3xl font-semibold text-[#1d1d1f]">
                         Tender Published
                       </h3>
-                      <p className="text-lg text-[#6e6e73] max-w-md mx-auto">
+                      <p className="text-base md:text-lg text-[#6e6e73] max-w-md mx-auto">
                         Signup to publish and start receiving bids from verified
                         suppliers.
                       </p>
@@ -570,11 +572,11 @@ export default function Hero() {
               </AnimatePresence>
 
               {/* Navigation */}
-              <div className="flex gap-3 mt-8">
+              <div className="flex gap-3 mt-6 md:mt-8 flex-col sm:flex-row">
                 {!showSignupScreen && currentStep > 0 && (
                   <button
                     onClick={prevStep}
-                    className="flex-1 h-12 rounded-xl text-black hover:bg-black/5 transition-colors"
+                    className="w-full sm:flex-1 h-12 rounded-xl text-black hover:bg-black/5 transition-colors"
                   >
                     Back
                   </button>
@@ -586,14 +588,14 @@ export default function Hero() {
                         ? handlePostTender()
                         : nextStep()
                     }
-                    className="flex-1 bg-black hover:bg-neutral-900 text-white h-12 rounded-xl font-medium flex items-center justify-center gap-2 transition-colors"
+                    className="w-full sm:flex-1 bg-black hover:bg-neutral-900 text-white h-12 rounded-xl font-medium flex items-center justify-center gap-2 transition-colors"
                   >
                     {currentStep === steps.length - 1
                       ? "Save & Continue"
                       : "Continue"}
                   </button>
                 ) : (
-                  <div className="flex gap-3 w-full">
+                  <div className="flex flex-col sm:flex-row gap-3 w-full">
                     <button
                       onClick={() => {
                         localStorage.removeItem(GUEST_TENDER_KEY);
@@ -601,7 +603,7 @@ export default function Hero() {
                         setCurrentStep(0);
                         setIsSaved(false);
                       }}
-                      className="flex-1 h-12 rounded-xl border border-[#d2d2d7] text-[#1d1d1f] hover:bg-[#f5f5f7]"
+                      className="w-full sm:flex-1 h-12 rounded-xl border border-[#d2d2d7] text-[#1d1d1f] hover:bg-[#f5f5f7]"
                     >
                       Edit Tender
                     </button>
@@ -609,7 +611,7 @@ export default function Hero() {
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       href="/signup"
-                      className="flex-1 bg-black hover:bg-neutral-900 text-white h-12 rounded-xl font-medium flex items-center justify-center gap-2"
+                      className="w-full sm:flex-1 bg-black hover:bg-neutral-900 text-white h-12 rounded-xl font-medium flex items-center justify-center gap-2"
                     >
                       Sign up now
                     </motion.a>
@@ -617,7 +619,7 @@ export default function Hero() {
                 )}
               </div>
 
-              <p className="text-center text-xs text-[#86868b] mt-6">
+              <p className="text-center text-xs text-[#86868b] mt-4">
                 {!showSignupScreen
                   ? currentStep === steps.length - 1
                     ? "Your tender will be saved locally."
@@ -648,7 +650,7 @@ export default function Hero() {
                 Your current draft will be lost.
               </p>
             </div>
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-3">
               <button
                 onClick={() => setPendingClose(false)}
                 className="flex-1 h-12 rounded-xl border border-[#d2d2d7] text-[#1d1d1f] hover:bg-[#f5f5f7]"

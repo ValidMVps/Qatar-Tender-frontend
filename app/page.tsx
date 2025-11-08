@@ -28,27 +28,27 @@ import PageTransitionWrapper from "@/components/animations/PageTransitionWrapper
 const processSteps = [
   {
     label: "Post",
-    title: "Submit comprehensive tender with clear requirements",
-    description: "Define project scope, budget, and critical details",
-    linkText: "View details",
+    title: "Post your tender",
+    description:
+      "Describe your requirements, set deadline, and publish instantly",
+    linkText: "Post now",
     bgImage:
       "https://images.pexels.com/photos/3184360/pexels-photo-3184360.jpeg?auto=compress&cs=tinysrgb&w=384&h=630",
   },
   {
-    label: "Bids",
-    title: "Receive and compare structured proposals from qualified vendors",
-    description:
-      "Evaluate competitive bids with transparent pricing and timelines",
-    linkText: "Compare now",
+    label: "Receive & compare bids",
+    title: "Receive and compare bids",
+    description: "Get multiple quotes and compare them side by side",
+    linkText: "Compare bids",
     bgImage:
       "https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=384&h=630",
   },
   {
-    label: "Award",
-    title: "Negotiate and finalize with your preferred vendor",
+    label: "Chat & award",
+    title: "Chat and award",
     description:
-      "Communicate securely and select the best match for your project",
-    linkText: "Select winner",
+      "Negotiate and award the tender, identities revealed only after award",
+    linkText: "Award tender",
     bgImage:
       "https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg?auto=compress&cs=tinysrgb&w=384&h=630",
   },
@@ -56,27 +56,27 @@ const processSteps = [
 
 function Process() {
   return (
-    <section className="px-6 py-16 md:px-16 md:py-28 bg-gray-50">
+    <section className="px-4 sm:px-6 py-16 md:py-24 lg:py-32 bg-gray-50">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="max-w-3xl mx-auto text-center mb-16">
-          <span className="text-Color-Scheme-1-Text text-base font-semibold font-inter leading-6">
+          <span className="text-Color-Scheme-1-Text text-sm md:text-base font-semibold font-inter leading-6">
             Process
           </span>
-          <h2 className="mt-2 text-4xl md:text-5xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight md:leading-[62.4px]">
-            How gotenderly works
+          <h2 className="mt-2 text-3xl sm:text-4xl md:text-5xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight">
+            How Tenderly works
           </h2>
-          <p className="mt-4 text-lg font-normal font-inter text-Color-Scheme-1-Text leading-7">
+          <p className="mt-4 text-base md:text-lg font-normal font-inter text-Color-Scheme-1-Text leading-7">
             Create detailed project specifications in minutes
           </p>
         </div>
 
         {/* Process Steps - Responsive Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           {processSteps.map((step, index) => (
             <div
               key={index}
-              className="group relative h-[540px] md:h-[580px] rounded-md overflow-hidden shadow-lg transition-transform hover:scale-[1.02]"
+              className="group relative min-h-[400px] sm:min-h-[500px] md:min-h-[540px] lg:min-h-[580px] rounded-md overflow-hidden shadow-lg transition-transform hover:scale-[1.02]"
               style={{
                 backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.7)), url('${step.bgImage}')`,
                 backgroundSize: "cover",
@@ -86,10 +86,10 @@ function Process() {
               {/* Content */}
               <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 text-white z-10">
                 <div className="flex flex-col gap-3">
-                  <span className="text-sm md:text-base font-semibold font-inter uppercase tracking-wider opacity-90">
+                  <span className="text-xs md:text-sm font-semibold font-inter uppercase tracking-wider opacity-90">
                     {step.label}
                   </span>
-                  <h3 className="text-2xl md:text-3xl lg:text-4xl font-medium font-outfit leading-tight">
+                  <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-medium font-outfit leading-tight">
                     {step.title}
                   </h3>
                 </div>
@@ -124,7 +124,7 @@ function HowItWorksDetailed() {
       audience: "For tenderers (buyers)",
       items: [
         "Post your tender (title, category, deadline, optional budget, deliverables).",
-        "Use Q/A to clarify specs or request revisions, without revealing identity.",
+        "Use Q/A to clarify specs or request revisionswithout revealing identity.",
         "Compare & shortlist side-by-side, then award the winner (identities reveal after award).",
       ],
     },
@@ -139,7 +139,10 @@ function HowItWorksDetailed() {
   ];
 
   return (
-    <section id="how-it-works-detailed" className="py-24 sm:py-32 bg-[#fbfbfd]">
+    <section
+      id="how-it-works-detailed"
+      className="py-16 md:py-24 lg:py-32 bg-[#fbfbfd]"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -148,15 +151,15 @@ function HowItWorksDetailed() {
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-[#1d1d1f] mb-4">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight text-[#1d1d1f] mb-4 leading-tight">
             How it works , step by step.
           </h2>
-          <p className="text-xl text-[#6e6e73] max-w-2xl mx-auto">
+          <p className="text-base md:text-lg lg:text-xl text-[#6e6e73] max-w-2xl mx-auto leading-7">
             Clear actions for both tenderers and bidders.
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {steps.map((s, i) => (
             <motion.div
               key={s.audience}
@@ -165,14 +168,14 @@ function HowItWorksDetailed() {
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: i * 0.1 }}
             >
-              <h3 className="text-2xl font-semibold text-[#1d1d1f] mb-6">
+              <h3 className="text-xl sm:text-2xl font-semibold text-[#1d1d1f] mb-6 leading-tight">
                 {s.audience}
               </h3>
               <ol className="space-y-4">
                 {s.items.map((item, idx) => (
                   <li
                     key={idx}
-                    className="flex items-start gap-3 text-base text-[#6e6e73]"
+                    className="flex items-start gap-3 text-sm md:text-base text-[#6e6e73] leading-6"
                   >
                     <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[#38b6ff] text-white text-sm font-medium flex items-center justify-center">
                       {idx + 1}
@@ -191,12 +194,12 @@ function HowItWorksDetailed() {
 /* ----------------------------- Testimonials ------------------------------- */
 function Testimonials() {
   return (
-    <div className="bg-gray-50 py-16 px-8">
+    <div className="bg-gray-50 py-16 md:py-24 lg:py-32 px-4 sm:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 items-start gap-12">
           {/* Left Image */}
           <div className="w-full h-full bg-gray-200 rounded-md flex items-center justify-center overflow-hidden">
-            <div className="relative w-full h-[600px]">
+            <div className="relative w-full h-[300px] sm:h-[400px] md:h-[500px] lg:h-[600px]">
               <Image
                 src="https://www.shutterstock.com/image-photo/positive-handsome-arabic-businessman-beard-600nw-2510267591.jpg"
                 alt="Arabic businessman smiling in office"
@@ -226,7 +229,7 @@ function Testimonials() {
               </div>
 
               {/* Quote */}
-              <p className="text-3xl leading-relaxed text-gray-900 mb-6 text-center md:text-left">
+              <p className="text-2xl md:text-3xl leading-relaxed text-gray-900 mb-6 text-center md:text-left">
                 “Our tender platform cut through bureaucratic barriers like a
                 sharp knife through paper. We won contracts we never thought
                 possible.”
@@ -235,10 +238,10 @@ function Testimonials() {
               {/* Author */}
               <div className="flex items-center justify-center md:justify-start gap-4">
                 <div>
-                  <p className="font-medium text-lg text-gray-900">
+                  <p className="font-medium text-base md:text-lg text-gray-900">
                     Michael Roberts
                   </p>
-                  <p className="text-md text-gray-600">
+                  <p className="text-sm md:text-md text-gray-600">
                     CEO, Global Construction
                   </p>
                 </div>
@@ -256,7 +259,7 @@ function Testimonials() {
                       strokeWidth="2"
                     />
                   </svg>
-                  <span className="ml-1 text-sm font-medium text-gray-900">
+                  <span className="ml-1 text-xs md:text-sm font-medium text-gray-900">
                     Webflow
                   </span>
                 </div>
@@ -314,14 +317,14 @@ function Testimonials() {
 /* --------------------------------- CTA ------------------------------------ */
 function CTA() {
   return (
-    <section className="py-24 sm:py-32  text-black">
+    <section className="py-16 md:py-24 lg:py-32  text-black">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="relative overflow-hidden rounded-sm border border-white/10 bg-gray-100 p-12 sm:p-16 lg:p-20"
+          className="relative overflow-hidden rounded-sm border border-white/10 bg-gray-100 p-8 sm:p-12 lg:p-20"
         >
           <div className="relative z-10 max-w-3xl mx-auto text-center">
             <motion.h2
@@ -329,7 +332,7 @@ function CTA() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight leading-tight mb-10"
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight leading-tight mb-10"
             >
               Get better quotes without the back-and-forth.
             </motion.h2>
@@ -345,7 +348,7 @@ function CTA() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 href="/post"
-                className="bg-white text-black hover:bg-white/90 rounded-full px-8 h-14 text-lg font-medium  flex items-center gap-2"
+                className="bg-white text-black hover:bg-white/90 rounded-full px-8 h-14 text-base md:text-lg font-medium  flex items-center gap-2"
               >
                 Post your tender for free <ArrowRight className="w-5 h-5" />
               </motion.a>
@@ -356,7 +359,7 @@ function CTA() {
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.5 }}
-              className="text-sm text-white/60 mt-8"
+              className="text-xs md:text-sm text-white/60 mt-8 leading-5"
             >
               Anonymous until award • No fees • Takes ~2 minutes
             </motion.p>
@@ -388,19 +391,21 @@ function Footer() {
   };
 
   return (
-    <footer className="bg-gray-50 border-t border-gray-200">
-      <div className="max-w-7xl mx-auto px-6 py-12">
+    <footer className="bg-gray-50 border-t border-gray-200 py-16 md:py-24 lg:py-32">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
           {/* Left Column - Logo, Location, Contact */}
           <div className="flex flex-col ">
-            <span className="text-sm font-medium text-gray-900 mb-4">Logo</span>
+            <span className="text-xs md:text-sm font-medium text-gray-900 mb-4">
+              Logo
+            </span>
 
-            <div className="space-y-4 text-sm text-gray-600">
+            <div className="space-y-4 text-xs md:text-sm text-gray-600 leading-5">
               <p className="font-semibold text-gray-900">Location</p>
-              <p>Level 1, 123 Innovation Drive, Sydney NSW 2000</p>
+              <p>Level 1, 123 Innovation Drive, Doha, Qatar</p>
 
               <p className="font-semibold text-gray-900 mt-6">Connect</p>
-              <p>1800 tender • help@tenderplatform.com</p>
+              <p>1800 tender • help@tenderly.com</p>
             </div>
 
             <div className="flex space-x-4 mt-6">
@@ -413,7 +418,7 @@ function Footer() {
           </div>
 
           {/* Right Column - Links */}
-          <div className="flex justify-end items-center gap-x-27  gap-y-6 text-sm">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 justify-items-start text-xs md:text-sm leading-5">
             <div>
               <p className="font-semibold text-gray-900 mb-3">
                 Platform insights
@@ -457,10 +462,10 @@ function Footer() {
         {/* Bottom Bar */}
         <div className="pt-2">
           {/* <div className="w-full text-center font-serif font-bold text-gray-900 mb-6 text-[100px] leading-none tracking-widest uppercase break-words">
-        GoTenderly
+        Tenderly
       </div> */}
 
-          <div className="flex flex-col md:flex-row justify-between items-center border-t border-gray-200 pt-6 text-sm text-gray-600">
+          <div className="flex flex-col md:flex-row justify-between items-center border-t border-gray-200 pt-6 text-xs md:text-sm text-gray-600 leading-5">
             <div>© 2024 Tender Platform. All rights reserved.</div>
             <div className="flex space-x-6 mt-4 md:mt-0">
               <span className="hover:text-gray-900 cursor-pointer">
@@ -482,65 +487,64 @@ function Footer() {
 
 const features = [
   {
-    icon: MessageSquare,
-    title: "One-to-many quote generation",
-    description:
-      "Instantly reach multiple qualified vendors with a single tender submission",
+    icon: Users,
+    title: "One-to-Many Quotes",
+    description: "Post once, reach many bidders instantly.",
   },
   {
-    icon: Users,
-    title: "Private negotiation platform",
-    description: "Secure communication channel for direct vendor interactions",
+    icon: MessageSquare,
+    title: "Private Chat & Negotiation",
+    description: "Clarify details without sharing identity.",
   },
   {
     icon: Shield,
-    title: "Anonymity by default",
-    description: "Protect sensitive information until you're ready to award",
+    title: "Anonymity by Default",
+    description: "Both sides stay anonymous until award.",
   },
   {
     icon: Award,
-    title: "Trusted profiles",
-    description: "Verified business credentials ensure quality and reliability",
+    title: "Profiles & Verification",
+    description: "KYC/business verification and ratings.",
   },
 ];
 
 function Features() {
   return (
-    <section className="self-stretch px-16 py-28 bg-Color-Scheme-1-Background flex flex-col justify-start items-center gap-20 overflow-hidden">
+    <section className="self-stretch px-4 sm:px-16 py-16 md:py-24 lg:py-32 bg-Color-Scheme-1-Background flex flex-col justify-start items-center gap-20 overflow-hidden">
       <div className="w-full max-w-[1280px] flex flex-col justify-start items-start gap-20">
         <div className="w-full max-w-[768px] flex flex-col justify-start items-start gap-4">
           <div className="flex justify-start items-center">
-            <span className="text-Color-Scheme-1-Text text-base font-semibold font-inter leading-6">
+            <span className="text-Color-Scheme-1-Text text-sm md:text-base font-semibold font-inter leading-6">
               Features
             </span>
           </div>
           <div className="self-stretch flex flex-col justify-start items-start gap-6">
-            <h2 className="self-stretch text-Color-Scheme-1-Text text-5xl font-medium font-outfit leading-[62.40px]">
+            <h2 className="self-stretch text-Color-Scheme-1-Text text-3xl sm:text-4xl md:text-5xl font-medium font-outfit leading-tight">
               Powerful tools for seamless tendering
             </h2>
-            <p className="self-stretch text-Color-Scheme-1-Text text-lg font-normal font-inter leading-7">
+            <p className="self-stretch text-Color-Scheme-1-Text text-base md:text-lg font-normal font-inter leading-7">
               Designed to simplify your procurement and bidding experience
             </p>
           </div>
         </div>
 
         <div className="self-stretch flex flex-col justify-start items-start gap-16">
-          <div className="self-stretch flex justify-start items-start gap-8">
+          <div className="self-stretch grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {features.map((feature, index) => {
               const Icon = feature.icon;
               return (
                 <div
                   key={index}
-                  className="flex-1 flex flex-col justify-start items-start gap-6"
+                  className="flex flex-col justify-start items-start gap-6"
                 >
                   <div className="w-12 h-12 flex items-center justify-center">
                     <Icon size={40} className="text-Color-Scheme-1-Text" />
                   </div>
                   <div className="self-stretch flex flex-col justify-start items-start gap-4">
-                    <h3 className="self-stretch text-Color-Scheme-1-Text text-3xl font-medium font-outfit leading-10">
+                    <h3 className="self-stretch text-Color-Scheme-1-Text text-xl sm:text-2xl md:text-3xl font-medium font-outfit leading-tight">
                       {feature.title}
                     </h3>
-                    <p className="self-stretch text-Color-Scheme-1-Text text-base font-normal font-inter leading-6">
+                    <p className="self-stretch text-Color-Scheme-1-Text text-sm md:text-base font-normal font-inter leading-6">
                       {feature.description}
                     </p>
                   </div>
@@ -551,10 +555,10 @@ function Features() {
         </div>
 
         <div className="flex justify-start items-center gap-6">
-          <button className="px-3 py-1.5 bg-Opacity-Neutral-Darkest-5 outline outline-1 outline-Opacity-Transparent text-Color-Neutral-Darkest text-base font-medium font-inter leading-6 hover:bg-opacity-70 transition-all overflow-hidden">
+          <button className="px-3 py-1.5 bg-Opacity-Neutral-Darkest-5 outline outline-1 outline-Opacity-Transparent text-Color-Neutral-Darkest text-sm md:text-base font-medium font-inter leading-6 hover:bg-opacity-70 transition-all overflow-hidden">
             Learn more
           </button>
-          <button className="flex justify-center items-center gap-2 text-Color-Neutral-Darkest text-base font-medium font-inter leading-6 hover:gap-3 transition-all overflow-hidden">
+          <button className="flex justify-center items-center gap-2 text-Color-Neutral-Darkest text-sm md:text-base font-medium font-inter leading-6 hover:gap-3 transition-all overflow-hidden">
             <span>Explore</span>
             <ArrowRight size={20} />
           </button>
@@ -566,53 +570,58 @@ function Features() {
 
 function About() {
   return (
-    <section className="px-6 py-16 md:px-16 md:py-28 bg-Color-Scheme-1-Background">
+    <section className="px-4 sm:px-6 py-16 md:py-24 lg:py-32 bg-Color-Scheme-1-Background">
       <div className="max-w-7xl mx-auto">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-start">
           {/* Text Content */}
           <div className="flex flex-col gap-8">
             {/* Header */}
             <div className="flex flex-col gap-6">
-              <span className="text-Color-Scheme-1-Text text-base font-semibold font-inter leading-6">
+              <span className="text-Color-Scheme-1-Text text-sm md:text-base font-semibold font-inter leading-6">
                 Tender
               </span>
-              <h2 className="text-4xl md:text-5xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight md:leading-[62.4px]">
-                Solve the friction of finding and awarding local vendors
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight">
+                A centralized tender marketplace for individuals and businesses
+                describe, bidders reply instantly, you compare, negotiate, and
+                award.
               </h2>
-              <p className="text-lg font-normal font-inter text-Color-Scheme-1-Text leading-7">
+              <p className="text-base md:text-lg font-normal font-inter text-Color-Scheme-1-Text leading-7">
                 Streamline your procurement process with a platform designed for
                 Qatar's dynamic market.
               </p>
             </div>
 
             {/* For Tenderers & Bidders */}
-            <div className="grid sm:grid-cols-2 gap-8 py-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 py-4">
               <div className="flex flex-col gap-3">
-                <h3 className="text-xl font-medium font-outfit text-Color-Scheme-1-Text leading-8">
+                <h3 className="text-lg sm:text-xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight">
                   For tenderers
                 </h3>
-                <p className="text-base font-normal font-inter text-Color-Scheme-1-Text leading-6">
-                  Cut through complexity. Get precise bids from verified local
-                  professionals without endless email chains.
+                <p className="text-sm md:text-base font-normal font-inter text-Color-Scheme-1-Text leading-6">
+                  Post once and reach many bidders at once. Use built-in Q/A to
+                  clarify missing details before award. Compare apples-to-apples
+                  (price, ETA, notes) in one view. Stay anonymous until award;
+                  choose the best fit faster.
                 </p>
               </div>
               <div className="flex flex-col gap-3">
-                <h3 className="text-xl font-medium font-outfit text-Color-Scheme-1-Text leading-8">
+                <h3 className="text-lg sm:text-xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight">
                   For bidders
                 </h3>
-                <p className="text-base font-normal font-inter text-Color-Scheme-1-Text leading-6">
-                  Access quality projects directly. Showcase your skills to the
-                  right clients with transparent, structured opportunities.
+                <p className="text-sm md:text-base font-normal font-inter text-Color-Scheme-1-Text leading-6">
+                  Ask/answer clarifying questions publicly on the tender. See
+                  all required fields up front; submit a clear, competitive bid.
+                  Keep negotiations in one private thread; get awarded faster.
                 </p>
               </div>
             </div>
 
             {/* CTA Buttons */}
             <div className="flex flex-wrap items-center gap-4">
-              <button className="px-4 py-2 bg-Opacity-Neutral-Darkest-5 outline outline-1 outline-Opacity-Transparent text-Color-Neutral-Darkest text-base font-medium font-inter leading-6 rounded-md hover:bg-opacity-70 transition-all">
+              <button className="px-4 py-2 bg-Opacity-Neutral-Darkest-5 outline outline-1 outline-Opacity-Transparent text-Color-Neutral-Darkest text-sm md:text-base font-medium font-inter leading-6 rounded-md hover:bg-opacity-70 transition-all">
                 Learn more
               </button>
-              <button className="flex items-center gap-2 text-Color-Neutral-Darkest text-base font-medium font-inter leading-6 hover:gap-3 transition-all">
+              <button className="flex items-center gap-2 text-Color-Neutral-Darkest text-sm md:text-base font-medium font-inter leading-6 hover:gap-3 transition-all">
                 <span>Get started</span>
                 <ArrowRight size={20} />
               </button>
@@ -624,7 +633,7 @@ function About() {
             <img
               src="https://images.pexels.com/photos/3184338/pexels-photo-3184338.jpeg?auto=compress&cs=tinysrgb&w=600&h=640"
               alt="Professional workspace"
-              className="w-full h-[540px] md:h-[600px] object-cover rounded-md shadow-lg"
+              className="w-full h-auto max-h-[600px] object-cover rounded-md shadow-lg"
             />
           </div>
         </div>
@@ -644,32 +653,33 @@ function About() {
 
 const smallServices = [
   {
-    title: "Automotive services",
-    description: "Connect with mechanics, dealers, and auto specialists",
+    title: "Automotive services (repair, detailing, tires)",
+    description:
+      "HM’s SUV needs brake pads and a full detail. Not sure of fair pricing or downtime. HM posted the plate/model and preferred time window. Garages responded with parts options (OEM/aftermarket), ETAs, and warranty notes; a detailer asked in Q/A about interior shampoo vs. quick wash. HM picked a garage that offered pick-up/drop-off and a detail comboproblem solved in one go.",
     linkText: "Browse",
     bgImage:
       "https://images.pexels.com/photos/279949/pexels-photo-279949.jpeg?auto=compress&cs=tinysrgb&w=600",
   },
   {
-    title: "Events and hospitality",
+    title: "Events (weddings, corporate, birthdays)",
     description:
-      "Source vendors for conferences, weddings, and corporate events",
+      "MA is planning a small wedding in Al Wakrah: catering for 120, décor, DJ, and photo/video. Vendors were scattered and hard to coordinate. SA posted the budget range, menu style, and venue restrictions. Using Q/A, suppliers clarified power load and layout. SA quickly compared package breakdowns, shortlisted two, negotiated extras (LED dance floor), and awarded a single vendor bundle.",
     linkText: "View details",
     bgImage:
       "https://images.pexels.com/photos/1190298/pexels-photo-1190298.jpeg?auto=compress&cs=tinysrgb&w=600",
   },
   {
-    title: "Construction solutions",
+    title: "Construction & renovation (small works, fit-outs, repairs)",
     description:
-      "Find contractors, suppliers, and specialized construction services",
+      "AA wants a kitchen refreshcabinet re-facing and new countertop. Past quotes were inconsistent and missed measurements. AB posted with drawings/photos and a rough timeline. Contractors used Q/A to ask about materials and site access; AB added dimensions. Comparable bids arrived with line-item costs and lead times. AB awarded one contractor and arranged a site visit after award.",
     linkText: "Compare now",
     bgImage:
       "https://images.pexels.com/photos/1216589/pexels-photo-1216589.jpeg?auto=compress&cs=tinysrgb&w=600",
   },
   {
-    title: "Facilities management",
+    title: "Facilities management & building maintenance",
     description:
-      "Streamline maintenance and operational support for businesses",
+      "LT needs a combined soft/hard FM contract: daily cleaning plus quarterly HVAC maintenance. Previous suppliers covered only part of the scope. LT posted a single tender with SLAs and KPIs. In Q/A, bidders confirmed consumables, call-out times, and preventive schedules. LT compared consolidated proposals, checked references, and awarded one provider for the whole site.",
     linkText: "Get started",
     bgImage:
       "https://images.pexels.com/photos/416405/pexels-photo-416405.jpeg?auto=compress&cs=tinysrgb&w=600",
@@ -678,26 +688,26 @@ const smallServices = [
 
 function Services() {
   return (
-    <section className="px-6 py-16 md:px-16 md:py-28 bg-Color-Scheme-1-Background">
+    <section className="px-4 sm:px-6 py-16 md:py-24 lg:py-32 bg-gray-50">
       <div className="max-w-7xl mx-auto">
         {/* ---------- Header ---------- */}
         <div className="max-w-3xl mx-auto text-center mb-12 md:mb-16">
-          <span className="text-Color-Scheme-1-Text text-base font-semibold font-inter leading-6">
-            Services
+          <span className="text-Color-Scheme-1-Text text-sm md:text-base font-semibold font-inter leading-6">
+            Use cases (Qatar)
           </span>
-          <h2 className="mt-3 text-4xl md:text-5xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight md:leading-[62.4px]">
+          <h2 className="mt-3 text-3xl sm:text-4xl md:text-5xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight">
             Tenders across Qatar's key industries
           </h2>
-          <p className="mt-4 text-lg font-normal font-inter text-Color-Scheme-1-Text leading-7">
+          <p className="mt-4 text-base md:text-lg font-normal font-inter text-Color-Scheme-1-Text leading-7">
             Find the right solution for every project need
           </p>
         </div>
 
         {/* ---------- Layout: Large + Grid of 4 ---------- */}
-        <div className="grid lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Large Card (Individuals) */}
           <div
-            className="group relative h-[500px] md:h-full p-8 md:p-12 rounded-md overflow-hidden
+            className="group relative min-h-[400px] sm:min-h-[500px] p-6 sm:p-8 md:p-12 rounded-md overflow-hidden
                        bg-cover bg-center transition-transform hover:scale-[1.01]"
             style={{
               backgroundImage: `
@@ -708,23 +718,19 @@ function Services() {
           >
             <div className="flex flex-col justify-end h-full gap-6 text-white">
               <div>
-                <span className="text-sm md:text-base font-semibold font-inter uppercase tracking-wider opacity-90">
-                  Individuals
+                <span className="text-xs md:text-sm font-semibold font-inter uppercase tracking-wider opacity-90">
+                  For individuals
                 </span>
-                <h3 className="mt-1 text-4xl md:text-5xl font-medium font-outfit leading-tight">
-                  Home services and personal projects
+                <h3 className="mt-1 text-3xl sm:text-4xl md:text-5xl font-medium font-outfit leading-tight">
+                  Home services (cleaning & maintenance)
                 </h3>
-                <p className="mt-3 text-base md:text-lg font-normal font-inter leading-relaxed opacity-95">
-                  Quickly find skilled professionals for home repairs,
-                  renovations, and personal tasks
-                </p>
               </div>
 
               <div className="flex flex-wrap items-center gap-4">
-                <button className="px-5 py-2.5 bg-white/10 backdrop-blur-sm border border-white/20 text-white text-base font-medium rounded-md hover:bg-white/20 transition-all">
+                <button className="px-5 py-2.5 bg-white/10 backdrop-blur-sm border border-white/20 text-white text-sm md:text-base font-medium rounded-md hover:bg-white/20 transition-all">
                   See sample tender
                 </button>
-                <button className="flex items-center gap-2 text-white text-base font-normal hover:gap-3 transition-all">
+                <button className="flex items-center gap-2 text-white text-sm md:text-base font-normal hover:gap-3 transition-all">
                   <span>Explore</span>
                   <ArrowRight
                     size={20}
@@ -740,7 +746,7 @@ function Services() {
             {smallServices.map((service, idx) => (
               <div
                 key={idx}
-                className="group relative h-72 md:h-80 p-6 rounded-md overflow-hidden bg-cover bg-center
+                className="group relative min-h-72 md:min-h-80 p-6 rounded-md overflow-hidden bg-cover bg-center
                            transition-transform hover:scale-[1.03] shadow-lg"
                 style={{
                   backgroundImage: `
@@ -755,16 +761,13 @@ function Services() {
                       <Briefcase size={28} className="text-white" />
                     </div>
                     <div>
-                      <h4 className="text-2xl md:text-3xl font-medium font-outfit leading-tight">
+                      <h4 className="text-xl sm:text-2xl md:text-3xl font-medium font-outfit leading-tight">
                         {service.title}
                       </h4>
-                      <p className="mt-2 text-sm md:text-base font-normal font-inter leading-relaxed opacity-95">
-                        {service.description}
-                      </p>
                     </div>
                   </div>
 
-                  <button className="flex items-center gap-2 text-white text-sm md:text-base font-normal hover:gap-3 transition-all mt-4">
+                  <button className="flex items-center gap-2 text-white text-xs md:text-sm lg:text-base font-normal hover:gap-3 transition-all mt-4">
                     <span>{service.linkText}</span>
                     <ArrowRight
                       size={18}
@@ -783,42 +786,57 @@ function Services() {
 
 const faqs = [
   {
-    question: "How does Gotenderly work?",
+    question: "I’m not sure how to write requirements.",
     answer:
-      "Gotenderly connects businesses and service providers through a simple, transparent tender process. Post your project, receive bids, and select the best vendor quickly and securely.",
+      "Use Tenderly’s Q/A feature: bidders and tenderers can ask and answer clarifying questions on the tender page to surface any unknown or missing details (scope, deliverables, timeline, acceptance criteria). This keeps everything transparent, comparable, and helps you receive accurate quotesno guided templates needed.",
   },
   {
-    question: "Is posting a tender free?",
+    question: "What is Tenderly?",
     answer:
-      "Yes, posting tenders is completely free for all users. We believe in removing barriers to finding great local talent.",
+      "Qatar’s open tender platform. Post projects, get bids, pick the best.",
   },
   {
-    question: "How long do tenders remain open?",
+    question: "Is it really anonymous?",
     answer:
-      "Tenders typically remain open for 7-14 days, depending on the project complexity. You can adjust the deadline when posting.",
+      "Yes. Your profile and contact details are hidden until you choose a winner. After award, both parties can share details.",
   },
   {
-    question: "Are vendors verified?",
-    answer:
-      "We conduct basic verification for all vendors and provide transparent profiles to help you make informed decisions.",
+    question: "Who can bid?",
+    answer: "Registered companies only.",
   },
   {
-    question: "Can I communicate with bidders?",
+    question: "How do I post?",
+    answer: "Register → create a new tender and publish → view bids and award.",
+  },
+  {
+    question: "Any fees?",
+    answer: "No. Posting and bidding are free.",
+  },
+  {
+    question: "Do you handle contracts or payments?",
     answer:
-      "Our platform offers secure, private messaging to discuss project details directly with potential vendors.",
+      "No. We’re a neutral platform. You finalize contracts and payments directly with the other party.",
+  },
+  {
+    question: "Who can use Tenderly?",
+    answer: "Anyoneindividuals and businesses of any size.",
+  },
+  {
+    question: "What categories are allowed?",
+    answer: "Anything.",
   },
 ];
 
 function FAQ2() {
   return (
-    <section className="self-stretch px-16 py-28 bg-Color-Scheme-1-Background flex flex-col justify-start items-center gap-20 overflow-hidden">
+    <section className="self-stretch px-4 sm:px-16 py-16 md:py-24 lg:py-32 bg-Color-Scheme-1-Background flex flex-col justify-start items-center gap-20 overflow-hidden">
       <div className="w-full max-w-[1280px] flex flex-col justify-start items-center gap-20">
         <div className="w-full max-w-[768px] flex flex-col justify-start items-center gap-6">
-          <h2 className="self-stretch text-center text-Color-Scheme-1-Text text-5xl font-medium font-outfit leading-[62.40px]">
+          <h2 className="self-stretch text-center text-Color-Scheme-1-Text text-3xl sm:text-4xl md:text-5xl font-medium font-outfit leading-tight">
             FAQs
           </h2>
-          <p className="self-stretch text-center text-Color-Scheme-1-Text text-lg font-normal font-inter leading-7">
-            Common questions about tendering on Gotenderly
+          <p className="self-stretch text-center text-Color-Scheme-1-Text text-base md:text-lg font-normal font-inter leading-7">
+            Common questions about tendering on Tenderly
           </p>
         </div>
 
@@ -828,10 +846,10 @@ function FAQ2() {
               key={index}
               className="self-stretch flex flex-col justify-start items-start gap-4"
             >
-              <h3 className="self-stretch text-Color-Scheme-1-Text text-lg font-bold font-inter leading-7">
+              <h3 className="self-stretch text-Color-Scheme-1-Text text-base md:text-lg font-bold font-inter leading-7">
                 {faq.question}
               </h3>
-              <p className="self-stretch text-Color-Scheme-1-Text text-base font-normal font-inter leading-6">
+              <p className="self-stretch text-Color-Scheme-1-Text text-sm md:text-base font-normal font-inter leading-6">
                 {faq.answer}
               </p>
             </div>
@@ -844,15 +862,15 @@ function FAQ2() {
 
 function Problems() {
   return (
-    <section className="max-w-7xl mx-auto px-6 py-20">
+    <section className="max-w-7xl mx-auto px-4 sm:px-6 py-16 md:py-24 lg:py-32">
       <div className="max-w-3xl mx-auto text-center mb-12 md:mb-16">
-        <span className="text-Color-Scheme-1-Text text-base font-semibold font-inter leading-6">
-          Why Choose Us
+        <span className="text-Color-Scheme-1-Text text-sm md:text-base font-semibold font-inter leading-6">
+          Problem → Outcome
         </span>
-        <h2 className="mt-3 text-4xl md:text-5xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight md:leading-[62.4px]">
+        <h2 className="mt-3 text-3xl sm:text-4xl md:text-5xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight">
           The smarter way to handle <br /> procurement in Qatar
         </h2>
-        <p className="mt-4 text-lg font-normal font-inter text-Color-Scheme-1-Text leading-7">
+        <p className="mt-4 text-base md:text-lg font-normal font-inter text-Color-Scheme-1-Text leading-7">
           We Are Better Than Every Other Tendering Platform
         </p>
       </div>
@@ -865,15 +883,15 @@ function Problems() {
                 {/* Table Header with Legend */}
                 <thead>
                   <tr className="border-b bg-muted/10">
-                    <th className="px-6 py-4 text-sm font-medium text-muted-foreground w-1/3 min-w-[180px]">
+                    <th className="px-6 py-4 text-xs md:text-sm font-medium text-muted-foreground w-1/3 min-w-[180px]">
                       Feature
                     </th>
-                    <th className="px-6 py-4 text-sm font-medium text-primary w-1/3 min-w-[220px]">
+                    <th className="px-6 py-4 text-xs md:text-sm font-medium text-primary w-1/3 min-w-[220px]">
                       <div className="flex items-center gap-2">
-                        <span>Gotenderly</span>
+                        <span>Tenderly</span>
                       </div>
                     </th>
-                    <th className="px-6 py-4 text-sm font-medium text-muted-foreground w-1/3 min-w-[220px]">
+                    <th className="px-6 py-4 text-xs md:text-sm font-medium text-muted-foreground w-1/3 min-w-[220px]">
                       <div className="flex items-center gap-2">
                         <span>Traditional Platforms</span>
                       </div>
@@ -885,54 +903,54 @@ function Problems() {
                 <tbody>
                   {[
                     [
-                      "Vendor discovery",
-                      "Smart AI matching connects you with verified vendors in seconds",
-                      "Manual search across multiple directories",
+                      "Finding vendors",
+                      "Post once and reach many bidders at once",
+                      "Hard to find all options; vendors are fragmented",
                     ],
                     [
-                      "Tender posting process",
-                      "One unified dashboard for publishing, tracking, and managing all tenders",
-                      "Scattered communication through emails and PDFs",
+                      "Requirements clarity",
+                      "Use built-in Q/A to clarify missing details before award",
+                      "Unclear requirements lead to wrong quotes and rework",
                     ],
                     [
-                      "Requirement clarity",
-                      "Built-in templates and guided forms prevent vague specs or missing info",
-                      "Open-ended briefs often lead to wrong quotes and rework",
+                      "Briefing vendors",
+                      "Compare apples-to-apples (price, ETA, notes) in one view",
+                      "Repeating the same brief to each vendor takes time",
                     ],
                     [
-                      "Bid management",
-                      "Live analytics show quote ranges, vendor engagement, and performance",
-                      "No visibility until bids close decisions made blind",
+                      "Privacy and selection",
+                      "Stay anonymous until award; choose the best fit faster",
+                      "",
                     ],
                     [
-                      "Communication",
-                      "All chat, negotiation, and updates happen inside the platform no lost emails",
-                      "Negotiations spread across calls and emails",
+                      "Specs quality",
+                      "Ask/answer clarifying questions publicly on the tender",
+                      "Specs are vague; quoting feels risky or time-wasting",
                     ],
                     [
-                      "Verification and trust",
-                      "Vendor KYC, ratings, and performance history built-in",
-                      "Little to no verification hard to identify reliable partners",
+                      "Finding buyers",
+                      "See all required fields up front; submit a clear, competitive bid",
+                      "Hard to find real, ready buyers; leads aren’t qualified",
                     ],
                     [
-                      "Support & response time",
-                      "Local Qatar-based support with real-time chat",
-                      "Generic or delayed ticket based support",
+                      "Negotiations",
+                      "Keep negotiations in one private thread; get awarded faster",
+                      "Negotiations spread across calls/emails and get lost",
                     ],
-                  ].map(([label, gotenderly, other], i) => (
+                  ].map(([label, tenderly, other], i) => (
                     <tr
                       key={label}
                       className={`border-b last:border-b-0 transition-colors hover:bg-muted/50 ${
                         i % 2 === 0 ? "bg-muted/30" : "bg-background"
                       }`}
                     >
-                      <td className="px-6 py-5 text-sm font-medium text-foreground align-top min-w-[180px]">
+                      <td className="px-6 py-5 text-xs md:text-sm font-medium text-foreground align-top min-w-[180px] leading-5">
                         {label}
                       </td>
-                      <td className="px-6 py-5 text-sm font-normal   align-top min-w-[220px]">
-                        <span className="block break-words">{gotenderly}</span>
+                      <td className="px-6 py-5 text-xs md:text-sm font-normal   align-top min-w-[220px] leading-5">
+                        <span className="block break-words">{tenderly}</span>
                       </td>
-                      <td className="px-6 py-5 text-sm font-normal align-top min-w-[220px]">
+                      <td className="px-6 py-5 text-xs md:text-sm font-normal align-top min-w-[220px] leading-5">
                         <span className="block break-words">{other}</span>
                       </td>
                     </tr>
@@ -951,17 +969,17 @@ function PricingSection() {
 
   return (
     <>
-      <section className="py-20 px-6 bg-background text-foreground">
+      <section className="py-16 md:py-24 lg:py-32 px-4 sm:px-6 bg-background text-foreground">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="text-center mb-16 max-w-3xl mx-auto">
-            <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-2">
-              Pricing
+            <p className="text-xs md:text-sm font-medium text-muted-foreground uppercase tracking-wider mb-2 leading-5">
+              Offer & pricing
             </p>
-            <h2 className="text-4xl font-semibold mb-4">
+            <h2 className="text-3xl sm:text-4xl font-semibold mb-4 leading-tight">
               Flexible procurement solutions
             </h2>
-            <p className="text-base text-muted-foreground">
+            <p className="text-sm md:text-base text-muted-foreground leading-6">
               Scale your tender strategy with transparent, adaptable pricing for
               every business need.
             </p>
@@ -973,12 +991,16 @@ function PricingSection() {
             <Card className="border border-border bg-muted/40 shadow-none">
               <CardContent className="p-8">
                 <div className="mb-8">
-                  <h3 className="text-2xl font-semibold mb-2">Starter Plan</h3>
+                  <h3 className="text-xl sm:text-2xl font-semibold mb-2 leading-tight">
+                    Tenderer Plan
+                  </h3>
                   <div className="flex items-baseline">
-                    <span className="text-5xl font-bold">Free</span>
-                    <span className="ml-2 text-muted-foreground">forever</span>
+                    <span className="text-4xl sm:text-5xl font-bold">Free</span>
+                    <span className="ml-2 text-muted-foreground text-sm md:text-base">
+                      forever
+                    </span>
                   </div>
-                  <p className="mt-4 text-muted-foreground">
+                  <p className="mt-4 text-muted-foreground text-sm md:text-base leading-6">
                     Launch your procurement journey with unlimited tender
                     postings at no cost.
                   </p>
@@ -986,7 +1008,9 @@ function PricingSection() {
 
                 <div className="space-y-6 mb-8">
                   <div>
-                    <h4 className="font-semibold mb-3">Includes</h4>
+                    <h4 className="font-semibold mb-3 text-base md:text-lg leading-tight">
+                      Includes
+                    </h4>
                     <ul className="space-y-3">
                       {[
                         "3 active tender postings",
@@ -995,7 +1019,10 @@ function PricingSection() {
                         "Essential security protocols",
                         "Limited integration options",
                       ].map((item) => (
-                        <li key={item} className="flex items-start">
+                        <li
+                          key={item}
+                          className="flex items-start text-sm md:text-base leading-6"
+                        >
                           <Check className="w-5 h-5 text-foreground mr-3 mt-0.5" />
                           <span className="text-muted-foreground">{item}</span>
                         </li>
@@ -1004,7 +1031,9 @@ function PricingSection() {
                   </div>
 
                   <div>
-                    <h4 className="font-semibold mb-3">Support</h4>
+                    <h4 className="font-semibold mb-3 text-base md:text-lg leading-tight">
+                      Support
+                    </h4>
                     <ul className="space-y-3">
                       {[
                         "Basic vendor profile access",
@@ -1013,7 +1042,10 @@ function PricingSection() {
                         "Platform onboarding guide",
                         "Monthly performance insights",
                       ].map((item) => (
-                        <li key={item} className="flex items-start">
+                        <li
+                          key={item}
+                          className="flex items-start text-sm md:text-base leading-6"
+                        >
                           <Check className="w-5 h-5 text-foreground mr-3 mt-0.5" />
                           <span className="text-muted-foreground">{item}</span>
                         </li>
@@ -1024,7 +1056,7 @@ function PricingSection() {
 
                 <Button
                   variant="outline"
-                  className="w-full font-semibold rounded-md"
+                  className="w-full font-semibold rounded-md text-sm md:text-base"
                 >
                   Start Posting Tenders
                 </Button>
@@ -1035,28 +1067,35 @@ function PricingSection() {
             <Card className="border border-border bg-muted/10 shadow-none">
               <CardContent className="p-8">
                 <div className="mb-8">
-                  <h3 className="text-2xl font-semibold mb-2">Pay-per-Bid</h3>
+                  <h3 className="text-xl sm:text-2xl font-semibold mb-2 leading-tight">
+                    Bidder Plan
+                  </h3>
                   <div className="flex items-baseline">
-                    <span className="text-5xl font-bold">100</span>
-                    <span className="text-2xl ml-1 font-medium">QAR</span>
-                    <span className="ml-2 text-muted-foreground">per bid</span>
+                    <span className="text-4xl sm:text-5xl font-bold">100</span>
+                    <span className="ml-2 text-muted-foreground text-sm md:text-base">
+                      QAR / bid
+                    </span>
                   </div>
-                  <p className="mt-4 text-muted-foreground">
-                    Only pay when you submit a bid. No subscriptions, no hidden
-                    fees.
+                  <p className="mt-4 text-muted-foreground text-sm md:text-base leading-6">
+                    Pay per bid no hidden fees. You only pay when you decide
+                    to participate in a tender opportunity that matters to you.
                   </p>
                 </div>
 
                 <div className="border border-border rounded-md p-6 mb-8 bg-muted/50">
-                  <p className="font-medium">Transparent & Risk-Free</p>
-                  <p className="text-muted-foreground mt-2">
-                    You only pay when a tender is worth bidding on. Access all
-                    browsing, matching, and analytics features completely free.
+                  <p className="font-medium text-base md:text-lg leading-tight">
+                    Transparent & Risk-Free
+                  </p>
+                  <p className="text-muted-foreground mt-2 text-sm md:text-base leading-6">
+                    Access browsing, matching, and analytics features completely
+                    free. Payment only applies to actual bid submissions.
                   </p>
                 </div>
 
                 <div className="space-y-4 mb-8">
-                  <h4 className="font-semibold">What you get with every bid</h4>
+                  <h4 className="font-semibold text-base md:text-lg leading-tight">
+                    What you get with every bid
+                  </h4>
                   <ul className="space-y-3">
                     {[
                       "Full access to tender specifications & documents",
@@ -1065,7 +1104,10 @@ function PricingSection() {
                       "Direct communication with tender owner",
                       "Bid performance analytics post-submission",
                     ].map((item) => (
-                      <li key={item} className="flex items-start">
+                      <li
+                        key={item}
+                        className="flex items-start text-sm md:text-base leading-6"
+                      >
                         <Check className="w-5 h-5 text-foreground mr-3 mt-0.5" />
                         <span className="text-muted-foreground">{item}</span>
                       </li>
@@ -1075,7 +1117,7 @@ function PricingSection() {
 
                 <Button
                   variant="outline"
-                  className="w-full font-semibold rounded-md"
+                  className="w-full font-semibold rounded-md text-sm md:text-base"
                 >
                   Browse Tenders to Bid
                 </Button>
