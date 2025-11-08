@@ -19,25 +19,16 @@ import { getUserTenders, getTender } from "@/app/services/tenderService";
 import { useAuth } from "@/context/AuthContext";
 import { useTranslation } from "react-i18next";
 import { getUserBids } from "@/app/services/BidService";
-import { ProjectDetailsSidebarawarded } from "@/components/project-details-sidebar-awarded";
-import PageTransitionWrapper from "@/components/animations/PageTransitionWrapper";
 import { ProjectDetailsSidebar } from "@/components/project-details-sidebar";
+import PageTransitionWrapper from "@/components/animations/PageTransitionWrapper";
 
-// Define User type
-type User = {
-  _id: string;
-  email: string;
-  userType: string;
-};
-
-// Define Bid type
+// Types
+type User = { _id: string; email: string; userType: string };
 type Bid = {
   _id: string;
   tender: Tender;
   status: "accepted" | "completed" | "pending" | "rejected";
 };
-
-// Define Tender type with correct field names and types
 type Tender = {
   _id: string;
   title: string;
@@ -53,214 +44,190 @@ type Tender = {
 export default function Component() {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const [tenders, setTenders] = React.useState<Tender[]>([]);
   const [selectedTender, setSelectedTender] = React.useState<Tender | null>(
     null
   );
-  const [first, setfirst] = React.useState(true);
-  const [refresh, setRefresh] = React.useState(1);
+  const [refresh, setRefresh] = React.useState(0);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
-  const [isReviewDialogOpen, setIsReviewDialogOpen] = React.useState(false);
   const [isProjectListOpen, setIsProjectListOpen] = React.useState(false);
   const [isProjectDetailsOpen, setIsProjectDetailsOpen] = React.useState(false);
   const [activeTab, setActiveTab] = React.useState<"owned" | "awarded">(
     "owned"
   );
-  const [awardedtome, setawardedtome] = React.useState<Tender[]>([]);
 
-  // Fetch tenders when user or tab changes
+  // Memoized data
+  const [tenders, setTenders] = React.useState<Tender[]>([]);
+  const [awardedTenders, setAwardedTenders] = React.useState<Tender[]>([]);
+
+  const currentTenders = activeTab === "owned" ? tenders : awardedTenders;
+
+  // Fetch Logic (Optimized)
   React.useEffect(() => {
     if (!user) return;
 
-    const fetchTenders = async () => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+
       try {
-        setLoading(true);
-        setError(null);
-
         if (activeTab === "owned") {
-          let fetchedTenders: Tender[] = await getUserTenders(user._id);
-          fetchedTenders = fetchedTenders.filter((tender) => {
-            const isPostedByUser =
-              typeof tender.postedBy === "string"
-                ? tender.postedBy === user._id
-                : tender.postedBy._id === user._id;
-            const isAwardedOrCompleted =
-              tender.status === "awarded" || tender.status === "completed";
-            return isPostedByUser && isAwardedOrCompleted;
+          const fetched = await getUserTenders(user._id);
+          const filtered = fetched.filter((t: Tender) => {
+            const isOwner =
+              typeof t.postedBy === "string"
+                ? t.postedBy === user._id
+                : t.postedBy._id === user._id;
+            return isOwner && ["awarded", "completed"].includes(t.status);
           });
-
-          setTenders(fetchedTenders);
-
-          // Reset selection only if no tenders or force update
-          if (fetchedTenders.length > 0) {
-            // Always update selection if switching to this tab
-            if (!selectedTender || activeTab !== "owned") {
-              setSelectedTender(fetchedTenders[0]);
-            }
-          } else {
-            setSelectedTender(null);
+          setTenders(filtered);
+          if (
+            filtered.length > 0 &&
+            (!selectedTender ||
+              (selectedTender.status !== "awarded" &&
+                selectedTender.status !== "completed"))
+          ) {
+            setSelectedTender(filtered[0]);
           }
-        } else if (activeTab === "awarded") {
-          const gottenBids: Bid[] = await getUserBids();
-          const awardedBids = gottenBids.filter(
-            (bid) => bid.status === "accepted" || bid.status === "completed"
+        } else {
+          const bids = await getUserBids();
+          const awardedBids = bids.filter((b: Bid) =>
+            ["accepted", "completed"].includes(b.status)
           );
-          const awardedTenders = awardedBids.map((bid) => bid.tender);
-          const uniqueAwardedTenders = Array.from(
-            new Map(awardedTenders.map((t) => [t._id, t])).values()
+          // Explicitly type the Map and resulting array so TypeScript treats these as Tender[]
+          const unique: Tender[] = Array.from(
+            new Map<string, Tender>(
+              awardedBids.map((b: Bid) => [b.tender._id, b.tender as Tender])
+            ).values()
           );
-          setawardedtome(uniqueAwardedTenders);
-          setTenders(uniqueAwardedTenders); // Sync with `tenders` for consistent rendering
-
-          // Always select first if switching tab or none selected
-          if (uniqueAwardedTenders.length > 0) {
-            if (!selectedTender || activeTab !== "awarded") {
-              setSelectedTender(uniqueAwardedTenders[0]);
-            }
-          } else {
-            setSelectedTender(null);
+          setAwardedTenders(unique);
+          if (
+            unique.length > 0 &&
+            (!selectedTender ||
+              !unique.some((t) => t._id === selectedTender._id))
+          ) {
+            setSelectedTender(unique[0]);
           }
         }
       } catch (err) {
-        setError("Failed to fetch tenders");
+        setError("Failed to load projects");
         console.error(err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchTenders();
+    fetchData();
   }, [user, activeTab]);
 
-  // Fetch detailed tender info when selected tender changes
+  // Fetch tender details only when ID changes
+  const prevTenderId = React.useRef<string | null>(null);
   React.useEffect(() => {
-    if (!selectedTender) return;
+    if (!selectedTender || selectedTender._id === prevTenderId.current) return;
 
-    const fetchTenderDetails = async () => {
+    const fetchDetails = async () => {
       try {
-        const detailedTender: Tender = await getTender(selectedTender._id);
-        setSelectedTender(detailedTender);
+        const detailed = await getTender(selectedTender._id);
+        setSelectedTender(detailed);
+        prevTenderId.current = detailed._id;
       } catch (err) {
         console.error("Failed to fetch tender details", err);
       }
     };
 
-    fetchTenderDetails();
-  }, [selectedTender?._id, refresh]);
+    fetchDetails();
+  }, [selectedTender?._id]);
 
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "in progress":
-        return "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300";
-      case "completed":
-        return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300";
-      case "active":
-        return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300";
-      case "awarded":
-        return "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300";
-      default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-800/30 dark:text-gray-300";
+  // Force refresh trigger
+  React.useEffect(() => {
+    if (refresh > 0 && selectedTender) {
+      prevTenderId.current = null; // Force refetch
     }
+  }, [refresh, selectedTender]);
+
+  // Helpers
+  const getStatusColor = (status: string) => {
+    const s = status.toLowerCase();
+    if (s === "completed")
+      return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300";
+    if (s === "awarded")
+      return "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300";
+    if (s === "in progress" || s === "active")
+      return "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300";
+    return "bg-gray-100 text-gray-800 dark:bg-gray-800/30 dark:text-gray-300";
   };
 
   const getStatusIcon = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "completed":
-        return <CheckCircle2 className="h-3 w-3" />;
-      case "in progress":
-      case "active":
-      case "awarded":
-        return <Circle className="h-3 w-3 fill-current" />;
-      default:
-        return <Circle className="h-3 w-3" />;
-    }
+    return status.toLowerCase() === "completed" ? (
+      <CheckCircle2 className="h-3 w-3" />
+    ) : (
+      <Circle className="h-3 w-3 fill-current" />
+    );
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffTime = Math.abs(now.getTime() - date.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    if (diffDays === 1) return "1 day ago";
-    if (diffDays < 7) return `${diffDays} days ago`;
-    if (diffDays < 30) return `${Math.ceil(diffDays / 7)} weeks ago`;
-    return `${Math.ceil(diffDays / 30)} months ago`;
+  const formatDate = (date: string) => {
+    const diff =
+      Math.abs(new Date().getTime() - new Date(date).getTime()) /
+      (1000 * 60 * 60 * 24);
+    if (diff < 1) return "Today";
+    if (diff < 7) return `${Math.floor(diff)}d ago`;
+    if (diff < 30) return `${Math.floor(diff / 7)}w ago`;
+    return `${Math.floor(diff / 30)}mo ago`;
   };
 
-  const getPostedById = (postedBy: Tender["postedBy"]): User | string => {
-    if (!postedBy) return "";
-    if (typeof postedBy === "string") return postedBy;
-    return postedBy;
-  };
-
-  const ProjectCard = ({
-    tender,
-    isSelected,
-    onClick,
-  }: {
-    tender: Tender;
-    isSelected: boolean;
-    onClick: () => void;
-  }) => (
-    <div
-      className={`
-        group relative cursor-pointer rounded-xl border border-gray-200/60 
-        bg-white/80 backdrop-blur-sm transition-all duration-200 ease-out
-        hover:border-gray-300/80 hover:bg-white hover:shadow-lg hover:shadow-gray-200/40
-        dark:border-gray-700/60 dark:bg-gray-900/80 dark:hover:border-gray-600/80 
-        dark:hover:bg-gray-800/90 dark:hover:shadow-gray-900/40
+  // Memoized Project Card
+  const ProjectCard = React.memo(
+    ({
+      tender,
+      isSelected,
+      onClick,
+    }: {
+      tender: Tender;
+      isSelected: boolean;
+      onClick: () => void;
+    }) => (
+      <div
+        onClick={onClick}
+        className={`
+        group relative cursor-pointer rounded-xl border p-4 transition-all duration-200
         ${
           isSelected
-            ? "border-blue-300/80 bg-blue-50/80 shadow-md shadow-blue-200/40 dark:border-blue-600/60 dark:bg-blue-950"
-            : ""
+            ? "border-blue-300 bg-blue-50/80 shadow-md dark:border-blue-600 dark:bg-blue-950"
+            : "border-gray-200/60 bg-white/80 hover:border-gray-300 hover:bg-white hover:shadow-lg dark:border-gray-700/60 dark:bg-gray-900/80 dark:hover:border-gray-600"
         }
       `}
-      onClick={onClick}
-    >
-      <div className="p-4">
-        <div className="flex items-start justify-between mb-3">
-          <h3 className="font-semibold text-gray-900 dark:text-gray-100 text-sm leading-5 line-clamp-2">
-            {tender.title}
-          </h3>
-          <ChevronRight className="h-4 w-4 text-gray-400 dark:text-gray-500 ml-2 flex-shrink-0 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors" />
+      >
+        <div className="flex justify-between mb-3">
+          <h3 className="font-semibold text-sm line-clamp-2">{tender.title}</h3>
+          <ChevronRight className="h-4 w-4 text-gray-400 group-hover:text-gray-600 transition-colors" />
         </div>
-
-        <p className="text-xs text-gray-600 dark:text-gray-400 mb-3 line-clamp-2 leading-4">
+        <p className="text-xs text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">
           {tender.description}
         </p>
-
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Badge
-              variant="secondary"
-              className={`${getStatusColor(
-                tender.status
-              )} text-xs px-2 py-1 rounded-full border-0 font-medium flex items-center gap-1`}
-            >
-              {getStatusIcon(tender.status)}
-              {tender.status === "awarded"
-                ? t("awarded")
-                : tender.status === "completed"
-                ? t("completed")
-                : t("active")}
-            </Badge>
-          </div>
-          <span className="text-xs text-gray-500 dark:text-gray-400">
+        <div className="flex justify-between items-center">
+          <Badge
+            variant="secondary"
+            className={`${getStatusColor(
+              tender.status
+            )} text-xs px-2 py-1 flex items-center gap-1`}
+          >
+            {getStatusIcon(tender.status)}
+            {tender.status}
+          </Badge>
+          <span className="text-xs text-gray-500">
             {formatDate(tender.createdAt)}
           </span>
         </div>
       </div>
-    </div>
+    )
   );
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-full bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+      <div className="flex items-center justify-center h-full">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-500 border-t-transparent mx-auto mb-3"></div>
-          <p className="text-gray-600 dark:text-gray-400 text-sm">Loading...</p>
+          <p className="text-sm text-gray-600">Loading...</p>
         </div>
       </div>
     );
@@ -268,10 +235,8 @@ export default function Component() {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center h-full bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-        <div className="text-center p-6 rounded-2xl bg-white/80 backdrop-blur-sm border border-red-200/60 shadow-lg">
-          <p className="text-red-600 dark:text-red-400">{error}</p>
-        </div>
+      <div className="flex items-center justify-center h-full p-6">
+        <p className="text-red-600">{error}</p>
       </div>
     );
   }
@@ -281,463 +246,212 @@ export default function Component() {
       <div className="h-full bg-gradient-to-br from-gray-50/80 to-white dark:from-gray-900 dark:to-gray-800">
         <Tabs
           value={activeTab}
-          onValueChange={(value) => setActiveTab(value as "owned" | "awarded")}
+          onValueChange={(v) => setActiveTab(v as any)}
           className="h-full flex flex-col"
         >
-          {activeTab !== "awarded" && (
-            <TabsContent
-              value="owned"
-              className="flex-1 overflow-hidden m-0 p-0"
-            >
-              {" "}
-              <PageTransitionWrapper>
-                <div className="flex w-full flex-col h-full md:h-[calc(100vh-85px)] overflow-hidden">
-                  <div className="grid flex-1 h-full overflow-hidden grid-cols-1 md:grid-cols-12 gap-4 p-4">
-                    {/* Left Sidebar - Project List (Desktop) */}
-                    <div className="hidden md:flex md:col-span-4 lg:col-span-3 flex-col overflow-y-scroll">
-                      <div className="bg-white/80 backdrop-blur-sm rounded-2xl h-10 border border-gray-200/60 shadow-lg shadow-gray-200/40 dark:bg-gray-900/80 dark:border-gray-700/60 dark:shadow-gray-900/40 h-full flex flex-col overflow-hidden">
-                        {/* Header */}
-                        <div className="flex items-center justify-between p-6 pb-4 border-b border-gray-100 dark:border-gray-700/50">
-                          <div className="flex items-center gap-3">
-                            <div className="p-2 bg-blue-100 dark:bg-blue-900/40 rounded-lg">
-                              <Inbox className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                            </div>
-                            <span className="font-semibold text-gray-900 dark:text-gray-100">
-                              {t("inbox")}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-2 text-xs">
-                            <span className="text-gray-500 dark:text-gray-400">
-                              {t("all")}
-                            </span>
-                            <Switch className="scale-75" />
-                            <span className="text-gray-500 dark:text-gray-400">
-                              {t("unread")}
-                            </span>
-                          </div>
-                        </div>
+          <TabsContent value="owned" className="flex-1 overflow-hidden m-0 p-0">
+            <ChatLayout
+              tenders={tenders}
+              selectedTender={selectedTender}
+              setSelectedTender={setSelectedTender}
+              isProjectListOpen={isProjectListOpen}
+              setIsProjectListOpen={setIsProjectListOpen}
+              isProjectDetailsOpen={isProjectDetailsOpen}
+              setIsProjectDetailsOpen={setIsProjectDetailsOpen}
+              getStatusColor={getStatusColor}
+              ProjectCard={ProjectCard}
+              user={user}
+              setRefresh={setRefresh}
+              activeTab="owned"
+            />
+          </TabsContent>
 
-                        {/* Tabs */}
-                        <div className="px-6 pt-4 pb-4">
-                          <TabsList className="w-full flex bg-blue-50/70 dark:bg-blue-900/30 backdrop-blur-md  rounded-xl shadow- border border-blue-200/50 dark:border-blue-700/40">
-                            <TabsTrigger
-                              value="owned"
-                              className="flex-1 rounded-xl text-sm font-medium transition-all duration-200
-      data-[state=active]:bg-blue-500 data-[state=active]:text-white data-[state=active]:shadow-
-      hover:bg-blue-100/80 dark:hover:bg-blue-800/50 dark:data-[state=active]:bg-blue-600"
-                            >
-                              {t("Tender")}
-                            </TabsTrigger>
-                            <TabsTrigger
-                              value="awarded"
-                              className="flex-1 rounded-xl text-sm font-medium transition-all duration-200
-      data-[state=active]:bg-blue-500 data-[state=active]:text-white data-[state=active]:shadow-
-      hover:bg-blue-100/80 dark:hover:bg-blue-800/50 dark:data-[state=active]:bg-blue-600"
-                            >
-                              {t("Bids")}
-                            </TabsTrigger>
-                          </TabsList>
-                        </div>
-
-                        {/* Search */}
-                        <div className="px-6 pb-4">
-                          <div className="relative">
-                            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                            <Input
-                              placeholder={t("search_projects")}
-                              type="search"
-                              className="pl-10 bg-gray-50/80 dark:bg-gray-800/80 border-gray-200/60 dark:border-gray-700/60 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
-                            />
-                          </div>
-                        </div>
-
-                        {/* Project List */}
-                        <div className="flex-1 overflow-y-auto px-6 pb-6">
-                          <div className="space-y-3">
-                            {tenders.length === 0 ? (
-                              <div className="text-center py-8">
-                                <div className="p-4 bg-gray-100 dark:bg-gray-800 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                                  <Inbox className="h-6 w-6 text-gray-400" />
-                                </div>
-                                <p className="text-gray-500 dark:text-gray-400 text-sm">
-                                  {t("no_projects_found")}
-                                </p>
-                              </div>
-                            ) : (
-                              tenders.map((tender) => (
-                                <ProjectCard
-                                  key={tender._id}
-                                  tender={tender}
-                                  isSelected={
-                                    selectedTender?._id === tender._id
-                                  }
-                                  onClick={() => setSelectedTender(tender)}
-                                />
-                              ))
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Chat Section */}
-                    <ChatSection
-                      tenderId={selectedTender?._id ?? ""}
-                      className="col-span-full md:col-span-8 lg:col-span-6 rounded-2xl overflow-hidden"
-                      onOpenProjectList={() => setIsProjectListOpen(true)}
-                      onOpenProjectDetails={() => setIsProjectDetailsOpen(true)}
-                    />
-
-                    {/* Project Details Sidebar */}
-                    <ProjectDetailsSidebar
-                      className="hidden lg:flex lg:col-span-3"
-                      selectedProject={
-                        selectedTender
-                          ? {
-                              id: selectedTender._id,
-                              title: selectedTender.title,
-                              description: selectedTender.description,
-                              budget: selectedTender.budget,
-                              status: selectedTender.status,
-                              startDate: selectedTender.createdAt,
-                              awardedTo: selectedTender.awardedTo,
-                              postedBy:
-                                typeof selectedTender.postedBy === "string"
-                                  ? selectedTender.postedBy
-                                  : selectedTender.postedBy._id,
-                            }
-                          : null
-                      }
-                      getStatusColor={getStatusColor}
-                      onMarkComplete={() => setIsReviewDialogOpen(true)}
-                      currentUserId={user?._id || ""}
-                      setRefresh={setRefresh}
-                    />
-                  </div>
-
-                  {/* Mobile Sheet for Project List */}
-                  <Sheet
-                    open={isProjectListOpen}
-                    onOpenChange={setIsProjectListOpen}
-                  >
-                    <SheetContent
-                      side="left"
-                      className="w-80 p-0 bg-white/95 backdrop-blur-sm"
-                    >
-                      <div className="flex flex-col h-full">
-                        <div className="flex items-center justify-between p-6 border-b border-gray-100">
-                          <div className="flex items-center gap-3">
-                            <div className="p-2 bg-blue-100 rounded-lg">
-                              <Inbox className="h-4 w-4 text-blue-600" />
-                            </div>
-                            <span className="font-semibold text-gray-900">
-                              {t("inbox")}
-                            </span>
-                          </div>
-                        </div>
-
-                        <div className="px-6 py-4">
-                          <div className="relative">
-                            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                            <Input
-                              placeholder={t("search_projects")}
-                              type="search"
-                              className="pl-10 bg-gray-50 border-gray-200 rounded-xl"
-                            />
-                          </div>
-                        </div>
-
-                        <div className="flex-1 overflow-y-auto px-6 pb-6">
-                          <div className="space-y-3">
-                            {tenders.map((tender) => (
-                              <ProjectCard
-                                key={tender._id}
-                                tender={tender}
-                                isSelected={selectedTender?._id === tender._id}
-                                onClick={() => {
-                                  setSelectedTender(tender);
-                                  setIsProjectListOpen(false);
-                                }}
-                              />
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </SheetContent>
-                  </Sheet>
-
-                  {/* Mobile Sheet for Project Details */}
-                  <Sheet
-                    open={isProjectDetailsOpen}
-                    onOpenChange={setIsProjectDetailsOpen}
-                  >
-                    <SheetContent
-                      side="right"
-                      className="w-80 p-0 bg-white/95 backdrop-blur-sm"
-                    >
-                      <ProjectDetailsSidebar
-                        selectedProject={
-                          selectedTender
-                            ? {
-                                id: selectedTender._id,
-                                title: selectedTender.title,
-                                description: selectedTender.description,
-                                budget: selectedTender.budget,
-                                status: selectedTender.status,
-                                startDate: selectedTender.createdAt,
-                                awardedTo: selectedTender.awardedTo,
-                                postedBy:
-                                  typeof selectedTender.postedBy === "string"
-                                    ? selectedTender.postedBy
-                                    : selectedTender.postedBy._id,
-                              }
-                            : null
-                        }
-                        getStatusColor={getStatusColor}
-                        onMarkComplete={() => {
-                          setIsReviewDialogOpen(true);
-                          setIsProjectDetailsOpen(false);
-                        }}
-                        setRefresh={setRefresh}
-                        currentUserId={user?._id || ""}
-                      />
-                    </SheetContent>
-                  </Sheet>
-                </div>
-              </PageTransitionWrapper>
-            </TabsContent>
-          )}
-
-          {/* Awarded Tab Content */}
           <TabsContent
             value="awarded"
             className="flex-1 overflow-hidden m-0 p-0"
           >
-            {" "}
-            <PageTransitionWrapper>
-              <div className="flex w-full flex-col h-full md:h-[calc(100vh-85px)] overflow-hidden">
-                <div className="grid flex-1 h-full overflow-hidden grid-cols-1 md:grid-cols-12 gap-4 p-4">
-                  {/* Left Sidebar for Awarded Projects */}
-                  <div className="hidden md:flex md:col-span-4 lg:col-span-3 flex-col overflow-y-scroll ">
-                    <div className="bg-white/80 backdrop-blur-sm rounded-2xl border h-10 border-gray-200/60 shadow-lg shadow-gray-200/40 dark:bg-gray-900/80 dark:border-gray-700/60 dark:shadow-gray-900/40 h-full flex flex-col overflow-hidden">
-                      {/* Header */}
-                      <div className="flex items-center justify-between p-6 pb-4 border-b border-gray-100 dark:border-gray-700/50">
-                        <div className="flex items-center gap-3">
-                          <div className="p-2 bg-blue-100 dark:bg-blue-900/40 rounded-lg">
-                            <Inbox className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                          </div>
-                          <span className="font-semibold text-gray-900 dark:text-gray-100">
-                            {t("inbox")}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2 text-xs">
-                          <span className="text-gray-500 dark:text-gray-400">
-                            {t("all")}
-                          </span>
-                          <Switch className="scale-75" />
-                          <span className="text-gray-500 dark:text-gray-400">
-                            {t("unread")}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Tabs */}
-                      <div className="px-6 pt-4 pb-4">
-                        <TabsList className="w-full flex bg-blue-50/70 dark:bg-blue-900/30 backdrop-blur-md rounded-xl shadow- border border-blue-200/50 dark:border-blue-700/40">
-                          <TabsTrigger
-                            value="owned"
-                            className="flex-1 rounded-xl text-sm font-medium transition-all duration-200
-      data-[state=active]:bg-blue-500 data-[state=active]:text-white data-[state=active]:shadow
-      hover:bg-blue-100/80 dark:hover:bg-blue-800/50 dark:data-[state=active]:bg-blue-600"
-                          >
-                            {t("Tenders")}
-                          </TabsTrigger>
-                          <TabsTrigger
-                            value="awarded"
-                            className="flex-1 rounded-xl text-sm font-medium transition-all duration-200
-      data-[state=active]:bg-blue-500 data-[state=active]:text-white data-[state=active]:shadow
-      hover:bg-blue-100/80 dark:hover:bg-blue-800/50 dark:data-[state=active]:bg-blue-600"
-                          >
-                            {t("Bids")}
-                          </TabsTrigger>
-                        </TabsList>
-                      </div>
-
-                      {/* Search */}
-                      <div className="px-6 pb-4">
-                        <div className="relative">
-                          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                          <Input
-                            placeholder={t("search_projects")}
-                            type="search"
-                            className="pl-10 bg-gray-50/80 dark:bg-gray-800/80 border-gray-200/60 dark:border-gray-700/60 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
-                          />
-                        </div>
-                      </div>
-
-                      {/* Awarded Project List */}
-                      <div className="flex-1 overflow-y-auto px-6 pb-6">
-                        <div className="space-y-3">
-                          {awardedtome.length === 0 ? (
-                            <div className="text-center py-8">
-                              <div className="p-4 bg-gray-100 dark:bg-gray-800 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                                <Inbox className="h-6 w-6 text-gray-400" />
-                              </div>
-                              <p className="text-gray-500 dark:text-gray-400 text-sm">
-                                {t("no_projects_found")}
-                              </p>
-                            </div>
-                          ) : (
-                            awardedtome.map((tender) => (
-                              <ProjectCard
-                                key={tender._id}
-                                tender={tender}
-                                isSelected={selectedTender?._id === tender._id}
-                                onClick={() => setSelectedTender(tender)}
-                              />
-                            ))
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Chat Section */}
-                  <ChatSection
-                    tenderId={selectedTender?._id ?? ""}
-                    className="col-span-full md:col-span-8 lg:col-span-6 rounded-2xl overflow-hidden"
-                    onOpenProjectList={() => setIsProjectListOpen(true)}
-                    onOpenProjectDetails={() => setIsProjectDetailsOpen(true)}
-                  />
-
-                  {/* Project Details Sidebar for Awarded */}
-                  <ProjectDetailsSidebarawarded
-                    className="hidden lg:flex lg:col-span-3"
-                    selectedProject={
-                      selectedTender
-                        ? {
-                            id: selectedTender._id,
-                            title: selectedTender.title,
-                            description: selectedTender.description,
-                            budget: selectedTender.budget,
-                            status: selectedTender.status,
-                            startDate: selectedTender.createdAt,
-                            awardedTo: selectedTender.awardedTo
-                              ? typeof selectedTender.awardedTo === "string"
-                                ? {
-                                    _id: selectedTender.awardedTo,
-                                    email: "unknown@example.com",
-                                  }
-                                : {
-                                    _id: selectedTender.awardedTo._id,
-                                    email: selectedTender.awardedTo.email,
-                                  }
-                              : undefined,
-                            postedBy: getPostedById(selectedTender.postedBy),
-                          }
-                        : null
-                    }
-                    getStatusColor={getStatusColor}
-                    currentUserId={user?._id || ""}
-                    setRefresh={setRefresh}
-                  />
-                </div>
-
-                {/* Mobile Sheets for Awarded Tab */}
-                <Sheet
-                  open={isProjectListOpen}
-                  onOpenChange={setIsProjectListOpen}
-                >
-                  <SheetContent
-                    side="left"
-                    className="w-80 p-0 bg-white/95 backdrop-blur-sm"
-                  >
-                    <div className="flex flex-col h-full">
-                      <div className="flex items-center justify-between p-6 border-b border-gray-100">
-                        <div className="flex items-center gap-3">
-                          <div className="p-2 bg-blue-100 rounded-lg">
-                            <Inbox className="h-4 w-4 text-blue-600" />
-                          </div>
-                          <span className="font-semibold text-gray-900">
-                            {t("inbox")}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="px-6 py-4">
-                        <div className="relative">
-                          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                          <Input
-                            placeholder={t("search_projects")}
-                            type="search"
-                            className="pl-10 bg-gray-50 border-gray-200 rounded-xl"
-                          />
-                        </div>
-                      </div>
-
-                      <div className="flex-1 overflow-y-auto px-6 pb-6">
-                        <div className="space-y-3">
-                          {awardedtome.map((tender) => (
-                            <ProjectCard
-                              key={tender._id}
-                              tender={tender}
-                              isSelected={selectedTender?._id === tender._id}
-                              onClick={() => {
-                                setSelectedTender(tender);
-                                setIsProjectListOpen(false);
-                              }}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </SheetContent>
-                </Sheet>
-
-                <Sheet
-                  open={isProjectDetailsOpen}
-                  onOpenChange={setIsProjectDetailsOpen}
-                >
-                  <SheetContent
-                    side="right"
-                    className="w-80 p-0 bg-white/95 backdrop-blur-sm"
-                  >
-                    <ProjectDetailsSidebarawarded
-                      selectedProject={
-                        selectedTender
-                          ? {
-                              id: selectedTender._id,
-                              title: selectedTender.title,
-                              description: selectedTender.description,
-                              budget: selectedTender.budget,
-                              status: selectedTender.status,
-                              startDate: selectedTender.createdAt,
-                              awardedTo: selectedTender.awardedTo
-                                ? typeof selectedTender.awardedTo === "string"
-                                  ? {
-                                      _id: selectedTender.awardedTo,
-                                      email: "unknown@example.com",
-                                    }
-                                  : {
-                                      _id: selectedTender.awardedTo._id,
-                                      email: selectedTender.awardedTo.email,
-                                    }
-                                : undefined,
-                              postedBy: getPostedById(selectedTender.postedBy),
-                            }
-                          : null
-                      }
-                      getStatusColor={getStatusColor}
-                      setRefresh={setRefresh}
-                      currentUserId={user?._id || ""}
-                    />
-                  </SheetContent>
-                </Sheet>
-              </div>
-            </PageTransitionWrapper>
+            <ChatLayout
+              tenders={awardedTenders}
+              selectedTender={selectedTender}
+              setSelectedTender={setSelectedTender}
+              isProjectListOpen={isProjectListOpen}
+              setIsProjectListOpen={setIsProjectListOpen}
+              isProjectDetailsOpen={isProjectDetailsOpen}
+              setIsProjectDetailsOpen={setIsProjectDetailsOpen}
+              getStatusColor={getStatusColor}
+              ProjectCard={ProjectCard}
+              user={user}
+              setRefresh={setRefresh}
+              activeTab="awarded"
+            />
           </TabsContent>
         </Tabs>
       </div>
     </PageTransitionWrapper>
+  );
+}
+
+// Extracted Layout (Avoid Duplication)
+function ChatLayout({
+  tenders,
+  selectedTender,
+  setSelectedTender,
+  isProjectListOpen,
+  setIsProjectListOpen,
+  isProjectDetailsOpen,
+  setIsProjectDetailsOpen,
+  getStatusColor,
+  ProjectCard,
+  user,
+  setRefresh,
+  activeTab,
+}: any) {
+  const { t } = useTranslation();
+
+  return (
+    <div className="flex flex-col h-full md:h-[calc(100vh-85px)] overflow-hidden">
+      <div className="grid flex-1 h-full overflow-hidden grid-cols-1 md:grid-cols-12 gap-4 p-4">
+        {/* Desktop Sidebar */}
+        <div className="hidden md:flex md:col-span-4 lg:col-span-3 flex-col overflow-y-auto">
+          <SidebarContent
+            tenders={tenders}
+            selectedTender={selectedTender}
+            setSelectedTender={setSelectedTender}
+            ProjectCard={ProjectCard}
+            activeTab={activeTab}
+            t={t}
+          />
+        </div>
+
+        {/* Chat */}
+        <ChatSection
+          tenderId={selectedTender?._id ?? ""}
+          className="col-span-full md:col-span-8 lg:col-span-6 rounded-2xl overflow-hidden"
+          onOpenProjectList={() => setIsProjectListOpen(true)}
+          onOpenProjectDetails={() => setIsProjectDetailsOpen(true)}
+        />
+
+        {/* Details Sidebar */}
+        <ProjectDetailsSidebar
+          className="hidden lg:flex lg:col-span-3"
+          selectedProject={
+            selectedTender
+              ? {
+                  id: selectedTender._id,
+                  title: selectedTender.title,
+                  description: selectedTender.description,
+                  budget: selectedTender.budget,
+                  status: selectedTender.status,
+                  startDate: selectedTender.createdAt,
+                  awardedTo: selectedTender.awardedTo,
+                  postedBy:
+                    typeof selectedTender.postedBy === "string"
+                      ? selectedTender.postedBy
+                      : selectedTender.postedBy._id,
+                }
+              : null
+          }
+          getStatusColor={getStatusColor}
+          currentUserId={user?._id || ""}
+          setRefresh={setRefresh}
+          activeTab={activeTab}
+        />
+      </div>
+
+      {/* Mobile Sheets */}
+      <Sheet open={isProjectListOpen} onOpenChange={setIsProjectListOpen}>
+        <SheetContent side="left" className="w-80 p-0">
+          <SidebarContent
+            tenders={tenders}
+            selectedTender={selectedTender}
+            setSelectedTender={(t: Tender) => {
+              setSelectedTender(t);
+              setIsProjectListOpen(false);
+            }}
+            ProjectCard={ProjectCard}
+            activeTab={activeTab}
+            t={t}
+          />
+        </SheetContent>
+      </Sheet>
+
+      <Sheet open={isProjectDetailsOpen} onOpenChange={setIsProjectDetailsOpen}>
+        <SheetContent side="right" className="w-80 p-0">
+          <ProjectDetailsSidebar
+            selectedProject={selectedTender ? selectedTender : null}
+            getStatusColor={getStatusColor}
+            currentUserId={user?._id || ""}
+            setRefresh={setRefresh}
+            activeTab={activeTab}
+          />
+        </SheetContent>
+      </Sheet>
+    </div>
+  );
+}
+
+// Extracted Sidebar
+function SidebarContent({
+  tenders,
+  selectedTender,
+  setSelectedTender,
+  ProjectCard,
+  activeTab,
+  t,
+}: any) {
+  return (
+    <div className="bg-white/80 backdrop-blur-sm rounded-2xl h-full flex flex-col overflow-hidden border border-gray-200/60 shadow-lg">
+      <div className="flex items-center justify-between p-6 pb-4 border-b">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-blue-100 rounded-lg">
+            <Inbox className="h-4 w-4 text-blue-600" />
+          </div>
+          <span className="font-semibold">{t("inbox")}</span>
+        </div>
+        <div className="flex items-center gap-2 text-xs">
+          <span className="text-gray-500">{t("all")}</span>
+          <Switch className="scale-75" />
+          <span className="text-gray-500">{t("unread")}</span>
+        </div>
+      </div>
+
+      <div className="px-6 pt-4 pb-4">
+        <TabsList className="w-full">
+          <TabsTrigger value="owned" className="flex-1">
+            {t("Tenders")}
+          </TabsTrigger>
+          <TabsTrigger value="awarded" className="flex-1">
+            {t("Bids")}
+          </TabsTrigger>
+        </TabsList>
+      </div>
+
+      <div className="px-6 pb-4">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+          <Input placeholder={t("search_projects")} className="pl-10" />
+        </div>
+      </div>
+
+      <div className="flex-1 overflow-y-auto px-6 pb-6">
+        <div className="space-y-3">
+          {tenders.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              <Inbox className="h-6 w-6 mx-auto mb-2" />
+              <p className="text-sm">{t("no_projects_found")}</p>
+            </div>
+          ) : (
+            tenders.map((tender: Tender) => (
+              <ProjectCard
+                key={tender._id}
+                tender={tender}
+                isSelected={selectedTender?._id === tender._id}
+                onClick={() => setSelectedTender(tender)}
+              />
+            ))
+          )}
+        </div>
+      </div>
+    </div>
   );
 }
