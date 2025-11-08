@@ -358,7 +358,7 @@ export default function SignupWizard() {
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto rounded-2xl p-4 sm:p-6 md:p-8 bg-white border border-gray-100 shadow-sm">
+    <div className="w-full max-w-2xl mx-auto rounded-2xl p-4 sm:p-6 md:p-8 bg-white border border-gray-100 ">
       <StepHeader current={step} />
 
       {errors.general && (
@@ -527,7 +527,7 @@ function SelectableCard({
       className={cn(
         "group flex gap-4 sm:gap-6 relative text-left",
         "rounded-xl border bg-white p-4 sm:p-5 transition-all",
-        "hover:shadow-xs focus-visible:outline-none",
+        " focus-visible:outline-none",
         selected ? "border-blue-400" : "border-neutral-200"
       )}
     >

@@ -1,5 +1,4 @@
 "use client";
-
 import { motion } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
 import {
@@ -57,7 +56,10 @@ const processSteps = [
 
 function Process() {
   return (
-    <section className="px-4 sm:px-6 py-16 md:py-24 lg:py-32 bg-gray-50">
+    <section
+      id="process"
+      className="px-4 sm:px-6 py-16 md:py-24 lg:py-32 bg-gray-50"
+    >
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="max-w-3xl mx-auto text-center mb-16">
@@ -71,7 +73,6 @@ function Process() {
             Create detailed project specifications in minutes
           </p>
         </div>
-
         {/* Process Steps - Responsive Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           {processSteps.map((step, index) => (
@@ -94,11 +95,9 @@ function Process() {
                     {step.title}
                   </h3>
                 </div>
-
                 <p className="mt-4 text-sm md:text-base font-normal font-inter leading-relaxed opacity-95">
                   {step.description}
                 </p>
-
                 <button className="mt-6 flex items-center gap-2 text-white text-sm md:text-base font-medium font-inter leading-6 hover:gap-3 transition-all">
                   <span>{step.linkText}</span>
                   <ArrowRight
@@ -107,7 +106,6 @@ function Process() {
                   />
                 </button>
               </div>
-
               {/* Optional: Subtle overlay on hover */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
@@ -125,7 +123,7 @@ function HowItWorksDetailed() {
       audience: "For tenderers (buyers)",
       items: [
         "Post your tender (title, category, deadline, optional budget, deliverables).",
-        "Use Q/A to clarify specs or request revisionswithout revealing identity.",
+        "Use Q/A to clarify specs or request revisions without revealing identity.",
         "Compare & shortlist side-by-side, then award the winner (identities reveal after award).",
       ],
     },
@@ -138,7 +136,6 @@ function HowItWorksDetailed() {
       ],
     },
   ];
-
   return (
     <section
       id="how-it-works-detailed"
@@ -153,13 +150,12 @@ function HowItWorksDetailed() {
           className="text-center mb-16"
         >
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight text-[#1d1d1f] mb-4 leading-tight">
-            How it works , step by step.
+            How it works, step by step.
           </h2>
           <p className="text-base md:text-lg lg:text-xl text-[#6e6e73] max-w-2xl mx-auto leading-7">
             Clear actions for both tenderers and bidders.
           </p>
         </motion.div>
-
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {steps.map((s, i) => (
             <motion.div
@@ -192,10 +188,14 @@ function HowItWorksDetailed() {
     </section>
   );
 }
+
 /* ----------------------------- Testimonials ------------------------------- */
 function Testimonials() {
   return (
-    <div className="bg-gray-50 py-16 md:py-24 lg:py-32 px-4 sm:px-8">
+    <section
+      id="testimonials"
+      className="bg-gray-50 py-16 md:py-24 lg:py-32 px-4 sm:px-8"
+    >
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 items-start gap-12">
           {/* Left Image */}
@@ -210,7 +210,6 @@ function Testimonials() {
               />
             </div>
           </div>
-
           {/* Right Content */}
           <div className="flex flex-col justify-between h-full">
             {/* Centered Content */}
@@ -228,14 +227,12 @@ function Testimonials() {
                   </svg>
                 ))}
               </div>
-
               {/* Quote */}
               <p className="text-2xl md:text-3xl leading-relaxed text-gray-900 mb-6 text-center md:text-left">
                 “Our tender platform cut through bureaucratic barriers like a
                 sharp knife through paper. We won contracts we never thought
                 possible.”
               </p>
-
               {/* Author */}
               <div className="flex items-center justify-center md:justify-start gap-4">
                 <div>
@@ -266,7 +263,6 @@ function Testimonials() {
                 </div>
               </div>
             </div>
-
             {/* Bottom Navigation */}
             <div className="flex items-center justify-between mt-12">
               <div className="flex gap-2">
@@ -274,7 +270,6 @@ function Testimonials() {
                 <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
                 <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
               </div>
-
               <div className="flex gap-2">
                 <button className="p-2 border border-gray-300 rounded-md hover:bg-gray-50 transition">
                   <svg
@@ -311,14 +306,14 @@ function Testimonials() {
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 }
 
 /* --------------------------------- CTA ------------------------------------ */
 function CTA() {
   return (
-    <section className="py-16 md:py-24 lg:py-32  text-black">
+    <section id="cta" className="py-16 md:py-24 lg:py-32 text-black">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
@@ -337,7 +332,6 @@ function CTA() {
             >
               Get better quotes without the back-and-forth.
             </motion.h2>
-
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -348,13 +342,12 @@ function CTA() {
               <motion.a
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                href="/post"
-                className="bg-white text-black hover:bg-white/90 rounded-full px-8 h-14 text-base md:text-lg font-medium  flex items-center gap-2"
+                href="#hero"
+                className="bg-white text-black hover:bg-white/90 rounded-full px-8 h-14 text-base md:text-lg font-medium flex items-center gap-2"
               >
                 Post your tender for free <ArrowRight className="w-5 h-5" />
               </motion.a>
             </motion.div>
-
             <motion.p
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
@@ -374,11 +367,10 @@ function CTA() {
 /* -------------------------------- Footer ---------------------------------- */
 function Footer() {
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
-
   const footerLinks = {
     platform: [
-      { name: "How it works", href: "#how-it-works" },
-      { name: "Use cases", href: "#use-cases" },
+      { name: "How it works", href: "#how-it-works-detailed" },
+      { name: "Use cases", href: "#services" },
       { name: "FAQ", href: "#faq" },
     ],
     company: [
@@ -390,9 +382,11 @@ function Footer() {
       { name: "Terms", href: "#terms" },
     ],
   };
-
   return (
-    <footer className="bg-gray-50 border-t border-gray-200 py-16 md:py-24 lg:py-32">
+    <footer
+      id="footer"
+      className="bg-gray-50 border-t border-gray-200 py-16 md:py-24 lg:py-32"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
           {/* Left Column - Logo, Location, Contact */}
@@ -400,15 +394,12 @@ function Footer() {
             <span className="text-xs md:text-sm font-medium text-gray-900 mb-4">
               Logo
             </span>
-
             <div className="space-y-4 text-xs md:text-sm text-gray-600 leading-5">
               <p className="font-semibold text-gray-900">Location</p>
               <p>Level 1, 123 Innovation Drive, Doha, Qatar</p>
-
               <p className="font-semibold text-gray-900 mt-6">Connect</p>
               <p>1800 tender • help@tenderly.com</p>
             </div>
-
             <div className="flex space-x-4 mt-6">
               <Facebook className="w-5 h-5 text-gray-600 cursor-pointer hover:text-gray-900" />
               <Instagram className="w-5 h-5 text-gray-600 cursor-pointer hover:text-gray-900" />
@@ -417,7 +408,6 @@ function Footer() {
               <Youtube className="w-5 h-5 text-gray-600 cursor-pointer hover:text-gray-900" />
             </div>
           </div>
-
           {/* Right Column - Links */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 justify-items-start text-xs md:text-sm leading-5">
             <div>
@@ -439,7 +429,6 @@ function Footer() {
                 </li>
               </ul>
             </div>
-
             <div>
               <p className="font-semibold text-gray-900 mb-3">About mission</p>
               <ul className="space-y-2 text-gray-600">
@@ -459,13 +448,8 @@ function Footer() {
             </div>
           </div>
         </div>
-
         {/* Bottom Bar */}
         <div className="pt-2">
-          {/* <div className="w-full text-center font-serif font-bold text-gray-900 mb-6 text-[100px] leading-none tracking-widest uppercase break-words">
-        Tenderly
-      </div> */}
-
           <div className="flex flex-col md:flex-row justify-between items-center border-t border-gray-200 pt-6 text-xs md:text-sm text-gray-600 leading-5">
             <div>© 2024 Tender Platform. All rights reserved.</div>
             <div className="flex space-x-6 mt-4 md:mt-0">
@@ -511,7 +495,10 @@ const features = [
 
 function Features() {
   return (
-    <section className="self-stretch px-4 sm:px-16 py-16 md:py-24 lg:py-32 bg-Color-Scheme-1-Background flex flex-col justify-start items-center gap-20 overflow-hidden">
+    <section
+      id="features"
+      className="self-stretch px-4 sm:px-16 py-16 md:py-24 lg:py-32 bg-Color-Scheme-1-Background flex flex-col justify-start items-center gap-20 overflow-hidden"
+    >
       <div className="w-full max-w-[1280px] flex flex-col justify-start items-start gap-20">
         <div className="w-full max-w-[768px] flex flex-col justify-start items-start gap-4">
           <div className="flex justify-start items-center">
@@ -528,7 +515,6 @@ function Features() {
             </p>
           </div>
         </div>
-
         <div className="self-stretch flex flex-col justify-start items-start gap-16">
           <div className="self-stretch grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {features.map((feature, index) => {
@@ -554,7 +540,6 @@ function Features() {
             })}
           </div>
         </div>
-
         <div className="flex justify-start items-center gap-6">
           <button className="px-3 py-1.5 bg-Opacity-Neutral-Darkest-5 outline outline-1 outline-Opacity-Transparent text-Color-Neutral-Darkest text-sm md:text-base font-medium font-inter leading-6 hover:bg-opacity-70 transition-all overflow-hidden">
             Learn more
@@ -571,7 +556,10 @@ function Features() {
 
 function About() {
   return (
-    <section className="flex items-center justify-center min-h-screen px-4 sm:px-6 py-16 md:py-24 lg:py-32 bg-Color-Scheme-1-Background">
+    <section
+      id="about"
+      className="flex items-center justify-center min-h-screen px-4 sm:px-6 py-16 md:py-24 lg:py-32 bg-Color-Scheme-1-Background"
+    >
       <div className="max-w-7xl mx-auto">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
           {/* Text Content */}
@@ -590,7 +578,6 @@ function About() {
                 Qatar's dynamic market.
               </p>
             </div>
-
             {/* For Tenderers & Bidders */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 py-4">
               <div className="flex flex-col gap-3">
@@ -615,7 +602,6 @@ function About() {
                 </p>
               </div>
             </div>
-
             {/* CTA Buttons */}
             <div className="flex flex-wrap items-center gap-4">
               <button className="px-4 py-2 bg-Opacity-Neutral-Darkest-5 outline outline-1 outline-Opacity-Transparent text-Color-Neutral-Darkest text-sm md:text-base font-medium font-inter leading-6 rounded-md hover:bg-opacity-70 transition-all">
@@ -627,7 +613,6 @@ function About() {
               </button>
             </div>
           </div>
-
           {/* Image */}
           <div className="hidden lg:block h-full">
             <img
@@ -637,7 +622,6 @@ function About() {
             />
           </div>
         </div>
-
         {/* Mobile Image */}
         <div className="lg:hidden mt-12">
           <img
@@ -688,7 +672,10 @@ const smallServices = [
 
 function Services() {
   return (
-    <section className="px-4 sm:px-6 py-16 md:py-24 lg:py-32 bg-gray-50">
+    <section
+      id="services"
+      className="px-4 sm:px-6 py-16 md:py-24 lg:py-32 bg-gray-50"
+    >
       <div className="max-w-7xl mx-auto">
         {/* ---------- Header ---------- */}
         <div className="max-w-3xl mx-auto text-center mb-12 md:mb-16">
@@ -702,7 +689,6 @@ function Services() {
             Find the right solution for every project need
           </p>
         </div>
-
         {/* ---------- Layout: Large + Grid of 4 ---------- */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Large Card (Individuals) */}
@@ -725,7 +711,6 @@ function Services() {
                   Home services (cleaning & maintenance)
                 </h3>
               </div>
-
               <div className="flex flex-wrap items-center gap-4">
                 <button className="px-5 py-2.5 bg-white/10 backdrop-blur-sm border border-white/20 text-white text-sm md:text-base font-medium rounded-md hover:bg-white/20 transition-all">
                   See sample tender
@@ -740,7 +725,6 @@ function Services() {
               </div>
             </div>
           </div>
-
           {/* Small Cards Grid (2x2) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             {smallServices.map((service, idx) => (
@@ -766,7 +750,6 @@ function Services() {
                       </h4>
                     </div>
                   </div>
-
                   <button className="flex items-center gap-2 text-white text-xs md:text-sm lg:text-base font-normal hover:gap-3 transition-all mt-4">
                     <span>{service.linkText}</span>
                     <ArrowRight
@@ -829,7 +812,10 @@ const faqs = [
 
 function FAQ2() {
   return (
-    <section className="self-stretch px-4 sm:px-16 py-16 md:py-24 lg:py-32 bg-Color-Scheme-1-Background flex flex-col justify-start items-center gap-20 overflow-hidden">
+    <section
+      id="faq"
+      className="self-stretch px-4 sm:px-16 py-16 md:py-24 lg:py-32 bg-Color-Scheme-1-Background flex flex-col justify-start items-center gap-20 overflow-hidden"
+    >
       <div className="w-full max-w-[1280px] flex flex-col justify-start items-center gap-20">
         <div className="w-full max-w-[768px] flex flex-col justify-start items-center gap-6">
           <h2 className="self-stretch text-center text-Color-Scheme-1-Text text-3xl sm:text-4xl md:text-5xl font-medium font-outfit leading-tight">
@@ -839,7 +825,6 @@ function FAQ2() {
             Common questions about tendering on Tenderly
           </p>
         </div>
-
         <div className="w-full max-w-[768px] flex flex-col justify-start items-start gap-12 overflow-hidden">
           {faqs.map((faq, index) => (
             <div
@@ -862,7 +847,10 @@ function FAQ2() {
 
 function Problems() {
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 py-16 md:py-24 lg:py-32">
+    <section
+      id="problems"
+      className="max-w-7xl mx-auto px-4 sm:px-6 py-16 md:py-24 lg:py-32"
+    >
       <div className="max-w-3xl mx-auto text-center mb-12 md:mb-16">
         <span className="text-Color-Scheme-1-Text text-sm md:text-base font-semibold font-inter leading-6">
           Problem → Outcome
@@ -874,7 +862,6 @@ function Problems() {
           We Are Better Than Every Other Tendering Platform
         </p>
       </div>
-
       <div className="mt-12">
         <Card className="shadow-none border-muted overflow-hidden">
           <CardContent className="p-0">
@@ -898,7 +885,6 @@ function Problems() {
                     </th>
                   </tr>
                 </thead>
-
                 {/* Table Body */}
                 <tbody>
                   {[
@@ -947,7 +933,7 @@ function Problems() {
                       <td className="px-6 py-5 text-xs md:text-sm font-medium text-foreground align-top min-w-[180px] leading-5">
                         {label}
                       </td>
-                      <td className="px-6 py-5 text-xs md:text-sm font-normal   align-top min-w-[220px] leading-5">
+                      <td className="px-6 py-5 text-xs md:text-sm font-normal align-top min-w-[220px] leading-5">
                         <span className="block break-words">{tenderly}</span>
                       </td>
                       <td className="px-6 py-5 text-xs md:text-sm font-normal align-top min-w-[220px] leading-5">
@@ -964,145 +950,60 @@ function Problems() {
     </section>
   );
 }
+
 function PricingSection() {
   const [activeTab, setActiveTab] = useState<"tender" | "bid">("tender");
-
   return (
-    <>
-      <section className="py-16 md:py-24 lg:py-32 px-4 sm:px-6 bg-background text-foreground">
-        <div className="max-w-7xl mx-auto">
-          {/* Header */}
-          <div className="text-center mb-16 max-w-3xl mx-auto">
-            <p className="text-xs md:text-sm font-medium text-muted-foreground uppercase tracking-wider mb-2 leading-5">
-              Offer & pricing
-            </p>
-            <h2 className="text-3xl sm:text-4xl font-semibold mb-4 leading-tight">
-              Flexible procurement solutions
-            </h2>
-            <p className="text-sm md:text-base text-muted-foreground leading-6">
-              Scale your tender strategy with transparent, adaptable pricing for
-              every business need.
-            </p>
-          </div>
-
-          {/* Two Pricing Cards Side by Side */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-            {/* Tender Plan */}
-            <Card className="border border-border bg-muted/40 shadow-none">
-              <CardContent className="p-8">
-                <div className="mb-8">
-                  <h3 className="text-xl sm:text-2xl font-semibold mb-2 leading-tight">
-                    Tenderer Plan
-                  </h3>
-                  <div className="flex items-baseline">
-                    <span className="text-4xl sm:text-5xl font-bold">Free</span>
-                    <span className="ml-2 text-muted-foreground text-sm md:text-base">
-                      forever
-                    </span>
-                  </div>
-                  <p className="mt-4 text-muted-foreground text-sm md:text-base leading-6">
-                    Launch your procurement journey with unlimited tender
-                    postings at no cost.
-                  </p>
+    <section
+      id="pricing"
+      className="py-16 md:py-24 lg:py-32 px-4 sm:px-6 bg-background text-foreground"
+    >
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-16 max-w-3xl mx-auto">
+          <p className="text-xs md:text-sm font-medium text-muted-foreground uppercase tracking-wider mb-2 leading-5">
+            Offer & pricing
+          </p>
+          <h2 className="text-3xl sm:text-4xl font-semibold mb-4 leading-tight">
+            Flexible procurement solutions
+          </h2>
+          <p className="text-sm md:text-base text-muted-foreground leading-6">
+            Scale your tender strategy with transparent, adaptable pricing for
+            every business need.
+          </p>
+        </div>
+        {/* Two Pricing Cards Side by Side */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+          {/* Tender Plan */}
+          <Card className="border border-border bg-muted/40 shadow-none">
+            <CardContent className="p-8">
+              <div className="mb-8">
+                <h3 className="text-xl sm:text-2xl font-semibold mb-2 leading-tight">
+                  Tenderer Plan
+                </h3>
+                <div className="flex items-baseline">
+                  <span className="text-4xl sm:text-5xl font-bold">Free</span>
+                  <span className="ml-2 text-muted-foreground text-sm md:text-base">
+                    forever
+                  </span>
                 </div>
-
-                <div className="space-y-6 mb-8">
-                  <div>
-                    <h4 className="font-semibold mb-3 text-base md:text-lg leading-tight">
-                      Includes
-                    </h4>
-                    <ul className="space-y-3">
-                      {[
-                        "3 active tender postings",
-                        "Standard communication tools",
-                        "Basic reporting metrics",
-                        "Essential security protocols",
-                        "Limited integration options",
-                      ].map((item) => (
-                        <li
-                          key={item}
-                          className="flex items-start text-sm md:text-base leading-6"
-                        >
-                          <Check className="w-5 h-5 text-foreground mr-3 mt-0.5" />
-                          <span className="text-muted-foreground">{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <div>
-                    <h4 className="font-semibold mb-3 text-base md:text-lg leading-tight">
-                      Support
-                    </h4>
-                    <ul className="space-y-3">
-                      {[
-                        "Basic vendor profile access",
-                        "Community support channel",
-                        "Single user account",
-                        "Platform onboarding guide",
-                        "Monthly performance insights",
-                      ].map((item) => (
-                        <li
-                          key={item}
-                          className="flex items-start text-sm md:text-base leading-6"
-                        >
-                          <Check className="w-5 h-5 text-foreground mr-3 mt-0.5" />
-                          <span className="text-muted-foreground">{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-
-                <Button
-                  variant="outline"
-                  className="w-full font-semibold rounded-md text-sm md:text-base"
-                >
-                  Start Posting Tenders
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Bid Plan */}
-            <Card className="border border-border bg-muted/10 shadow-none">
-              <CardContent className="p-8">
-                <div className="mb-8">
-                  <h3 className="text-xl sm:text-2xl font-semibold mb-2 leading-tight">
-                    Bidder Plan
-                  </h3>
-                  <div className="flex items-baseline">
-                    <span className="text-4xl sm:text-5xl font-bold">100</span>
-                    <span className="ml-2 text-muted-foreground text-sm md:text-base">
-                      QAR / bid
-                    </span>
-                  </div>
-                  <p className="mt-4 text-muted-foreground text-sm md:text-base leading-6">
-                    Pay per bid no hidden fees. You only pay when you decide to
-                    participate in a tender opportunity that matters to you.
-                  </p>
-                </div>
-
-                <div className="border border-border rounded-md p-6 mb-8 bg-muted/50">
-                  <p className="font-medium text-base md:text-lg leading-tight">
-                    Transparent & Risk-Free
-                  </p>
-                  <p className="text-muted-foreground mt-2 text-sm md:text-base leading-6">
-                    Access browsing, matching, and analytics features completely
-                    free. Payment only applies to actual bid submissions.
-                  </p>
-                </div>
-
-                <div className="space-y-4 mb-8">
-                  <h4 className="font-semibold text-base md:text-lg leading-tight">
-                    What you get with every bid
+                <p className="mt-4 text-muted-foreground text-sm md:text-base leading-6">
+                  Launch your procurement journey with unlimited tender postings
+                  at no cost.
+                </p>
+              </div>
+              <div className="space-y-6 mb-8">
+                <div>
+                  <h4 className="font-semibold mb-3 text-base md:text-lg leading-tight">
+                    Includes
                   </h4>
                   <ul className="space-y-3">
                     {[
-                      "Full access to tender specifications & documents",
-                      "Smart vendor matching & quote templates",
-                      "Secure submission with audit trail",
-                      "Direct communication with tender owner",
-                      "Bid performance analytics post-submission",
+                      "3 active tender postings",
+                      "Standard communication tools",
+                      "Basic reporting metrics",
+                      "Essential security protocols",
+                      "Limited integration options",
                     ].map((item) => (
                       <li
                         key={item}
@@ -1114,23 +1015,102 @@ function PricingSection() {
                     ))}
                   </ul>
                 </div>
-
-                <Button
-                  variant="outline"
-                  className="w-full font-semibold rounded-md text-sm md:text-base"
-                >
-                  Browse Tenders to Bid
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
+                <div>
+                  <h4 className="font-semibold mb-3 text-base md:text-lg leading-tight">
+                    Support
+                  </h4>
+                  <ul className="space-y-3">
+                    {[
+                      "Basic vendor profile access",
+                      "Community support channel",
+                      "Single user account",
+                      "Platform onboarding guide",
+                      "Monthly performance insights",
+                    ].map((item) => (
+                      <li
+                        key={item}
+                        className="flex items-start text-sm md:text-base leading-6"
+                      >
+                        <Check className="w-5 h-5 text-foreground mr-3 mt-0.5" />
+                        <span className="text-muted-foreground">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+              <Button
+                variant="outline"
+                className="w-full font-semibold rounded-md text-sm md:text-base"
+              >
+                Start Posting Tenders
+              </Button>
+            </CardContent>
+          </Card>
+          {/* Bid Plan */}
+          <Card className="border border-border bg-muted/10 shadow-none">
+            <CardContent className="p-8">
+              <div className="mb-8">
+                <h3 className="text-xl sm:text-2xl font-semibold mb-2 leading-tight">
+                  Bidder Plan
+                </h3>
+                <div className="flex items-baseline">
+                  <span className="text-4xl sm:text-5xl font-bold">100</span>
+                  <span className="ml-2 text-muted-foreground text-sm md:text-base">
+                    QAR / bid
+                  </span>
+                </div>
+                <p className="mt-4 text-muted-foreground text-sm md:text-base leading-6">
+                  Pay per bid no hidden fees. You only pay when you decide to
+                  participate in a tender opportunity that matters to you.
+                </p>
+              </div>
+              <div className="border border-border rounded-md p-6 mb-8 bg-muted/50">
+                <p className="font-medium text-base md:text-lg leading-tight">
+                  Transparent & Risk-Free
+                </p>
+                <p className="text-muted-foreground mt-2 text-sm md:text-base leading-6">
+                  Access browsing, matching, and analytics features completely
+                  free. Payment only applies to actual bid submissions.
+                </p>
+              </div>
+              <div className="space-y-4 mb-8">
+                <h4 className="font-semibold text-base md:text-lg leading-tight">
+                  What you get with every bid
+                </h4>
+                <ul className="space-y-3">
+                  {[
+                    "Full access to tender specifications & documents",
+                    "Smart vendor matching & quote templates",
+                    "Secure submission with audit trail",
+                    "Direct communication with tender owner",
+                    "Bid performance analytics post-submission",
+                  ].map((item) => (
+                    <li
+                      key={item}
+                      className="flex items-start text-sm md:text-base leading-6"
+                    >
+                      <Check className="w-5 h-5 text-foreground mr-3 mt-0.5" />
+                      <span className="text-muted-foreground">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <Button
+                variant="outline"
+                className="w-full font-semibold rounded-md text-sm md:text-base"
+              >
+                Browse Tenders to Bid
+              </Button>
+            </CardContent>
+          </Card>
         </div>
-      </section>
-    </>
+      </div>
+    </section>
   );
 }
+
 /* -------------------------------------------------------------------------- */
-/*                                 PAGE EXPORT                                */
+/* PAGE EXPORT */
 /* -------------------------------------------------------------------------- */
 export default function Home() {
   return (
