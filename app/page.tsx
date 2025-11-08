@@ -127,11 +127,8 @@ function Process() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="max-w-3xl mx-auto text-center mb-8">
-          <span className="text-Color-Scheme-1-Text text-sm md:text-base font-semibold font-inter leading-6">
-            Process
-          </span>
           <h2 className="mt-2 text-3xl sm:text-4xl md:text-5xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight">
-            How Tenderly works
+            How GoTenderly works
           </h2>
 
           {/* Tabs */}
@@ -500,17 +497,12 @@ function Features() {
     >
       <div className="w-full max-w-[1280px] flex flex-col justify-start items-start gap-20">
         <div className="w-full max-w-[768px] flex flex-col justify-start items-start gap-4">
-          <div className="flex justify-start items-center">
-            <span className="text-Color-Scheme-1-Text text-sm md:text-base font-semibold font-inter leading-6">
-              Features
-            </span>
-          </div>
           <div className="self-stretch flex flex-col justify-start items-start gap-6">
             <h2 className="self-stretch text-Color-Scheme-1-Text text-3xl sm:text-4xl md:text-5xl font-medium font-outfit leading-tight">
-              Powerful tools for seamless tendering
+              Powerful tools for seamless Project Managment
             </h2>
             <p className="self-stretch text-Color-Scheme-1-Text text-base md:text-lg font-normal font-inter leading-7">
-              Designed to simplify your procurement and bidding experience
+              Designed to simplify your Projects and bidding experience
             </p>
           </div>
         </div>
@@ -565,15 +557,12 @@ function About() {
           <div className="flex flex-col gap-8">
             {/* Header */}
             <div className="flex flex-col gap-6">
-              <span className="text-Color-Scheme-1-Text text-sm md:text-base font-semibold font-inter leading-6">
-                Tender
-              </span>
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight">
                 A tender marketplace for individuals and businesses bidders,
                 reply instantly, you compare, negotiate, and award.
               </h2>
               <p className="text-base md:text-lg font-normal font-inter text-Color-Scheme-1-Text leading-7">
-                Streamline your procurement process with a platform designed for
+                Streamline your Projects process with a platform designed for
                 Qatar's dynamic market.
               </p>
             </div>
@@ -864,11 +853,12 @@ const faqs = [
   },
   {
     question: "Who can use Tenderly?",
-    answer: "Anyoneindividuals and businesses of any size.",
+    answer: "Anyone ,  individuals and businesses of any size.",
   },
   {
     question: "What categories are allowed?",
-    answer: "Anything.",
+    answer:
+      "All categories are allowed , from construction, IT, and logistics to marketing, design, and consulting. In short: anything.",
   },
 ];
 
@@ -914,14 +904,11 @@ function Problems() {
       className="max-w-7xl mx-auto px-4 sm:px-6 py-16 md:py-24 lg:py-32"
     >
       <div className="max-w-3xl mx-auto text-center mb-12 md:mb-16">
-        <span className="text-Color-Scheme-1-Text text-sm md:text-base font-semibold font-inter leading-6">
-          Problem → Outcome
-        </span>
         <h2 className="mt-3 text-3xl sm:text-4xl md:text-5xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight">
-          The smarter way to handle <br /> procurement in Qatar
+          The smarter way to handle <br /> Projects in Qatar
         </h2>
         <p className="mt-4 text-base md:text-lg font-normal font-inter text-Color-Scheme-1-Text leading-7">
-          We Are Better Than Every Other Tendering Platform
+          The platform every bidder and client actually loves.
         </p>
       </div>
       <div className="mt-12">
@@ -1027,7 +1014,7 @@ function PricingSection() {
             Offer & pricing
           </p>
           <h2 className="text-3xl sm:text-4xl font-semibold mb-4 leading-tight">
-            Flexible procurement solutions
+            Flexible Projects solutions
           </h2>
           <p className="text-sm md:text-base text-muted-foreground leading-6">
             Scale your tender strategy with transparent, adaptable pricing for
@@ -1050,8 +1037,8 @@ function PricingSection() {
                   </span>
                 </div>
                 <p className="mt-4 text-muted-foreground text-sm md:text-base leading-6">
-                  Launch your procurement journey with unlimited tender postings
-                  at no cost.
+                  Launch your Projectsjourney with unlimited tender postings at
+                  no cost.
                 </p>
               </div>
               <div className="space-y-6 mb-8">

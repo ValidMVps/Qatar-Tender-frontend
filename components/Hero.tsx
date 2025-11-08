@@ -302,16 +302,15 @@ export default function Hero() {
             className="space-y-6 md:space-y-8 text-left"
           >
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-semibold tracking-tight text-[#1d1d1f] leading-[1.05]">
-              built for Qatar.
+              Post once. Get multiple quotes.
               <br />
-              <span className="text-black">
-                Compliant. Transparent. Faster.
-              </span>
+              <span className="text-black"></span>
             </h1>
+
             <p className="text-base sm:text-lg text-[#6e6e73] font-normal leading-relaxed max-w-xl">
-              GoTenderly is a secure e-tendering platform for Qatari
-              organisations KYC-verified suppliers, audit-ready workflows, and
-              built-in evaluation tools to shorten procurement cycles.
+              A centralized tender marketplace for individuals and businesses,
+              describe, bidders reply instantly, you compare, negotiate, and
+              award.
             </p>
 
             <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4">
@@ -341,7 +340,11 @@ export default function Hero() {
               </div>
               <div className="flex items-center gap-2">
                 <Check className="w-5 h-5 text-black" />
-                Evaluation scorecards & audit trail
+                Anonymous until award
+              </div>{" "}
+              <div className="flex items-center gap-2">
+                <Check className="w-5 h-5 text-black" />
+                Anonymous until award
               </div>
             </div>
           </motion.div>
