@@ -570,9 +570,9 @@ function Features() {
 
 function About() {
   return (
-    <section className="px-4 sm:px-6 py-16 md:py-24 lg:py-32 bg-Color-Scheme-1-Background">
+    <section className="flex items-center justify-center min-h-screen px-4 sm:px-6 py-16 md:py-24 lg:py-32 bg-Color-Scheme-1-Background">
       <div className="max-w-7xl mx-auto">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-start">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
           {/* Text Content */}
           <div className="flex flex-col gap-8">
             {/* Header */}
@@ -581,9 +581,8 @@ function About() {
                 Tender
               </span>
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight">
-                A centralized tender marketplace for individuals and businesses
-                describe, bidders reply instantly, you compare, negotiate, and
-                award.
+                A tender marketplace for individuals and businesses bidders,
+                reply instantly, you compare, negotiate, and award.
               </h2>
               <p className="text-base md:text-lg font-normal font-inter text-Color-Scheme-1-Text leading-7">
                 Streamline your procurement process with a platform designed for
@@ -629,16 +628,16 @@ function About() {
           </div>
 
           {/* Image */}
-          <div className="hidden lg:block">
+          <div className="hidden lg:block h-full">
             <img
               src="https://images.pexels.com/photos/3184338/pexels-photo-3184338.jpeg?auto=compress&cs=tinysrgb&w=600&h=640"
               alt="Professional workspace"
-              className="w-full h-auto max-h-[600px] object-cover rounded-md shadow-lg"
+              className="w-full h-full max-h-full object-cover rounded-md shadow-lg"
             />
           </div>
         </div>
 
-        {/* Mobile Image (optional - show below on small screens) */}
+        {/* Mobile Image */}
         <div className="lg:hidden mt-12">
           <img
             src="https://images.pexels.com/photos/3184338/pexels-photo-3184338.jpeg?auto=compress&cs=tinysrgb&w=600&h=640"
@@ -1077,8 +1076,8 @@ function PricingSection() {
                     </span>
                   </div>
                   <p className="mt-4 text-muted-foreground text-sm md:text-base leading-6">
-                    Pay per bid no hidden fees. You only pay when you decide
-                    to participate in a tender opportunity that matters to you.
+                    Pay per bid no hidden fees. You only pay when you decide to
+                    participate in a tender opportunity that matters to you.
                   </p>
                 </div>
 
