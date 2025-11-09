@@ -1,5 +1,4 @@
 "use client";
-
 import { useAuth } from "@/context/AuthContext";
 import { motion } from "framer-motion";
 import Image from "next/image";
@@ -7,25 +6,22 @@ import { useEffect, useState } from "react";
 import logo from "../media/logo.png";
 import { Menu, X } from "lucide-react";
 import Link from "next/link";
-
 export default function NavbarLanding() {
   const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
   const navItems = [
     { name: "Features", href: "#features" },
-    { name: "How it works", href: "#how-it-works" },
+    { name: "How it works", href: "#process" },
     { name: "Pricing", href: "#pricing" },
     { name: "FAQ", href: "#faq" },
+    { name: "Contact", href: "/contact" },
   ];
-
   return (
     <motion.nav
       animate={{
@@ -49,19 +45,17 @@ export default function NavbarLanding() {
               priority
             />
           </Link>
-
           {/* Desktop menu */}
           <div className="hidden md:flex items-center gap-8">
             {navItems.map((item) => (
-              <a
+              <Link
                 key={item.name}
                 href={item.href}
                 className="text-sm text-black hover:text-gray-600 transition-colors"
               >
                 {item.name}
-              </a>
+              </Link>
             ))}
-
             {user ? (
               <Link
                 href="/dashboard"
@@ -86,7 +80,6 @@ export default function NavbarLanding() {
               </div>
             )}
           </div>
-
           {/* Mobile toggle */}
           <button
             onClick={() => setIsOpen(!isOpen)}
@@ -96,7 +89,6 @@ export default function NavbarLanding() {
           </button>
         </div>
       </div>
-
       {/* Mobile menu */}
       <motion.div
         initial={false}
@@ -108,16 +100,15 @@ export default function NavbarLanding() {
       >
         <div className="px-4 py-4 space-y-3">
           {navItems.map((item) => (
-            <a
+            <Link
               key={item.name}
               href={item.href}
               onClick={() => setIsOpen(false)}
               className="block py-2 text-sm text-black hover:text-gray-600 transition-colors"
             >
               {item.name}
-            </a>
+            </Link>
           ))}
-
           {user ? (
             <Link
               href="/dashboard"

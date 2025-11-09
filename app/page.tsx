@@ -1,5 +1,5 @@
 "use client";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
 import {
   ArrowRight,
@@ -16,6 +16,18 @@ import {
   Youtube,
   Handshake,
   Calendar,
+  Building2,
+  Heart,
+  Truck,
+  Palette,
+  Camera,
+  Coffee,
+  Wrench,
+  HomeIcon,
+  Laptop,
+  Plus,
+  Play,
+  ChevronDown,
 } from "lucide-react";
 import logo from "../media/logo.png";
 import Hero from "@/components/Hero";
@@ -26,8 +38,114 @@ import { Button } from "@/components/ui/button";
 import PageTransitionWrapper from "@/components/animations/PageTransitionWrapper";
 import LenisScroll from "@/components/LenisWrapper";
 import Footer from "@/components/Footer";
-import tender1 from "../media/tender1.png";
-import tender2 from "../media/tender2.png";
+import tender1 from "../media/1.png";
+import tender2 from "../media/2.png";
+import tender3 from "../media/3.png";
+import tender4 from "../media/4.png";
+import tender5 from "../media/5.png";
+import tender6 from "../media/6.png";
+import Link from "next/link";
+import aboutimage from "../media/unnamed (3).jpg";
+import feature1 from "../media/unnamed.jpg";
+import feature2 from "../media/unnamed (1).jpg";
+import feature3 from "../media/unnamed2.jpg";
+import feature4 from "../media/unnamed (4).jpg";
+
+const features: {
+  image: string;
+  alt: string;
+  title: string;
+  description: string;
+}[] = [
+  {
+    image: feature1.src,
+    alt: "Multiple bidders illustration",
+    title: "One-to-Many Quotes",
+    description: "Post once, reach many bidders instantly.",
+  },
+  {
+    image: feature2.src,
+    alt: "Private chat illustration",
+    title: "Private Chat & Negotiation",
+    description: "Clarify details and negotiate without sharing identity.",
+  },
+  {
+    image: feature3.src,
+    alt: "Anonymous users illustration",
+    title: "Anonymity by Default",
+    description: "Both sides stay anonymous until award.",
+  },
+  {
+    image: feature4.src,
+    alt: "Verification badge illustration",
+    title: "Profiles & Verification",
+    description: "KYC/business verification and ratings for trust.",
+  },
+];
+
+function Features() {
+  return (
+    <section
+      id="features"
+      className="self-stretch px-4 sm:px-16 py-16 md:py-24 lg:py-32 bg-Color-Scheme-1-Background flex flex-col justify-start items-center overflow-hidden"
+    >
+      <div className="w-full max-w-[1280px] flex flex-col justify-start items-start gap-12">
+        {/* ---------- Header ---------- */}
+        <div className="w-full max-w-[768px] flex flex-col justify-start items-start gap-4">
+          <h2 className="text-Color-Scheme-1-Text text-3xl sm:text-4xl md:text-5xl font-medium font-outfit leading-tight">
+            Powerful tools for seamless Project Management
+          </h2>
+          <p className="text-Color-Scheme-1-Text text-base md:text-lg font-normal font-inter leading-7">
+            Designed to simplify your projects and bidding experience.
+          </p>
+        </div>
+
+        {/* ---------- Feature Cards ---------- */}
+        <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          {features.map((feature, idx) => (
+            <article
+              key={idx}
+              className="flex flex-col items-start bg-white/5 rounded-2xl -xs hover:-md transition-all overflow-hidden"
+              aria-labelledby={`feature-${idx}-title`}
+            >
+              {/* Full-width image */}
+              <div className="w-full h-48 relative">
+                <Image
+                  src={feature.image}
+                  alt={feature.alt}
+                  fill
+                  className="object-contain"
+                />
+              </div>
+
+              {/* Text content */}
+              <div className="p-5 flex flex-col gap-3">
+                <h3
+                  id={`feature-${idx}-title`}
+                  className="text-Color-Scheme-1-Text text-xl sm:text-2xl font-medium font-outfit leading-tight"
+                >
+                  {feature.title}
+                </h3>
+                <p className="text-Color-Scheme-1-Text text-sm md:text-base font-normal font-inter leading-6">
+                  {feature.description}
+                </p>
+              </div>
+            </article>
+          ))}
+        </div>
+
+        {/* ---------- CTA ---------- */}
+        <div className="flex items-center gap-4 pt-2">
+          <Link href="/signup" legacyBehavior>
+            <a className="inline-flex items-center justify-center px-5 py-3 rounded-xl bg-Opacity-Neutral-Darkest-5 text-Color-Neutral-Darkest text-sm md:text-base font-medium font-inter  hover:opacity-95 transition">
+              Get started know
+            </a>
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
 
 const processSteps = [
   {
@@ -80,8 +198,7 @@ const tenderSteps = [
     description:
       "Negotiate and award the tender, identities revealed only after award.",
     linkText: "Award tender",
-    bgImage:
-      "https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg?auto=compress&cs=tinysrgb&w=384&h=630",
+    bgImage: tender3.src,
   },
 ];
 
@@ -89,20 +206,17 @@ const bidderSteps = [
   {
     label: "Discover",
     title: "Find relevant tenders",
-    description:
-      "Smart matching surfaces tenders that fit your services, budget and timeline.",
+    description: "Browse and explore tenders that match your business needs.",
     linkText: "Browse tenders",
-    bgImage:
-      "https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=384&h=630",
+    bgImage: tender4.src,
   },
   {
     label: "Prepare",
     title: "Prepare your quote",
     description:
-      "Use templates and analytics to produce competitive, accurate proposals quickly.",
+      "Easily create and submit your quote to participate in tenders quickly.",
     linkText: "Create quote",
-    bgImage:
-      "https://images.pexels.com/photos/3184410/pexels-photo-3184410.jpeg?auto=compress&cs=tinysrgb&w=384&h=630",
+    bgImage: tender5.src,
   },
   {
     label: "Submit",
@@ -110,8 +224,7 @@ const bidderSteps = [
     description:
       "Send a secure submission with audit trail and track status in one place.",
     linkText: "Submit bid",
-    bgImage:
-      "https://images.pexels.com/photos/3184434/pexels-photo-3184434.jpeg?auto=compress&cs=tinysrgb&w=384&h=630",
+    bgImage: tender6.src,
   },
 ];
 
@@ -144,7 +257,7 @@ function Process() {
                 onClick={() => setTab("tender")}
                 className={`px-4 py-2 rounded-md text-sm md:text-base font-medium ${
                   tab === "tender"
-                    ? "bg-white shadow-sm text-Color-Scheme-1-Text"
+                    ? "bg-white -sm text-Color-Scheme-1-Text"
                     : "text-muted-foreground hover:bg-white/60"
                 } transition`}
               >
@@ -156,7 +269,7 @@ function Process() {
                 onClick={() => setTab("bidder")}
                 className={`px-4 py-2 rounded-md text-sm md:text-base font-medium ${
                   tab === "bidder"
-                    ? "bg-white shadow-sm text-Color-Scheme-1-Text"
+                    ? "bg-white -sm text-Color-Scheme-1-Text"
                     : "text-muted-foreground hover:bg-white/60"
                 } transition`}
               >
@@ -178,7 +291,7 @@ function Process() {
           {steps.map((step, index) => (
             <div
               key={index}
-              className="group relative min-h-[400px] sm:min-h-[500px] md:min-h-[540px] lg:min-h-[580px] rounded-md overflow-hidden shadow-lg transition-transform hover:scale-[1.02]"
+              className="group relative min-h-[400px] sm:min-h-[500px] md:min-h-[540px] lg:min-h-[580px] rounded-md overflow-hidden -lg transition-transform hover:scale-[1.02]"
               style={{
                 backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.1)), url('${step.bgImage}')`,
                 backgroundSize: "cover",
@@ -466,85 +579,6 @@ function CTA() {
 
 /* -------------------------------- Footer ---------------------------------- */
 
-const features = [
-  {
-    icon: Users,
-    title: "One-to-Many Quotes",
-    description: "Post once, reach many bidders instantly.",
-  },
-  {
-    icon: MessageSquare,
-    title: "Private Chat & Negotiation",
-    description: "Clarify details without sharing identity.",
-  },
-  {
-    icon: Shield,
-    title: "Anonymity by Default",
-    description: "Both sides stay anonymous until award.",
-  },
-  {
-    icon: Award,
-    title: "Profiles & Verification",
-    description: "KYC/business verification and ratings.",
-  },
-];
-
-function Features() {
-  return (
-    <section
-      id="features"
-      className="self-stretch px-4 sm:px-16 py-16 md:py-24 lg:py-32 bg-Color-Scheme-1-Background flex flex-col justify-start items-center gap-20 overflow-hidden"
-    >
-      <div className="w-full max-w-[1280px] flex flex-col justify-start items-start gap-20">
-        <div className="w-full max-w-[768px] flex flex-col justify-start items-start gap-4">
-          <div className="self-stretch flex flex-col justify-start items-start gap-6">
-            <h2 className="self-stretch text-Color-Scheme-1-Text text-3xl sm:text-4xl md:text-5xl font-medium font-outfit leading-tight">
-              Powerful tools for seamless Project Managment
-            </h2>
-            <p className="self-stretch text-Color-Scheme-1-Text text-base md:text-lg font-normal font-inter leading-7">
-              Designed to simplify your Projects and bidding experience
-            </p>
-          </div>
-        </div>
-        <div className="self-stretch flex flex-col justify-start items-start gap-16">
-          <div className="self-stretch grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {features.map((feature, index) => {
-              const Icon = feature.icon;
-              return (
-                <div
-                  key={index}
-                  className="flex flex-col justify-start items-start gap-6"
-                >
-                  <div className="w-12 h-12 flex items-center justify-center">
-                    <Icon size={40} className="text-Color-Scheme-1-Text" />
-                  </div>
-                  <div className="self-stretch flex flex-col justify-start items-start gap-4">
-                    <h3 className="self-stretch text-Color-Scheme-1-Text text-xl sm:text-2xl md:text-3xl font-medium font-outfit leading-tight">
-                      {feature.title}
-                    </h3>
-                    <p className="self-stretch text-Color-Scheme-1-Text text-sm md:text-base font-normal font-inter leading-6">
-                      {feature.description}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-        <div className="flex justify-start items-center gap-6">
-          <button className="px-3 py-1.5 bg-Opacity-Neutral-Darkest-5 outline outline-1 outline-Opacity-Transparent text-Color-Neutral-Darkest text-sm md:text-base font-medium font-inter leading-6 hover:bg-opacity-70 transition-all overflow-hidden">
-            Learn more
-          </button>
-          <button className="flex justify-center items-center gap-2 text-Color-Neutral-Darkest text-sm md:text-base font-medium font-inter leading-6 hover:gap-3 transition-all overflow-hidden">
-            <span>Explore</span>
-            <ArrowRight size={20} />
-          </button>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 function About() {
   return (
     <section
@@ -609,9 +643,9 @@ function About() {
           {/* Image */}
           <div className="hidden lg:block h-full">
             <img
-              src="https://images.pexels.com/photos/3184338/pexels-photo-3184338.jpeg?auto=compress&cs=tinysrgb&w=600&h=640"
+              src={aboutimage.src}
               alt="Professional workspace"
-              className="w-full h-full max-h-full object-cover rounded-md shadow-lg"
+              className="w-full h-full max-h-full object-cover rounded-md -lg"
             />
           </div>
         </div>
@@ -619,9 +653,9 @@ function About() {
         {/* Mobile Image */}
         <div className="lg:hidden mt-12">
           <img
-            src="https://images.pexels.com/photos/3184338/pexels-photo-3184338.jpeg?auto=compress&cs=tinysrgb&w=600&h=640"
+            src={aboutimage.src}
             alt="Professional workspace"
-            className="w-full h-80 object-cover rounded-md shadow-md"
+            className="w-full h-80 object-cover rounded-md -md"
           />
         </div>
       </div>
@@ -664,7 +698,7 @@ const smallServices = [
   },
 ];
 
-const services = [
+const allServices = [
   {
     icon: Calendar,
     title: "Events and hospitality",
@@ -672,30 +706,143 @@ const services = [
     linkText: "View details",
   },
   {
-    icon: Calendar,
-    title: "Construction & Infrastructure",
+    icon: Building2,
+    title: "Construction ",
     subtitle: "Tenders for building materials, machinery, and labor services",
     linkText: "View details",
   },
   {
-    icon: Calendar,
+    icon: Heart,
     title: "Healthcare Services",
     subtitle: "Medical equipment, staffing, and facility maintenance",
     linkText: "View details",
   },
   {
-    icon: Calendar,
+    icon: Laptop,
     title: "IT & Technology",
     subtitle: "Software, hardware, cloud services, and cybersecurity solutions",
     linkText: "View details",
   },
+  {
+    icon: HomeIcon,
+    title: "Home Services",
+    subtitle: "Plumbing, electrical, painting, and renovation contractors",
+    linkText: "View details",
+  },
+  {
+    icon: Truck,
+    title: "Logistics & Transport",
+    subtitle: "Freight, delivery, fleet management, and warehousing solutions",
+    linkText: "View details",
+  },
+  {
+    icon: Briefcase,
+    title: "Professional Services",
+    subtitle: "Legal, accounting, HR, and consulting firm tenders",
+    linkText: "View details",
+  },
+  {
+    icon: Palette,
+    title: "Creative & Design",
+    subtitle: "Graphic design, branding, photography, and video production",
+    linkText: "View details",
+  },
+  {
+    icon: Camera,
+    title: "Media & Advertising",
+    subtitle: "Billboards, digital campaigns, TV, and print media services",
+    linkText: "View details",
+  },
+  {
+    icon: Coffee,
+    title: "Food & Catering",
+    subtitle: "Cafes, restaurants, event catering, and food supply chains",
+    linkText: "View details",
+  },
+  {
+    icon: Wrench,
+    title: "Maintenance & Repair",
+    subtitle: "AC servicing, vehicle repair, and equipment maintenance",
+    linkText: "View details",
+  },
+  {
+    icon: Calendar,
+    title: "Education & Training",
+    subtitle: "Tutors, workshops, corporate training, and e-learning platforms",
+    linkText: "View details",
+  },
 ];
 
+/* duplicate for seamless loop */
+const duplicated = [...allServices, ...allServices];
+
 function Services() {
+  const topRef = useRef<HTMLDivElement>(null);
+  const bottomRef = useRef<HTMLDivElement>(null);
+  const [topPaused, setTopPaused] = useState(false);
+  const [bottomPaused, setBottomPaused] = useState(false);
+
+  /* ---------- Top row – right to left ---------- */
+  useEffect(() => {
+    if (!topRef.current || topPaused) return;
+    const el = topRef.current;
+    let id: number;
+
+    const step = () => {
+      el.scrollLeft -= 1;
+      if (el.scrollLeft <= 0) el.scrollLeft = el.scrollWidth / 2;
+      id = requestAnimationFrame(step);
+    };
+    id = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(id);
+  }, [topPaused]);
+
+  /* ---------- Bottom row – left to right ---------- */
+  useEffect(() => {
+    if (!bottomRef.current || bottomPaused) return;
+    const el = bottomRef.current;
+    let id: number;
+
+    const step = () => {
+      el.scrollLeft += 1;
+      if (el.scrollLeft >= el.scrollWidth / 2) el.scrollLeft = 0;
+      id = requestAnimationFrame(step);
+    };
+    id = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(id);
+  }, [bottomPaused]);
+
+  const renderCard = (service: (typeof allServices)[0], idx: number) => {
+    const Icon = service.icon;
+    return (
+      <div
+        key={idx}
+        className="group flex-shrink-0 w-80 bg-white rounded-xl transition-all duration-300 p-6 flex flex-col h-full border border-gray-100 hover:-lg hover:-translate-y-1"
+      >
+        <div className="w-14 h-14 flex items-center justify-center rounded-full bg-gray-100 text-gray-700 mb-5">
+          <Icon size={28} />
+        </div>
+        <h3 className="text-xl md:text-2xl font-medium font-outfit text-gray-900 leading-tight mb-2">
+          {service.title}
+        </h3>
+        <p className="text-sm md:text-base font-normal font-inter text-gray-600 leading-relaxed flex-grow">
+          {service.subtitle}
+        </p>
+        <button className="mt-6 flex items-center gap-2 text-gray-700 text-sm md:text-base font-medium hover:gap-3 transition-all">
+          <span>{service.linkText}</span>
+          <ArrowRight
+            size={18}
+            className="transition-transform group-hover:translate-x-1"
+          />
+        </button>
+      </div>
+    );
+  };
+
   return (
     <section
       id="services"
-      className="px-4 sm:px-6 py-16 md:py-24 lg:py-32 bg-gray-50"
+      className="px-4 sm:px-6 py-16 md:py-24 lg:py-32 bg-gray-50 overflow-hidden"
     >
       <div className="max-w-7xl mx-auto">
         {/* ---------- Header ---------- */}
@@ -708,122 +855,70 @@ function Services() {
           </h2>
           <p className="mt-4 text-base md:text-lg font-normal font-inter text-Color-Scheme-1-Text leading-7">
             Find the right solution for every project need
-          </p>
+          </p>{" "}
         </div>
 
-        {/* ---------- Uniform Card Grid ---------- */}
-        <div className="grid grid-cols-1 sm:grid-cols-2  gap-3">
-          <div className="flex flex-col gap-3 h-full">
-            <div className="group relative bg-white rounded-2xl transition-all duration-300 overflow-hidden border border-gray-100 flex flex-col">
-              {/* Top Text Section */}
-              <div className="p-6 sm:p-8 flex-1">
-                <div className="mb-4">
-                  <span className="inline-block px-3 py-1 text-xs font-semibold text-gray-700 bg-gray-100 rounded-full">
-                    Individuals
-                  </span>
-                </div>
-
-                <h3 className="text-2xl sm:text-3xl font-medium font-outfit text-gray-900 leading-tight mb-3">
-                  Home services and personal projects
-                </h3>
-
-                <p className="text-sm sm:text-base font-normal font-inter text-gray-600 leading-relaxed">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                  Suspendisse varius enim in eros elementum tristique.
-                </p>
-
-                <div className="mt-6 flex flex-wrap items-center gap-3">
-                  <button className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors">
-                    See sample tender
-                  </button>
-                  <button className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:gap-3 transition-all">
-                    <span>Explore</span>
-                    <ArrowRight
-                      size={16}
-                      className="transition-transform group-hover:translate-x-1"
-                    />
-                  </button>
-                </div>
+        {/* ---------- Two-Row Carousel ---------- */}
+        <div className="relative space-y-1">
+          {/* TOP ROW – right to left */}
+          <div
+            onMouseEnter={() => setTopPaused(true)}
+            onMouseLeave={() => setTopPaused(false)}
+            className="relative"
+          >
+            <div className="flex justify-center mb-11">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-full border border-gray-200">
+                <Plus className="w-4 h-4 text-gray-600" />
+                <span className="text-sm font-medium text-gray-700">
+                  Many more services available
+                </span>
               </div>
-
-              {/* Bottom Image Section */}
             </div>
-            <div className="group relative bg-white rounded-2xl transition-all duration-300 overflow-hidden border border-gray-100 flex flex-col ">
-              {/* Top Text Section */}
-              <div className="p-6 sm:p-8 flex-1">
-                <div className="mb-4">
-                  <span className="inline-block px-3 py-1 text-xs font-semibold text-gray-700 bg-gray-100 rounded-full">
-                    Individuals
-                  </span>
-                </div>
-
-                <h3 className="text-2xl sm:text-3xl font-medium font-outfit text-gray-900 leading-tight mb-3">
-                  Home services and personal projects
-                </h3>
-
-                <p className="text-sm sm:text-base font-normal font-inter text-gray-600 leading-relaxed">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                  Suspendisse varius enim in eros elementum tristique.
-                </p>
-
-                <div className="mt-6 flex flex-wrap items-center gap-3">
-                  <button className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors">
-                    See sample tender
-                  </button>
-                  <button className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:gap-3 transition-all">
-                    <span>Explore</span>
-                    <ArrowRight
-                      size={16}
-                      className="transition-transform group-hover:translate-x-1"
-                    />
-                  </button>
-                </div>
-              </div>
-
-              {/* Bottom Image Section */}
+            <div
+              ref={topRef}
+              className="flex gap-3 overflow-x-auto scrollbar-hide h-full"
+              style={{ scrollBehavior: "auto" }}
+            >
+              {duplicated.map((s, i) => renderCard(s, i))}
             </div>
+            <div className="pointer-events-none absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-gray-50 to-transparent z-10" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-gray-50 to-transparent z-10" />
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {services.map((service, idx) => {
-              const Icon = service.icon;
-              return (
-                <div
-                  key={idx}
-                  className="group bg-white rounded-xl  transition-all duration-300 p-6 flex flex-col h-full border border-gray-100"
-                >
-                  {/* Icon */}
-                  <div className="w-12 h-12 flex items-center justify-center rounded-full bg-gray-100 text-gray-700 mb-5">
-                    <Icon size={24} />
-                  </div>
 
-                  {/* Title */}
-                  <h3 className="text-xl md:text-2xl font-medium font-outfit text-gray-900 leading-tight mb-2">
-                    {service.title}
-                  </h3>
+          {/* “More services” badge – centered between rows */}
 
-                  {/* Subtitle */}
-                  <p className="text-sm md:text-base font-normal font-inter text-gray-600 leading-relaxed flex-grow">
-                    {service.subtitle}
-                  </p>
-
-                  {/* Link */}
-                  <button className="mt-6 flex items-center gap-2 text-gray-700 text-sm md:text-base font-medium hover:gap-3 transition-all">
-                    <span>{service.linkText}</span>
-                    <ArrowRight
-                      size={18}
-                      className="transition-transform group-hover:translate-x-1"
-                    />
-                  </button>
-                </div>
-              );
-            })}
+          {/* BOTTOM ROW – left to right */}
+          <div
+            onMouseEnter={() => setBottomPaused(true)}
+            onMouseLeave={() => setBottomPaused(false)}
+            className="relative"
+          >
+            <div
+              ref={bottomRef}
+              className="flex gap-3 mt-5 overflow-x-auto scrollbar-hide h-full"
+              style={{ scrollBehavior: "auto" }}
+            >
+              {duplicated.map((s, i) => renderCard(s, i + duplicated.length))}
+            </div>
+            <div className="pointer-events-none absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-gray-50 to-transparent z-10" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-gray-50 to-transparent z-10" />
           </div>
         </div>
       </div>
+
+      {/* Hide scrollbars */}
+      <style jsx>{`
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
     </section>
   );
 }
-
 const faqs = [
   {
     question: "I’m not sure how to write requirements.",
@@ -869,40 +964,69 @@ const faqs = [
 ];
 
 function FAQ2() {
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+
+  const toggleFAQ = (index: number) => {
+    setActiveIndex(activeIndex === index ? null : index);
+  };
+
   return (
     <section
       id="faq"
-      className="self-stretch px-4 sm:px-16 py-16 md:py-24 lg:py-32 bg-Color-Scheme-1-Background flex flex-col justify-start items-center gap-20 overflow-hidden"
+      className="px-4 sm:px-8 md:px-16 py-20 md:py-28 bg-gray-50 text-black flex flex-col items-center"
     >
-      <div className="w-full max-w-[1280px] flex flex-col justify-start items-center gap-20">
-        <div className="w-full max-w-[768px] flex flex-col justify-start items-center gap-6">
-          <h2 className="self-stretch text-center text-Color-Scheme-1-Text text-3xl sm:text-4xl md:text-5xl font-medium font-outfit leading-tight">
-            FAQs
-          </h2>
-          <p className="self-stretch text-center text-Color-Scheme-1-Text text-base md:text-lg font-normal font-inter leading-7">
-            Common questions about tendering on Tenderly
-          </p>
-        </div>
-        <div className="w-full max-w-[768px] flex flex-col justify-start items-start gap-12 overflow-hidden">
-          {faqs.map((faq, index) => (
-            <div
-              key={index}
-              className="self-stretch flex flex-col justify-start items-start gap-4"
+      <div className="max-w-3xl w-full text-center mb-12">
+        <h2 className="text-4xl sm:text-5xl font-semibold mb-4 font-outfit">
+          Frequently Asked Questions
+        </h2>
+        <p className="text-gray-400 text-base md:text-lg font-inter">
+          Common questions about tendering on Tenderly
+        </p>
+      </div>
+
+      <div className="w-full max-w-3xl space-y-6">
+        {faqs.map((faq, index) => (
+          <div
+            key={index}
+            className="border border-white/10 rounded-2xl p-6 bg-white/5 hover:bg-white/10 transition-all duration-100"
+          >
+            <button
+              className="flex justify-between items-center w-full text-left"
+              onClick={() => toggleFAQ(index)}
             >
-              <h3 className="self-stretch text-Color-Scheme-1-Text text-base md:text-lg font-bold font-inter leading-7">
+              <h3 className="text-lg md:text-xl font-medium font-inter">
                 {faq.question}
               </h3>
-              <p className="self-stretch text-Color-Scheme-1-Text text-sm md:text-base font-normal font-inter leading-6">
-                {faq.answer}
-              </p>
-            </div>
-          ))}
-        </div>
+              <motion.div
+                animate={{ rotate: activeIndex === index ? 180 : 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <ChevronDown className="w-6 h-6 text-gray-950" />
+              </motion.div>
+            </button>
+
+            <AnimatePresence initial={false}>
+              {activeIndex === index && (
+                <motion.div
+                  key="content"
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.4, ease: "easeInOut" }}
+                  className="overflow-hidden"
+                >
+                  <p className="mt-4 text-gray-950 text-base font-inter leading-relaxed">
+                    {faq.answer}
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        ))}
       </div>
     </section>
   );
 }
-
 function Problems() {
   return (
     <section
@@ -918,7 +1042,7 @@ function Problems() {
         </p>
       </div>
       <div className="mt-12">
-        <Card className="shadow-none border-muted overflow-hidden">
+        <Card className="-none border-muted overflow-hidden">
           <CardContent className="p-0">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
@@ -1011,7 +1135,7 @@ function PricingSection() {
   return (
     <section
       id="pricing"
-      className="py-16 md:py-24 lg:py-32 px-4 sm:px-6 bg-background text-foreground"
+      className="py-16 md:py-24 lg:py-32 px-4 sm:px-6 bg-white  text-foreground"
     >
       <div className="max-w-7xl mx-auto">
         {/* Header */}
@@ -1028,133 +1152,57 @@ function PricingSection() {
           </p>
         </div>
         {/* Two Pricing Cards Side by Side */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-          {/* Tender Plan */}
-          <Card className="border border-border bg-muted/40 shadow-none">
-            <CardContent className="p-8">
-              <div className="mb-8">
-                <h3 className="text-xl sm:text-2xl font-semibold mb-2 leading-tight">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Tenderer Plan */}
+          <Card className="border border-gray-300 bg-white -sm hover:-md transition-all duration-300 flex flex-col h-full">
+            <CardContent className="p-8 flex flex-col justify-between h-full">
+              <div>
+                <h3 className="text-2xl font-semibold mb-2 leading-tight text-black">
                   Tenderer Plan
                 </h3>
                 <div className="flex items-baseline">
-                  <span className="text-4xl sm:text-5xl font-bold">Free</span>
-                  <span className="ml-2 text-muted-foreground text-sm md:text-base">
-                    forever
-                  </span>
+                  <span className="text-5xl font-bold text-black">Free</span>
+                  <span className="ml-2 text-gray-500 text-base">forever</span>
                 </div>
-                <p className="mt-4 text-muted-foreground text-sm md:text-base leading-6">
-                  Launch your Projectsjourney with unlimited tender postings at
-                  no cost.
+                <p className="mt-4 text-gray-600 text-base leading-6">
+                  Launch your project journey with unlimited tender postings —
+                  no cost, no limits.
                 </p>
               </div>
-              <div className="space-y-6 mb-8">
-                <div>
-                  <h4 className="font-semibold mb-3 text-base md:text-lg leading-tight">
-                    Includes
-                  </h4>
-                  <ul className="space-y-3">
-                    {[
-                      "3 active tender postings",
-                      "Standard communication tools",
-                      "Basic reporting metrics",
-                      "Essential security protocols",
-                      "Limited integration options",
-                    ].map((item) => (
-                      <li
-                        key={item}
-                        className="flex items-start text-sm md:text-base leading-6"
-                      >
-                        <Check className="w-5 h-5 text-foreground mr-3 mt-0.5" />
-                        <span className="text-muted-foreground">{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <div>
-                  <h4 className="font-semibold mb-3 text-base md:text-lg leading-tight">
-                    Support
-                  </h4>
-                  <ul className="space-y-3">
-                    {[
-                      "Basic vendor profile access",
-                      "Community support channel",
-                      "Single user account",
-                      "Platform onboarding guide",
-                      "Monthly performance insights",
-                    ].map((item) => (
-                      <li
-                        key={item}
-                        className="flex items-start text-sm md:text-base leading-6"
-                      >
-                        <Check className="w-5 h-5 text-foreground mr-3 mt-0.5" />
-                        <span className="text-muted-foreground">{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
+
               <Button
                 variant="outline"
-                className="w-full font-semibold rounded-md text-sm md:text-base"
+                className="mt-8 w-full font-semibold rounded-md text-base transition-all duration-200"
               >
-                Start Posting Tenders
+                Get Started — Post a Tender
               </Button>
             </CardContent>
           </Card>
-          {/* Bid Plan */}
-          <Card className="border border-border bg-muted/10 shadow-none">
-            <CardContent className="p-8">
-              <div className="mb-8">
-                <h3 className="text-xl sm:text-2xl font-semibold mb-2 leading-tight">
+
+          {/* Bidder Plan */}
+          <Card className="border border-gray-300 bg-white -sm hover:-md transition-all duration-300 flex flex-col h-full">
+            <CardContent className="p-8 flex flex-col justify-between h-full">
+              <div>
+                <h3 className="text-2xl font-semibold mb-2 leading-tight text-black">
                   Bidder Plan
                 </h3>
                 <div className="flex items-baseline">
-                  <span className="text-4xl sm:text-5xl font-bold">100</span>
-                  <span className="ml-2 text-muted-foreground text-sm md:text-base">
+                  <span className="text-5xl font-bold text-black">100</span>
+                  <span className="ml-2 text-gray-500 text-base">
                     QAR / bid
                   </span>
                 </div>
-                <p className="mt-4 text-muted-foreground text-sm md:text-base leading-6">
-                  Pay per bid no hidden fees. You only pay when you decide to
-                  participate in a tender opportunity that matters to you.
+                <p className="mt-4 text-gray-600 text-base leading-6">
+                  Pay only when you bid no subscriptions, no hidden fees. Choose
+                  tenders that matter to you.
                 </p>
               </div>
-              <div className="border border-border rounded-md p-6 mb-8 bg-muted/50">
-                <p className="font-medium text-base md:text-lg leading-tight">
-                  Transparent & Risk-Free
-                </p>
-                <p className="text-muted-foreground mt-2 text-sm md:text-base leading-6">
-                  Access browsing, matching, and analytics features completely
-                  free. Payment only applies to actual bid submissions.
-                </p>
-              </div>
-              <div className="space-y-4 mb-8">
-                <h4 className="font-semibold text-base md:text-lg leading-tight">
-                  What you get with every bid
-                </h4>
-                <ul className="space-y-3">
-                  {[
-                    "Full access to tender specifications & documents",
-                    "Smart vendor matching & quote templates",
-                    "Secure submission with audit trail",
-                    "Direct communication with tender owner",
-                    "Bid performance analytics post-submission",
-                  ].map((item) => (
-                    <li
-                      key={item}
-                      className="flex items-start text-sm md:text-base leading-6"
-                    >
-                      <Check className="w-5 h-5 text-foreground mr-3 mt-0.5" />
-                      <span className="text-muted-foreground">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+
               <Button
                 variant="outline"
-                className="w-full font-semibold rounded-md text-sm md:text-base"
+                className="mt-8 w-full font-semibold rounded-md text-base transition-all duration-200"
               >
-                Browse Tenders to Bid
+                Get Started Browse Tenders
               </Button>
             </CardContent>
           </Card>
@@ -1207,7 +1255,7 @@ function Suppliers() {
           {supplierCards.map((card, i) => (
             <article
               key={i}
-              className="flex flex-col bg-white border rounded-md overflow-hidden shadow-sm"
+              className="flex flex-col bg-white border rounded-md overflow-hidden -sm"
             >
               {/* Image / visual area */}
               <div className="h-56 bg-gray-100 flex items-center justify-center">
@@ -1269,6 +1317,92 @@ function Suppliers() {
     </section>
   );
 }
+function SaasVideo() {
+  return (
+    <section
+      id="video"
+      className="w-full py-16 md:py-24 lg:py-32 bg-gradient-to-b from-gray-50 to-white overflow-hidden"
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-12"
+        >
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight text-gray-900 mb-4 leading-tight">
+            See GoTenderly in Action
+          </h2>
+          <p className="text-base md:text-lg text-gray-600 max-w-2xl mx-auto leading-7">
+            Watch how easy it is to post a tender, receive competitive bids, and
+            award the best supplier all in under 2 minutes.
+          </p>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, scale: 0.98 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="relative w-full max-w-5xl mx-auto"
+        >
+          {/* Video Container with Cool Styling */}
+          <div className="relative rounded-2xl overflow-hidden -2xl bg-black/90 border border-white/10">
+            {/* Placeholder Video - Replace src with your actual video */}
+            <video
+              className="w-full h-auto aspect-video object-cover"
+              poster="https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+              controls
+              preload="metadata"
+            >
+              <source
+                src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+                type="video/mp4"
+              />
+              Your browser does not support the video tag.
+            </video>
+
+            {/* Play Button Overlay (for thumbnail) */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <motion.div
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center cursor-pointer pointer-events-auto border border-white/30 -xl"
+              >
+                <Play
+                  className="w-10 h-10 text-white ml-1"
+                  fill="currentColor"
+                />
+              </motion.div>
+            </div>
+
+            {/* Subtle Gradient Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
+          </div>
+        </motion.div>
+
+        {/* CTA Below Video */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.6 }}
+          className="mt-12 text-center gap-5 flex w-full justify-center"
+        >
+          <button className="group inline-flex items-center gap-3 px-6 py-3 bg-black text-white font-medium rounded-md  text-sm md:text-base hover:bg-gray-900 transition-all ">
+            Post Your Tender Know
+            <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+          </button>{" "}
+          <button className="group inline-flex items-center gap-3 px-6 py-3 bg-white text-black rounded-md font-medium text-sm md:text-base hover:bg-gray-900 hover:text-white transition-all ">
+            Start Bidding Know
+            <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+          </button>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
 /* -------------------------------------------------------------------------- */
 /* PAGE EXPORT */
 /* -------------------------------------------------------------------------- */
@@ -1285,7 +1419,8 @@ export default function Home() {
           <Features />
           <Services />
           <Problems />
-          <Testimonials />
+          {/* <Testimonials /> */}
+          <SaasVideo />
           <PricingSection />
           <FAQ2 />
           <CTA />

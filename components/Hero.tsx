@@ -301,7 +301,7 @@ export default function Hero() {
             transition={{ duration: 0.8 }}
             className="space-y-6 md:space-y-8 text-left"
           >
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-semibold tracking-tight text-[#1d1d1f] leading-[1.05]">
+            <h1 className="text-4xl sm:text-5xl md:text-7xl font-semibold tracking-tight text-[#1d1d1f] leading-[1.05]">
               Post once. Get multiple quotes.
             </h1>
 
