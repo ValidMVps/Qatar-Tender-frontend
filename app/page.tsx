@@ -593,13 +593,15 @@ function About() {
             </div>
 
             {/* CTA Buttons */}
-            <div className="flex flex-wrap items-center gap-4">
-              <button className="px-4 py-2 bg-Opacity-Neutral-Darkest-5 outline outline-1 outline-Opacity-Transparent text-Color-Neutral-Darkest text-sm md:text-base font-medium font-inter leading-6 rounded-md hover:bg-opacity-70 transition-all">
-                Learn more
+            <div className="flex flex-wrap items-center gap-4 pt-6">
+              {/* Tenderer CTA */}
+              <button className="px-5 py-3 bg-black text-white text-sm md:text-base font-medium font-inter rounded-md hover:bg-neutral-900 transition-all">
+                Post a Tender
               </button>
-              <button className="flex items-center gap-2 text-Color-Neutral-Darkest text-sm md:text-base font-medium font-inter leading-6 hover:gap-3 transition-all">
-                <span>Get started</span>
-                <ArrowRight size={20} />
+
+              {/* Bidder CTA */}
+              <button className="px-5 py-3 bg-white text-black outline-1 outline-black/10 text-sm md:text-base font-medium font-inter rounded-md hover:bg-black/5 transition-all">
+                Browse Open Tenders
               </button>
             </div>
           </div>
