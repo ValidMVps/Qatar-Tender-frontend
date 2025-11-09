@@ -558,38 +558,40 @@ function About() {
             {/* Header */}
             <div className="flex flex-col gap-6">
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight">
-                A tender marketplace for individuals and businesses bidders,
-                reply instantly, you compare, negotiate, and award.
+                Built for both Tenderers & Bidders
               </h2>
               <p className="text-base md:text-lg font-normal font-inter text-Color-Scheme-1-Text leading-7">
-                Streamline your Projects process with a platform designed for
-                Qatar's dynamic market.
+                Whether you're posting a project or competing for one our
+                marketplace connects verified buyers and suppliers to make the
+                tendering process transparent, fast, and fair.
               </p>
             </div>
+
             {/* For Tenderers & Bidders */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 py-4">
               <div className="flex flex-col gap-3">
                 <h3 className="text-lg sm:text-xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight">
-                  For tenderers
+                  For Tenderers
                 </h3>
                 <p className="text-sm md:text-base font-normal font-inter text-Color-Scheme-1-Text leading-6">
-                  Post once and reach many bidders at once. Use built-in Q/A to
-                  clarify missing details before award. Compare apples-to-apples
-                  (price, ETA, notes) in one view. Stay anonymous until award;
-                  choose the best fit faster.
+                  Post once and reach verified bidders instantly. Compare
+                  quotes, timelines, and offers side by side all while staying
+                  anonymous until the award. Make faster, data-backed decisions.
                 </p>
               </div>
+
               <div className="flex flex-col gap-3">
                 <h3 className="text-lg sm:text-xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight">
-                  For bidders
+                  For Bidders
                 </h3>
                 <p className="text-sm md:text-base font-normal font-inter text-Color-Scheme-1-Text leading-6">
-                  Ask/answer clarifying questions publicly on the tender. See
-                  all required fields up front; submit a clear, competitive bid.
-                  Keep negotiations in one private thread; get awarded faster.
+                  Access live tenders from real buyers, ask questions, and
+                  submit bids that stand out. Manage proposals, negotiations,
+                  and awards all in one secure workspace.
                 </p>
               </div>
             </div>
+
             {/* CTA Buttons */}
             <div className="flex flex-wrap items-center gap-4">
               <button className="px-4 py-2 bg-Opacity-Neutral-Darkest-5 outline outline-1 outline-Opacity-Transparent text-Color-Neutral-Darkest text-sm md:text-base font-medium font-inter leading-6 rounded-md hover:bg-opacity-70 transition-all">
@@ -601,6 +603,7 @@ function About() {
               </button>
             </div>
           </div>
+
           {/* Image */}
           <div className="hidden lg:block h-full">
             <img
@@ -610,6 +613,7 @@ function About() {
             />
           </div>
         </div>
+
         {/* Mobile Image */}
         <div className="lg:hidden mt-12">
           <img

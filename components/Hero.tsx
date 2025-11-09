@@ -303,12 +303,10 @@ export default function Hero() {
           >
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-semibold tracking-tight text-[#1d1d1f] leading-[1.05]">
               Post once. Get multiple quotes.
-              <br />
-              <span className="text-black"></span>
             </h1>
 
             <p className="text-base sm:text-lg text-[#6e6e73] font-normal leading-relaxed max-w-xl">
-              A centralized tender marketplace for individuals and businesses,
+              A centralized tender marketplace for individuals and businesses
               describe, bidders reply instantly, you compare, negotiate, and
               award.
             </p>
@@ -320,7 +318,7 @@ export default function Hero() {
                 href="/signup"
                 className="px-5 sm:px-6 h-12 text-black hover:bg-black/5 rounded-md font-medium flex items-center gap-2 justify-center"
               >
-                Get started
+                Browse open tenders
               </motion.a>
 
               <motion.button
@@ -329,22 +327,23 @@ export default function Hero() {
                 onClick={openForm}
                 className="px-5 sm:px-6 h-12 bg-black hover:bg-neutral-900 text-white rounded-md font-medium flex items-center gap-2 justify-center"
               >
-                Create a tender
+                Post your tender for free
               </motion.button>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 pt-4 text-sm text-[#6e6e73]">
+            {/* Micro-proof Section */}
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pt-5 text-sm text-[#6e6e73]">
               <div className="flex items-center gap-2">
-                <Check className="w-5 h-5 text-black" />
-                KYC & company verification
+                <Check className="w-4 h-4 text-black" />
+                Anonymous until award
               </div>
               <div className="flex items-center gap-2">
-                <Check className="w-5 h-5 text-black" />
-                Anonymous until award
-              </div>{" "}
+                <Check className="w-4 h-4 text-black" />
+                No fees
+              </div>
               <div className="flex items-center gap-2">
-                <Check className="w-5 h-5 text-black" />
-                Anonymous until award
+                <Check className="w-4 h-4 text-black" />
+                Takes ~2 minutes
               </div>
             </div>
           </motion.div>
