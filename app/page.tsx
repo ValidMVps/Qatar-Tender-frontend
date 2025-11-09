@@ -136,10 +136,10 @@ function Features() {
 
         {/* ---------- CTA ---------- */}
         <div className="flex items-center gap-4 pt-2">
-          <Link href="/signup" legacyBehavior>
-            <a className="inline-flex items-center justify-center px-5 py-3 rounded-xl bg-Opacity-Neutral-Darkest-5 text-Color-Neutral-Darkest text-sm md:text-base font-medium font-inter  hover:opacity-95 transition">
-              Get started know
-            </a>
+          <Link href="/signup">
+            <div className="inline-flex items-center justify-center px-5 py-3 rounded-xl bg-Opacity-Neutral-Darkest-5 text-Color-Neutral-Darkest text-sm md:text-base font-medium font-inter hover:opacity-95 transition">
+              Get started now
+            </div>
           </Link>
         </div>
       </div>
@@ -184,6 +184,7 @@ const tenderSteps = [
       "Describe your requirements, set deadline, and publish instantly.",
     linkText: "Post now",
     bgImage: tender1.src,
+    href: "#hero",
   },
   {
     label: "Receive & compare bids",
@@ -191,6 +192,7 @@ const tenderSteps = [
     description: "Get multiple quotes and compare them side by side.",
     linkText: "Compare bids",
     bgImage: tender2.src,
+    href: "#hero",
   },
   {
     label: "Chat & award",
@@ -199,6 +201,7 @@ const tenderSteps = [
       "Negotiate and award the tender, identities revealed only after award.",
     linkText: "Award tender",
     bgImage: tender3.src,
+    href: "#hero",
   },
 ];
 
@@ -209,6 +212,7 @@ const bidderSteps = [
     description: "Browse and explore tenders that match your business needs.",
     linkText: "Browse tenders",
     bgImage: tender4.src,
+    href: "/tenders",
   },
   {
     label: "Prepare",
@@ -217,6 +221,7 @@ const bidderSteps = [
       "Easily create and submit your quote to participate in tenders quickly.",
     linkText: "Create quote",
     bgImage: tender5.src,
+    href: "/signup",
   },
   {
     label: "Submit",
@@ -225,6 +230,7 @@ const bidderSteps = [
       "Send a secure submission with audit trail and track status in one place.",
     linkText: "Submit bid",
     bgImage: tender6.src,
+    href: "/signup",
   },
 ];
 
@@ -289,39 +295,40 @@ function Process() {
         {/* Process Steps - Responsive Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           {steps.map((step, index) => (
-            <div
-              key={index}
-              className="group relative min-h-[400px] sm:min-h-[500px] md:min-h-[540px] lg:min-h-[580px] rounded-md overflow-hidden -lg transition-transform hover:scale-[1.02]"
-              style={{
-                backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.1)), url('${step.bgImage}')`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-              }}
-            >
-              {/* Content */}
-              <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 text-white z-10">
-                <div className="flex flex-col gap-3">
-                  <span className="text-xs md:text-sm font-semibold font-inter uppercase tracking-wider opacity-90">
-                    {step.label}
-                  </span>
-                  <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-medium font-outfit leading-tight">
-                    {step.title}
-                  </h3>
+            <Link key={index} href={step.href || "#"} className="block">
+              <div
+                className="group relative min-h-[400px] sm:min-h-[500px] md:min-h-[540px] lg:min-h-[580px] rounded-md overflow-hidden -lg transition-transform hover:scale-[1.02]"
+                style={{
+                  backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.1)), url('${step.bgImage}')`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                }}
+              >
+                {/* Content */}
+                <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 text-white z-10">
+                  <div className="flex flex-col gap-3">
+                    <span className="text-xs md:text-sm font-semibold font-inter uppercase tracking-wider opacity-90">
+                      {step.label}
+                    </span>
+                    <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-medium font-outfit leading-tight">
+                      {step.title}
+                    </h3>
+                  </div>
+                  <p className="mt-4 text-sm md:text-base font-normal font-inter leading-relaxed opacity-95">
+                    {step.description}
+                  </p>
+                  <button className="mt-6 flex items-center gap-2 text-white text-sm md:text-base font-medium font-inter leading-6 hover:gap-3 transition-all">
+                    <span>{step.linkText}</span>
+                    <ArrowRight
+                      size={18}
+                      className="transition-transform group-hover:translate-x-1"
+                    />
+                  </button>
                 </div>
-                <p className="mt-4 text-sm md:text-base font-normal font-inter leading-relaxed opacity-95">
-                  {step.description}
-                </p>
-                <button className="mt-6 flex items-center gap-2 text-white text-sm md:text-base font-medium font-inter leading-6 hover:gap-3 transition-all">
-                  <span>{step.linkText}</span>
-                  <ArrowRight
-                    size={18}
-                    className="transition-transform group-hover:translate-x-1"
-                  />
-                </button>
+                {/* Hover overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
-              {/* Hover overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-            </div>
+            </Link>
           ))}
         </div>
       </div>
@@ -552,14 +559,15 @@ function CTA() {
               transition={{ duration: 0.6, delay: 0.4 }}
               className="flex flex-col sm:flex-row items-center justify-center gap-4"
             >
-              <motion.a
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                href="#hero"
-                className="bg-white text-black hover:bg-white/90 rounded-full px-8 h-14 text-base md:text-lg font-medium flex items-center gap-2"
-              >
-                Post your tender for free <ArrowRight className="w-5 h-5" />
-              </motion.a>
+              <Link href="#hero">
+                <motion.a
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="bg-white text-black hover:bg-white/90 rounded-full px-8 h-14 text-base md:text-lg font-medium flex items-center gap-2"
+                >
+                  Post your tender for free <ArrowRight className="w-5 h-5" />
+                </motion.a>
+              </Link>
             </motion.div>
             <motion.p
               initial={{ opacity: 0 }}
@@ -577,8 +585,7 @@ function CTA() {
   );
 }
 
-/* -------------------------------- Footer ---------------------------------- */
-
+/* -------------------------------- About ---------------------------------- */
 function About() {
   return (
     <section
@@ -629,14 +636,18 @@ function About() {
             {/* CTA Buttons */}
             <div className="flex flex-wrap items-center gap-4 pt-6">
               {/* Tenderer CTA */}
-              <button className="px-5 py-3 bg-black text-white text-sm md:text-base font-medium font-inter rounded-md hover:bg-neutral-900 transition-all">
-                Post a Tender
-              </button>
+              <Link href="#hero">
+                <button className="px-5 py-3 bg-black text-white text-sm md:text-base font-medium font-inter rounded-md hover:bg-neutral-900 transition-all">
+                  Post a Tender
+                </button>
+              </Link>
 
               {/* Bidder CTA */}
-              <button className="px-5 py-3 bg-white text-black outline-1 outline-black/10 text-sm md:text-base font-medium font-inter rounded-md hover:bg-black/5 transition-all">
-                Browse Open Tenders
-              </button>
+              <Link href="/tenders">
+                <button className="px-5 py-3 bg-white text-black outline-1 outline-black/10 text-sm md:text-base font-medium font-inter rounded-md hover:bg-black/5 transition-all">
+                  Browse Open Tenders
+                </button>
+              </Link>
             </div>
           </div>
 
@@ -667,10 +678,11 @@ const smallServices = [
   {
     title: "Automotive services (repair, detailing, tires)",
     description:
-      "HM’s SUV needs brake pads and a full detail. Not sure of fair pricing or downtime. HM posted the plate/model and preferred time window. Garages responded with parts options (OEM/aftermarket), ETAs, and warranty notes; a detailer asked in Q/A about interior shampoo vs. quick wash. HM picked a garage that offered pick-up/drop-off and a detail comboproblem solved in one go.",
+      "HM’s SUV needs brake pads and a full detail. Not sure of fair pricing or downtime. HM posted the plate/model and preferred time window. Garages responded with parts options (OEM/aftermarket), ETAs, and warranty notes; a detailer asked in Q/A about interior shampoo vs. quick wash. HM picked a garage that offered pick-up/drop-off and a detail combo—problem solved in one go.",
     linkText: "Browse",
     bgImage:
       "https://images.pexels.com/photos/279949/pexels-photo-279949.jpeg?auto=compress&cs=tinysrgb&w=600",
+    href: "/tenders?category=automotive",
   },
   {
     title: "Events (weddings, corporate, birthdays)",
@@ -679,14 +691,16 @@ const smallServices = [
     linkText: "View details",
     bgImage:
       "https://images.pexels.com/photos/1190298/pexels-photo-1190298.jpeg?auto=compress&cs=tinysrgb&w=600",
+    href: "/tenders?category=events",
   },
   {
     title: "Construction & renovation (small works, fit-outs, repairs)",
     description:
-      "AA wants a kitchen refreshcabinet re-facing and new countertop. Past quotes were inconsistent and missed measurements. AB posted with drawings/photos and a rough timeline. Contractors used Q/A to ask about materials and site access; AB added dimensions. Comparable bids arrived with line-item costs and lead times. AB awarded one contractor and arranged a site visit after award.",
+      "AA wants a kitchen refresh—cabinet re-facing and new countertop. Past quotes were inconsistent and missed measurements. AB posted with drawings/photos and a rough timeline. Contractors used Q/A to ask about materials and site access; AB added dimensions. Comparable bids arrived with line-item costs and lead times. AB awarded one contractor and arranged a site visit after award.",
     linkText: "Compare now",
     bgImage:
       "https://images.pexels.com/photos/1216589/pexels-photo-1216589.jpeg?auto=compress&cs=tinysrgb&w=600",
+    href: "/tenders?category=construction",
   },
   {
     title: "Facilities management & building maintenance",
@@ -695,6 +709,7 @@ const smallServices = [
     linkText: "Get started",
     bgImage:
       "https://images.pexels.com/photos/416405/pexels-photo-416405.jpeg?auto=compress&cs=tinysrgb&w=600",
+    href: "/tenders?category=facilities",
   },
 ];
 
@@ -704,72 +719,84 @@ const allServices = [
     title: "Events and hospitality",
     subtitle: "Source vendors for conferences, weddings, and corporate events",
     linkText: "View details",
+    href: "/tenders?category=events",
   },
   {
     icon: Building2,
-    title: "Construction ",
+    title: "Construction",
     subtitle: "Tenders for building materials, machinery, and labor services",
     linkText: "View details",
+    href: "/tenders?category=construction",
   },
   {
     icon: Heart,
     title: "Healthcare Services",
     subtitle: "Medical equipment, staffing, and facility maintenance",
     linkText: "View details",
+    href: "/tenders?category=healthcare",
   },
   {
     icon: Laptop,
     title: "IT & Technology",
     subtitle: "Software, hardware, cloud services, and cybersecurity solutions",
     linkText: "View details",
+    href: "/tenders?category=it",
   },
   {
     icon: HomeIcon,
     title: "Home Services",
     subtitle: "Plumbing, electrical, painting, and renovation contractors",
     linkText: "View details",
+    href: "/tenders?category=home",
   },
   {
     icon: Truck,
     title: "Logistics & Transport",
     subtitle: "Freight, delivery, fleet management, and warehousing solutions",
     linkText: "View details",
+    href: "/tenders?category=logistics",
   },
   {
     icon: Briefcase,
     title: "Professional Services",
     subtitle: "Legal, accounting, HR, and consulting firm tenders",
     linkText: "View details",
+    href: "/tenders?category=professional",
   },
   {
     icon: Palette,
     title: "Creative & Design",
     subtitle: "Graphic design, branding, photography, and video production",
     linkText: "View details",
+    href: "/tenders?category=creative",
   },
   {
     icon: Camera,
     title: "Media & Advertising",
     subtitle: "Billboards, digital campaigns, TV, and print media services",
     linkText: "View details",
+    href: "/tenders?category=media",
   },
   {
     icon: Coffee,
     title: "Food & Catering",
     subtitle: "Cafes, restaurants, event catering, and food supply chains",
     linkText: "View details",
+    href: "/tenders?category=catering",
   },
   {
     icon: Wrench,
     title: "Maintenance & Repair",
     subtitle: "AC servicing, vehicle repair, and equipment maintenance",
     linkText: "View details",
+    href: "/tenders?category=maintenance",
   },
   {
     icon: Calendar,
     title: "Education & Training",
     subtitle: "Tutors, workshops, corporate training, and e-learning platforms",
     linkText: "View details",
+    href: "/tenders?category=education",
   },
 ];
 
@@ -815,27 +842,26 @@ function Services() {
   const renderCard = (service: (typeof allServices)[0], idx: number) => {
     const Icon = service.icon;
     return (
-      <div
-        key={idx}
-        className="group flex-shrink-0 w-80 bg-white rounded-xl transition-all duration-300 p-6 flex flex-col h-full border border-gray-100 hover:-lg hover:-translate-y-1"
-      >
-        <div className="w-14 h-14 flex items-center justify-center rounded-full bg-gray-100 text-gray-700 mb-5">
-          <Icon size={28} />
+      <Link key={idx} href={service.href} className="block">
+        <div className="group flex-shrink-0 w-80 bg-white rounded-xl transition-all duration-300 p-6 flex flex-col h-full border border-gray-100 hover:-lg hover:-translate-y-1">
+          <div className="w-14 h-14 flex items-center justify-center rounded-full bg-gray-100 text-gray-700 mb-5">
+            <Icon size={28} />
+          </div>
+          <h3 className="text-xl md:text-2xl font-medium font-outfit text-gray-900 leading-tight mb-2">
+            {service.title}
+          </h3>
+          <p className="text-sm md:text-base font-normal font-inter text-gray-600 leading-relaxed flex-grow">
+            {service.subtitle}
+          </p>
+          <button className="mt-6 flex items-center gap-2 text-gray-700 text-sm md:text-base font-medium hover:gap-3 transition-all">
+            <span>{service.linkText}</span>
+            <ArrowRight
+              size={18}
+              className="transition-transform group-hover:translate-x-1"
+            />
+          </button>
         </div>
-        <h3 className="text-xl md:text-2xl font-medium font-outfit text-gray-900 leading-tight mb-2">
-          {service.title}
-        </h3>
-        <p className="text-sm md:text-base font-normal font-inter text-gray-600 leading-relaxed flex-grow">
-          {service.subtitle}
-        </p>
-        <button className="mt-6 flex items-center gap-2 text-gray-700 text-sm md:text-base font-medium hover:gap-3 transition-all">
-          <span>{service.linkText}</span>
-          <ArrowRight
-            size={18}
-            className="transition-transform group-hover:translate-x-1"
-          />
-        </button>
-      </div>
+      </Link>
     );
   };
 
@@ -855,7 +881,7 @@ function Services() {
           </h2>
           <p className="mt-4 text-base md:text-lg font-normal font-inter text-Color-Scheme-1-Text leading-7">
             Find the right solution for every project need
-          </p>{" "}
+          </p>
         </div>
 
         {/* ---------- Two-Row Carousel ---------- */}
@@ -884,8 +910,6 @@ function Services() {
             <div className="pointer-events-none absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-gray-50 to-transparent z-10" />
             <div className="pointer-events-none absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-gray-50 to-transparent z-10" />
           </div>
-
-          {/* “More services” badge – centered between rows */}
 
           {/* BOTTOM ROW – left to right */}
           <div
@@ -919,11 +943,12 @@ function Services() {
     </section>
   );
 }
+
 const faqs = [
   {
     question: "I’m not sure how to write requirements.",
     answer:
-      "Use Tenderly’s Q/A feature: bidders and tenderers can ask and answer clarifying questions on the tender page to surface any unknown or missing details (scope, deliverables, timeline, acceptance criteria). This keeps everything transparent, comparable, and helps you receive accurate quotesno guided templates needed.",
+      "Use Tenderly’s Q/A feature: bidders and tenderers can ask and answer clarifying questions on the tender page to surface any unknown or missing details (scope, deliverables, timeline, acceptance criteria). This keeps everything transparent, comparable, and helps you receive accurate quotes—no guided templates needed.",
   },
   {
     question: "What is Tenderly?",
@@ -954,12 +979,12 @@ const faqs = [
   },
   {
     question: "Who can use Tenderly?",
-    answer: "Anyone ,  individuals and businesses of any size.",
+    answer: "Anyone, individuals and businesses of any size.",
   },
   {
     question: "What categories are allowed?",
     answer:
-      "All categories are allowed , from construction, IT, and logistics to marketing, design, and consulting. In short: anything.",
+      "All categories are allowed, from construction, IT, and logistics to marketing, design, and consulting. In short: anything.",
   },
 ];
 
@@ -1027,6 +1052,7 @@ function FAQ2() {
     </section>
   );
 }
+
 function Problems() {
   return (
     <section
@@ -1067,55 +1093,68 @@ function Problems() {
                 {/* Table Body */}
                 <tbody>
                   {[
-                    [
-                      "Finding vendors",
-                      "Post once and reach many bidders at once",
-                      "Hard to find all options; vendors are fragmented",
-                    ],
-                    [
-                      "Requirements clarity",
-                      "Use built-in Q/A to clarify missing details before award",
-                      "Unclear requirements lead to wrong quotes and rework",
-                    ],
-                    [
-                      "Briefing vendors",
-                      "Compare apples-to-apples (price, ETA, notes) in one view",
-                      "Repeating the same brief to each vendor takes time",
-                    ],
-                    [
-                      "Privacy and selection",
-                      "Stay anonymous until award; choose the best fit faster",
-                      "",
-                    ],
-                    [
-                      "Specs quality",
-                      "Ask/answer clarifying questions publicly on the tender",
-                      "Specs are vague; quoting feels risky or time-wasting",
-                    ],
-                    [
-                      "Finding buyers",
-                      "See all required fields up front; submit a clear, competitive bid",
-                      "Hard to find real, ready buyers; leads aren’t qualified",
-                    ],
-                    [
-                      "Negotiations",
-                      "Keep negotiations in one private thread; get awarded faster",
-                      "Negotiations spread across calls/emails and get lost",
-                    ],
-                  ].map(([label, tenderly, other], i) => (
+                    {
+                      label: "Finding vendors",
+                      tenderly: "Post once and reach many bidders instantly.",
+                      other:
+                        "Hard to find all options; vendors are fragmented.",
+                    },
+                    {
+                      label: "Requirements clarity",
+                      tenderly:
+                        "Use built-in Q/A to clarify missing details before award.",
+                      other:
+                        "Unclear requirements lead to wrong quotes and rework.",
+                    },
+                    {
+                      label: "Briefing vendors",
+                      tenderly:
+                        "Compare apples-to-apples (price, ETA, notes) in one view.",
+                      other:
+                        "Repeating the same brief to each vendor takes time.",
+                    },
+                    {
+                      label: "Paid and subscription model",
+                      tenderly:
+                        "Free to post and free to bid — no commissions or hidden costs.",
+                      other:
+                        "Other platforms charge subscriptions or posting fees for access.",
+                    },
+                    {
+                      label: "Specs quality",
+                      tenderly:
+                        "Ask/answer clarifying questions publicly on the tender.",
+                      other:
+                        "Specs are vague; quoting feels risky or time-wasting.",
+                    },
+                    {
+                      label: "Finding buyers",
+                      tenderly:
+                        "See all required fields up front; submit a clear, competitive bid.",
+                      other:
+                        "Hard to find real, ready buyers; leads aren’t qualified.",
+                    },
+                    {
+                      label: "Negotiations",
+                      tenderly:
+                        "Keep negotiations in one private thread; get awarded faster.",
+                      other:
+                        "Negotiations spread across calls/emails and get lost.",
+                    },
+                  ].map(({ label, tenderly, other }, i) => (
                     <tr
                       key={label}
                       className={`border-b last:border-b-0 transition-colors hover:bg-muted/50 ${
                         i % 2 === 0 ? "bg-muted/30" : "bg-background"
                       }`}
                     >
-                      <td className="px-6 py-5 text-xs md:text-sm font-medium text-foreground align-top min-w-[180px] leading-5">
+                      <td className="px-6 py-5 text-xs md:text-sm font-semibold text-foreground align-top min-w-[180px] leading-5">
                         {label}
                       </td>
-                      <td className="px-6 py-5 text-xs md:text-sm font-normal align-top min-w-[220px] leading-5">
+                      <td className="px-6 py-5 text-xs md:text-sm font-normal text-foreground/90 align-top min-w-[220px] leading-6">
                         <span className="block break-words">{tenderly}</span>
                       </td>
-                      <td className="px-6 py-5 text-xs md:text-sm font-normal align-top min-w-[220px] leading-5">
+                      <td className="px-6 py-5 text-xs md:text-sm font-normal text-foreground/70 align-top min-w-[220px] leading-6">
                         <span className="block break-words">{other}</span>
                       </td>
                     </tr>
@@ -1135,7 +1174,7 @@ function PricingSection() {
   return (
     <section
       id="pricing"
-      className="py-16 md:py-24 lg:py-32 px-4 sm:px-6 bg-white  text-foreground"
+      className="py-16 md:py-24 lg:py-32 px-4 sm:px-6 bg-white text-foreground"
     >
       <div className="max-w-7xl mx-auto">
         {/* Header */}
@@ -1170,12 +1209,14 @@ function PricingSection() {
                 </p>
               </div>
 
-              <Button
-                variant="outline"
-                className="mt-8 w-full font-semibold rounded-md text-base transition-all duration-200"
-              >
-                Get Started — Post a Tender
-              </Button>
+              <Link href="#hero">
+                <Button
+                  variant="outline"
+                  className="mt-8 w-full font-semibold rounded-md text-base transition-all duration-200"
+                >
+                  Get Started — Post a Tender
+                </Button>
+              </Link>
             </CardContent>
           </Card>
 
@@ -1198,12 +1239,14 @@ function PricingSection() {
                 </p>
               </div>
 
-              <Button
-                variant="outline"
-                className="mt-8 w-full font-semibold rounded-md text-base transition-all duration-200"
-              >
-                Get Started Browse Tenders
-              </Button>
+              <Link href="/tenders">
+                <Button
+                  variant="outline"
+                  className="mt-8 w-full font-semibold rounded-md text-base transition-all duration-200"
+                >
+                  Get Started — Browse Tenders
+                </Button>
+              </Link>
             </CardContent>
           </Card>
         </div>
@@ -1211,24 +1254,28 @@ function PricingSection() {
     </section>
   );
 }
+
 const supplierCards = [
   {
     title: "Register",
     subtitle: "Tagline",
     desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    cta: "Button",
+    cta: "Sign Up",
+    href: "/signup",
   },
   {
     title: "Browse tenders",
     subtitle: "Tagline",
     desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    cta: "Button",
+    cta: "Explore",
+    href: "/tenders",
   },
   {
     title: "Submit bid",
     subtitle: "Tagline",
     desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    cta: "Button",
+    cta: "Bid Now",
+    href: "/signup",
   },
 ];
 
@@ -1253,70 +1300,69 @@ function Suppliers() {
 
         <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {supplierCards.map((card, i) => (
-            <article
-              key={i}
-              className="flex flex-col bg-white border rounded-md overflow-hidden -sm"
-            >
-              {/* Image / visual area */}
-              <div className="h-56 bg-gray-100 flex items-center justify-center">
-                {/* Replace with <img src={...} /> or Next/Image if you have an asset */}
-                <svg
-                  className="w-14 h-14 text-gray-300"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="1.5"
-                    d="M3 7a2 2 0 012-2h3l2 3h6a2 2 0 012 2v7a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"
-                  />
-                </svg>
-              </div>
-
-              {/* Body */}
-              <div className="p-5 flex-1 flex flex-col justify-between">
-                <div>
-                  <span className="text-xs text-muted-foreground block mb-2">
-                    {card.subtitle}
-                  </span>
-                  <h3 className="text-lg font-medium mb-2">{card.title}</h3>
-                  <p className="text-sm text-muted-foreground">{card.desc}</p>
-                </div>
-
-                <div className="mt-4">
-                  <button
-                    type="button"
-                    className="inline-flex items-center text-sm font-medium text-primary hover:underline focus:outline-none"
-                    aria-label={`${card.cta} ${card.title}`}
+            <Link key={i} href={card.href} className="block">
+              <article className="flex flex-col bg-white border rounded-md overflow-hidden -sm">
+                {/* Image / visual area */}
+                <div className="h-56 bg-gray-100 flex items-center justify-center">
+                  <svg
+                    className="w-14 h-14 text-gray-300"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
                   >
-                    <span>{card.cta}</span>
-                    <svg
-                      className="ml-2 w-4 h-4"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M9 5l7 7-7 7"
-                      />
-                    </svg>
-                  </button>
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="1.5"
+                      d="M3 7a2 2 0 012-2h3l2 3h6a2 2 0 012 2v7a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"
+                    />
+                  </svg>
                 </div>
-              </div>
-            </article>
+
+                {/* Body */}
+                <div className="p-5 flex-1 flex flex-col justify-between">
+                  <div>
+                    <span className="text-xs text-muted-foreground block mb-2">
+                      {card.subtitle}
+                    </span>
+                    <h3 className="text-lg font-medium mb-2">{card.title}</h3>
+                    <p className="text-sm text-muted-foreground">{card.desc}</p>
+                  </div>
+
+                  <div className="mt-4">
+                    <button
+                      type="button"
+                      className="inline-flex items-center text-sm font-medium text-primary hover:underline focus:outline-none"
+                      aria-label={`${card.cta} ${card.title}`}
+                    >
+                      <span>{card.cta}</span>
+                      <svg
+                        className="ml-2 w-4 h-4"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 5l7 7-7 7"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </article>
+            </Link>
           ))}
         </div>
       </div>
     </section>
   );
 }
+
 function SaasVideo() {
   return (
     <section
@@ -1349,7 +1395,6 @@ function SaasVideo() {
         >
           {/* Video Container with Cool Styling */}
           <div className="relative rounded-2xl overflow-hidden -2xl bg-black/90 border border-white/10">
-            {/* Placeholder Video - Replace src with your actual video */}
             <video
               className="w-full h-auto aspect-video object-cover"
               poster="https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
@@ -1363,7 +1408,6 @@ function SaasVideo() {
               Your browser does not support the video tag.
             </video>
 
-            {/* Play Button Overlay (for thumbnail) */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <motion.div
                 whileHover={{ scale: 1.1 }}
@@ -1377,7 +1421,6 @@ function SaasVideo() {
               </motion.div>
             </div>
 
-            {/* Subtle Gradient Overlay */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
           </div>
         </motion.div>
@@ -1390,19 +1433,24 @@ function SaasVideo() {
           transition={{ duration: 0.6, delay: 0.6 }}
           className="mt-12 text-center gap-5 flex w-full justify-center"
         >
-          <button className="group inline-flex items-center gap-3 px-6 py-3 bg-black text-white font-medium rounded-md  text-sm md:text-base hover:bg-gray-900 transition-all ">
-            Post Your Tender Know
-            <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
-          </button>{" "}
-          <button className="group inline-flex items-center gap-3 px-6 py-3 bg-white text-black rounded-md font-medium text-sm md:text-base hover:bg-gray-900 hover:text-white transition-all ">
-            Start Bidding Know
-            <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
-          </button>
+          <Link href="#hero">
+            <button className="group inline-flex items-center gap-3 px-6 py-3 bg-black text-white font-medium rounded-md text-sm md:text-base hover:bg-gray-900 transition-all">
+              Post Your Tender Now
+              <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+            </button>
+          </Link>
+          <Link href="/signup">
+            <button className="group inline-flex items-center gap-3 px-6 py-3 bg-white text-black rounded-md font-medium text-sm md:text-base hover:bg-gray-900 hover:text-white transition-all">
+              Start Bidding Now
+              <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+            </button>
+          </Link>
         </motion.div>
       </div>
     </section>
   );
 }
+
 /* -------------------------------------------------------------------------- */
 /* PAGE EXPORT */
 /* -------------------------------------------------------------------------- */
@@ -1415,7 +1463,6 @@ export default function Home() {
           <Hero />
           <About />
           <Process />
-
           <Features />
           <Services />
           <Problems />
