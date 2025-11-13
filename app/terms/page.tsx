@@ -1,10 +1,13 @@
 // pages/terms.tsx (or app/terms/page.tsx for App Router)
+import Footer from "@/components/Footer";
+import NavbarLanding from "@/components/Navbarladning";
 import Link from "next/link";
 
 export default function Terms() {
   return (
-    <div className="container mx-auto p-8 max-w-4xl bg-white border border-gray-100 rounded-2xl">
-      <h1 className="text-2xl font-bold mb-6 text-foreground">
+    <div className="container mx-auto p-8 max-w-7xl bg-white  border-gray-100 rounded-2xl">
+      <NavbarLanding />
+      <h1 className="text-2xl font-bold mb-6 mt-20 text-foreground">
         Terms of Service
       </h1>
 
@@ -222,6 +225,7 @@ export default function Terms() {
         </a>
         .
       </p>
+      <Footer />
     </div>
   );
 }

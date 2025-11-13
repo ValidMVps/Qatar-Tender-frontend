@@ -138,3 +138,6 @@
 html{
   scroll-behavior: smooth;
 }
+:root {
+  font-family: var(--font-switzer) !important;
+}

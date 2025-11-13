@@ -1,6 +1,6 @@
 // app/layout.tsx
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import GoogleTranslate from "next-google-translate-widget";
 import Script from "next/script";
@@ -9,14 +9,19 @@ import { AuthProvider } from "@/context/AuthContext";
 import { ThemeProvider } from "@/components/DarkFilterController";
 import { NotificationProvider } from "@/context/NotificationContext";
 import { Toaster } from "@/components/ui/toaster";
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+// local Switzer font
+const switzer = localFont({
+  src: [
+    {
+      path: "../public/fonts/WEB/fonts/Switzer-Regular.woff2",
+      weight: "400",
+      style: "normal",
+    },
+  ],
+  variable: "--font-switzer",
+  display: "swap",
+  fallback: ["system-ui", "sans-serif"],
 });
 
 export const metadata: Metadata = {
@@ -30,7 +35,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={switzer.variable}>
       <head>
         <script
           async
@@ -38,10 +43,7 @@ export default function RootLayout({
           src="https://tweakcn.com/live-preview.min.js"
         />
       </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {/* ✅ ThemeProvider is a Client Component */}
+      <body className="antialiased">
         <ThemeProvider>
           <AuthProvider>
             <NotificationProvider>

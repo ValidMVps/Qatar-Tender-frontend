@@ -1,13 +1,15 @@
 // pages/privacy.tsx (or app/privacy/page.tsx for App Router)
+import Footer from "@/components/Footer";
+import NavbarLanding from "@/components/Navbarladning";
 import Link from "next/link";
 
 export default function Privacy() {
   return (
-    <div className="container mx-auto p-8 max-w-4xl bg-white border border-gray-100 rounded-2xl">
-      <h1 className="text-2xl font-bold mb-6 text-foreground">
+    <div className="container mx-auto p-8 max-w-7xl bg-white  border-gray-100 rounded-2xl">
+      <NavbarLanding />{" "}
+      <h1 className="text-2xl font-bold mb-6 mt-20 text-foreground">
         Privacy Policy
       </h1>
-
       <section className="space-y-4 text-sm text-foreground">
         <div>
           <strong>Roles.</strong> We act as controller for account, security,
@@ -58,7 +60,6 @@ export default function Privacy() {
           <strong>Children.</strong> Not for under-18.
         </div>
       </section>
-
       <p className="text-sm text-muted-foreground mt-6">
         For our Terms of Service, please see{" "}
         <Link href="/terms" className="text-blue-600 hover:underline">
@@ -76,6 +77,7 @@ export default function Privacy() {
         </a>
         .
       </p>
+      <Footer/>
     </div>
   );
 }

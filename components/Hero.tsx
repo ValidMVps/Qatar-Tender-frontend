@@ -1,5 +1,4 @@
 "use client";
-
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
@@ -12,9 +11,10 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-
+import businessDashboard from "@/media/business-dashboard.png";
 const GUEST_TENDER_KEY = "guestTender";
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+
 export default function Hero() {
   const [showForm, setShowForm] = useState(true);
   const [showSignupScreen, setShowSignupScreen] = useState(false);
@@ -57,7 +57,7 @@ export default function Hero() {
           label: "Estimated Budget (QAR)",
           type: "text",
           required: false,
-        }, // ← was true
+        },
         {
           name: "deadline",
           label: "Deadline",
@@ -87,12 +87,13 @@ export default function Hero() {
       ],
     },
   ];
+
   useEffect(() => {
     const saved = localStorage.getItem(GUEST_TENDER_KEY);
-    const wasSaved = saved && JSON.parse(saved).createdAt; // saved drafts have createdAt
-
+    const wasSaved = saved && JSON.parse(saved).createdAt;
     localStorage.removeItem(GUEST_TENDER_KEY);
   }, []);
+
   useEffect(() => {
     if (showForm && !showSignupScreen) {
       const saved = localStorage.getItem(GUEST_TENDER_KEY);
@@ -131,7 +132,6 @@ export default function Hero() {
         e.returnValue = "";
       }
     };
-
     if (showForm) window.addEventListener("beforeunload", handleBeforeUnload);
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [showForm]);
@@ -139,7 +139,6 @@ export default function Hero() {
   const validateStep = (step: number): boolean => {
     const stepFields = steps[step].fields;
     const newErrors: Record<string, string> = {};
-
     stepFields.forEach((field) => {
       const value = formData[field.name as keyof typeof formData];
       if (
@@ -155,14 +154,12 @@ export default function Hero() {
         }
       }
       if (field.name === "estimatedBudget" && value) {
-        // ← only run when value exists
         const budget = (value as string).replace(/[^0-9]/g, "");
         if (budget && (isNaN(Number(budget)) || Number(budget) <= 0)) {
           newErrors[field.name] = "Budget must be a positive number";
         }
       }
     });
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -192,7 +189,6 @@ export default function Hero() {
 
   const handlePostTender = async () => {
     if (!validateStep(currentStep)) return;
-
     const payload = {
       title: formData.title.trim(),
       description: formData.description.trim(),
@@ -202,25 +198,20 @@ export default function Hero() {
       deadline: formData.deadline ? formData.deadline.toISOString() : "",
       location: formData.location.trim(),
       contactEmail: formData.contactEmail.trim(),
-      contactPhone: formData.contactPhone?.trim() || "", // make sure you add an input for phone if not present
+      contactPhone: formData.contactPhone?.trim() || "",
       createdAt: new Date().toISOString(),
     };
-
     try {
-      // show some UI loading state if you want
       const res = await fetch(`${API_BASE_URL}/api/tenders/guest`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
         throw new Error(err.message || "Failed to save tender");
       }
-
       const data = await res.json();
-      // Save returned token + tender id so user can claim it later after signup
       const saveObj = {
         ...payload,
         tenderId: data.tenderId,
@@ -228,14 +219,11 @@ export default function Hero() {
         createdAt: new Date().toISOString(),
       };
       localStorage.setItem(GUEST_TENDER_KEY, JSON.stringify(saveObj));
-
       setShowSignupScreen(true);
       setIsSaved(true);
       hasUnsavedData.current = false;
     } catch (error: any) {
-      // show error inline you can map server errors to UI
       console.error("Guest tender save failed:", error);
-      // set a user-visible error (reuse errors state or create a top-level message)
       setErrors((prev) => ({
         ...prev,
         form: error.message || "Unable to save tender",
@@ -287,391 +275,542 @@ export default function Hero() {
   };
 
   return (
-    <section
-      className="relative min-h-screen flex items-center justify-center overflow-visible pt-15 lg:pt-0 bg-gray-50"
-      id="hero"
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20 w-full">
-        {/* Side-by-Side Layout (responsive) */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 items-center">
-          {/* Left: Hero Text */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="space-y-6 md:space-y-8 text-left"
-          >
-            <h1 className="text-4xl sm:text-5xl md:text-7xl font-semibold tracking-tight text-[#1d1d1f] leading-[1.05]">
-              Post once. Get multiple quotes.
-            </h1>
-
-            <p className="text-base sm:text-lg text-[#6e6e73] font-normal leading-relaxed max-w-xl">
-              A centralized tender marketplace for individuals and businesses
-              describe, bidders reply instantly, you compare, negotiate, and
-              award.
-            </p>
-
-            <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4">
-              <motion.a
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                href="/signup"
-                className="px-5 sm:px-6 h-12 text-black hover:bg-black/5 rounded-md font-medium flex items-center gap-2 justify-center"
+    <>
+      <>
+        {/* ===== HERO SECTION (UNCHANGED) ===== */}
+        <section
+          className="relative min-h-screen  items-center justify-center overflow-visible flex flex-col "
+          id="hero"
+        >
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20 w-full">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 items-center">
+              {/* Left: Hero Text */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8 }}
+                className="space-y-6 md:space-y-8 text-left"
               >
-                Browse open tenders
-              </motion.a>
-
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={openForm}
-                className="px-5 sm:px-6 h-12 bg-black hover:bg-neutral-900 text-white rounded-md font-medium flex items-center gap-2 justify-center"
-              >
-                Post your tender for free
-              </motion.button>
-            </div>
-
-            {/* Micro-proof Section */}
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pt-5 text-sm text-[#6e6e73]">
-              <div className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-black" />
-                Anonymous until award
-              </div>
-              <div className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-black" />
-                No fees
-              </div>
-              <div className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-black" />
-                Takes ~2 minutes
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Right: Tender Form (Inline) */}
-          {showForm && (
-            <motion.div
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 50 }}
-              className="bg-white rounded-md border border-[#d2d2d7] p-6 md:p-8 max-h-[88vh] overflow-y-auto relative md:sticky md:top-24"
-            >
-              {/* Close Button */}
-              <button
-                onClick={confirmClose}
-                className="absolute top-4 right-4 text-[#86868b] hover:text-[#1d1d1f] transition-colors z-10"
-                aria-label="Close"
-              >
-                <X className="w-5 h-5 md:w-6 md:h-6" />
-              </button>
-
-              {/* Progress Bar */}
-              <div className="flex items-center justify-center mb-6 md:mb-8">
-                {steps.map((step, i) => (
-                  <div key={step.id} className="flex items-center">
-                    <motion.div
-                      animate={{
-                        backgroundColor:
-                          i <= currentStep ? "#000000" : "#f5f5f7",
-                        scale: i === currentStep ? 1.06 : 1,
-                      }}
-                      className={cn(
-                        "flex items-center justify-center rounded-md",
-                        i === currentStep ? "w-10 h-10" : "w-8 h-8"
-                      )}
-                    >
-                      {i < currentStep ? (
-                        <Check className="w-4 h-4 text-white" />
-                      ) : (
-                        <span
-                          className={`text-sm font-semibold ${
-                            i <= currentStep ? "text-white" : "text-[#86868b]"
-                          }`}
-                        >
-                          {step.id}
-                        </span>
-                      )}
-                    </motion.div>
-                    {i < steps.length - 1 && (
-                      <motion.div
-                        animate={{
-                          backgroundColor:
-                            i < currentStep ? "#000000" : "#e5e5ea",
-                        }}
-                        className="h-0.5 w-8 sm:w-12 mx-2"
-                      />
-                    )}
-                  </div>
-                ))}
-              </div>
-
-              <AnimatePresence mode="wait">
-                {!showSignupScreen ? (
-                  <motion.div
-                    key={currentStep}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
-                    className="space-y-5 md:space-y-6"
+                <motion.h1
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8, delay: 0.1 }}
+                  className="text-4xl sm:text-5xl md:text-7xl font-semibold tracking-tight text-[#1d1d1f] leading-[1.05]"
+                >
+                  Post once. Get multiple quotes.
+                </motion.h1>
+                <motion.p
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8, delay: 0.2 }}
+                  className="text-base sm:text-lg text-[#6e6e73] font-normal leading-relaxed max-w-xl"
+                >
+                  A centralized tender marketplace for individuals and
+                  businesses describe, bidders reply instantly, you compare,
+                  negotiate, and award.
+                </motion.p>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8, delay: 0.3 }}
+                  className="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4"
+                >
+                  <motion.a
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    href="/signup"
+                    className="px-5 sm:px-6 h-12 text-black hover:bg-black/5 rounded-md font-medium flex items-center gap-2 justify-center"
                   >
-                    <h3 className="text-xl md:text-2xl font-semibold text-[#1d1d1f]">
-                      {steps[currentStep].title}
-                    </h3>
-                    {steps[currentStep].fields.map((field, idx) => (
-                      <motion.div
-                        key={field.name}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: idx * 0.06 }}
-                        className="space-y-2"
-                      >
-                        <label className="text-sm font-medium text-[#6e6e73]">
-                          {field.label}
-                          {field.required && (
-                            <span className="text-red-500 ml-1">*</span>
-                          )}{" "}
-                        </label>
+                    Browse open tenders
+                  </motion.a>
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={openForm}
+                    className="px-5 sm:px-6 h-12 bg-black hover:bg-neutral-900 text-white rounded-md font-medium flex items-center gap-2 justify-center"
+                  >
+                    Post your tender for free
+                  </motion.button>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8, delay: 0.4 }}
+                  className="flex flex-wrap items-center gap-x-4 gap-y-2 pt-5 text-sm text-[#6e6e73]"
+                >
+                  <motion.div
+                    initial={{ opacity: 0, x: -10 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6, delay: 0.5 }}
+                    className="flex items-center gap-2"
+                  >
+                    <Check className="w-4 h-4 text-black" />
+                    Anonymous until award
+                  </motion.div>
+                  <motion.div
+                    initial={{ opacity: 0, x: -10 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6, delay: 0.6 }}
+                    className="flex items-center gap-2"
+                  >
+                    <Check className="w-4 h-4 text-black" />
+                    No fees
+                  </motion.div>
+                  <motion.div
+                    initial={{ opacity: 0, x: -10 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6, delay: 0.7 }}
+                    className="flex items-center gap-2"
+                  >
+                    <Check className="w-4 h-4 text-black" />
+                    Takes ~2 minutes
+                  </motion.div>
+                </motion.div>
+              </motion.div>
 
-                        {field.type === "textarea" ? (
-                          <div className="relative">
-                            <textarea
-                              name={field.name}
-                              value={
-                                formData[
-                                  field.name as keyof typeof formData
-                                ] as string
-                              }
-                              onChange={handleChange}
-                              placeholder={field.label}
-                              className={cn(
-                                "w-full h-28 sm:h-32 bg-[#f5f5f7] rounded-md border px-4 py-3 text-sm outline-none transition-colors resize-none",
-                                errors[field.name]
-                                  ? "border-red-500"
-                                  : "border-transparent hover:border-black/20 focus:border-black"
-                              )}
-                            />
-                            {errors[field.name] && (
-                              <p className="text-red-500 text-xs mt-1">
-                                {errors[field.name]}
-                              </p>
-                            )}
-                          </div>
-                        ) : field.type === "calendar" ? (
-                          <div className="relative">
-                            <Popover>
-                              <PopoverTrigger asChild>
-                                <button
-                                  className={cn(
-                                    "w-full h-12 bg-[#f5f5f7] rounded-md border px-4 text-sm text-left font-normal flex items-center justify-between transition-colors",
-                                    errors.deadline
-                                      ? "border-red-500"
-                                      : "border-transparent hover:border-black/20 focus:border-black",
-                                    !formData.deadline &&
-                                      "text-muted-foreground"
-                                  )}
-                                >
-                                  {formData.deadline ? (
-                                    format(formData.deadline, "PPP p")
-                                  ) : (
-                                    <span>Select deadline</span>
-                                  )}
-                                  <CalendarIcon className="mr-2 h-4 w-4" />
-                                </button>
-                              </PopoverTrigger>
-                              <PopoverContent className="w-full max-w-full sm:w-auto p-4 space-y-3">
-                                <Calendar
-                                  mode="single"
-                                  selected={formData.deadline || undefined}
-                                  onSelect={(date) => {
-                                    if (!date) return;
-                                    const prev =
-                                      formData.deadline || new Date();
-                                    const newDate = new Date(date);
-                                    newDate.setHours(
-                                      prev.getHours(),
-                                      prev.getMinutes()
-                                    );
-                                    handleDeadlineChange(newDate);
-                                  }}
-                                  initialFocus
-                                />
-                                <input
-                                  type="time"
-                                  className="w-full rounded-md border px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-black"
-                                  value={
-                                    formData.deadline
-                                      ? format(formData.deadline, "HH:mm")
-                                      : ""
-                                  }
-                                  onChange={(e) => {
-                                    const [hours, minutes] = e.target.value
-                                      .split(":")
-                                      .map(Number);
-                                    const prev =
-                                      formData.deadline || new Date();
-                                    const newDate = new Date(prev);
-                                    newDate.setHours(hours, minutes);
-                                    handleDeadlineChange(newDate);
-                                  }}
-                                />
-                              </PopoverContent>
-                            </Popover>
-                            {errors.deadline && (
-                              <p className="text-red-500 text-xs mt-1">
-                                {errors.deadline}
-                              </p>
-                            )}
-                          </div>
-                        ) : (
-                          <div className="relative">
-                            <input
-                              type={
-                                field.name === "contactEmail" ? "email" : "text"
-                              }
-                              name={field.name}
-                              value={
-                                formData[
-                                  field.name as keyof typeof formData
-                                ] as string
-                              }
-                              onChange={handleChange}
-                              placeholder={field.label}
-                              className={cn(
-                                "w-full h-12 bg-[#f5f5f7] rounded-md border px-4 text-sm outline-none transition-colors",
-                                errors[field.name]
-                                  ? "border-red-500"
-                                  : "border-transparent hover:border-black/20 focus:border-black"
-                              )}
-                            />
-                            {errors[field.name] && (
-                              <p className="text-red-500 text-xs mt-1">
-                                {errors[field.name]}
-                              </p>
-                            )}
-                          </div>
+              {/* Right: Tender Form (Inline) */}
+              {showForm && (
+                <motion.div
+                  initial={{ opacity: 0, x: 50 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 50 }}
+                  transition={{ duration: 0.5, ease: "easeOut" }}
+                  className="bg-white/90  rounded-md border border-[#d2d2d7] p-6 md:p-8 max-h-[88vh] overflow-y-auto relative md:sticky md:top-24"
+                >
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={confirmClose}
+                    className="absolute top-4 right-4 text-[#86868b] hover:text-[#1d1d1f] transition-colors z-10"
+                    aria-label="Close"
+                  >
+                    <X className="w-5 h-5 md:w-6 md:h-6" />
+                  </motion.button>
+
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6 }}
+                    className="flex items-center justify-center mb-6 md:mb-8"
+                  >
+                    {steps.map((step, i) => (
+                      <div key={step.id} className="flex items-center">
+                        <motion.div
+                          animate={{
+                            backgroundColor:
+                              i <= currentStep ? "#000000" : "#f5f5f7",
+                            scale: i === currentStep ? 1.06 : 1,
+                          }}
+                          transition={{ duration: 0.3 }}
+                          className={cn(
+                            "flex items-center justify-center rounded-md",
+                            i === currentStep ? "w-10 h-10" : "w-8 h-8"
+                          )}
+                        >
+                          {i < currentStep ? (
+                            <Check className="w-4 h-4 text-white" />
+                          ) : (
+                            <span
+                              className={`text-sm font-semibold ${
+                                i <= currentStep
+                                  ? "text-white"
+                                  : "text-[#86868b]"
+                              }`}
+                            >
+                              {step.id}
+                            </span>
+                          )}
+                        </motion.div>
+                        {i < steps.length - 1 && (
+                          <motion.div
+                            animate={{
+                              backgroundColor:
+                                i < currentStep ? "#000000" : "#e5e5ea",
+                            }}
+                            transition={{ duration: 0.3 }}
+                            className="h-0.5 w-8 sm:w-12 mx-2"
+                          />
                         )}
-                      </motion.div>
+                      </div>
                     ))}
                   </motion.div>
-                ) : (
+
+                  <AnimatePresence mode="wait">
+                    {!showSignupScreen ? (
+                      <motion.div
+                        key={currentStep}
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -20 }}
+                        transition={{ duration: 0.4, ease: "easeInOut" }}
+                        className="space-y-5 md:space-y-6"
+                      >
+                        <motion.h3
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.4 }}
+                          className="text-xl md:text-2xl font-semibold text-[#1d1d1f]"
+                        >
+                          {steps[currentStep].title}
+                        </motion.h3>
+                        {steps[currentStep].fields.map((field, idx) => (
+                          <motion.div
+                            key={field.name}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: idx * 0.06, duration: 0.4 }}
+                            className="space-y-2"
+                          >
+                            <motion.label
+                              initial={{ opacity: 0, x: -10 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: idx * 0.06 + 0.1 }}
+                              className="text-sm font-medium text-[#6e6e73]"
+                            >
+                              {field.label}
+                              {field.required && (
+                                <span className="text-red-500 ml-1">*</span>
+                              )}
+                            </motion.label>
+                            {field.type === "textarea" ? (
+                              <motion.div
+                                initial={{ opacity: 0, scale: 0.98 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ delay: idx * 0.06 + 0.15 }}
+                                className="relative"
+                              >
+                                <textarea
+                                  name={field.name}
+                                  value={
+                                    formData[
+                                      field.name as keyof typeof formData
+                                    ] as string
+                                  }
+                                  onChange={handleChange}
+                                  placeholder={field.label}
+                                  className={cn(
+                                    "w-full h-28 sm:h-32 bg-[#f5f5f7] rounded-md border px-4 py-3 text-sm outline-none transition-colors resize-none",
+                                    errors[field.name]
+                                      ? "border-red-500"
+                                      : "border-transparent hover:border-black/20 focus:border-black"
+                                  )}
+                                />
+                                {errors[field.name] && (
+                                  <motion.p
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    className="text-red-500 text-xs mt-1"
+                                  >
+                                    {errors[field.name]}
+                                  </motion.p>
+                                )}
+                              </motion.div>
+                            ) : field.type === "calendar" ? (
+                              <motion.div
+                                initial={{ opacity: 0, scale: 0.98 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ delay: idx * 0.06 + 0.15 }}
+                                className="relative"
+                              >
+                                <Popover>
+                                  <PopoverTrigger asChild>
+                                    <motion.button
+                                      whileHover={{ scale: 1.01 }}
+                                      whileTap={{ scale: 0.99 }}
+                                      className={cn(
+                                        "w-full h-12 bg-[#f5f5f7] rounded-md border px-4 text-sm text-left font-normal flex items-center justify-between transition-colors",
+                                        errors.deadline
+                                          ? "border-red-500"
+                                          : "border-transparent hover:border-black/20 focus:border-black",
+                                        !formData.deadline &&
+                                          "text-muted-foreground"
+                                      )}
+                                    >
+                                      {formData.deadline ? (
+                                        format(formData.deadline, "PPP p")
+                                      ) : (
+                                        <span>Select deadline</span>
+                                      )}
+                                      <CalendarIcon className="mr-2 h-4 w-4" />
+                                    </motion.button>
+                                  </PopoverTrigger>
+                                  <PopoverContent className="w-full max-w-full sm:w-auto p-4 space-y-3">
+                                    <Calendar
+                                      mode="single"
+                                      selected={formData.deadline || undefined}
+                                      onSelect={(date) => {
+                                        if (!date) return;
+                                        const prev =
+                                          formData.deadline || new Date();
+                                        const newDate = new Date(date);
+                                        newDate.setHours(
+                                          prev.getHours(),
+                                          prev.getMinutes()
+                                        );
+                                        handleDeadlineChange(newDate);
+                                      }}
+                                      initialFocus
+                                    />
+                                    <input
+                                      type="time"
+                                      className="w-full rounded-md border px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+                                      value={
+                                        formData.deadline
+                                          ? format(formData.deadline, "HH:mm")
+                                          : ""
+                                      }
+                                      onChange={(e) => {
+                                        const [hours, minutes] = e.target.value
+                                          .split(":")
+                                          .map(Number);
+                                        const prev =
+                                          formData.deadline || new Date();
+                                        const newDate = new Date(prev);
+                                        newDate.setHours(hours, minutes);
+                                        handleDeadlineChange(newDate);
+                                      }}
+                                    />
+                                  </PopoverContent>
+                                </Popover>
+                                {errors.deadline && (
+                                  <motion.p
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    className="text-red-500 text-xs mt-1"
+                                  >
+                                    {errors.deadline}
+                                  </motion.p>
+                                )}
+                              </motion.div>
+                            ) : (
+                              <motion.div
+                                initial={{ opacity: 0, scale: 0.98 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ delay: idx * 0.06 + 0.15 }}
+                                className="relative"
+                              >
+                                <input
+                                  type={
+                                    field.name === "contactEmail"
+                                      ? "email"
+                                      : "text"
+                                  }
+                                  name={field.name}
+                                  value={
+                                    formData[
+                                      field.name as keyof typeof formData
+                                    ] as string
+                                  }
+                                  onChange={handleChange}
+                                  placeholder={field.label}
+                                  className={cn(
+                                    "w-full h-12 bg-[#f5f5f7] rounded-md border px-4 text-sm outline-none transition-colors",
+                                    errors[field.name]
+                                      ? "border-red-500"
+                                      : "border-transparent hover:border-black/20 focus:border-black"
+                                  )}
+                                />
+                                {errors[field.name] && (
+                                  <motion.p
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    className="text-red-500 text-xs mt-1"
+                                  >
+                                    {errors[field.name]}
+                                  </motion.p>
+                                )}
+                              </motion.div>
+                            )}
+                          </motion.div>
+                        ))}
+                      </motion.div>
+                    ) : (
+                      <motion.div
+                        key="signup-screen"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5 }}
+                        className="space-y-6 text-center py-8 md:py-12"
+                      >
+                        <motion.div
+                          initial={{ scale: 0.8, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          transition={{ duration: 0.5, ease: "backOut" }}
+                          className="mx-auto w-20 h-20 bg-black/10 rounded-md flex items-center justify-center"
+                        >
+                          <Check className="w-10 h-10 text-black" />
+                        </motion.div>
+                        <div className="space-y-3">
+                          <motion.h3
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.2 }}
+                            className="text-2xl md:text-3xl font-semibold text-[#1d1d1f]"
+                          >
+                            Tender Published
+                          </motion.h3>
+                          <motion.p
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.3 }}
+                            className="text-base md:text-lg text-[#6e6e73] max-w-md mx-auto"
+                          >
+                            Signup to publish and start receiving bids from
+                            verified suppliers.
+                          </motion.p>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
                   <motion.div
-                    key="signup-screen"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="space-y-6 text-center py-8 md:py-12"
+                    transition={{ duration: 0.5, delay: 0.3 }}
+                    className="flex gap-3 mt-6 md:mt-8 flex-col sm:flex-row"
                   >
-                    <div className="mx-auto w-20 h-20 bg-black/10 rounded-md flex items-center justify-center">
-                      <Check className="w-10 h-10 text-black" />
-                    </div>
-                    <div className="space-y-3">
-                      <h3 className="text-2xl md:text-3xl font-semibold text-[#1d1d1f]">
-                        Tender Published
-                      </h3>
-                      <p className="text-base md:text-lg text-[#6e6e73] max-w-md mx-auto">
-                        Signup to publish and start receiving bids from verified
-                        suppliers.
-                      </p>
-                    </div>
+                    {!showSignupScreen && currentStep > 0 && (
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={prevStep}
+                        className="w-full sm:flex-1 h-12 rounded-md text-black hover:bg-black/5 transition-colors"
+                      >
+                        Back
+                      </motion.button>
+                    )}
+                    {!showSignupScreen ? (
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() =>
+                          currentStep === steps.length - 1
+                            ? handlePostTender()
+                            : nextStep()
+                        }
+                        className="w-full sm:flex-1 bg-black hover:bg-neutral-900 text-white h-12 rounded-md font-medium flex items-center justify-center gap-2 transition-colors"
+                      >
+                        {currentStep === steps.length - 1
+                          ? "Save & Continue"
+                          : "Continue"}
+                      </motion.button>
+                    ) : (
+                      <div className="flex flex-col sm:flex-row gap-3 w-full">
+                        <motion.button
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => {
+                            localStorage.removeItem(GUEST_TENDER_KEY);
+                            setShowSignupScreen(false);
+                            setCurrentStep(0);
+                            setIsSaved(false);
+                          }}
+                          className="w-full sm:flex-1 h-12 rounded-md border border-[#d2d2d7] text-[#1d1d1f] hover:bg-[#f5f5f7]"
+                        >
+                          Edit Tender
+                        </motion.button>
+                        <motion.a
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          href="/signup"
+                          className="w-full sm:flex-1 bg-black hover:bg-neutral-900 text-white h-12 rounded-md font-medium flex items-center justify-center gap-2"
+                        >
+                          Sign up now
+                        </motion.a>
+                      </div>
+                    )}
                   </motion.div>
-                )}
-              </AnimatePresence>
-
-              {/* Navigation */}
-              <div className="flex gap-3 mt-6 md:mt-8 flex-col sm:flex-row">
-                {!showSignupScreen && currentStep > 0 && (
-                  <button
-                    onClick={prevStep}
-                    className="w-full sm:flex-1 h-12 rounded-md text-black hover:bg-black/5 transition-colors"
+                  <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.4 }}
+                    className="text-center text-xs text-[#86868b] mt-4"
                   >
-                    Back
-                  </button>
-                )}
-                {!showSignupScreen ? (
-                  <button
-                    onClick={() =>
-                      currentStep === steps.length - 1
-                        ? handlePostTender()
-                        : nextStep()
-                    }
-                    className="w-full sm:flex-1 bg-black hover:bg-neutral-900 text-white h-12 rounded-md font-medium flex items-center justify-center gap-2 transition-colors"
-                  >
-                    {currentStep === steps.length - 1
-                      ? "Save & Continue"
-                      : "Continue"}
-                  </button>
-                ) : (
-                  <div className="flex flex-col sm:flex-row gap-3 w-full">
-                    <button
-                      onClick={() => {
-                        localStorage.removeItem(GUEST_TENDER_KEY);
-                        setShowSignupScreen(false);
-                        setCurrentStep(0);
-                        setIsSaved(false);
-                      }}
-                      className="w-full sm:flex-1 h-12 rounded-md border border-[#d2d2d7] text-[#1d1d1f] hover:bg-[#f5f5f7]"
-                    >
-                      Edit Tender
-                    </button>
-                    <motion.a
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      href="/signup"
-                      className="w-full sm:flex-1 bg-black hover:bg-neutral-900 text-white h-12 rounded-md font-medium flex items-center justify-center gap-2"
-                    >
-                      Sign up now
-                    </motion.a>
-                  </div>
-                )}
-              </div>
+                    {!showSignupScreen
+                      ? currentStep === steps.length - 1
+                        ? "Your tender will be saved locally."
+                        : `Step ${currentStep + 1} of ${steps.length}`
+                      : ""}
+                  </motion.p>
+                </motion.div>
+              )}
+            </div>
 
-              <p className="text-center text-xs text-[#86868b] mt-4">
-                {!showSignupScreen
-                  ? currentStep === steps.length - 1
-                    ? "Your tender will be saved locally."
-                    : `Step ${currentStep + 1} of ${steps.length}`
-                  : ""}
-              </p>
+        
+          </div>
+
+          {/* Discard Confirmation Dialog */}
+          {pendingClose && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+            >
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                className="bg-white rounded-md p-6 max-w-md w-full space-y-6 text-center "
+              >
+                <motion.div
+                  initial={{ scale: 0.8 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                  className="mx-auto w-16 h-16 bg-red-100 rounded-md flex items-center justify-center"
+                >
+                  <X className="w-8 h-8 text-red-600" />
+                </motion.div>
+                <div>
+                  <motion.h3
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-xl font-semibold text-[#1d1d1f]"
+                  >
+                    Discard changes?
+                  </motion.h3>
+                  <motion.p
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
+                    className="text-[#6e6e73] mt-2"
+                  >
+                    Your current draft will be lost.
+                  </motion.p>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => setPendingClose(false)}
+                    className="flex-1 h-12 rounded-md border border-[#d2d2d7] text-[#1d1d1f] hover:bg-[#f5f5f7]"
+                  >
+                    Cancel
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={performClose}
+                    className="flex-1 h-12 rounded-md bg-red-500 hover:bg-red-600 text-white"
+                  >
+                    Discard
+                  </motion.button>
+                </div>
+              </motion.div>
             </motion.div>
           )}
-        </div>
-      </div>
-
-      {/* Discard Confirmation Dialog */}
-      {pendingClose && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="bg-white rounded-md p-6 max-w-md w-full space-y-6 text-center"
-          >
-            <div className="mx-auto w-16 h-16 bg-red-100 rounded-md flex items-center justify-center">
-              <X className="w-8 h-8 text-red-600" />
-            </div>
-            <div>
-              <h3 className="text-xl font-semibold text-[#1d1d1f]">
-                Discard changes?
-              </h3>
-              <p className="text-[#6e6e73] mt-2">
-                Your current draft will be lost.
-              </p>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <button
-                onClick={() => setPendingClose(false)}
-                className="flex-1 h-12 rounded-md border border-[#d2d2d7] text-[#1d1d1f] hover:bg-[#f5f5f7]"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={performClose}
-                className="flex-1 h-12 rounded-md bg-red-500 hover:bg-red-600 text-white"
-              >
-                Discard
-              </button>
-            </div>
-          </motion.div>
-        </div>
-      )}
-    </section>
+        </section>
+      </>
+    </>
   );
 }

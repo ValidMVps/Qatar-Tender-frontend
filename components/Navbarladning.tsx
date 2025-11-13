@@ -38,7 +38,7 @@ export default function NavbarLanding() {
           {/* Logo */}
           <Link href="/" className="flex items-center">
             <Image
-              src={logo}
+              src={logo.src}
               alt="GoTenderly Logo"
               width={140}
               height={42}

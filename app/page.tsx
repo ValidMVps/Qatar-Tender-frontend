@@ -28,6 +28,8 @@ import {
   Plus,
   Play,
   ChevronDown,
+  CheckCheck,
+  X,
 } from "lucide-react";
 import logo from "../media/logo.png";
 import Hero from "@/components/Hero";
@@ -50,7 +52,11 @@ import feature1 from "../media/unnamed.jpg";
 import feature2 from "../media/unnamed (1).jpg";
 import feature3 from "../media/unnamed2.jpg";
 import feature4 from "../media/unnamed (4).jpg";
-
+import businessdashboard from "../media/business-dashboard.png";
+import individualdashboard from "../media/individual-dashboard.png";
+import tendersimage from "../media/Group 1.png";
+import biddersimage from "../media/Group 2.png";
+import Background from "@/components/animations/Background";
 const features: {
   image: string;
   alt: string;
@@ -87,7 +93,7 @@ function Features() {
   return (
     <section
       id="features"
-      className="self-stretch px-4 sm:px-16 py-16 md:py-24 lg:py-32 bg-Color-Scheme-1-Background flex flex-col justify-start items-center overflow-hidden"
+      className="self-stretch px-4 bg-white sm:px-16 py-16 md:py-24 lg:py-32 bg-Color-Scheme-1-Background flex flex-col justify-start items-center overflow-hidden"
     >
       <div className="w-full max-w-[1280px] flex flex-col justify-start items-start gap-12">
         {/* ---------- Header ---------- */}
@@ -241,7 +247,7 @@ function Process() {
   return (
     <section
       id="process"
-      className="px-4 sm:px-6 py-16 md:py-24 lg:py-32 bg-gray-50"
+      className="px-4 sm:px-6 py-16 md:py-24 lg:py-32 bg-white"
     >
       <div className="max-w-7xl mx-auto">
         {/* Header */}
@@ -414,7 +420,7 @@ function Testimonials() {
   return (
     <section
       id="testimonials"
-      className="bg-gray-50 py-16 md:py-24 lg:py-32 px-4 sm:px-8"
+      className="bg-gray-50/30 py-16 md:py-24 lg:py-32 px-4 sm:px-8"
     >
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 items-start gap-12">
@@ -491,7 +497,7 @@ function Testimonials() {
                 <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
               </div>
               <div className="flex gap-2">
-                <button className="p-2 border border-gray-300 rounded-md hover:bg-gray-50 transition">
+                <button className="p-2 border border-gray-300 rounded-md hover:bg-gray-50/30 transition">
                   <svg
                     className="w-4 h-4"
                     fill="none"
@@ -506,7 +512,7 @@ function Testimonials() {
                     />
                   </svg>
                 </button>
-                <button className="p-2 border border-gray-300 rounded-md hover:bg-gray-50 transition">
+                <button className="p-2 border border-gray-300 rounded-md hover:bg-gray-50/30 transition">
                   <svg
                     className="w-4 h-4"
                     fill="none"
@@ -574,7 +580,7 @@ function CTA() {
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.5 }}
-              className="text-xs md:text-sm text-white/60 mt-8 leading-5"
+              className="text-xs md:text-sm text-black/60 mt-8 leading-5"
             >
               Anonymous until award • No fees • Takes ~2 minutes
             </motion.p>
@@ -585,88 +591,92 @@ function CTA() {
   );
 }
 
-/* -------------------------------- About ---------------------------------- */
 function About() {
+  const [hovered, setHovered] = useState(false);
+
   return (
     <section
       id="about"
-      className="flex items-center justify-center min-h-screen px-4 sm:px-6 py-16 md:py-24 lg:py-32 bg-Color-Scheme-1-Background"
+      className="flex justify-center items-center bg-gray-50/30 py-24 px-4 sm:px-6 lg:px-12"
     >
-      <div className="max-w-7xl mx-auto">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-          {/* Text Content */}
-          <div className="flex flex-col gap-8">
-            {/* Header */}
-            <div className="flex flex-col gap-6">
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight">
-                Built for both Tenderers & Bidders
-              </h2>
-              <p className="text-base md:text-lg font-normal font-inter text-Color-Scheme-1-Text leading-7">
-                Whether you're posting a project or competing for one our
-                marketplace connects verified buyers and suppliers to make the
-                tendering process transparent, fast, and fair.
+      <div className="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        {/* LEFT: Text */}
+        <div className="flex flex-col gap-8">
+          <div className="flex flex-col gap-4">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold font-outfit text-Color-Scheme-1-Text leading-tight">
+              Built for both Tenderers & Bidders
+            </h2>
+            <p className="text-base md:text-lg font-inter text-Color-Scheme-1-Text/90 leading-relaxed">
+              Whether you're posting a project or competing for one, our
+              marketplace connects verified buyers and suppliers to make the
+              tendering process transparent, fast, and fair.
+            </p>
+          </div>
+
+          {/* FEATURES */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+            <div className="flex flex-col gap-3">
+              <h3 className="text-lg sm:text-xl font-semibold font-outfit text-Color-Scheme-1-Text">
+                For Tenderers
+              </h3>
+              <p className="text-sm md:text-base font-inter text-Color-Scheme-1-Text/90">
+                Post once and reach verified bidders instantly. Compare quotes,
+                timelines, and offers side-by-side while staying anonymous until
+                the award.
               </p>
             </div>
 
-            {/* For Tenderers & Bidders */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 py-4">
-              <div className="flex flex-col gap-3">
-                <h3 className="text-lg sm:text-xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight">
-                  For Tenderers
-                </h3>
-                <p className="text-sm md:text-base font-normal font-inter text-Color-Scheme-1-Text leading-6">
-                  Post once and reach verified bidders instantly. Compare
-                  quotes, timelines, and offers side by side all while staying
-                  anonymous until the award. Make faster, data-backed decisions.
-                </p>
-              </div>
-
-              <div className="flex flex-col gap-3">
-                <h3 className="text-lg sm:text-xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight">
-                  For Bidders
-                </h3>
-                <p className="text-sm md:text-base font-normal font-inter text-Color-Scheme-1-Text leading-6">
-                  Access live tenders from real buyers, ask questions, and
-                  submit bids that stand out. Manage proposals, negotiations,
-                  and awards all in one secure workspace.
-                </p>
-              </div>
-            </div>
-
-            {/* CTA Buttons */}
-            <div className="flex flex-wrap items-center gap-4 pt-6">
-              {/* Tenderer CTA */}
-              <Link href="#hero">
-                <button className="px-5 py-3 bg-black text-white text-sm md:text-base font-medium font-inter rounded-md hover:bg-neutral-900 transition-all">
-                  Post a Tender
-                </button>
-              </Link>
-
-              {/* Bidder CTA */}
-              <Link href="/tenders">
-                <button className="px-5 py-3 bg-white text-black outline-1 outline-black/10 text-sm md:text-base font-medium font-inter rounded-md hover:bg-black/5 transition-all">
-                  Browse Open Tenders
-                </button>
-              </Link>
+            <div className="flex flex-col gap-3">
+              <h3 className="text-lg sm:text-xl font-semibold font-outfit text-Color-Scheme-1-Text">
+                For Bidders
+              </h3>
+              <p className="text-sm md:text-base font-inter text-Color-Scheme-1-Text/90">
+                Access live tenders from real buyers, ask questions, and submit
+                bids that stand out. Manage proposals and awards all in one
+                secure workspace.
+              </p>
             </div>
           </div>
 
-          {/* Image */}
-          <div className="hidden lg:block h-full">
-            <img
-              src={aboutimage.src}
-              alt="Professional workspace"
-              className="w-full h-full max-h-full object-cover rounded-md -lg"
-            />
+          {/* CTA BUTTONS */}
+          <div className="flex flex-wrap gap-4 pt-4">
+            <Link href="#hero">
+              <button className="px-6 py-3 bg-black text-white text-sm md:text-base font-medium font-inter rounded-md hover:bg-neutral-900 transition-all">
+                Post a Tender
+              </button>
+            </Link>
+            <Link href="/tenders">
+              <button className="px-6 py-3 bg-white text-black border border-black/10 text-sm md:text-base font-medium font-inter rounded-md hover:bg-black/5 transition-all">
+                Browse Open Tenders
+              </button>
+            </Link>
           </div>
         </div>
 
-        {/* Mobile Image */}
-        <div className="lg:hidden mt-12">
-          <img
-            src={aboutimage.src}
-            alt="Professional workspace"
-            className="w-full h-80 object-cover rounded-md -md"
+        {/* RIGHT: Image with hover effect */}
+        <div
+          className="relative w-full h-auto rounded-xl overflow-hidden transition-transform duration-300 flex justify-center items-center"
+          onMouseEnter={() => setHovered(true)}
+          onMouseLeave={() => setHovered(false)}
+        >
+          {/* Default image */}
+          <Image
+            src={tendersimage}
+            alt="Business dashboard"
+            className={`transition-opacity duration-500 ${
+              hovered ? "opacity-0" : "opacity-100"
+            }  h-full object-contain`}
+            priority
+          />
+
+          {/* Hover image */}
+          <Image
+            src={biddersimage}
+            alt="Individual dashboard"
+            className={`absolute inset-0 transition-opacity duration-500 ${
+              hovered ? "opacity-100" : "opacity-0"
+            }  h-full object-contain`}
+            priority
           />
         </div>
       </div>
@@ -868,7 +878,7 @@ function Services() {
   return (
     <section
       id="services"
-      className="px-4 sm:px-6 py-16 md:py-24 lg:py-32 bg-gray-50 overflow-hidden"
+      className="px-4 sm:px-6 py-16 md:py-24 lg:py-32 bg-gray-50/30 overflow-hidden"
     >
       <div className="max-w-7xl mx-auto">
         {/* ---------- Header ---------- */}
@@ -998,7 +1008,7 @@ function FAQ2() {
   return (
     <section
       id="faq"
-      className="px-4 sm:px-8 md:px-16 py-20 md:py-28 bg-gray-50 text-black flex flex-col items-center"
+      className="px-4 sm:px-8 md:px-16 py-20 md:py-28 bg-white text-black flex flex-col items-center"
     >
       <div className="max-w-3xl w-full text-center mb-12">
         <h2 className="text-4xl sm:text-5xl font-semibold mb-4 font-outfit">
@@ -1054,116 +1064,106 @@ function FAQ2() {
 }
 
 function Problems() {
+  const rows = [
+    {
+      title:
+        "Finding vendors – Post once and reach many bidders instantly, while other platforms make it hard to find all options.",
+    },
+    {
+      title:
+        "Requirements clarity – Clarify every detail with built-in Q/A before awarding, unlike unclear briefs that lead to wrong quotes.",
+    },
+    {
+      title:
+        "Briefing vendors – Compare price, ETA, and notes in one view — no need to repeat the same brief to every vendor.",
+    },
+    {
+      title:
+        "Paid and subscription model – Free to post and bid with zero commissions, unlike platforms that charge fees or subscriptions.",
+    },
+    {
+      title:
+        "Specs quality – Ask and answer questions publicly on the tender, avoiding vague specs that waste time or feel risky.",
+    },
+    {
+      title:
+        "Finding buyers – See all required fields upfront and submit competitive bids, while other platforms offer unqualified leads.",
+    },
+    {
+      title:
+        "Negotiations – Keep everything in one private thread for faster awards, instead of scattered calls and emails.",
+    },
+  ];
   return (
     <section
       id="problems"
-      className="max-w-7xl mx-auto px-4 sm:px-6 py-16 md:py-24 lg:py-32"
+      className="mx-auto bg-gray-50/30 px-4 sm:px-6 py-16 md:py-24 lg:py-32"
     >
-      <div className="max-w-3xl mx-auto text-center mb-12 md:mb-16">
-        <h2 className="mt-3 text-3xl sm:text-4xl md:text-5xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight">
-          The smarter way to handle <br /> Projects in Qatar
-        </h2>
-        <p className="mt-4 text-base md:text-lg font-normal font-inter text-Color-Scheme-1-Text leading-7">
-          The platform every bidder and client actually loves.
-        </p>
-      </div>
-      <div className="mt-12">
-        <Card className="-none border-muted overflow-hidden">
-          <CardContent className="p-0">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                {/* Table Header with Legend */}
-                <thead>
-                  <tr className="border-b bg-muted/10">
-                    <th className="px-6 py-4 text-xs md:text-sm font-medium text-muted-foreground w-1/3 min-w-[180px]">
-                      Feature
-                    </th>
-                    <th className="px-6 py-4 text-xs md:text-sm font-medium text-primary w-1/3 min-w-[220px]">
-                      <div className="flex items-center gap-2">
-                        <span>Tenderly</span>
-                      </div>
-                    </th>
-                    <th className="px-6 py-4 text-xs md:text-sm font-medium text-muted-foreground w-1/3 min-w-[220px]">
-                      <div className="flex items-center gap-2">
-                        <span>Traditional Platforms</span>
-                      </div>
-                    </th>
-                  </tr>
-                </thead>
-                {/* Table Body */}
-                <tbody>
-                  {[
-                    {
-                      label: "Finding vendors",
-                      tenderly: "Post once and reach many bidders instantly.",
-                      other:
-                        "Hard to find all options; vendors are fragmented.",
-                    },
-                    {
-                      label: "Requirements clarity",
-                      tenderly:
-                        "Use built-in Q/A to clarify missing details before award.",
-                      other:
-                        "Unclear requirements lead to wrong quotes and rework.",
-                    },
-                    {
-                      label: "Briefing vendors",
-                      tenderly:
-                        "Compare apples-to-apples (price, ETA, notes) in one view.",
-                      other:
-                        "Repeating the same brief to each vendor takes time.",
-                    },
-                    {
-                      label: "Paid and subscription model",
-                      tenderly:
-                        "Free to post and free to bid — no commissions or hidden costs.",
-                      other:
-                        "Other platforms charge subscriptions or posting fees for access.",
-                    },
-                    {
-                      label: "Specs quality",
-                      tenderly:
-                        "Ask/answer clarifying questions publicly on the tender.",
-                      other:
-                        "Specs are vague; quoting feels risky or time-wasting.",
-                    },
-                    {
-                      label: "Finding buyers",
-                      tenderly:
-                        "See all required fields up front; submit a clear, competitive bid.",
-                      other:
-                        "Hard to find real, ready buyers; leads aren’t qualified.",
-                    },
-                    {
-                      label: "Negotiations",
-                      tenderly:
-                        "Keep negotiations in one private thread; get awarded faster.",
-                      other:
-                        "Negotiations spread across calls/emails and get lost.",
-                    },
-                  ].map(({ label, tenderly, other }, i) => (
-                    <tr
-                      key={label}
-                      className={`border-b last:border-b-0 transition-colors hover:bg-muted/50 ${
-                        i % 2 === 0 ? "bg-muted/30" : "bg-background"
-                      }`}
-                    >
-                      <td className="px-6 py-5 text-xs md:text-sm font-semibold text-foreground align-top min-w-[180px] leading-5">
-                        {label}
-                      </td>
-                      <td className="px-6 py-5 text-xs md:text-sm font-normal text-foreground/90 align-top min-w-[220px] leading-6">
-                        <span className="block break-words">{tenderly}</span>
-                      </td>
-                      <td className="px-6 py-5 text-xs md:text-sm font-normal text-foreground/70 align-top min-w-[220px] leading-6">
-                        <span className="block break-words">{other}</span>
-                      </td>
+      <div className="max-w-7xl mx-auto">
+        {" "}
+        <div className="max-w-3xl mx-auto text-center mb-12 md:mb-16">
+          <h2 className="mt-3 text-3xl sm:text-4xl md:text-5xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight">
+            The smarter way to handle <br /> Projects in Qatar
+          </h2>
+          <p className="mt-4 text-base md:text-lg font-normal font-inter text-Color-Scheme-1-Text leading-7">
+            The platform every bidder and client actually loves.
+          </p>
+        </div>
+        <div className="mt-12">
+          <Card className="border-muted overflow-hidden">
+            <CardContent className="p-0">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  {/* Header */}
+                  <thead>
+                    <tr className="border-b bg-muted/10">
+                      <th className="px-6 py-4 text-xs md:text-sm font-medium text-muted-foreground w-1/2 min-w-[250px]">
+                        Problem / Feature
+                      </th>
+                      <th className="px-6 py-4 text-xs md:text-sm font-medium text-primary w-1/4 text-center">
+                        Tenderly
+                      </th>
+                      <th className="px-6 py-4 text-xs md:text-sm font-medium text-muted-foreground w-1/4 text-center">
+                        Other platforms
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
+                  </thead>
+
+                  {/* Body */}
+                  <tbody>
+                    {rows.map(({ title }, i) => (
+                      <tr
+                        key={i}
+                        className={`border-b last:border-b-0 transition-colors hover:bg-muted/50 ${
+                          i % 2 === 0 ? "bg-muted/30" : "bg-background"
+                        }`}
+                      >
+                        {/* Expanded title with both descriptions */}
+                        <td className="px-6 py-5 text-xs md:text-sm font-medium text-foreground align-top leading-6">
+                          {title}
+                        </td>
+
+                        {/* Tick only */}
+                        <td className="px-6 py-5 text-center">
+                          <span className="inline-block text-2xl font-bold text-green-600">
+                            <Check />
+                          </span>
+                        </td>
+
+                        {/* Cross only */}
+                        <td className="px-6 py-5 text-center">
+                          <span className="inline-block text-2xl font-bold text-red-600">
+                            <X />
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </section>
   );
@@ -1367,7 +1367,7 @@ function SaasVideo() {
   return (
     <section
       id="video"
-      className="w-full py-16 md:py-24 lg:py-32 bg-gradient-to-b from-gray-50 to-white overflow-hidden"
+      className="w-full py-16 md:py-24 lg:py-32 bg-gray-50/30 overflow-hidden"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
@@ -1450,7 +1450,111 @@ function SaasVideo() {
     </section>
   );
 }
+function DashboardShowcase() {
+  const [hovered, setHovered] = useState(false);
 
+  return (
+    <section className="w-full py-16 md:py-24 lg:py-32 bg-white overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-6"
+        >
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight text-gray-900">
+            Individual & Business Dashboards
+          </h2>
+        </motion.div>
+
+        {/* Description below heading */}
+        <motion.p
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="text-center text-gray-600 max-w-2xl mx-auto mb-12 text-base md:text-lg"
+        >
+          Businesses can post{" "}
+          <span className="font-medium text-gray-800">tenders and bids</span>,
+          while individuals can only{" "}
+          <span className="font-medium text-gray-800">post tenders</span>.
+          Experience seamless interaction through our intuitive dashboard
+          system.
+        </motion.p>
+
+        {/* Dashboard Preview */}
+        <motion.div
+          initial={{ opacity: 0, scale: 1 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.9, ease: "easeOut" }}
+          className="relative w-full max-w-5xl mx-auto"
+          onMouseEnter={() => setHovered(true)}
+          onMouseLeave={() => setHovered(false)}
+        >
+          <motion.div
+            layout
+            transition={{ duration: 0.8, ease: "easeInOut" }}
+            className="relative rounded-2xl overflow-hidden border border-gray-200/10"
+          >
+            <div className="relative w-full h-auto aspect-video">
+              <motion.div
+                key={hovered ? "individual" : "business"}
+                initial={{ opacity: 0, scale: 1 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.98 }}
+                transition={{ duration: 0.8, ease: "easeInOut" }}
+                className="absolute inset-0"
+              >
+                <Image
+                  src={hovered ? individualdashboard : businessdashboard}
+                  alt={hovered ? "Individual Dashboard" : "Business Dashboard"}
+                  fill
+                  className="object-cover rounded-lg"
+                  priority
+                />
+              </motion.div>
+            </div>
+
+            {/* Label */}
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: "easeOut", delay: 0.3 }}
+              className="absolute top-4 left-4 bg-black/70 backdrop-blur-md rounded-full px-4 py-2 text-white font-medium text-sm"
+            >
+              {hovered ? "Individual" : "Business"}
+            </motion.div>
+          </motion.div>
+        </motion.div>
+        {/* Buttons */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.5 }}
+          className="mt-12 flex justify-center gap-4 flex-wrap"
+        >
+          <Link href="#hero">
+            <button className="group inline-flex items-center gap-2 px-6 py-3 bg-black text-white font-medium rounded-md text-sm hover:bg-gray-900 transition-all">
+              Post Tender
+              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+            </button>
+          </Link>
+          <Link href="/signup">
+            <button className="group inline-flex items-center gap-2 px-6 py-3 bg-white text-black rounded-md font-medium text-sm hover:bg-gray-900 hover:text-white transition-all border border-gray-300">
+              Start Bidding
+              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+            </button>
+          </Link>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
 /* -------------------------------------------------------------------------- */
 /* PAGE EXPORT */
 /* -------------------------------------------------------------------------- */
@@ -1458,17 +1562,17 @@ export default function Home() {
   return (
     <LenisScroll>
       <div className="min-h-screen">
+        <Background />
         <PageTransitionWrapper>
           <Navbarlanding />
           <Hero />
+          <DashboardShowcase />
           <About />
           <Process />
-          <Features />
           <Services />
+          <Features />
           <Problems />
-          {/* <Testimonials /> */}
-          <SaasVideo />
-          <PricingSection />
+          <PricingSection /> <SaasVideo />
           <FAQ2 />
           <CTA />
           <Footer />

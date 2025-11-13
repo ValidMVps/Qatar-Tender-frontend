@@ -112,7 +112,7 @@ export async function POST(req: Request) {
     `;
 
     const data = await resend.emails.send({
-      from: "Go Tenderly Contact <onboarding@resend.dev>", // temporary sender
+      from: "Go Tenderly Contact <onboarding@resend.dev>",
       to: process.env.SUPPORT_EMAIL || "yourtestemail@gmail.com",
       subject: `Contact form message from ${safeName}`,
       html,

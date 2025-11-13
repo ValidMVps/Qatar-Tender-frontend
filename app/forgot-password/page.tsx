@@ -11,6 +11,7 @@ import Headerauth from "@/components/Headerauth";
 import { useToast } from "@/hooks/use-toast";
 import { authService } from "@/utils/auth";
 import useTranslation from "@/lib/hooks/useTranslation";
+import NavbarLanding from "@/components/Navbarladning";
 
 export default function ForgotPasswordForm() {
   const [step, setStep] = useState<"email" | "otp">("email");
@@ -96,7 +97,7 @@ export default function ForgotPasswordForm() {
 
   return (
     <div className="min-h-screen p-0 bg-gray-100">
-      <Headerauth />
+      <NavbarLanding />
       <div className="flex justify-center items-center h-full p-0">
         <div className="min-h-screen flex w-full items-center justify-center">
           <div className="flex w-full items-center justify-center">
