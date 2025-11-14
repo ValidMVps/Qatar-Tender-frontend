@@ -135,7 +135,7 @@
   opacity: 1;
   visibility: visible;
 }
-html{
+html {
   scroll-behavior: smooth;
 }
 :root {

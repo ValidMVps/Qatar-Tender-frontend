@@ -8,6 +8,7 @@ import emailjs from "emailjs-com";
 import { Mail, Phone, MapPin, Check, Loader2 } from "lucide-react";
 import NavbarLanding from "@/components/Navbarladning";
 import Footer from "@/components/Footer";
+import Background from "@/components/animations/Background";
 
 // Zod Schema
 const formSchema = z.object({
@@ -63,6 +64,7 @@ export default function Home() {
   return (
     <>
       <NavbarLanding />
+                <Background />
 
       {/* Hero Contact */}
       <section className="px-5 md:px-10 py-20 md:py-24 lg:py-48">
@@ -83,9 +85,8 @@ export default function Home() {
 
               <div className="space-y-4">
                 {[
-                  { Icon: Mail, text: "hello@tender.io" },
-                  { Icon: Phone, text: "+1 (555) 000-0000" },
-                  { Icon: MapPin, text: "123 Sample St, Sydney NSW 2000 AU" },
+                  { Icon: Mail, text: "support@gotenderly.com" },
+                  { Icon: Phone, text: "+974 1234 5678" },
                 ].map(({ Icon, text }, i) => (
                   <div
                     key={i}
@@ -111,7 +112,7 @@ export default function Home() {
                   {...register("name")}
                   id="name"
                   type="text"
-                  className="w-full rounded- border-b border-gray-300 bg-white px-4 py-3 pb-5 text-sm focus:border-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-200"
+                  className="w-full rounded- border-b border-gray-300  px-4 py-3 pb-5 text-sm  focus:outline-none "
                 />
                 {errors.name && (
                   <p className="mt-1 text-xs text-red-600">
@@ -131,7 +132,7 @@ export default function Home() {
                   {...register("email")}
                   id="email"
                   type="email"
-                  className="w-full rounded- border-b border-gray-300 bg-white px-4 py-3 pb-5 text-sm focus:border-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-200"
+                  className="w-full rounded- border-b border-gray-300  px-4 py-3 pb-5 text-sm  focus:outline-none"
                 />
                 {errors.email && (
                   <p className="mt-1 text-xs text-red-600">
@@ -152,7 +153,7 @@ export default function Home() {
                   id="message"
                   rows={5}
                   placeholder="Your message..."
-                  className="w-full rounded- border-b border-gray-300 bg-white px-4 py-3 pb-5 text-sm focus:border-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-200 resize-none"
+                  className="w-full rounded- border-b border-gray-300  px-4 py-3 pb-5 text-sm  focus:outline-none resize-none"
                 />
                 {errors.message && (
                   <p className="mt-1 text-xs text-red-600">

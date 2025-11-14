@@ -4,7 +4,7 @@ import Image from "next/image";
 
 export default function Background() {
   return (
-    <div className="fixed inset-0 overflow-hidden pointer-events-none bg-gray-50 -z-10 opacity-50">
+    <div className="fixed inset-0 overflow-hidden pointer-events-none bg-gray-50 -z-10 opacity-100">
       {/* Base Background */}
       <div
         className="absolute inset-0 "

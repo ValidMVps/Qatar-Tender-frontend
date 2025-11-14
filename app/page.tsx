@@ -546,7 +546,7 @@ function CTA() {
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="relative overflow-hidden rounded-sm border border-white/10 bg-gray-100 p-8 sm:p-12 lg:p-20"
+          className="relative overflow-hidden rounded-lg border border-white/10 bg-gray-100 p-8 sm:p-12 lg:p-20"
         >
           <div className="relative z-10 max-w-3xl mx-auto text-center">
             <motion.h2
@@ -878,7 +878,7 @@ function Services() {
   return (
     <section
       id="services"
-      className="px-4 sm:px-6 py-16 md:py-24 lg:py-32 bg-gray-50/30 overflow-hidden"
+      className="px-4 sm:px-6 py-16 md:py-24 lg:py-32 bg-gray-50/90 overflow-hidden"
     >
       <div className="max-w-7xl mx-auto">
         {/* ---------- Header ---------- */}
@@ -1075,7 +1075,7 @@ function Problems() {
     },
     {
       title:
-        "Briefing vendors – Compare price, ETA, and notes in one view — no need to repeat the same brief to every vendor.",
+        "Briefing vendors – Compare price, ETA, and notes in one view  no need to repeat the same brief to every vendor.",
     },
     {
       title:
@@ -1097,63 +1097,78 @@ function Problems() {
   return (
     <section
       id="problems"
-      className="mx-auto bg-gray-50/30 px-4 sm:px-6 py-16 md:py-24 lg:py-32"
+      className="mx-auto px-4 sm:px-6 py-16 md:py-24 lg:py-32 bg-gray-50/30 relative overflow-hidden"
+      style={{
+        backdropFilter: "blur(12px)",
+        WebkitBackdropFilter: "blur(12px)",
+      }}
     >
+      {/* Optional: Subtle animated background blobs for depth */}
+      <div className="absolute inset-0 -z-10 overflow-hidden">
+        <div className="absolute -top-40 -left-40 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute -bottom-40 -right-40 w-80 h-80 bg-teal-500/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+      </div>
+
       <div className="max-w-7xl mx-auto">
-        {" "}
         <div className="max-w-3xl mx-auto text-center mb-12 md:mb-16">
-          <h2 className="mt-3 text-3xl sm:text-4xl md:text-5xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight">
+          <h2 className="mt-3 text-3xl sm:text-4xl md:text-5xl font-medium font-outfit text-black  leading-tight">
             The smarter way to handle <br /> Projects in Qatar
           </h2>
-          <p className="mt-4 text-base md:text-lg font-normal font-inter text-Color-Scheme-1-Text leading-7">
+          <p className="mt-4 text-base md:text-lg font-normal font-inter text-black/80  leading-7">
             The platform every bidder and client actually loves.
           </p>
         </div>
+
         <div className="mt-12">
-          <Card className="border-muted overflow-hidden">
-            <CardContent className="p-0">
+          {/* Glass Card */}
+          <div
+            className="rounded-2xl border border-white/20  shadow-sm backdrop-blur-xl"
+            style={{
+              background: "rgba(255, 255, 255, 0.12)",
+            }}
+          >
+            <div className="p-0">
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   {/* Header */}
                   <thead>
-                    <tr className="border-b bg-muted/10">
-                      <th className="px-6 py-4 text-xs md:text-sm font-medium text-muted-foreground w-1/2 min-w-[250px]">
+                    <tr className="border-b border-white/10">
+                      <th className="px-6 py-5 text-xs md:text-sm font-medium text-black/70 w-1/2 min-w-[250px]">
                         Problem / Feature
                       </th>
-                      <th className="px-6 py-4 text-xs md:text-sm font-medium text-primary w-1/4 text-center">
+                      <th className="px-6 py-5 text-xs md:text-sm font-medium text-emerald-400 w-1/4 text-center">
                         Tenderly
                       </th>
-                      <th className="px-6 py-4 text-xs md:text-sm font-medium text-muted-foreground w-1/4 text-center">
+                      <th className="px-6 py-5 text-xs md:text-sm font-medium text-black/50 w-1/4 text-center">
                         Other platforms
                       </th>
                     </tr>
                   </thead>
-
                   {/* Body */}
                   <tbody>
                     {rows.map(({ title }, i) => (
                       <tr
                         key={i}
-                        className={`border-b last:border-b-0 transition-colors hover:bg-muted/50 ${
-                          i % 2 === 0 ? "bg-muted/30" : "bg-background"
-                        }`}
+                        className={`
+                      border-b border-white/5 last:border-b-0 transition-all duration-200
+                      hover:bg-white/5
+                      ${i % 2 === 0 ? "bg-white/5" : "bg-transparent"}
+                    `}
                       >
-                        {/* Expanded title with both descriptions */}
-                        <td className="px-6 py-5 text-xs md:text-sm font-medium text-foreground align-top leading-6">
+                        {/* Problem/Feature Title */}
+                        <td className="px-6 py-5 text-xs md:text-sm font-medium text-black align-top leading-6">
                           {title}
                         </td>
-
-                        {/* Tick only */}
+                        {/* Check Icon */}
                         <td className="px-6 py-5 text-center">
-                          <span className="inline-block text-2xl font-bold text-green-600">
-                            <Check />
+                          <span className="inline-flex items-center justify-center w-8 h-8 rounded-full  text-emerald-400">
+                            <Check className="w-8 h-8" />
                           </span>
                         </td>
-
-                        {/* Cross only */}
+                        {/* Cross Icon */}
                         <td className="px-6 py-5 text-center">
-                          <span className="inline-block text-2xl font-bold text-red-600">
-                            <X />
+                          <span className="inline-flex items-center justify-center w-8 h-8 rounded-full  text-red-400">
+                            <X className="w-8 h-8" />
                           </span>
                         </td>
                       </tr>
@@ -1161,8 +1176,8 @@ function Problems() {
                   </tbody>
                 </table>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -1204,17 +1219,17 @@ function PricingSection() {
                   <span className="ml-2 text-gray-500 text-base">forever</span>
                 </div>
                 <p className="mt-4 text-gray-600 text-base leading-6">
-                  Launch your project journey with unlimited tender postings —
+                  Launch your project journey with unlimited tender postings ,
                   no cost, no limits.
                 </p>
               </div>
 
               <Link href="#hero">
                 <Button
-                  variant="outline"
-                  className="mt-8 w-full font-semibold rounded-md text-base transition-all duration-200"
+                  variant="secondary"
+                  className="mt-8 w-full bg-black/90 text-white font-normal rounded-md text-base transition-all duration-200"
                 >
-                  Get Started — Post a Tender
+                  Get Started, Post a Tender
                 </Button>
               </Link>
             </CardContent>
@@ -1239,12 +1254,12 @@ function PricingSection() {
                 </p>
               </div>
 
-              <Link href="/tenders">
+              <Link href="#hero">
                 <Button
-                  variant="outline"
-                  className="mt-8 w-full font-semibold rounded-md text-base transition-all duration-200"
+                  variant="secondary"
+                  className="mt-8 w-full  bg-black/90 text-white font-normal rounded-md text-base transition-all duration-200"
                 >
-                  Get Started — Browse Tenders
+                  Get Started, Browse Tenders
                 </Button>
               </Link>
             </CardContent>
@@ -1560,24 +1575,25 @@ function DashboardShowcase() {
 /* -------------------------------------------------------------------------- */
 export default function Home() {
   return (
-    <LenisScroll>
-      <div className="min-h-screen">
-        <Background />
-        <PageTransitionWrapper>
-          <Navbarlanding />
-          <Hero />
-          <DashboardShowcase />
-          <About />
-          <Process />
-          <Services />
-          <Features />
-          <Problems />
-          <PricingSection /> <SaasVideo />
-          <FAQ2 />
-          <CTA />
-          <Footer />
-        </PageTransitionWrapper>
-      </div>
-    </LenisScroll>
+   <LenisScroll>
+  <div className="min-h-screen">
+    <Background />
+    <PageTransitionWrapper>
+      <Navbarlanding />
+      <Hero />
+      <DashboardShowcase />
+      <About />
+      <Process />
+      <Services />
+      <Features />
+      <Problems />       
+      <PricingSection />
+      <SaasVideo />
+      <FAQ2 />
+      <CTA />
+      <Footer />
+    </PageTransitionWrapper>
+  </div>
+</LenisScroll>
   );
 }

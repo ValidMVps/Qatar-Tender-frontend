@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { authService } from "@/utils/auth";
 import useTranslation from "@/lib/hooks/useTranslation";
 import NavbarLanding from "@/components/Navbarladning";
+import Background from "@/components/animations/Background";
 
 export default function ForgotPasswordForm() {
   const [step, setStep] = useState<"email" | "otp">("email");
@@ -96,18 +97,19 @@ export default function ForgotPasswordForm() {
   };
 
   return (
-    <div className="min-h-screen p-0 bg-gray-100">
+    <div className="min-h-screen p-0 bg-gray-10">
       <NavbarLanding />
+      <Background/>
       <div className="flex justify-center items-center h-full p-0">
         <div className="min-h-screen flex w-full items-center justify-center">
           <div className="flex w-full items-center justify-center">
-            <Card className="w-md border border-neutral-200">
+            <Card className="w-md border bg-white/60 border-neutral-200">
               <CardContent>
                 <div className="space-y-6 py-7 w-full max-w-md mx-auto">
                   {step === "email" && (
                     <form onSubmit={handleEmailSubmit} className="space-y-6">
                       <div className="text-center">
-                        <h1 className="text-2xl font-bold">Forgot Password</h1>
+                        <h1 className="text-2xl font-bold">Forget Password</h1>
                         <p className="text-sm text-muted-foreground mt-1">
                           Enter your email and we’ll send you an OTP.
                         </p>

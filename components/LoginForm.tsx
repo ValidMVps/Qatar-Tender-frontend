@@ -56,7 +56,7 @@ export default function LoginForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-6 bg-white rounded-xl p-0 sm:p-0">
+    <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-6 rounded-xl p-0 sm:p-0">
       {/* Email */}
       <div>
         <label htmlFor="email" className="mb-2 block text-sm font-medium text-gray-900">

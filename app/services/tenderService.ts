@@ -144,7 +144,6 @@ export const createGuestTender = async (
 
   if (payload instanceof FormData) {
     init.body = payload;
-    // IMPORTANT: do NOT set Content-Type header for FormData — browser sets boundary
   } else {
     init.headers = {
       "Content-Type": "application/json",
@@ -176,7 +175,6 @@ export const claimGuestTender = async (payload: {
   tenderId: string;
   guestToken: string;
 }) => {
-  // this endpoint is protected — caller must be authenticated
   const res = await api.post("/api/tenders/claim", payload);
   return res.data; // { message, tender }
 };

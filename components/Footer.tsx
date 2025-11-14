@@ -10,11 +10,11 @@ import {
   Youtube,
   ArrowRight,
 } from "lucide-react";
-import logo from "../media/logo.png";
+import logo from "../media/favicon.png";
 
 export default function Footer() {
   return (
-    <footer className="bg-gray-50 w-full  absolute text-Color-Scheme-1-Text py-16 px-4 sm:px-6 lg:px-8 border-t border-white/10">
+    <footer className="bg-gray-50/70 w-full   text-Color-Scheme-1-Text py-16 px-4 sm:px-6 lg:px-8 border-t border-white/10">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8">
           {/* Logo and Description */}
@@ -33,7 +33,7 @@ export default function Footer() {
             </Link>
             <p className="text-sm md:text-base font-inter leading-relaxed opacity-80">
               Qatar’s open tender platform. Post projects, get bids, pick the
-              best — anonymous, fast, and fair.
+              best, anonymous, fast, and fair.
             </p>
           </div>
 
