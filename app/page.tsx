@@ -30,6 +30,11 @@ import {
   ChevronDown,
   CheckCheck,
   X,
+  PackageSearch,
+  FileCheck,
+  Send,
+  Megaphone,
+  FileText,
 } from "lucide-react";
 import logo from "../media/logo.png";
 import Hero from "@/components/Hero";
@@ -57,6 +62,8 @@ import individualdashboard from "../media/individual-dashboard.png";
 import tendersimage from "../media/Group 1.png";
 import biddersimage from "../media/Group 2.png";
 import Background from "@/components/animations/Background";
+import postenderimage from "../media/Frame 1.png";
+import postbidimage from "../media/Frame 2.png";
 const features: {
   image: string;
   alt: string;
@@ -189,25 +196,28 @@ const tenderSteps = [
     description:
       "Describe your requirements, set deadline, and publish instantly.",
     linkText: "Post now",
-    bgImage: tender1.src,
+    icon: FileText,
     href: "#hero",
+    image: postenderimage.src, // ✅ add image only here
   },
   {
     label: "Receive & compare bids",
     title: "Receive and compare bids",
     description: "Get multiple quotes and compare them side by side.",
     linkText: "Compare bids",
-    bgImage: tender2.src,
     href: "#hero",
+    icon: FileText,
+    iconColor: "text-blue-400",
   },
   {
     label: "Chat & award",
     title: "Chat and award",
     description:
-      "Negotiate and award the tender, identities revealed only after award.",
+      "Negotiate and award the tender — identities revealed only after award.",
     linkText: "Award tender",
-    bgImage: tender3.src,
     href: "#hero",
+    icon: Handshake,
+    iconColor: "text-blue-400",
   },
 ];
 
@@ -217,26 +227,28 @@ const bidderSteps = [
     title: "Find relevant tenders",
     description: "Browse and explore tenders that match your business needs.",
     linkText: "Browse tenders",
-    bgImage: tender4.src,
+    icon: FileCheck,
     href: "/tenders",
+    image: postbidimage.src, // ✅ add image only here
   },
   {
     label: "Prepare",
     title: "Prepare your quote",
-    description:
-      "Easily create and submit your quote to participate in tenders quickly.",
+    description: "Easily create and submit your quote with smart templates.",
     linkText: "Create quote",
-    bgImage: tender5.src,
     href: "/signup",
+    icon: FileCheck,
+    iconColor: "text-blue-400",
   },
   {
     label: "Submit",
     title: "Submit your bid securely",
     description:
-      "Send a secure submission with audit trail and track status in one place.",
+      "Secure submission with full audit trail and real-time tracking.",
     linkText: "Submit bid",
-    bgImage: tender6.src,
     href: "/signup",
+    icon: Send,
+    iconColor: "text-blue-400",
   },
 ];
 
@@ -245,102 +257,108 @@ function Process() {
   const steps = tab === "tender" ? tenderSteps : bidderSteps;
 
   return (
-    <section
-      id="process"
-      className="px-4 sm:px-6 py-16 md:py-24 lg:py-32 bg-white"
-    >
+    <section id="process" className="px-4 sm:px-6 py-20 lg:py-32 bg-white">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="max-w-3xl mx-auto text-center mb-8">
-          <h2 className="mt-2 text-3xl sm:text-4xl md:text-5xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight">
-            How GoTenderly works
+        <div className="text-center mb-16">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-black">
+            How GoTenderly{" "}
+            <span className=" decoration-black/20">Works</span>
           </h2>
+          <p className="mt-6 sm:mt-9 text-base sm:text-lg text-gray-700 max-w-3xl mx-auto px-4">
+            {tab === "tender"
+              ? "Create detailed project specifications and receive qualified bids from verified suppliers."
+              : "Browse tender opportunities, prepare accurate quotes and submit them with confidence."}
+          </p>
 
           {/* Tabs */}
-          <div className="mt-6 flex items-center justify-center gap-3">
-            <div
-              role="tablist"
-              aria-label="Process tabs"
-              className="inline-flex rounded-md bg-white/30 p-1"
-            >
+          <div className="mt-7 flex justify-center">
+            <div className="inline-flex items-center rounded-xl bg-gray-100 border border-gray-300 p-1">
               <button
-                role="tab"
-                aria-selected={tab === "tender"}
                 onClick={() => setTab("tender")}
-                className={`px-4 py-2 rounded-md text-sm md:text-base font-medium ${
+                className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg text-sm sm:text-base font-medium transition ${
                   tab === "tender"
-                    ? "bg-white -sm text-Color-Scheme-1-Text"
-                    : "text-muted-foreground hover:bg-white/60"
-                } transition`}
+                    ? "bg-black text-white"
+                    : "text-black hover:bg-gray-200"
+                }`}
               >
-                Tenderer
+                For Tenderers
               </button>
+
               <button
-                role="tab"
-                aria-selected={tab === "bidder"}
                 onClick={() => setTab("bidder")}
-                className={`px-4 py-2 rounded-md text-sm md:text-base font-medium ${
+                className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg text-sm sm:text-base font-medium transition ${
                   tab === "bidder"
-                    ? "bg-white -sm text-Color-Scheme-1-Text"
-                    : "text-muted-foreground hover:bg-white/60"
-                } transition`}
+                    ? "bg-black text-white"
+                    : "text-black hover:bg-gray-200"
+                }`}
               >
-                Bidder
+                For Bidders
               </button>
             </div>
           </div>
-
-          {/* Tab-specific intro */}
-          <p className="mt-4 text-base md:text-lg font-normal font-inter text-Color-Scheme-1-Text leading-7">
-            {tab === "tender"
-              ? "Create detailed project specifications in minutes and receive qualified bids from verified suppliers."
-              : "Browse tailored tender opportunities, prepare accurate quotes with templates and submit bids with confidence."}
-          </p>
         </div>
 
-        {/* Process Steps - Responsive Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-          {steps.map((step, index) => (
-            <Link key={index} href={step.href || "#"} className="block">
-              <div
-                className="group relative min-h-[400px] sm:min-h-[500px] md:min-h-[540px] lg:min-h-[580px] rounded-md overflow-hidden -lg transition-transform hover:scale-[1.02]"
-                style={{
-                  backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.1)), url('${step.bgImage}')`,
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                }}
+        {/* Responsive Bento Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-12 gap-6 auto-rows-[minmax(200px,auto)]">
+          {steps.map((step, index) => {
+            const Icon = step.icon;
+
+            const gridSpan =
+              index === 0
+                ? "col-span-1 sm:col-span-2 md:col-span-4 lg:col-span-6 row-span-2"
+                : index === 1
+                ? "col-span-1 sm:col-span-2 md:col-span-4 lg:col-span-6"
+                : "col-span-1 sm:col-span-2 md:col-span-4 lg:col-span-6";
+
+            return (
+              <Link
+                key={index}
+                href={step.href}
+                className={`group relative block w-full rounded-3xl bg-gray-50/50 border border-gray-100 p-6 sm:p-8 transition hover:bg-gray-50 ${gridSpan}`}
               >
-                {/* Content */}
-                <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 text-white z-10">
-                  <div className="flex flex-col gap-3">
-                    <span className="text-xs md:text-sm font-semibold font-inter uppercase tracking-wider opacity-90">
+                <div className="flex flex-col w-full h-full justify-between">
+                  <div className="w-full">
+                    <span className="mt-2 inline-block text-xs font-semibold uppercase tracking-wider text-gray-600">
                       {step.label}
                     </span>
-                    <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-medium font-outfit leading-tight">
+
+                    <h3 className="mt-3 text-xl sm:text-2xl md:text-3xl font-semibold text-black">
                       {step.title}
                     </h3>
+
+                    <p className="mt-3 text-sm sm:text-base text-gray-700 leading-relaxed">
+                      {step.description}
+                    </p>
                   </div>
-                  <p className="mt-4 text-sm md:text-base font-normal font-inter leading-relaxed opacity-95">
-                    {step.description}
-                  </p>
-                  <button className="mt-6 flex items-center gap-2 text-white text-sm md:text-base font-medium font-inter leading-6 hover:gap-3 transition-all">
+
+                  {step.image && (
+                    <div className="py-8 my-4 bg-white rounded-xl">
+                      <img
+                        src={step.image}
+                        alt={step.title}
+                        className="w-full h-36 sm:h-40 md:h-48 object-cover rounded-lg"
+                      />
+                    </div>
+                  )}
+
+                  <div className="mt-4 sm:mt-6 flex items-center gap-2 text-black font-medium">
                     <span>{step.linkText}</span>
                     <ArrowRight
                       size={18}
-                      className="transition-transform group-hover:translate-x-1"
+                      className="transition group-hover:translate-x-1"
                     />
-                  </button>
+                  </div>
                 </div>
-                {/* Hover overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-              </div>
-            </Link>
-          ))}
+              </Link>
+            );
+          })}
         </div>
       </div>
     </section>
   );
 }
+
 
 /* --------------------------- HowItWorksDetailed --------------------------- */
 function HowItWorksDetailed() {
@@ -688,7 +706,7 @@ const smallServices = [
   {
     title: "Automotive services (repair, detailing, tires)",
     description:
-      "HM’s SUV needs brake pads and a full detail. Not sure of fair pricing or downtime. HM posted the plate/model and preferred time window. Garages responded with parts options (OEM/aftermarket), ETAs, and warranty notes; a detailer asked in Q/A about interior shampoo vs. quick wash. HM picked a garage that offered pick-up/drop-off and a detail combo—problem solved in one go.",
+      "HM’s SUV needs brake pads and a full detail. Not sure of fair pricing or downtime. HM posted the plate/model and preferred time window. Garages responded with parts options (OEM/aftermarket), ETAs, and warranty notes; a detailer asked in Q/A about interior shampoo vs. quick wash. HM picked a garage that offered pick-up/drop-off and a detail combo , problem solved in one go.",
     linkText: "Browse",
     bgImage:
       "https://images.pexels.com/photos/279949/pexels-photo-279949.jpeg?auto=compress&cs=tinysrgb&w=600",
@@ -706,7 +724,7 @@ const smallServices = [
   {
     title: "Construction & renovation (small works, fit-outs, repairs)",
     description:
-      "AA wants a kitchen refresh—cabinet re-facing and new countertop. Past quotes were inconsistent and missed measurements. AB posted with drawings/photos and a rough timeline. Contractors used Q/A to ask about materials and site access; AB added dimensions. Comparable bids arrived with line-item costs and lead times. AB awarded one contractor and arranged a site visit after award.",
+      "AA wants a kitchen refres, cabinet re-facing and new countertop. Past quotes were inconsistent and missed measurements. AB posted with drawings/photos and a rough timeline. Contractors used Q/A to ask about materials and site access; AB added dimensions. Comparable bids arrived with line-item costs and lead times. AB awarded one contractor and arranged a site visit after award.",
     linkText: "Compare now",
     bgImage:
       "https://images.pexels.com/photos/1216589/pexels-photo-1216589.jpeg?auto=compress&cs=tinysrgb&w=600",
@@ -958,7 +976,7 @@ const faqs = [
   {
     question: "I’m not sure how to write requirements.",
     answer:
-      "Use Tenderly’s Q/A feature: bidders and tenderers can ask and answer clarifying questions on the tender page to surface any unknown or missing details (scope, deliverables, timeline, acceptance criteria). This keeps everything transparent, comparable, and helps you receive accurate quotes—no guided templates needed.",
+      "Use Tenderly’s Q/A feature: bidders and tenderers can ask and answer clarifying questions on the tender page to surface any unknown or missing details (scope, deliverables, timeline, acceptance criteria). This keeps everything transparent, comparable, and helps you receive accurate quotes, no guided templates needed.",
   },
   {
     question: "What is Tenderly?",
@@ -1575,25 +1593,25 @@ function DashboardShowcase() {
 /* -------------------------------------------------------------------------- */
 export default function Home() {
   return (
-   <LenisScroll>
-  <div className="min-h-screen">
-    <Background />
-    <PageTransitionWrapper>
-      <Navbarlanding />
-      <Hero />
-      <DashboardShowcase />
-      <About />
-      <Process />
-      <Services />
-      <Features />
-      <Problems />       
-      <PricingSection />
-      <SaasVideo />
-      <FAQ2 />
-      <CTA />
-      <Footer />
-    </PageTransitionWrapper>
-  </div>
-</LenisScroll>
+    <LenisScroll>
+      <div className="min-h-screen">
+        <Background />
+        <PageTransitionWrapper>
+          <Navbarlanding />
+          <Hero />
+          <DashboardShowcase />
+          <About />
+          <Process />
+          <Services />
+          <Features />
+          <Problems />
+          <PricingSection />
+          <SaasVideo />
+          <FAQ2 />
+          <CTA />
+          <Footer />
+        </PageTransitionWrapper>
+      </div>
+    </LenisScroll>
   );
 }

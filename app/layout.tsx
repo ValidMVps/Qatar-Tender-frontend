@@ -58,7 +58,7 @@ export const metadata: Metadata = {
 
   // === FAVICONS (FIXED – this is the correct way in App Router) ===
   icons: {
-    icon: ["/favicon.png"], // ← 404-proof default
+    icon: ["/favicon.svg"], // ← 404-proof default
     shortcut: ["/favicon.png"],
     apple: ["/favicon.png"], // put apple-touch-icon.png in /public
     other: [

@@ -282,7 +282,7 @@ export default function Hero() {
           className="relative min-h-screen  items-center justify-center overflow-visible flex flex-col "
           id="hero"
         >
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20 w-full">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-22 md:py-20 w-full">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 items-center">
               {/* Left: Hero Text */}
               <motion.div
