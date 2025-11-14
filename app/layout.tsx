@@ -36,7 +36,7 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://gotenderly.com"),
   title: {
     default: "GoTenderly → Qatar's #1 Tender & Procurement Marketplace",
-    template: "%s | GoTenderly – Qatar Tenders",
+    template: "%s | GoTenderly, Qatar Tenders",
   },
   description:
     "Qatar’s fastest-growing tender marketplace. Find government & private tenders, submit bids, track opportunities, and win more contracts in Doha and across Qatar.",
@@ -59,20 +59,20 @@ export const metadata: Metadata = {
   // === FAVICONS (FIXED – this is the correct way in App Router) ===
   icons: {
     icon: ["/favicon.svg"], // ← 404-proof default
-    shortcut: ["/favicon.png"],
-    apple: ["/favicon.png"], // put apple-touch-icon.png in /public
+    shortcut: ["/favicon.svg"],
+    apple: ["/favicon.svg"], // put apple-touch-icon.png in /public
     other: [
       {
         rel: "icon",
         type: "image/png",
         sizes: "32x32",
-        url: "/favicon.png",
+        url: "/favicon.svg",
       },
       {
         rel: "icon",
         type: "image/png",
         sizes: "16x16",
-        url: "/favicon.png",
+        url: "/favicon.svg",
       },
     ],
   },
@@ -89,7 +89,7 @@ export const metadata: Metadata = {
         url: "/og-image.jpg", // 1200×630 recommended – put in /public
         width: 1200,
         height: 630,
-        alt: "GoTenderly – Qatar Tender Marketplace",
+        alt: "GoTenderly, Qatar Tender Marketplace",
       },
     ],
     locale: "en_US",
