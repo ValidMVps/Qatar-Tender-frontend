@@ -10,7 +10,7 @@ import {
   Youtube,
   ArrowRight,
 } from "lucide-react";
-import logo from "../media/favicon.png";
+import logo from "../public/favicon.png";
 
 export default function Footer() {
   return (
