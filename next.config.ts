@@ -19,7 +19,6 @@ const nextConfig: NextConfig = {
     minimumCacheTTL: 60, // cache remote images for 60s (adjust if needed)
   },
   poweredByHeader: false, // removes "X-Powered-By" header for slightly faster responses
-  swcMinify: true, // faster minification using Next.js SWC compiler
   experimental: {
     scrollRestoration: true, // improves navigation performance
     optimizeCss: true, // auto CSS optimization (Next 13+)

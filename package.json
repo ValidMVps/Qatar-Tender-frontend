@@ -80,6 +80,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/react-google-recaptcha": "^2.1.9",
+    "critters": "^0.0.23",
     "eslint": "^9",
     "eslint-config-next": "15.4.5",
     "i18next-scanner": "^4.6.0",
