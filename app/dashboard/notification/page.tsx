@@ -370,6 +370,8 @@ const NotificationDemo = () => {
 
   const handleOpenNotification = async (n: any) => {
     const route = getNotificationRoute(n);
+    console.log("ROUTE →", route, n);
+
     if (!route) return;
 
     try {

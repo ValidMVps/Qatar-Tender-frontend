@@ -380,21 +380,22 @@ const NotificationDemo = () => {
     return formatDistanceToNow(date, { addSuffix: true });
   };
 
-  const handleOpenNotification = async (n: any) => {
-    const route = getNotificationRoute(n);
-    if (!route) return;
+const handleOpenNotification = async (n: any) => {
+  const route = getNotificationRoute(n);
+  console.log("ROUTE →", route, n);
 
-    try {
-      if (!n.isRead && markAsRead) {
-        await markAsRead(n._id);
-      }
-    } catch (err) {
-      console.error("markAsRead failed:", err);
-    } finally {
-      router.push(route);
+  if (!route) return;
+
+  try {
+    if (!n.isRead && markAsRead) {
+      await markAsRead(n._id);
     }
-  };
-
+  } catch (err) {
+    console.error("markAsRead failed:", err);
+  } finally {
+    router.push(route);
+  }
+};
   return (
     <div className="mx-auto p-4 sm:p-6 w-full">
       <div className="bg-white/95 backdrop-blur-2xl rounded-2xl sm:rounded-3xl border border-slate-200/40 overflow-hidden shadow-xl shadow-slate-200/20">
