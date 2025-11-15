@@ -136,7 +136,7 @@ interface Bid {
 }
 
 export default function TenderDetailPage() {
-  const { profile } = useAuth();
+  const { profile, user } = useAuth();
   const { t } = useTranslation();
   const params = useParams();
   const router = useRouter();
@@ -344,7 +344,7 @@ export default function TenderDetailPage() {
     }).format(amount);
   };
 
-  const isTenderOwner = profile?._id === tender?.postedBy?._id;
+  const isTenderOwner = user?._id === tender?.postedBy?._id;
   const deadline = tender?.deadline ? new Date(tender.deadline) : null;
   const isDeadlinePassed = deadline ? deadline < new Date() : false;
   const canBeMadeActive = tender?.status === "draft" && !isDeadlinePassed;
@@ -410,7 +410,41 @@ export default function TenderDetailPage() {
       </div>
     );
   }
+  if (!isTenderOwner) {
+    // Optional: Log attempt for security
+    console.log(
+      "Unauthorized access attempt to tender:",
+      tender.postedBy._id,
+      "by user:",
+      user?._id
+    );
 
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="flex flex-col items-center justify-center min-h-screen px-4">
+          <div className="bg-white rounded-md shadow-none border border-gray-100 p-6 sm:p-8 text-center max-w-md w-full">
+            <div className="w-16 h-16 bg-yellow-50 rounded-full flex items-center justify-center mx-auto mb-4">
+              <LockIcon className="h-8 w-8 text-yellow-600" />
+            </div>
+            <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
+              Access Restricted
+            </h3>
+            <p className="text-gray-600 leading-relaxed mb-6">
+              You do not have permission to view this tender. Only the tender
+              owner can access this page.
+            </p>
+            <Button
+              onClick={() => router.push("/tenders")}
+              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 sm:px-6 sm:py-2.5 rounded-full font-medium transition-all text-sm sm:text-base"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Tenders
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
   return (
     <PageTransitionWrapper>
       <div className="min-h-screen">

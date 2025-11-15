@@ -19,6 +19,7 @@ export default function NavbarLanding() {
     { name: "Features", href: "#features" },
     { name: "How it works", href: "#process" },
     { name: "Pricing", href: "#pricing" },
+    { name: "Blogs", href: "/blog" },
     { name: "FAQ", href: "#faq" },
     { name: "Contact", href: "/contact" },
   ];
@@ -51,7 +52,7 @@ export default function NavbarLanding() {
               <Link
                 key={item.name}
                 href={item.href}
-                className="text-sm text-black hover:text-gray-600 transition-colors"
+                className="text-md text-black hover:text-gray-600 hover:underline transition-all"
               >
                 {item.name}
               </Link>
