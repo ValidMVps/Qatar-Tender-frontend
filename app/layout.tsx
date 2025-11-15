@@ -9,7 +9,9 @@ import { ThemeProvider } from "@/components/DarkFilterController";
 import { NotificationProvider } from "@/context/NotificationContext";
 import { Toaster } from "@/components/ui/toaster";
 
-// Local Switzer font
+/* -------------------------------------------------
+   LOCAL FONT – Switzer
+   ------------------------------------------------- */
 const switzer = localFont({
   src: [
     {
@@ -32,6 +34,9 @@ const switzer = localFont({
   display: "swap",
 });
 
+/* -------------------------------------------------
+   VIEWPORT & METADATA
+   ------------------------------------------------- */
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
@@ -68,33 +73,19 @@ export const metadata: Metadata = {
   creator: "GoTenderly",
   publisher: "GoTenderly",
 
-  // === FAVICONS (SVG KEPT + FULL SUPPORT) ===
+  // ---------- ICONS ----------
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",
-    apple: "/apple-touch-icon.png", // 180x180 PNG in /public
+    apple: "/apple-touch-icon.png",
     other: [
-      {
-        rel: "icon",
-        type: "image/svg+xml",
-        url: "/favicon.svg",
-      },
-      {
-        rel: "alternate icon",
-        type: "image/png",
-        sizes: "32x32",
-        url: "/favicon-32x32.png", // fallback
-      },
-      {
-        rel: "alternate icon",
-        type: "image/png",
-        sizes: "16x16",
-        url: "/favicon-16x16.png",
-      },
+      { rel: "icon", type: "image/svg+xml", url: "/favicon.svg" },
+      { rel: "icon", type: "image/png", sizes: "32x32", url: "/favicon-32x32.png" },
+      { rel: "icon", type: "image/png", sizes: "16x16", url: "/favicon-16x16.png" },
     ],
   },
 
-  // === OPEN GRAPH ===
+  // ---------- OPEN GRAPH ----------
   openGraph: {
     title: "GoTenderly → Qatar's #1 Tender Marketplace",
     description:
@@ -113,7 +104,7 @@ export const metadata: Metadata = {
     type: "website",
   },
 
-  // === TWITTER ===
+  // ---------- TWITTER ----------
   twitter: {
     card: "summary_large_image",
     title: "GoTenderly → Qatar's #1 Tender Marketplace",
@@ -123,7 +114,7 @@ export const metadata: Metadata = {
     site: "@GoTenderly",
   },
 
-  // === ROBOTS & VERIFICATION ===
+  // ---------- ROBOTS ----------
   robots: {
     index: true,
     follow: true,
@@ -135,11 +126,13 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
+
+  // ---------- VERIFICATION ----------
   verification: {
     google: "YOUR_GOOGLE_SITE_VERIFICATION_CODE",
   },
 
-  // === MULTILINGUAL (English + Arabic) ===
+  // ---------- MULTILINGUAL ----------
   alternates: {
     canonical: "https://gotenderly.com",
     languages: {
@@ -150,49 +143,41 @@ export const metadata: Metadata = {
   },
 };
 
+/* -------------------------------------------------
+   ROOT LAYOUT
+   ------------------------------------------------- */
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={switzer.variable}>
+    <html lang="en" className={`${switzer.variable} scroll-smooth`}>
       <head>
-        {/* === FONT PRELOAD === */}
-        <link
-          rel="preload"
-          href="/fonts/WEB/fonts/Switzer-Regular.woff2"
-          as="font"
-          type="font/woff2"
-          crossOrigin="anonymous"
-        />
-        <link
-          rel="preload"
-          href="/fonts/WEB/fonts/Switzer-Medium.woff2"
-          as="font"
-          type="font/woff2"
-          crossOrigin="anonymous"
-        />
-        <link
-          rel="preload"
-          href="/fonts/WEB/fonts/Switzer-Semibold.woff2"
-          as="font"
-          type="font/woff2"
-          crossOrigin="anonymous"
-        />
+        {/* ---------- FONT PRELOAD ---------- */}
+        {[
+          "Switzer-Regular",
+          "Switzer-Medium",
+          "Switzer-Semibold",
+        ].map((name) => (
+          <link
+            key={name}
+            rel="preload"
+            href={`/fonts/WEB/fonts/${name}.woff2`}
+            as="font"
+            type="font/woff2"
+            crossOrigin="anonymous"
+          />
+        ))}
 
-        {/* === HREFLANG TAGS === */}
+        {/* ---------- HREFLANG (only once) ---------- */}
         <link rel="alternate" hrefLang="en" href="https://gotenderly.com" />
         <link rel="alternate" hrefLang="ar" href="https://gotenderly.com/ar" />
-        <link
-          rel="alternate"
-          hrefLang="x-default"
-          href="https://gotenderly.com"
-        />
+        <link rel="alternate" hrefLang="x-default" href="https://gotenderly.com" />
 
-        {/* === STRUCTURED DATA: Organization === */}
+        {/* ---------- STRUCTURED DATA: Organization ---------- */}
         <Script
-          id="structured-data-org"
+          id="org-jsonld"
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
@@ -202,8 +187,7 @@ export default function RootLayout({
               name: "GoTenderly",
               url: "https://gotenderly.com",
               logo: "https://gotenderly.com/media/logo.png",
-              description:
-                "Qatar's leading anonymous tender and bidding platform.",
+              description: "Qatar's leading anonymous tender and bidding platform.",
               sameAs: [
                 "https://twitter.com/GoTenderly",
                 "https://linkedin.com/company/gotenderly",
@@ -222,9 +206,9 @@ export default function RootLayout({
           }}
         />
 
-        {/* === STRUCTURED DATA: FAQ (from your landing page) === */}
+        {/* ---------- STRUCTURED DATA: FAQ ---------- */}
         <Script
-          id="structured-data-faq"
+          id="faq-jsonld"
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
@@ -268,12 +252,12 @@ export default function RootLayout({
           }}
         />
 
-        {/* === GOOGLE ANALYTICS === */}
+        {/* ---------- GOOGLE ANALYTICS ---------- */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"
           strategy="afterInteractive"
         />
-        <Script id="google-analytics" strategy="afterInteractive">
+        <Script id="ga-config" strategy="afterInteractive">
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
@@ -285,15 +269,15 @@ export default function RootLayout({
           `}
         </Script>
 
-        {/* === TWEAKCn LIVE PREVIEW (optional) === */}
-        <Script
-          id="tweakcn-live-preview"
+        {/* ---------- OPTIONAL: TweakCN live preview ---------- */}
+        {/* <Script
+          id="tweakcn"
           strategy="afterInteractive"
           src="https://tweakcn.com/live-preview.min.js"
-        />
+        /> */}
       </head>
 
-      <body className="antialiased">
+      <body className="antialiased gh">
         <ThemeProvider>
           <AuthProvider>
             <NotificationProvider>
