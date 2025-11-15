@@ -4,16 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import {
   ArrowRight,
   Check,
-  MessageSquare,
-  Shield,
-  Users,
-  Award,
   Briefcase,
-  Facebook,
-  Instagram,
-  Twitter,
-  Linkedin,
-  Youtube,
   Handshake,
   Calendar,
   Building2,
@@ -28,12 +19,9 @@ import {
   Plus,
   Play,
   ChevronDown,
-  CheckCheck,
   X,
-  PackageSearch,
   FileCheck,
   Send,
-  Megaphone,
   FileText,
 } from "lucide-react";
 import logo from "../media/logo.png";
@@ -45,14 +33,7 @@ import { Button } from "@/components/ui/button";
 import PageTransitionWrapper from "@/components/animations/PageTransitionWrapper";
 import LenisScroll from "@/components/LenisWrapper";
 import Footer from "@/components/Footer";
-import tender1 from "../media/1.png";
-import tender2 from "../media/2.png";
-import tender3 from "../media/3.png";
-import tender4 from "../media/4.png";
-import tender5 from "../media/5.png";
-import tender6 from "../media/6.png";
 import Link from "next/link";
-import aboutimage from "../media/unnamed (3).jpg";
 import feature1 from "../media/unnamed.jpg";
 import feature2 from "../media/unnamed (1).jpg";
 import feature3 from "../media/unnamed2.jpg";
@@ -64,6 +45,7 @@ import biddersimage from "../media/Group 2.png";
 import Background from "@/components/animations/Background";
 import postenderimage from "../media/Frame 1.png";
 import postbidimage from "../media/Frame 2.png";
+
 const features: {
   image: string;
   alt: string;
@@ -101,18 +83,21 @@ function Features() {
     <section
       id="features"
       className="self-stretch px-4 bg-white sm:px-16 py-16 md:py-24 lg:py-32 bg-Color-Scheme-1-Background flex flex-col justify-start items-center overflow-hidden"
+      aria-labelledby="features-heading"
     >
       <div className="w-full max-w-[1280px] flex flex-col justify-start items-start gap-12">
         {/* ---------- Header ---------- */}
-        <div className="w-full max-w-[768px] flex flex-col justify-start items-start gap-4">
-          <h2 className="text-Color-Scheme-1-Text text-3xl sm:text-4xl md:text-5xl font-medium font-outfit leading-tight">
+        <header className="w-full max-w-[768px] flex flex-col justify-start items-start gap-4">
+          <h1
+            id="features-heading"
+            className="text-Color-Scheme-1-Text text-3xl sm:text-4xl md:text-5xl font-medium font-outfit leading-tight"
+          >
             Powerful tools for seamless Project Management
-          </h2>
+          </h1>
           <p className="text-Color-Scheme-1-Text text-base md:text-lg font-normal font-inter leading-7">
             Designed to simplify your projects and bidding experience.
           </p>
-        </div>
-
+        </header>
         {/* ---------- Feature Cards ---------- */}
         <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {features.map((feature, idx) => (
@@ -130,15 +115,14 @@ function Features() {
                   className="object-contain"
                 />
               </div>
-
               {/* Text content */}
               <div className="p-5 flex flex-col gap-3">
-                <h3
+                <h2
                   id={`feature-${idx}-title`}
                   className="text-Color-Scheme-1-Text text-xl sm:text-2xl font-medium font-outfit leading-tight"
                 >
                   {feature.title}
-                </h3>
+                </h2>
                 <p className="text-Color-Scheme-1-Text text-sm md:text-base font-normal font-inter leading-6">
                   {feature.description}
                 </p>
@@ -146,7 +130,6 @@ function Features() {
             </article>
           ))}
         </div>
-
         {/* ---------- CTA ---------- */}
         <div className="flex items-center gap-4 pt-2">
           <Link href="/signup">
@@ -160,35 +143,6 @@ function Features() {
   );
 }
 
-const processSteps = [
-  {
-    label: "Post",
-    title: "Post your tender",
-    description:
-      "Describe your requirements, set deadline, and publish instantly",
-    linkText: "Post now",
-    bgImage:
-      "https://images.pexels.com/photos/3184360/pexels-photo-3184360.jpeg?auto=compress&cs=tinysrgb&w=384&h=630",
-  },
-  {
-    label: "Receive & compare bids",
-    title: "Receive and compare bids",
-    description: "Get multiple quotes and compare them side by side",
-    linkText: "Compare bids",
-    bgImage:
-      "https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=384&h=630",
-  },
-  {
-    label: "Chat & award",
-    title: "Chat and award",
-    description:
-      "Negotiate and award the tender, identities revealed only after award",
-    linkText: "Award tender",
-    bgImage:
-      "https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg?auto=compress&cs=tinysrgb&w=384&h=630",
-  },
-];
-
 const tenderSteps = [
   {
     label: "Post",
@@ -198,7 +152,7 @@ const tenderSteps = [
     linkText: "Post now",
     icon: FileText,
     href: "#hero",
-    image: postenderimage.src, // ✅ add image only here
+    image: postenderimage.src, // add image only here
   },
   {
     label: "Receive & compare bids",
@@ -229,7 +183,7 @@ const bidderSteps = [
     linkText: "Browse tenders",
     icon: FileCheck,
     href: "/tenders",
-    image: postbidimage.src, // ✅ add image only here
+    image: postbidimage.src, // add image only here
   },
   {
     label: "Prepare",
@@ -257,23 +211,32 @@ function Process() {
   const steps = tab === "tender" ? tenderSteps : bidderSteps;
 
   return (
-    <section id="process" className="px-4 sm:px-6 py-20 lg:py-32 bg-white">
+    <section
+      id="process"
+      className="px-4 sm:px-6 py-20 lg:py-32 bg-white"
+      aria-labelledby="process-heading"
+    >
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-black">
+        <header className="text-center mb-16">
+          <h1
+            id="process-heading"
+            className="text-3xl sm:text-4xl md:text-5xl font-bold text-black"
+          >
             How GoTenderly{" "}
-            <span className=" decoration-black/20">Works</span>
-          </h2>
+            <span className="decoration-black/20 underline">Works</span>
+          </h1>
           <p className="mt-6 sm:mt-9 text-base sm:text-lg text-gray-700 max-w-3xl mx-auto px-4">
             {tab === "tender"
               ? "Create detailed project specifications and receive qualified bids from verified suppliers."
               : "Browse tender opportunities, prepare accurate quotes and submit them with confidence."}
           </p>
-
           {/* Tabs */}
           <div className="mt-7 flex justify-center">
-            <div className="inline-flex items-center rounded-xl bg-gray-100 border border-gray-300 p-1">
+            <nav
+              className="inline-flex items-center rounded-xl bg-gray-100 border border-gray-300 p-1"
+              aria-label="Process tabs"
+            >
               <button
                 onClick={() => setTab("tender")}
                 className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg text-sm sm:text-base font-medium transition ${
@@ -281,10 +244,10 @@ function Process() {
                     ? "bg-black text-white"
                     : "text-black hover:bg-gray-200"
                 }`}
+                aria-selected={tab === "tender"}
               >
                 For Tenderers
               </button>
-
               <button
                 onClick={() => setTab("bidder")}
                 className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg text-sm sm:text-base font-medium transition ${
@@ -292,46 +255,42 @@ function Process() {
                     ? "bg-black text-white"
                     : "text-black hover:bg-gray-200"
                 }`}
+                aria-selected={tab === "bidder"}
               >
                 For Bidders
               </button>
-            </div>
+            </nav>
           </div>
-        </div>
-
+        </header>
         {/* Responsive Bento Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-12 gap-6 auto-rows-[minmax(200px,auto)]">
           {steps.map((step, index) => {
             const Icon = step.icon;
-
             const gridSpan =
               index === 0
                 ? "col-span-1 sm:col-span-2 md:col-span-4 lg:col-span-6 row-span-2"
                 : index === 1
                 ? "col-span-1 sm:col-span-2 md:col-span-4 lg:col-span-6"
                 : "col-span-1 sm:col-span-2 md:col-span-4 lg:col-span-6";
-
             return (
               <Link
                 key={index}
                 href={step.href}
                 className={`group relative block w-full rounded-3xl bg-gray-50/50 border border-gray-100 p-6 sm:p-8 transition hover:bg-gray-50 ${gridSpan}`}
+                aria-label={step.title}
               >
                 <div className="flex flex-col w-full h-full justify-between">
                   <div className="w-full">
                     <span className="mt-2 inline-block text-xs font-semibold uppercase tracking-wider text-gray-600">
                       {step.label}
                     </span>
-
-                    <h3 className="mt-3 text-xl sm:text-2xl md:text-3xl font-semibold text-black">
+                    <h2 className="mt-3 text-xl sm:text-2xl md:text-3xl font-semibold text-black">
                       {step.title}
-                    </h3>
-
+                    </h2>
                     <p className="mt-3 text-sm sm:text-base text-gray-700 leading-relaxed">
                       {step.description}
                     </p>
                   </div>
-
                   {step.image && (
                     <div className="py-8 my-4 bg-white rounded-xl">
                       <img
@@ -341,7 +300,6 @@ function Process() {
                       />
                     </div>
                   )}
-
                   <div className="mt-4 sm:mt-6 flex items-center gap-2 text-black font-medium">
                     <span>{step.linkText}</span>
                     <ArrowRight
@@ -359,205 +317,13 @@ function Process() {
   );
 }
 
-
-/* --------------------------- HowItWorksDetailed --------------------------- */
-function HowItWorksDetailed() {
-  const steps = [
-    {
-      audience: "For tenderers (buyers)",
-      items: [
-        "Post your tender (title, category, deadline, optional budget, deliverables).",
-        "Use Q/A to clarify specs or request revisions without revealing identity.",
-        "Compare & shortlist side-by-side, then award the winner (identities reveal after award).",
-      ],
-    },
-    {
-      audience: "For bidders (suppliers)",
-      items: [
-        "Register & browse matching tenders.",
-        "Submit your bid (price, ETA, terms, attachments); update anytime before the deadline.",
-        "Negotiate privately until the tenderer awards; identities reveal post-award for contracting.",
-      ],
-    },
-  ];
-  return (
-    <section
-      id="how-it-works-detailed"
-      className="py-16 md:py-24 lg:py-32 bg-[#fbfbfd]"
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-16"
-        >
-          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight text-[#1d1d1f] mb-4 leading-tight">
-            How it works, step by step.
-          </h2>
-          <p className="text-base md:text-lg lg:text-xl text-[#6e6e73] max-w-2xl mx-auto leading-7">
-            Clear actions for both tenderers and bidders.
-          </p>
-        </motion.div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {steps.map((s, i) => (
-            <motion.div
-              key={s.audience}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: i * 0.1 }}
-            >
-              <h3 className="text-xl sm:text-2xl font-semibold text-[#1d1d1f] mb-6 leading-tight">
-                {s.audience}
-              </h3>
-              <ol className="space-y-4">
-                {s.items.map((item, idx) => (
-                  <li
-                    key={idx}
-                    className="flex items-start gap-3 text-sm md:text-base text-[#6e6e73] leading-6"
-                  >
-                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[#38b6ff] text-white text-sm font-medium flex items-center justify-center">
-                      {idx + 1}
-                    </span>
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ol>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ----------------------------- Testimonials ------------------------------- */
-function Testimonials() {
-  return (
-    <section
-      id="testimonials"
-      className="bg-gray-50/30 py-16 md:py-24 lg:py-32 px-4 sm:px-8"
-    >
-      <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 items-start gap-12">
-          {/* Left Image */}
-          <div className="w-full h-full bg-gray-200 rounded-md flex items-center justify-center overflow-hidden">
-            <div className="relative w-full h-[300px] sm:h-[400px] md:h-[500px] lg:h-[600px]">
-              <Image
-                src="https://www.shutterstock.com/image-photo/positive-handsome-arabic-businessman-beard-600nw-2510267591.jpg"
-                alt="Arabic businessman smiling in office"
-                fill
-                className="object-cover rounded-md"
-                sizes="(max-width: 768px) 100vw, 50vw"
-              />
-            </div>
-          </div>
-          {/* Right Content */}
-          <div className="flex flex-col justify-between h-full">
-            {/* Centered Content */}
-            <div className="flex flex-col justify-center flex-1">
-              {/* Star Rating */}
-              <div className="flex gap-1 mb-6">
-                {[...Array(5)].map((_, i) => (
-                  <svg
-                    key={i}
-                    className="w-5 h-5 text-gray-900"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                  </svg>
-                ))}
-              </div>
-              {/* Quote */}
-              <p className="text-2xl md:text-3xl leading-relaxed text-gray-900 mb-6 text-center md:text-left">
-                “Our tender platform cut through bureaucratic barriers like a
-                sharp knife through paper. We won contracts we never thought
-                possible.”
-              </p>
-              {/* Author */}
-              <div className="flex items-center justify-center md:justify-start gap-4">
-                <div>
-                  <p className="font-medium text-base md:text-lg text-gray-900">
-                    Michael Roberts
-                  </p>
-                  <p className="text-sm md:text-md text-gray-600">
-                    CEO, Global Construction
-                  </p>
-                </div>
-                <div className="flex items-center">
-                  <span className="text-gray-900 text-5xl mx-3">|</span>
-                  <svg
-                    className="w-auto h-full text-gray-900"
-                    viewBox="0 0 80 20"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M0 10L5 10L10 5L15 15L20 0L25 10L30 10L35 5L40 15L45 0L50 10L55 10L60 5L65 15L70 0L75 10L80 10"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    />
-                  </svg>
-                  <span className="ml-1 text-xs md:text-sm font-medium text-gray-900">
-                    Webflow
-                  </span>
-                </div>
-              </div>
-            </div>
-            {/* Bottom Navigation */}
-            <div className="flex items-center justify-between mt-12">
-              <div className="flex gap-2">
-                <div className="w-2 h-2 bg-gray-900 rounded-full"></div>
-                <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
-                <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
-              </div>
-              <div className="flex gap-2">
-                <button className="p-2 border border-gray-300 rounded-md hover:bg-gray-50/30 transition">
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 19l-7-7 7-7"
-                    />
-                  </svg>
-                </button>
-                <button className="p-2 border border-gray-300 rounded-md hover:bg-gray-50/30 transition">
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* --------------------------------- CTA ------------------------------------ */
 function CTA() {
   return (
-    <section id="cta" className="py-16 md:py-24 lg:py-32 text-black">
+    <section
+      id="cta"
+      className="py-16 md:py-24 lg:py-32 text-black"
+      aria-labelledby="cta-heading"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
@@ -567,15 +333,16 @@ function CTA() {
           className="relative overflow-hidden rounded-lg border border-white/10 bg-gray-100 p-8 sm:p-12 lg:p-20"
         >
           <div className="relative z-10 max-w-3xl mx-auto text-center">
-            <motion.h2
+            <motion.h1
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.2 }}
+              id="cta-heading"
               className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight leading-tight mb-10"
             >
               Get better quotes without the back-and-forth.
-            </motion.h2>
+            </motion.h1>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -588,6 +355,7 @@ function CTA() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   className="bg-white text-black hover:bg-white/90 rounded-full px-8 h-14 text-base md:text-lg font-medium flex items-center gap-2"
+                  aria-label="Post your tender for free"
                 >
                   Post your tender for free <ArrowRight className="w-5 h-5" />
                 </motion.a>
@@ -611,51 +379,51 @@ function CTA() {
 
 function About() {
   const [hovered, setHovered] = useState(false);
-
   return (
     <section
       id="about"
       className="flex justify-center items-center bg-gray-50/30 py-24 px-4 sm:px-6 lg:px-12"
+      aria-labelledby="about-heading"
     >
       <div className="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
         {/* LEFT: Text */}
         <div className="flex flex-col gap-8">
-          <div className="flex flex-col gap-4">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold font-outfit text-Color-Scheme-1-Text leading-tight">
+          <header className="flex flex-col gap-4">
+            <h1
+              id="about-heading"
+              className="text-3xl sm:text-4xl md:text-5xl font-semibold font-outfit text-Color-Scheme-1-Text leading-tight"
+            >
               Built for both Tenderers & Bidders
-            </h2>
+            </h1>
             <p className="text-base md:text-lg font-inter text-Color-Scheme-1-Text/90 leading-relaxed">
               Whether you're posting a project or competing for one, our
               marketplace connects verified buyers and suppliers to make the
               tendering process transparent, fast, and fair.
             </p>
-          </div>
-
+          </header>
           {/* FEATURES */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-            <div className="flex flex-col gap-3">
-              <h3 className="text-lg sm:text-xl font-semibold font-outfit text-Color-Scheme-1-Text">
+            <article className="flex flex-col gap-3">
+              <h2 className="text-lg sm:text-xl font-semibold font-outfit text-Color-Scheme-1-Text">
                 For Tenderers
-              </h3>
+              </h2>
               <p className="text-sm md:text-base font-inter text-Color-Scheme-1-Text/90">
                 Post once and reach verified bidders instantly. Compare quotes,
                 timelines, and offers side-by-side while staying anonymous until
                 the award.
               </p>
-            </div>
-
-            <div className="flex flex-col gap-3">
-              <h3 className="text-lg sm:text-xl font-semibold font-outfit text-Color-Scheme-1-Text">
+            </article>
+            <article className="flex flex-col gap-3">
+              <h2 className="text-lg sm:text-xl font-semibold font-outfit text-Color-Scheme-1-Text">
                 For Bidders
-              </h3>
+              </h2>
               <p className="text-sm md:text-base font-inter text-Color-Scheme-1-Text/90">
                 Access live tenders from real buyers, ask questions, and submit
                 bids that stand out. Manage proposals and awards all in one
                 secure workspace.
               </p>
-            </div>
+            </article>
           </div>
-
           {/* CTA BUTTONS */}
           <div className="flex flex-wrap gap-4 pt-4">
             <Link href="#hero">
@@ -670,9 +438,8 @@ function About() {
             </Link>
           </div>
         </div>
-
         {/* RIGHT: Image with hover effect */}
-        <div
+        <figure
           className="relative w-full h-auto rounded-xl overflow-hidden transition-transform duration-300 flex justify-center items-center"
           onMouseEnter={() => setHovered(true)}
           onMouseLeave={() => setHovered(false)}
@@ -680,66 +447,26 @@ function About() {
           {/* Default image */}
           <Image
             src={tendersimage}
-            alt="Business dashboard"
+            alt="Tenders dashboard"
             className={`transition-opacity duration-500 ${
               hovered ? "opacity-0" : "opacity-100"
-            }  h-full object-contain`}
+            } h-full object-contain`}
             priority
           />
-
           {/* Hover image */}
           <Image
             src={biddersimage}
-            alt="Individual dashboard"
+            alt="Bidders dashboard"
             className={`absolute inset-0 transition-opacity duration-500 ${
               hovered ? "opacity-100" : "opacity-0"
-            }  h-full object-contain`}
+            } h-full object-contain`}
             priority
           />
-        </div>
+        </figure>
       </div>
     </section>
   );
 }
-
-const smallServices = [
-  {
-    title: "Automotive services (repair, detailing, tires)",
-    description:
-      "HM’s SUV needs brake pads and a full detail. Not sure of fair pricing or downtime. HM posted the plate/model and preferred time window. Garages responded with parts options (OEM/aftermarket), ETAs, and warranty notes; a detailer asked in Q/A about interior shampoo vs. quick wash. HM picked a garage that offered pick-up/drop-off and a detail combo , problem solved in one go.",
-    linkText: "Browse",
-    bgImage:
-      "https://images.pexels.com/photos/279949/pexels-photo-279949.jpeg?auto=compress&cs=tinysrgb&w=600",
-    href: "/tenders?category=automotive",
-  },
-  {
-    title: "Events (weddings, corporate, birthdays)",
-    description:
-      "MA is planning a small wedding in Al Wakrah: catering for 120, décor, DJ, and photo/video. Vendors were scattered and hard to coordinate. SA posted the budget range, menu style, and venue restrictions. Using Q/A, suppliers clarified power load and layout. SA quickly compared package breakdowns, shortlisted two, negotiated extras (LED dance floor), and awarded a single vendor bundle.",
-    linkText: "View details",
-    bgImage:
-      "https://images.pexels.com/photos/1190298/pexels-photo-1190298.jpeg?auto=compress&cs=tinysrgb&w=600",
-    href: "/tenders?category=events",
-  },
-  {
-    title: "Construction & renovation (small works, fit-outs, repairs)",
-    description:
-      "AA wants a kitchen refres, cabinet re-facing and new countertop. Past quotes were inconsistent and missed measurements. AB posted with drawings/photos and a rough timeline. Contractors used Q/A to ask about materials and site access; AB added dimensions. Comparable bids arrived with line-item costs and lead times. AB awarded one contractor and arranged a site visit after award.",
-    linkText: "Compare now",
-    bgImage:
-      "https://images.pexels.com/photos/1216589/pexels-photo-1216589.jpeg?auto=compress&cs=tinysrgb&w=600",
-    href: "/tenders?category=construction",
-  },
-  {
-    title: "Facilities management & building maintenance",
-    description:
-      "LT needs a combined soft/hard FM contract: daily cleaning plus quarterly HVAC maintenance. Previous suppliers covered only part of the scope. LT posted a single tender with SLAs and KPIs. In Q/A, bidders confirmed consumables, call-out times, and preventive schedules. LT compared consolidated proposals, checked references, and awarded one provider for the whole site.",
-    linkText: "Get started",
-    bgImage:
-      "https://images.pexels.com/photos/416405/pexels-photo-416405.jpeg?auto=compress&cs=tinysrgb&w=600",
-    href: "/tenders?category=facilities",
-  },
-];
 
 const allServices = [
   {
@@ -827,8 +554,6 @@ const allServices = [
     href: "/tenders?category=education",
   },
 ];
-
-/* duplicate for seamless loop */
 const duplicated = [...allServices, ...allServices];
 
 function Services() {
@@ -842,7 +567,6 @@ function Services() {
     if (!topRef.current || topPaused) return;
     const el = topRef.current;
     let id: number;
-
     const step = () => {
       el.scrollLeft -= 1;
       if (el.scrollLeft <= 0) el.scrollLeft = el.scrollWidth / 2;
@@ -857,7 +581,6 @@ function Services() {
     if (!bottomRef.current || bottomPaused) return;
     const el = bottomRef.current;
     let id: number;
-
     const step = () => {
       el.scrollLeft += 1;
       if (el.scrollLeft >= el.scrollWidth / 2) el.scrollLeft = 0;
@@ -871,7 +594,7 @@ function Services() {
     const Icon = service.icon;
     return (
       <Link key={idx} href={service.href} className="block">
-        <div className="group flex-shrink-0 w-80 bg-white rounded-xl transition-all duration-300 p-6 flex flex-col h-full border border-gray-100 hover:-lg hover:-translate-y-1">
+        <article className="group flex-shrink-0 w-80 bg-white rounded-xl transition-all duration-300 p-6 flex flex-col h-full border border-gray-100 hover:-lg hover:-translate-y-1">
           <div className="w-14 h-14 flex items-center justify-center rounded-full bg-gray-100 text-gray-700 mb-5">
             <Icon size={28} />
           </div>
@@ -888,7 +611,7 @@ function Services() {
               className="transition-transform group-hover:translate-x-1"
             />
           </button>
-        </div>
+        </article>
       </Link>
     );
   };
@@ -897,21 +620,24 @@ function Services() {
     <section
       id="services"
       className="px-4 sm:px-6 py-16 md:py-24 lg:py-32 bg-gray-50/90 overflow-hidden"
+      aria-labelledby="services-heading"
     >
       <div className="max-w-7xl mx-auto">
         {/* ---------- Header ---------- */}
-        <div className="max-w-3xl mx-auto text-center mb-12 md:mb-16">
+        <header className="max-w-3xl mx-auto text-center mb-12 md:mb-16">
           <span className="text-Color-Scheme-1-Text text-sm md:text-base font-semibold font-inter leading-6">
             Use cases (Qatar)
           </span>
-          <h2 className="mt-3 text-3xl sm:text-4xl md:text-5xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight">
+          <h1
+            id="services-heading"
+            className="mt-3 text-3xl sm:text-4xl md:text-5xl font-medium font-outfit text-Color-Scheme-1-Text leading-tight"
+          >
             Tenders across Qatar's key industries
-          </h2>
+          </h1>
           <p className="mt-4 text-base md:text-lg font-normal font-inter text-Color-Scheme-1-Text leading-7">
             Find the right solution for every project need
           </p>
-        </div>
-
+        </header>
         {/* ---------- Two-Row Carousel ---------- */}
         <div className="relative space-y-1">
           {/* TOP ROW – right to left */}
@@ -938,7 +664,6 @@ function Services() {
             <div className="pointer-events-none absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-gray-50 to-transparent z-10" />
             <div className="pointer-events-none absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-gray-50 to-transparent z-10" />
           </div>
-
           {/* BOTTOM ROW – left to right */}
           <div
             onMouseEnter={() => setBottomPaused(true)}
@@ -957,7 +682,6 @@ function Services() {
           </div>
         </div>
       </div>
-
       {/* Hide scrollbars */}
       <style jsx>{`
         .scrollbar-hide {
@@ -1018,7 +742,6 @@ const faqs = [
 
 function FAQ2() {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
-
   const toggleFAQ = (index: number) => {
     setActiveIndex(activeIndex === index ? null : index);
   };
@@ -1027,37 +750,43 @@ function FAQ2() {
     <section
       id="faq"
       className="px-4 sm:px-8 md:px-16 py-20 md:py-28 bg-white text-black flex flex-col items-center"
+      aria-labelledby="faq-heading"
     >
-      <div className="max-w-3xl w-full text-center mb-12">
-        <h2 className="text-4xl sm:text-5xl font-semibold mb-4 font-outfit">
+      <header className="max-w-3xl w-full text-center mb-12">
+        <h1
+          id="faq-heading"
+          className="text-4xl sm:text-5xl font-semibold mb-4 font-outfit"
+        >
           Frequently Asked Questions
-        </h2>
+        </h1>
         <p className="text-gray-400 text-base md:text-lg font-inter">
           Common questions about tendering on Tenderly
         </p>
-      </div>
-
+      </header>
       <div className="w-full max-w-3xl space-y-6">
         {faqs.map((faq, index) => (
-          <div
+          <details
             key={index}
             className="border border-white/10 rounded-2xl p-6 bg-white/5 hover:bg-white/10 transition-all duration-100"
+            open={activeIndex === index}
           >
-            <button
-              className="flex justify-between items-center w-full text-left"
-              onClick={() => toggleFAQ(index)}
+            <summary
+              className="flex justify-between items-center w-full text-left list-none cursor-pointer"
+              onClick={(e) => {
+                e.preventDefault();
+                toggleFAQ(index);
+              }}
             >
-              <h3 className="text-lg md:text-xl font-medium font-inter">
+              <h2 className="text-lg md:text-xl font-medium font-inter">
                 {faq.question}
-              </h3>
+              </h2>
               <motion.div
                 animate={{ rotate: activeIndex === index ? 180 : 0 }}
                 transition={{ duration: 0.3 }}
               >
                 <ChevronDown className="w-6 h-6 text-gray-950" />
               </motion.div>
-            </button>
-
+            </summary>
             <AnimatePresence initial={false}>
               {activeIndex === index && (
                 <motion.div
@@ -1074,7 +803,7 @@ function FAQ2() {
                 </motion.div>
               )}
             </AnimatePresence>
-          </div>
+          </details>
         ))}
       </div>
     </section>
@@ -1093,7 +822,7 @@ function Problems() {
     },
     {
       title:
-        "Briefing vendors – Compare price, ETA, and notes in one view  no need to repeat the same brief to every vendor.",
+        "Briefing vendors – Compare price, ETA, and notes in one view no need to repeat the same brief to every vendor.",
     },
     {
       title:
@@ -1112,6 +841,7 @@ function Problems() {
         "Negotiations – Keep everything in one private thread for faster awards, instead of scattered calls and emails.",
     },
   ];
+
   return (
     <section
       id="problems"
@@ -1120,27 +850,29 @@ function Problems() {
         backdropFilter: "blur(12px)",
         WebkitBackdropFilter: "blur(12px)",
       }}
+      aria-labelledby="problems-heading"
     >
       {/* Optional: Subtle animated background blobs for depth */}
       <div className="absolute inset-0 -z-10 overflow-hidden">
         <div className="absolute -top-40 -left-40 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute -bottom-40 -right-40 w-80 h-80 bg-teal-500/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
       </div>
-
       <div className="max-w-7xl mx-auto">
-        <div className="max-w-3xl mx-auto text-center mb-12 md:mb-16">
-          <h2 className="mt-3 text-3xl sm:text-4xl md:text-5xl font-medium font-outfit text-black  leading-tight">
+        <header className="max-w-3xl mx-auto text-center mb-12 md:mb-16">
+          <h1
+            id="problems-heading"
+            className="mt-3 text-3xl sm:text-4xl md:text-5xl font-medium font-outfit text-black leading-tight"
+          >
             The smarter way to handle <br /> Projects in Qatar
-          </h2>
-          <p className="mt-4 text-base md:text-lg font-normal font-inter text-black/80  leading-7">
+          </h1>
+          <p className="mt-4 text-base md:text-lg font-normal font-inter text-black/80 leading-7">
             The platform every bidder and client actually loves.
           </p>
-        </div>
-
+        </header>
         <div className="mt-12">
           {/* Glass Card */}
           <div
-            className="rounded-2xl border border-white/20  shadow-sm backdrop-blur-xl"
+            className="rounded-2xl border border-white/20 shadow-sm backdrop-blur-xl"
             style={{
               background: "rgba(255, 255, 255, 0.12)",
             }}
@@ -1179,13 +911,13 @@ function Problems() {
                         </td>
                         {/* Check Icon */}
                         <td className="px-6 py-5 text-center">
-                          <span className="inline-flex items-center justify-center w-8 h-8 rounded-full  text-emerald-400">
+                          <span className="inline-flex items-center justify-center w-8 h-8 rounded-full text-emerald-400">
                             <Check className="w-8 h-8" />
                           </span>
                         </td>
                         {/* Cross Icon */}
                         <td className="px-6 py-5 text-center">
-                          <span className="inline-flex items-center justify-center w-8 h-8 rounded-full  text-red-400">
+                          <span className="inline-flex items-center justify-center w-8 h-8 rounded-full text-red-400">
                             <X className="w-8 h-8" />
                           </span>
                         </td>
@@ -1208,30 +940,34 @@ function PricingSection() {
     <section
       id="pricing"
       className="py-16 md:py-24 lg:py-32 px-4 sm:px-6 bg-white text-foreground"
+      aria-labelledby="pricing-heading"
     >
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-16 max-w-3xl mx-auto">
+        <header className="text-center mb-16 max-w-3xl mx-auto">
           <p className="text-xs md:text-sm font-medium text-muted-foreground uppercase tracking-wider mb-2 leading-5">
             Offer & pricing
           </p>
-          <h2 className="text-3xl sm:text-4xl font-semibold mb-4 leading-tight">
+          <h1
+            id="pricing-heading"
+            className="text-3xl sm:text-4xl font-semibold mb-4 leading-tight"
+          >
             Flexible Projects solutions
-          </h2>
+          </h1>
           <p className="text-sm md:text-base text-muted-foreground leading-6">
             Scale your tender strategy with transparent, adaptable pricing for
             every business need.
           </p>
-        </div>
+        </header>
         {/* Two Pricing Cards Side by Side */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Tenderer Plan */}
           <Card className="border border-gray-300 bg-white -sm hover:-md transition-all duration-300 flex flex-col h-full">
             <CardContent className="p-8 flex flex-col justify-between h-full">
               <div>
-                <h3 className="text-2xl font-semibold mb-2 leading-tight text-black">
+                <h2 className="text-2xl font-semibold mb-2 leading-tight text-black">
                   Tenderer Plan
-                </h3>
+                </h2>
                 <div className="flex items-baseline">
                   <span className="text-5xl font-bold text-black">Free</span>
                   <span className="ml-2 text-gray-500 text-base">forever</span>
@@ -1241,7 +977,6 @@ function PricingSection() {
                   no cost, no limits.
                 </p>
               </div>
-
               <Link href="#hero">
                 <Button
                   variant="secondary"
@@ -1252,14 +987,13 @@ function PricingSection() {
               </Link>
             </CardContent>
           </Card>
-
           {/* Bidder Plan */}
           <Card className="border border-gray-300 bg-white -sm hover:-md transition-all duration-300 flex flex-col h-full">
             <CardContent className="p-8 flex flex-col justify-between h-full">
               <div>
-                <h3 className="text-2xl font-semibold mb-2 leading-tight text-black">
+                <h2 className="text-2xl font-semibold mb-2 leading-tight text-black">
                   Bidder Plan
-                </h3>
+                </h2>
                 <div className="flex items-baseline">
                   <span className="text-5xl font-bold text-black">100</span>
                   <span className="ml-2 text-gray-500 text-base">
@@ -1271,11 +1005,10 @@ function PricingSection() {
                   tenders that matter to you.
                 </p>
               </div>
-
               <Link href="#hero">
                 <Button
                   variant="secondary"
-                  className="mt-8 w-full  bg-black/90 text-white font-normal rounded-md text-base transition-all duration-200"
+                  className="mt-8 w-full bg-black/90 text-white font-normal rounded-md text-base transition-all duration-200"
                 >
                   Get Started, Browse Tenders
                 </Button>
@@ -1288,137 +1021,32 @@ function PricingSection() {
   );
 }
 
-const supplierCards = [
-  {
-    title: "Register",
-    subtitle: "Tagline",
-    desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    cta: "Sign Up",
-    href: "/signup",
-  },
-  {
-    title: "Browse tenders",
-    subtitle: "Tagline",
-    desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    cta: "Explore",
-    href: "/tenders",
-  },
-  {
-    title: "Submit bid",
-    subtitle: "Tagline",
-    desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    cta: "Bid Now",
-    href: "/signup",
-  },
-];
-
-function Suppliers() {
-  return (
-    <section
-      id="suppliers"
-      className="px-4 sm:px-6 md:px-8 py-16 bg-background text-foreground"
-    >
-      <div className="max-w-7xl mx-auto text-center">
-        <div className="mb-6">
-          <span className="block text-sm font-semibold text-muted-foreground">
-            Suppliers
-          </span>
-          <h2 className="mt-3 text-3xl sm:text-4xl font-medium">
-            Bid on relevant tenders
-          </h2>
-          <p className="mt-2 text-sm sm:text-base text-muted-foreground">
-            Connect with genuine buyers and showcase your services effectively.
-          </p>
-        </div>
-
-        <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {supplierCards.map((card, i) => (
-            <Link key={i} href={card.href} className="block">
-              <article className="flex flex-col bg-white border rounded-md overflow-hidden -sm">
-                {/* Image / visual area */}
-                <div className="h-56 bg-gray-100 flex items-center justify-center">
-                  <svg
-                    className="w-14 h-14 text-gray-300"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="1.5"
-                      d="M3 7a2 2 0 012-2h3l2 3h6a2 2 0 012 2v7a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"
-                    />
-                  </svg>
-                </div>
-
-                {/* Body */}
-                <div className="p-5 flex-1 flex flex-col justify-between">
-                  <div>
-                    <span className="text-xs text-muted-foreground block mb-2">
-                      {card.subtitle}
-                    </span>
-                    <h3 className="text-lg font-medium mb-2">{card.title}</h3>
-                    <p className="text-sm text-muted-foreground">{card.desc}</p>
-                  </div>
-
-                  <div className="mt-4">
-                    <button
-                      type="button"
-                      className="inline-flex items-center text-sm font-medium text-primary hover:underline focus:outline-none"
-                      aria-label={`${card.cta} ${card.title}`}
-                    >
-                      <span>{card.cta}</span>
-                      <svg
-                        className="ml-2 w-4 h-4"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 5l7 7-7 7"
-                        />
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-              </article>
-            </Link>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
 function SaasVideo() {
   return (
     <section
       id="video"
       className="w-full py-16 md:py-24 lg:py-32 bg-gray-50/30 overflow-hidden"
+      aria-labelledby="video-heading"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
+        <motion.header
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
           className="text-center mb-12"
         >
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight text-gray-900 mb-4 leading-tight">
+          <h1
+            id="video-heading"
+            className="text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight text-gray-900 mb-4 leading-tight"
+          >
             See GoTenderly in Action
-          </h2>
+          </h1>
           <p className="text-base md:text-lg text-gray-600 max-w-2xl mx-auto leading-7">
             Watch how easy it is to post a tender, receive competitive bids, and
             award the best supplier all in under 2 minutes.
           </p>
-        </motion.div>
-
+        </motion.header>
         <motion.div
           initial={{ opacity: 0, scale: 0.98 }}
           whileInView={{ opacity: 1, scale: 1 }}
@@ -1440,7 +1068,6 @@ function SaasVideo() {
               />
               Your browser does not support the video tag.
             </video>
-
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <motion.div
                 whileHover={{ scale: 1.1 }}
@@ -1453,11 +1080,9 @@ function SaasVideo() {
                 />
               </motion.div>
             </div>
-
             <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
           </div>
         </motion.div>
-
         {/* CTA Below Video */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -1483,25 +1108,30 @@ function SaasVideo() {
     </section>
   );
 }
+
 function DashboardShowcase() {
   const [hovered, setHovered] = useState(false);
-
   return (
-    <section className="w-full py-16 md:py-24 lg:py-32 bg-white overflow-hidden">
+    <section
+      className="w-full py-16 md:py-24 lg:py-32 bg-white overflow-hidden"
+      aria-labelledby="dashboard-heading"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <motion.div
+        <motion.header
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
           className="text-center mb-6"
         >
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight text-gray-900">
+          <h1
+            id="dashboard-heading"
+            className="text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight text-gray-900"
+          >
             Individual & Business Dashboards
-          </h2>
-        </motion.div>
-
+          </h1>
+        </motion.header>
         {/* Description below heading */}
         <motion.p
           initial={{ opacity: 0, y: 10 }}
@@ -1517,9 +1147,8 @@ function DashboardShowcase() {
           Experience seamless interaction through our intuitive dashboard
           system.
         </motion.p>
-
         {/* Dashboard Preview */}
-        <motion.div
+        <motion.figure
           initial={{ opacity: 0, scale: 1 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
@@ -1551,18 +1180,17 @@ function DashboardShowcase() {
                 />
               </motion.div>
             </div>
-
             {/* Label */}
-            <motion.div
+            <motion.figcaption
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: "easeOut", delay: 0.3 }}
               className="absolute top-4 left-4 bg-black/70 backdrop-blur-md rounded-full px-4 py-2 text-white font-medium text-sm"
             >
               {hovered ? "Individual" : "Business"}
-            </motion.div>
+            </motion.figcaption>
           </motion.div>
-        </motion.div>
+        </motion.figure>
         {/* Buttons */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -1588,6 +1216,7 @@ function DashboardShowcase() {
     </section>
   );
 }
+
 /* -------------------------------------------------------------------------- */
 /* PAGE EXPORT */
 /* -------------------------------------------------------------------------- */

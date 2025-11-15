@@ -162,11 +162,11 @@ export default async function BlogPostPage({
                 </div>
               </div>
               {post.image && (
-                <div className="mt-16 overflow-hidden rounded-2xl border bg-muted/50 ">
+                <div className="mt-16 overflow-hidden rounded-2xl  bg-muted/50 ">
                   <img
                     src={post.image}
                     alt={post.title}
-                    className="aspect-video w-full object-cover transition-transform duration-500 hover:scale-[1.02]"
+                    className="aspect-video w-full object-contain transition-transform duration-500 hover:scale-[1.02]"
                     loading="lazy"
                   />
                 </div>
