@@ -528,7 +528,7 @@ export default function page() {
 
   if (loading) {
     return (
-      <div className="w-full h-full flex items-center justify-center h-[400px]">
+      <div className="w-full h-full flex items-center justify-center ">
         <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
         <span className="ml-2 text-sm text-gray-500">
           {t("loading_dashboard_data")}

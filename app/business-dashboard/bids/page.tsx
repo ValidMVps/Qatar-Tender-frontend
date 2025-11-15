@@ -43,7 +43,6 @@ import {
   DollarSign,
   Calendar,
   FileText,
-  Lock,
   Trophy,
   MoreHorizontal,
   Pencil,
@@ -62,11 +61,8 @@ import { useTranslation } from "../../../lib/hooks/useTranslation";
 // Services
 import {
   getUserBids,
-  updateBid as apiUpdateBid,
-  updateBidStatus as apiUpdateBidStatus,
   deleteBid,
   resubmitRevisedBid,
-  retryBidPayment,
 } from "@/app/services/BidService";
 import { getTender } from "@/app/services/tenderService";
 import PageTransitionWrapper from "@/components/animations/PageTransitionWrapper";
@@ -372,12 +368,7 @@ export default function MyBidsPage() {
     }
   };
 
-  const handleEditBid = async (id: string) => {
-    toast({
-      title: "Edit",
-      description: "Redirect to edit page (implement route).",
-    });
-  };
+
 
   const handleGoToChat = (bidId: string) => {
     toast({

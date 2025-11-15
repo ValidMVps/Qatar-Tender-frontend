@@ -2,8 +2,6 @@ import fs from "fs";
 import path from "path";
 import { notFound } from "next/navigation";
 import { format } from "date-fns";
-import { Lightbulb } from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import NavbarLanding from "@/components/Navbarladning";
 import Footer from "@/components/Footer";

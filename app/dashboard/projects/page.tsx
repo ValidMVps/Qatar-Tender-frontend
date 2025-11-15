@@ -11,17 +11,15 @@ import {
   Circle,
   CheckCircle2,
 } from "lucide-react";
-import Link from "next/link";
 import ChatSection from "@/components/ChatSection";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { getUserTenders, getTender } from "@/app/services/tenderService";
 import { useAuth } from "@/context/AuthContext";
-import { useTranslation } from "react-i18next";
 import { getUserBids } from "@/app/services/BidService";
-import { ProjectDetailsSidebarawarded } from "@/components/project-details-sidebar-awarded";
 import PageTransitionWrapper from "@/components/animations/PageTransitionWrapper";
 import { ProjectDetailsSidebar } from "@/components/project-details-sidebar";
+import useTranslation from "@/lib/hooks/useTranslation";
 
 // Define User type
 type User = {
@@ -293,7 +291,7 @@ export default function Component() {
                 <div className="grid flex-1 h-full overflow-hidden grid-cols-1 md:grid-cols-12 gap-4 p-4">
                   {/* Left Sidebar - Project List (Desktop) */}
                   <div className="hidden md:flex md:col-span-4 lg:col-span-3 flex-col overflow-y-scroll">
-                    <div className="bg-white/80 backdrop-blur-sm rounded-2xl h-10 border border-gray-200/60 shadow-lg shadow-gray-200/40 dark:bg-gray-900/80 dark:border-gray-700/60 dark:shadow-gray-900/40 h-full flex flex-col overflow-hidden">
+                    <div className="bg-white/80 backdrop-blur-sm rounded-2xl  border border-gray-200/60 shadow-lg shadow-gray-200/40 dark:bg-gray-900/80 dark:border-gray-700/60 dark:shadow-gray-900/40 h-full flex flex-col overflow-hidden">
                       {/* Header */}
                       <div className="flex items-center justify-between p-6 pb-4 border-b border-gray-100 dark:border-gray-700/50">
                         <div className="flex items-center gap-3">

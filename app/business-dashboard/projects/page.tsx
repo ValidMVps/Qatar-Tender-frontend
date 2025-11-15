@@ -17,10 +17,11 @@ import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { getUserTenders, getTender } from "@/app/services/tenderService";
 import { useAuth } from "@/context/AuthContext";
-import { useTranslation } from "react-i18next";
+
 import { getUserBids } from "@/app/services/BidService";
 import { ProjectDetailsSidebar } from "@/components/project-details-sidebar";
 import PageTransitionWrapper from "@/components/animations/PageTransitionWrapper";
+import useTranslation from "@/lib/hooks/useTranslation";
 
 // Types
 type User = { _id: string; email: string; userType: string };

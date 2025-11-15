@@ -2,7 +2,6 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 
-// --- Rate limiting configuration ---
 const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
 const RATE_LIMIT_MAX = 3;
 const rateLimitMap = new Map<string, { count: number; timestamp: number }>();

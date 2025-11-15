@@ -23,12 +23,12 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
-import { useTranslation } from "react-i18next";
 import { updateTenderStatus } from "@/app/services/tenderService";
 import { createReview, getReviewForTender } from "@/app/services/ReviewService";
 import { getTenderBids, updateBidStatus } from "@/app/services/BidService";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
+import useTranslation from "@/lib/hooks/useTranslation";
 
 interface ProjectDetailsSidebarProps
   extends React.ComponentPropsWithoutRef<"div"> {

@@ -3,18 +3,14 @@ import React, { useEffect, useMemo, useState } from "react";
 import {
   Search,
   XCircle,
-  Save,
   Filter,
   Grid,
   List,
   CheckCircle,
-  Star,
-  DollarSign,
   MapPin,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
   Select,
@@ -23,8 +19,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Accordion,
   AccordionContent,
@@ -51,9 +45,7 @@ import {
   PopoverContent,
 } from "@/components/ui/popover";
 
-const escapeRegExp = (string: string) => {
-  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-};
+
 
 const HighlightText = ({
   text,
